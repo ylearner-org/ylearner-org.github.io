@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Lambda Functions – Anonymous Functions Explained | YLearner</title>
+  <meta name="description" content="Master Python lambda functions. Learn the syntax, real-world use cases with map(), filter(), sorted(), and when to use lambda vs def with clear examples.">
+  <meta name="keywords" content="python lambda, lambda function python, python anonymous function, python lambda examples, map filter lambda">
+  <link rel="canonical" href="https://ylearner-org.github.io/python/functions/lambda.html">
+  <meta property="og:title" content="Python Lambda Functions – Complete Guide | YLearner">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">Y<span>Learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/functions/function-basics.html">Functions</a><span class="separator">›</span>
+          <span class="current">Lambda Functions</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Functions</div>
+          <h1>Python Lambda Functions – The Complete Guide</h1>
+          <p class="lesson-intro">A lambda function is a small, anonymous function defined in a single line using the <code>lambda</code> keyword. Unlike regular functions defined with <code>def</code>, lambdas don't have a name, and their body is a single expression. They're incredibly useful for short operations, especially when passed to higher-order functions like <code>map()</code>, <code>filter()</code>, and <code>sorted()</code>.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2024</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="syntax">Lambda Syntax</h2>
+          <p>The syntax for a lambda function is:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">lambda arguments: expression
+
+# vs a regular function
+def function_name(arguments):
+    return expression</code></pre>
+          </div>
+
+          <p>Key rules:</p>
+          <ul>
+            <li>Can take any number of arguments but only <strong>one expression</strong></li>
+            <li>The expression is automatically returned — no <code>return</code> keyword</li>
+            <li>Cannot contain statements (<code>if/else</code> blocks, loops, assignments)</li>
+            <li>Can use conditional expressions (ternary): <code>x if condition else y</code></li>
+          </ul>
+
+          <h2 id="basic-examples">Basic Lambda Examples</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Regular function
+def square(x):
+    return x ** 2
+
+# Equivalent lambda
+square = lambda x: x ** 2
+
+print(square(5))   # 25
+print(square(10))  # 100
+
+# Multiple arguments
+add = lambda a, b: a + b
+print(add(3, 7))   # 10
+
+# No arguments
+greet = lambda: "Hello, World!"
+print(greet())     # Hello, World!
+
+# With conditional expression
+absolute = lambda x: x if x >= 0 else -x
+print(absolute(-5))  # 5
+print(absolute(3))   # 3</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+25
+100
+10
+Hello, World!
+5
+3
+          </div>
+
+          <h2 id="with-map">Lambda with map()</h2>
+          <p><code>map(function, iterable)</code> applies a function to every item in an iterable. Lambda is perfect here:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">numbers = [1, 2, 3, 4, 5]
+
+# Square every number
+squares = list(map(lambda x: x ** 2, numbers))
+print(squares)  # [1, 4, 9, 16, 25]
+
+# Convert temperatures from Celsius to Fahrenheit
+celsius = [0, 20, 37, 100]
+fahrenheit = list(map(lambda c: (c * 9/5) + 32, celsius))
+print(fahrenheit)  # [32.0, 68.0, 98.6, 212.0]
+
+# Capitalize all strings
+names = ["alice", "bob", "charlie"]
+capitalized = list(map(lambda s: s.capitalize(), names))
+print(capitalized)  # ['Alice', 'Bob', 'Charlie']</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+[1, 4, 9, 16, 25]
+[32.0, 68.0, 98.6, 212.0]
+['Alice', 'Bob', 'Charlie']
+          </div>
+
+          <h2 id="with-filter">Lambda with filter()</h2>
+          <p><code>filter(function, iterable)</code> keeps only items where the function returns <code>True</code>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+# Keep only even numbers
+evens = list(filter(lambda x: x % 2 == 0, numbers))
+print(evens)  # [2, 4, 6, 8, 10]
+
+# Keep numbers greater than 5
+greater = list(filter(lambda x: x > 5, numbers))
+print(greater)  # [6, 7, 8, 9, 10]
+
+# Filter non-empty strings
+words = ["hello", "", "world", "", "python"]
+non_empty = list(filter(lambda s: s, words))
+print(non_empty)  # ['hello', 'world', 'python']
+
+# Filter based on length
+long_words = list(filter(lambda w: len(w) > 4, words))
+print(long_words)  # ['hello', 'world', 'python']</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="with-sorted">Lambda with sorted()</h2>
+          <p>The <code>key</code> parameter in <code>sorted()</code> accepts a function — lambda makes this concise:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Sort by string length
+fruits = ["banana", "apple", "fig", "cherry", "kiwi"]
+by_length = sorted(fruits, key=lambda s: len(s))
+print(by_length)  # ['fig', 'kiwi', 'apple', 'banana', 'cherry']
+
+# Sort in reverse
+by_length_desc = sorted(fruits, key=lambda s: len(s), reverse=True)
+print(by_length_desc)  # ['banana', 'cherry', 'apple', 'kiwi', 'fig']
+
+# Sort list of tuples by second element
+points = [(1, 3), (4, 1), (2, 5), (3, 2)]
+by_y = sorted(points, key=lambda p: p[1])
+print(by_y)  # [(4, 1), (3, 2), (1, 3), (2, 5)]
+
+# Sort list of dicts by a key
+students = [
+    {"name": "Alice", "grade": 88},
+    {"name": "Bob", "grade": 95},
+    {"name": "Charlie", "grade": 72}
+]
+by_grade = sorted(students, key=lambda s: s["grade"], reverse=True)
+for s in by_grade:
+    print(f"{s['name']}: {s['grade']}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+['fig', 'kiwi', 'apple', 'banana', 'cherry']
+['banana', 'cherry', 'apple', 'kiwi', 'fig']
+[(4, 1), (3, 2), (1, 3), (2, 5)]
+Bob: 95
+Alice: 88
+Charlie: 72
+          </div>
+
+          <h2 id="lambda-vs-def">Lambda vs def – When to Use Which</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Situation</th><th>Use Lambda</th><th>Use def</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Simple one-line expression</td><td>✅</td><td>Overkill</td></tr>
+                <tr><td>Passed inline to another function</td><td>✅</td><td>Possible but verbose</td></tr>
+                <tr><td>Multiple lines of logic</td><td>❌ Not possible</td><td>✅</td></tr>
+                <tr><td>Needs a docstring</td><td>❌</td><td>✅</td></tr>
+                <tr><td>Reused multiple times</td><td>❌ (use def for clarity)</td><td>✅</td></tr>
+                <tr><td>Error handling (try/except)</td><td>❌</td><td>✅</td></tr>
+                <tr><td>Key in sorted()/min()/max()</td><td>✅</td><td>Possible</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>PEP 8 Guideline on Lambda</strong>
+              <p>Avoid assigning a lambda to a variable (<code>f = lambda x: x+1</code>) — that's what <code>def</code> is for. Use lambda anonymously, inline, where a function object is needed temporarily.</p>
+            </div>
+          </div>
+
+          <h2 id="advanced-patterns">Advanced Lambda Patterns</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from functools import reduce
+
+# Lambda with reduce() — sum all numbers
+numbers = [1, 2, 3, 4, 5]
+total = reduce(lambda acc, x: acc + x, numbers)
+print(total)  # 15
+
+# Lambda returning another lambda (currying)
+multiply = lambda x: (lambda y: x * y)
+double = multiply(2)
+triple = multiply(3)
+print(double(5))   # 10
+print(triple(5))   # 15
+
+# Lambda in a dictionary (dispatch table)
+operations = {
+    'add': lambda a, b: a + b,
+    'sub': lambda a, b: a - b,
+    'mul': lambda a, b: a * b,
+    'div': lambda a, b: a / b if b != 0 else "Error: division by zero"
+}
+
+result = operations['mul'](6, 7)
+print(result)  # 42</code></pre>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Use <code>map()</code> and lambda to convert a list of prices (floats) to strings with a "$" prefix.</li>
+              <li>Use <code>filter()</code> and lambda to extract all negative numbers from a list.</li>
+              <li>Sort a list of dictionaries representing products by price (lowest first).</li>
+              <li>Use <code>reduce()</code> and lambda to find the product (multiplication) of all elements in a list.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a mini functional data pipeline using only lambdas and higher-order functions. Given a list of raw employee records (dicts with name, salary, department), use lambda + filter to get only Engineering dept, lambda + map to give them a 10% raise, and lambda + sorted to sort by new salary. Print the final list.</p>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a lambda function in Python? How is it different from a regular function?</li>
+            <li>Can a lambda function have multiple lines? Why or why not?</li>
+            <li>What are the common use cases for lambda functions?</li>
+            <li>What is the difference between map() and filter()? Give examples with lambda.</li>
+            <li>What does the sorted() key parameter do? Provide a lambda example.</li>
+            <li>When should you prefer def over lambda? What does PEP 8 say about it?</li>
+            <li>Can lambda functions access variables from the enclosing scope (closures)?</li>
+          </ul>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Lambda creates an anonymous function: <code>lambda args: expression</code></li>
+              <li>The expression is automatically returned — no <code>return</code> needed</li>
+              <li>Best used inline with <code>map()</code>, <code>filter()</code>, <code>sorted()</code>, and <code>reduce()</code></li>
+              <li>Cannot contain multiple statements, loops, or assignments</li>
+              <li>Can use ternary expressions: <code>lambda x: x if x > 0 else 0</code></li>
+              <li>PEP 8 recommends using <code>def</code> when assigning to a variable name</li>
+            </ul>
+          </div>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/functions/function-basics.html" class="topic-tag">⚙️ Function Basics</a>
+            <a href="/python/data-structures/list-comprehensions.html" class="topic-tag">📝 List Comprehensions</a>
+            <a href="/python/advanced/decorators.html" class="topic-tag">🎯 Decorators</a>
+            <a href="/python/advanced/generators.html" class="topic-tag">⚡ Generators</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can a lambda function have a default parameter? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes: <code>lambda x, y=10: x + y</code>. The second parameter defaults to 10 if not provided.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can you use *args or **kwargs in a lambda? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes: <code>lambda *args: sum(args)</code> and <code>lambda **kwargs: kwargs</code> are both valid. This lets lambdas accept variable arguments.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is a list comprehension faster than map() + lambda? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Generally yes — list comprehensions are slightly faster and more Pythonic for most cases. Use <code>[x**2 for x in nums]</code> over <code>list(map(lambda x: x**2, nums))</code>. Use map+lambda when you already have a named function to pass in.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/functions/return-values.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Return Values</span>
+          </a>
+          <a href="/python/functions/scope.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Scope</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 YLearner Python Tutorial</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

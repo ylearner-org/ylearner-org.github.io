@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flask Python Tutorial – Build Your First Web App | YLearner</title>
+  <meta name="description" content="Complete Flask tutorial: install Flask, create routes, handle GET/POST requests, use Jinja2 templates, build a REST API, and understand Flask project structure.">
+  <meta name="keywords" content="flask tutorial, flask python, flask web app, flask routes, jinja2 templates, flask rest api, python web framework, flask beginner">
+  <link rel="canonical" href="https://ylearner-org.github.io/python/frameworks/flask.html">
+  <meta property="og:title" content="Flask Python Tutorial – Build Your First Web App | YLearner">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">Y<span>Learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/frameworks/">Frameworks</a><span class="separator">›</span>
+          <span class="current">Flask</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">⚡ Frameworks</div>
+          <h1>Flask Python Tutorial – Build Your First Web App</h1>
+          <p class="lesson-intro">Flask is a lightweight, "micro" web framework for Python that gives you everything you need to build web applications without imposing rigid conventions. It is the perfect starting point for learning web development with Python — simple enough to go from zero to a running app in minutes, yet powerful enough to build production APIs used by companies like Pinterest and LinkedIn. This tutorial takes you from installation to a fully functional REST API.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 30 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2024</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="what-is-flask">What is Flask?</h2>
+          <p>Flask is a Python web framework built on top of <strong>Werkzeug</strong> (WSGI toolkit) and <strong>Jinja2</strong> (templating engine). It is called a "micro" framework because it ships with minimal built-in tooling — no built-in database layer, form validation, or admin interface. Instead, you pick exactly the extensions you need.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Feature</th><th>Flask</th><th>Django</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Philosophy</td><td>Micro — add what you need</td><td>Batteries included</td></tr>
+                <tr><td>Learning curve</td><td>Gentle</td><td>Steeper</td></tr>
+                <tr><td>Flexibility</td><td>Very high</td><td>More opinionated</td></tr>
+                <tr><td>Best for</td><td>APIs, small–medium apps</td><td>Full-stack, CMS, large teams</td></tr>
+                <tr><td>ORM</td><td>Not built-in (use SQLAlchemy)</td><td>Built-in Django ORM</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="installing-flask">Installing Flask</h2>
+          <p>Flask is installed via pip. It is always best practice to work inside a virtual environment:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Shell</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-bash"># Create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate        # macOS / Linux
+# venv\Scripts\activate         # Windows
+
+# Install Flask
+pip install flask
+
+# Verify the installation
+python -c "import flask; print(flask.__version__)"
+# 3.0.x</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always use a virtual environment</strong>
+              <p>A virtual environment isolates your project's dependencies from your system Python and other projects. This prevents version conflicts and keeps your environment reproducible.</p>
+            </div>
+          </div>
+
+          <h2 id="first-flask-app">Your First Flask Application</h2>
+          <p>A minimal Flask app is just a few lines. Create a file called <code>app.py</code>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python – app.py</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from flask import Flask
+
+app = Flask(__name__)   # Create the Flask application instance
+
+@app.route("/")         # Register a route for the root URL
+def home():
+    return "Hello, Flask!"
+
+if __name__ == "__main__":
+    app.run(debug=True)  # Start the development server</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Shell</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-bash">python app.py</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+ * Running on http://127.0.0.1:5000
+ * Debug mode: on
+          </div>
+
+          <p>Open your browser at <code>http://127.0.0.1:5000</code> and you will see "Hello, Flask!". That is your first web application running.</p>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>debug=True is for development only</strong>
+              <p>Debug mode enables auto-reloading on code changes and an interactive debugger in the browser. Never use <code>debug=True</code> in production — it exposes your code and allows arbitrary code execution.</p>
+            </div>
+          </div>
+
+          <h2 id="routes">Routes and URL Rules</h2>
+          <p>A <strong>route</strong> maps a URL path to a Python function (called a <em>view function</em>). The <code>@app.route()</code> decorator registers the mapping.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Home Page"
+
+@app.route("/about")
+def about():
+    return "About Page"
+
+# Dynamic route — captures URL segment as a parameter
+@app.route("/user/&lt;username&gt;")
+def user_profile(username):
+    return f"Profile page for {username}"
+
+# Type-converters: string (default), int, float, path, uuid
+@app.route("/post/&lt;int:post_id&gt;")
+def show_post(post_id):
+    return f"Post #{post_id}"
+
+# Multiple URLs for the same view
+@app.route("/home")
+@app.route("/index")
+def index():
+    return "You reached the index!"
+
+if __name__ == "__main__":
+    app.run(debug=True)</code></pre>
+          </div>
+
+          <p>Visit <code>/user/alice</code> and Flask calls <code>user_profile("alice")</code>. Visit <code>/post/42</code> and Flask calls <code>show_post(42)</code> with an integer, not a string.</p>
+
+          <h2 id="http-methods">HTTP Methods – GET and POST</h2>
+          <p>By default, routes only accept GET requests. Use the <code>methods</code> argument to support POST, PUT, DELETE, and others:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from flask import Flask, request
+
+app = Flask(__name__)
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        if username == "admin" and password == "secret":
+            return f"Welcome, {username}!"
+        return "Invalid credentials", 401
+    # GET request — show the login form
+    return """
+    &lt;form method="post"&gt;
+      &lt;input name="username" placeholder="Username"&gt;
+      &lt;input name="password" type="password" placeholder="Password"&gt;
+      &lt;button type="submit"&gt;Log In&lt;/button&gt;
+    &lt;/form&gt;
+    """</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="the-request-object">The request Object</h2>
+          <p>Flask's <code>request</code> is a global context object that holds all information about the incoming HTTP request:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from flask import Flask, request
+
+app = Flask(__name__)
+
+@app.route("/data", methods=["GET", "POST"])
+def data():
+    # --- GET parameters from query string: /data?name=alice&age=30
+    name = request.args.get("name", "anonymous")
+    age  = request.args.get("age", "unknown")
+
+    # --- POST form data
+    form_value = request.form.get("field_name")
+
+    # --- JSON body (for API requests)
+    json_data = request.get_json()          # Returns None if not JSON
+
+    # --- Request metadata
+    print(request.method)           # GET, POST, etc.
+    print(request.url)              # Full URL
+    print(request.remote_addr)      # Client IP
+    print(request.headers)          # All HTTP headers
+    print(request.cookies)          # Cookies dict
+
+    return f"Hello {name}, age {age}"</code></pre>
+          </div>
+
+          <h2 id="jinja2-templates">Templates with Jinja2</h2>
+          <p>Instead of returning HTML strings, Flask uses <strong>Jinja2</strong> templates — HTML files with special syntax for variables, conditionals, and loops. Store templates in a <code>templates/</code> folder next to your app:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python – app.py</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from flask import Flask, render_template
+
+app = Flask(__name__)
+
+@app.route("/users")
+def users():
+    user_list = [
+        {"name": "Alice", "role": "admin"},
+        {"name": "Bob",   "role": "editor"},
+        {"name": "Carol", "role": "viewer"},
+    ]
+    return render_template("users.html", users=user_list, title="User List")</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML – templates/users.html</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;{{ title }}&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;{{ title }}&lt;/h1&gt;
+  &lt;ul&gt;
+    {% for user in users %}
+      &lt;li&gt;{{ user.name }} — &lt;em&gt;{{ user.role }}&lt;/em&gt;&lt;/li&gt;
+    {% endfor %}
+  &lt;/ul&gt;
+  {% if users|length == 0 %}
+    &lt;p&gt;No users found.&lt;/p&gt;
+  {% endif %}
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          </div>
+
+          <p>Jinja2 syntax uses <code>{{ variable }}</code> for output and <code>{% tag %}</code> for logic. Common tags include <code>for</code>, <code>if</code>, <code>elif</code>, <code>else</code>, <code>block</code>, and <code>extends</code>.</p>
+
+          <h3 id="template-inheritance">Template Inheritance</h3>
+          <p>Jinja2 supports template inheritance to avoid repeating your HTML boilerplate across pages:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML – templates/base.html</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;{% block title %}My App{% endblock %}&lt;/title&gt;
+  &lt;link rel="stylesheet" href="/static/style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;nav&gt;&lt;a href="/"&gt;Home&lt;/a&gt; | &lt;a href="/about"&gt;About&lt;/a&gt;&lt;/nav&gt;
+  &lt;main&gt;{% block content %}{% endblock %}&lt;/main&gt;
+  &lt;footer&gt;&amp;copy; 2024 MyApp&lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML – templates/home.html</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">{% extends "base.html" %}
+
+{% block title %}Home – MyApp{% endblock %}
+
+{% block content %}
+  &lt;h1&gt;Welcome!&lt;/h1&gt;
+  &lt;p&gt;This content is injected into the base template.&lt;/p&gt;
+{% endblock %}</code></pre>
+          </div>
+
+          <h2 id="returning-json">Returning JSON – Building an API</h2>
+          <p>Flask makes it trivial to return JSON responses, which is the foundation of REST APIs:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from flask import Flask, jsonify, request, abort
+
+app = Flask(__name__)
+
+# In-memory "database"
+books = [
+    {"id": 1, "title": "Fluent Python", "author": "Luciano Ramalho"},
+    {"id": 2, "title": "Clean Code",    "author": "Robert C. Martin"},
+]
+
+# GET all books
+@app.route("/api/books", methods=["GET"])
+def get_books():
+    return jsonify(books)
+
+# GET a single book
+@app.route("/api/books/&lt;int:book_id&gt;", methods=["GET"])
+def get_book(book_id):
+    book = next((b for b in books if b["id"] == book_id), None)
+    if book is None:
+        abort(404)   # Returns a 404 JSON error
+    return jsonify(book)
+
+# POST — create a new book
+@app.route("/api/books", methods=["POST"])
+def create_book():
+    data = request.get_json()
+    if not data or "title" not in data:
+        abort(400, description="title is required")
+    new_book = {
+        "id": max(b["id"] for b in books) + 1,
+        "title": data["title"],
+        "author": data.get("author", "Unknown"),
+    }
+    books.append(new_book)
+    return jsonify(new_book), 201   # 201 Created
+
+# DELETE a book
+@app.route("/api/books/&lt;int:book_id&gt;", methods=["DELETE"])
+def delete_book(book_id):
+    global books
+    books = [b for b in books if b["id"] != book_id]
+    return "", 204   # 204 No Content
+
+if __name__ == "__main__":
+    app.run(debug=True)</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Test with curl</div>
+# GET all books
+curl http://localhost:5000/api/books
+
+# POST a new book
+curl -X POST -H "Content-Type: application/json" \
+     -d '{"title": "Python Tricks", "author": "Dan Bader"}' \
+     http://localhost:5000/api/books
+
+# DELETE book #1
+curl -X DELETE http://localhost:5000/api/books/1
+          </div>
+
+          <h2 id="project-structure">Flask Project Structure</h2>
+          <p>For anything beyond a single file, organise your Flask project like this:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Project Layout</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-text">my_flask_app/
+├── app/
+│   ├── __init__.py        # create_app() factory function
+│   ├── routes/
+│   │   ├── __init__.py
+│   │   ├── main.py        # Blueprint: general pages
+│   │   └── api.py         # Blueprint: API endpoints
+│   ├── models.py          # SQLAlchemy database models
+│   ├── templates/
+│   │   ├── base.html
+│   │   └── home.html
+│   └── static/
+│       ├── style.css
+│       └── app.js
+├── tests/
+│   └── test_routes.py
+├── config.py              # Configuration classes
+├── requirements.txt
+└── run.py                 # Entry point: from app import create_app</code></pre>
+          </div>
+
+          <h3 id="blueprints">Flask Blueprints</h3>
+          <p>Blueprints let you split your app into modular components:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python – app/routes/api.py</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from flask import Blueprint, jsonify
+
+api_bp = Blueprint("api", __name__, url_prefix="/api/v1")
+
+@api_bp.route("/status")
+def status():
+    return jsonify({"status": "ok", "version": "1.0"})</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python – app/__init__.py</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from flask import Flask
+from .routes.api import api_bp
+
+def create_app(config=None):
+    app = Flask(__name__)
+    app.config.from_object(config or "config.DevelopmentConfig")
+    app.register_blueprint(api_bp)
+    return app</code></pre>
+          </div>
+
+          <h2 id="flask-config">Configuration</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python – config.py</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import os
+
+class Config:
+    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-key-change-in-prod")
+    DEBUG = False
+    TESTING = False
+
+class DevelopmentConfig(Config):
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///dev.db"
+
+class ProductionConfig(Config):
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
+    # Never hardcode production secrets!</code></pre>
+          </div>
+
+          <h2 id="deploying-flask">Deploying Flask</h2>
+          <p>Flask's built-in server is not suitable for production. Use a WSGI server like <strong>Gunicorn</strong> behind a reverse proxy like <strong>Nginx</strong>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Shell</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-bash"># Install Gunicorn
+pip install gunicorn
+
+# Run with 4 worker processes
+gunicorn -w 4 -b 0.0.0.0:8000 "app:create_app()"
+
+# For Docker: create a Dockerfile
+# FROM python:3.12-slim
+# WORKDIR /app
+# COPY requirements.txt .
+# RUN pip install -r requirements.txt
+# COPY . .
+# CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "app:create_app()"]</code></pre>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercises</h3>
+            <ol>
+              <li>Create a Flask app with at least three routes: home, about, and a dynamic <code>/greet/&lt;name&gt;</code> page that renders a Jinja2 template.</li>
+              <li>Build a simple to-do API (in memory) with GET (list all), POST (create), and DELETE (by id) endpoints. Test using <code>curl</code> or Postman.</li>
+              <li>Add a <code>/search</code> route that accepts a <code>q</code> query parameter and returns matching items from a list.</li>
+              <li>Refactor your app to use a Blueprint and the application factory pattern.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge: Mini Blog API</h3>
+            <p>Build a REST API for a mini blog with Flask. Requirements: posts have <code>id</code>, <code>title</code>, <code>body</code>, <code>author</code>, and <code>created_at</code> fields. Implement CRUD (GET all, GET one, POST, PUT/PATCH update, DELETE). Add validation — title and body are required. Return proper HTTP status codes (200, 201, 204, 400, 404). Store data in memory. Bonus: add pagination via <code>?page=1&per_page=5</code> query params.</p>
+          </div>
+
+          <ul class="interview-list">
+            <li>What is Flask and how does it differ from Django?</li>
+            <li>What does <code>Flask(__name__)</code> do? Why pass <code>__name__</code>?</li>
+            <li>How do you handle both GET and POST requests in the same route?</li>
+            <li>What is <code>request.args</code> vs <code>request.form</code> vs <code>request.get_json()</code>?</li>
+            <li>What is Jinja2 and how do you pass variables to a template?</li>
+            <li>What is a Flask Blueprint and why would you use one?</li>
+            <li>What WSGI server would you use to deploy a Flask app in production?</li>
+            <li>What does <code>abort(404)</code> do in Flask?</li>
+            <li>Why should you never use <code>debug=True</code> in production?</li>
+          </ul>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Flask is a lightweight Python micro-framework for building web apps and APIs.</li>
+              <li>Install with <code>pip install flask</code> inside a virtual environment.</li>
+              <li>Use <code>@app.route("/path")</code> to register URL rules; add <code>methods=["POST"]</code> for non-GET routes.</li>
+              <li>The <code>request</code> object holds query params (<code>.args</code>), form data (<code>.form</code>), and JSON (<code>.get_json()</code>).</li>
+              <li><code>render_template()</code> renders Jinja2 HTML templates stored in the <code>templates/</code> folder.</li>
+              <li><code>jsonify()</code> returns JSON responses with the correct <code>Content-Type</code> header.</li>
+              <li>Blueprints and the application factory pattern keep larger apps maintainable.</li>
+              <li>Use Gunicorn + Nginx to deploy Flask in production; never use the dev server.</li>
+            </ul>
+          </div>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/frameworks/django.html" class="topic-tag">🏗️ Django</a>
+            <a href="/python/frameworks/fastapi.html" class="topic-tag">⚡ FastAPI</a>
+            <a href="/python/advanced/decorators.html" class="topic-tag">✨ Decorators</a>
+            <a href="/python/real-world/debugging.html" class="topic-tag">🐛 Debugging</a>
+            <a href="/python/data-science/numpy.html" class="topic-tag">📊 NumPy</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Is Flask good for large applications? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, with proper structure. Use Blueprints to split the app into modules, an application factory to manage configuration, and extensions like Flask-SQLAlchemy, Flask-Login, and Flask-Migrate. Many large-scale applications are built on Flask.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between Flask and FastAPI? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>FastAPI is an async-first framework with built-in data validation via Pydantic, automatic OpenAPI docs, and native <code>async/await</code> support. Flask is synchronous by default (though Flask 2.x supports async) and is a more established ecosystem. Choose FastAPI for new API-only projects; Flask for projects needing Jinja2 templating or that have a large existing Flask ecosystem.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I add a database to Flask? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <strong>Flask-SQLAlchemy</strong> (<code>pip install flask-sqlalchemy</code>) for an ORM-based approach with SQLite, PostgreSQL, or MySQL. For schema migrations, add <strong>Flask-Migrate</strong>. For simple key-value needs, Flask-Caching or direct Redis integration work well.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I handle CORS in Flask? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Install <strong>Flask-CORS</strong> (<code>pip install flask-cors</code>) and apply it: <code>from flask_cors import CORS; CORS(app)</code>. You can restrict origins, headers, and methods as needed.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/real-world/debugging.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Debugging</span>
+          </a>
+          <a href="/python/frameworks/django.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Django</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 YLearner Python Tutorial</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

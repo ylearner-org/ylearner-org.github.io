@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Classes & OOP – __init__, self, Methods, Objects | YLearner</title>
+  <meta name="description" content="Learn Python object-oriented programming: define classes with class keyword, use __init__ and self, create instance and class attributes, write methods, and build real-world examples like BankAccount, Car, and Student.">
+  <meta name="keywords" content="python classes, python oop, python __init__, python self, python instance attributes, python class methods, python objects, object oriented programming python">
+  <link rel="canonical" href="https://ylearner-org.github.io/python/oop/classes.html">
+  <meta property="og:title" content="Python Classes & Objects – Complete OOP Guide | YLearner">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo">
+      <div class="logo-icon">Py</div>
+      <span class="logo-text">Y<span>Learner</span></span>
+    </a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar">
+      <nav id="sidebarNav"></nav>
+    </aside>
+
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/oop/">OOP</a><span class="separator">›</span>
+          <span class="current">Classes &amp; Objects</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🏗️ OOP</div>
+          <h1>Python Classes &amp; Objects – The Complete OOP Guide</h1>
+          <p class="lesson-intro">Object-Oriented Programming (OOP) is a paradigm that organizes code around <em>objects</em> — self-contained units that combine <strong>data</strong> (attributes) and <strong>behavior</strong> (methods). Python is a fully object-oriented language, and understanding classes is essential for writing clean, scalable, real-world programs. This lesson covers the <code>class</code> keyword, the <code>__init__</code> constructor, <code>self</code>, instance vs class attributes, instance methods, the <code>__str__</code> and <code>__repr__</code> magic methods, and multiple complete real-world class examples.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 35 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2024</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="what-is-oop">What is Object-Oriented Programming?</h2>
+          <p>In procedural programming you write functions that operate on data passed to them. In OOP you bundle the data and the functions that operate on it into a single unit called an <strong>object</strong>. Objects are created from a blueprint called a <strong>class</strong>.</p>
+
+          <p>Think of it this way:</p>
+          <ul>
+            <li>A <strong>class</strong> is like an architectural blueprint for a house.</li>
+            <li>An <strong>object</strong> (instance) is an actual house built from that blueprint.</li>
+            <li>You can build many houses from one blueprint, each with different colours, sizes, and occupants.</li>
+          </ul>
+
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="info-card-icon">📦</div>
+              <h3>Encapsulation</h3>
+              <p>Bundle data and methods together. Hide internal details; expose a clean interface.</p>
+            </div>
+            <div class="info-card">
+              <div class="info-card-icon">♻️</div>
+              <h3>Reusability</h3>
+              <p>Define a class once; create as many objects as you need. Subclasses inherit and extend behavior.</p>
+            </div>
+            <div class="info-card">
+              <div class="info-card-icon">🔧</div>
+              <h3>Maintainability</h3>
+              <p>Fix a bug in a class and every object of that class benefits. Changes are localized.</p>
+            </div>
+            <div class="info-card">
+              <div class="info-card-icon">🌍</div>
+              <h3>Modelling Reality</h3>
+              <p>Code mirrors real-world entities: <code>BankAccount</code>, <code>Car</code>, <code>Student</code> — making intent clear.</p>
+            </div>
+          </div>
+
+          <h2 id="defining-a-class">Defining a Class</h2>
+          <p>Use the <code>class</code> keyword followed by the class name (by convention in <strong>PascalCase</strong>) and a colon. The class body is indented.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Minimal class
+class Dog:
+    pass  # 'pass' is a placeholder for an empty body
+
+# Creating an object (instance) of the class
+my_dog = Dog()
+print(type(my_dog))    # <class '__main__.Dog'>
+print(my_dog)          # <__main__.Dog object at 0x...></code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+&lt;class '__main__.Dog'&gt;
+&lt;__main__.Dog object at 0x7f3a1b2c3d40&gt;
+          </div>
+
+          <h2 id="init-method">The __init__ Method (Constructor)</h2>
+          <p><code>__init__</code> is a special <strong>magic method</strong> (also called a dunder method — short for "double underscore"). It is automatically called whenever a new object is created from the class. Use it to set up the initial state of each object.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class Dog:
+    def __init__(self, name, breed, age):
+        # These are INSTANCE ATTRIBUTES
+        self.name = name
+        self.breed = breed
+        self.age = age
+
+# Create instances — __init__ is called automatically
+dog1 = Dog("Rex", "Labrador", 3)
+dog2 = Dog("Bella", "Poodle", 5)
+
+# Access attributes using dot notation
+print(dog1.name)    # Rex
+print(dog2.breed)   # Poodle
+print(dog1.age)     # 3
+
+# Each object has its OWN copy of instance attributes
+print(dog1.name == dog2.name)  # False - different objects</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Rex
+Poodle
+3
+False
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>What is self?</strong>
+              <p><code>self</code> is a reference to the <em>current object</em> (the instance being created or used). When you call <code>dog1.bark()</code>, Python automatically passes <code>dog1</code> as the first argument — that's <code>self</code>. The name "self" is a convention, not a keyword, but you should always use it.</p>
+            </div>
+          </div>
+
+          <h2 id="instance-methods">Instance Methods</h2>
+          <p>Methods are functions defined inside a class. The first parameter is always <code>self</code>, giving them access to the object's attributes.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class Dog:
+    def __init__(self, name, breed, age):
+        self.name = name
+        self.breed = breed
+        self.age = age
+
+    def bark(self):
+        return f"{self.name} says: Woof!"
+
+    def describe(self):
+        return f"{self.name} is a {self.age}-year-old {self.breed}."
+
+    def have_birthday(self):
+        self.age += 1
+        print(f"Happy Birthday {self.name}! Now {self.age} years old.")
+
+# Create objects and call methods
+rex = Dog("Rex", "Labrador", 3)
+print(rex.bark())
+print(rex.describe())
+
+rex.have_birthday()
+print(rex.describe())   # age is now 4</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Rex says: Woof!
+Rex is a 3-year-old Labrador.
+Happy Birthday Rex! Now 4 years old.
+Rex is a 4-year-old Labrador.
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="class-attributes">Instance Attributes vs Class Attributes</h2>
+          <p><strong>Instance attributes</strong> are unique to each object (set via <code>self</code> in <code>__init__</code>). <strong>Class attributes</strong> are shared among all instances — they're defined directly inside the class body, outside any method.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class Dog:
+    # CLASS attribute — shared by ALL instances
+    species = "Canis lupus familiaris"
+    total_dogs = 0  # count all dogs ever created
+
+    def __init__(self, name, breed):
+        # INSTANCE attributes — unique to each object
+        self.name = name
+        self.breed = breed
+        Dog.total_dogs += 1  # update class attribute
+
+    def info(self):
+        return f"{self.name} ({self.breed}) | Species: {self.species}"
+
+d1 = Dog("Rex", "Labrador")
+d2 = Dog("Bella", "Poodle")
+d3 = Dog("Max", "Beagle")
+
+print(d1.info())
+print(d2.info())
+
+# Access class attribute via class or any instance
+print(f"Species: {Dog.species}")
+print(f"Total dogs created: {Dog.total_dogs}")  # 3
+
+# Instance attribute shadows class attribute if set on the instance
+d1.species = "Modified"        # creates a local instance attribute
+print(d1.species)              # Modified (local copy)
+print(d2.species)              # Canis lupus familiaris (class attribute unchanged)</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Rex (Labrador) | Species: Canis lupus familiaris
+Bella (Poodle) | Species: Canis lupus familiaris
+Species: Canis lupus familiaris
+Total dogs created: 3
+Modified
+Canis lupus familiaris
+          </div>
+
+          <h2 id="str-repr">__str__ and __repr__ Magic Methods</h2>
+          <p><code>__str__</code> controls what <code>print(obj)</code> displays — a human-friendly string. <code>__repr__</code> controls the developer representation shown in the REPL and debugging. If only <code>__repr__</code> is defined, <code>print()</code> falls back to it.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class Book:
+    def __init__(self, title, author, year, pages):
+        self.title = title
+        self.author = author
+        self.year = year
+        self.pages = pages
+
+    def __str__(self):
+        """Human-friendly string: used by print()"""
+        return f'"{self.title}" by {self.author} ({self.year})'
+
+    def __repr__(self):
+        """Developer/debug representation"""
+        return (f"Book(title={self.title!r}, author={self.author!r}, "
+                f"year={self.year}, pages={self.pages})")
+
+book = Book("Clean Code", "Robert Martin", 2008, 431)
+
+print(book)        # uses __str__
+print(repr(book))  # uses __repr__
+
+# In a list, __repr__ is used:
+library = [book, Book("The Pragmatic Programmer", "Hunt & Thomas", 1999, 352)]
+print(library)</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+"Clean Code" by Robert Martin (2008)
+Book(title='Clean Code', author='Robert Martin', year=2008, pages=431)
+[Book(title='Clean Code', author='Robert Martin', year=2008, pages=431), Book(title='The Pragmatic Programmer', author='Hunt & Thomas', year=1999, pages=352)]
+          </div>
+
+          <h2 id="bankaccount-example">Real-World Example: BankAccount</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class BankAccount:
+    """A simple bank account with deposit and withdrawal support."""
+
+    bank_name = "PyBank"   # class attribute
+
+    def __init__(self, owner, account_number, initial_balance=0):
+        self.owner = owner
+        self.account_number = account_number
+        self._balance = initial_balance   # _ = convention for "private"
+        self._transactions = []
+
+    def deposit(self, amount):
+        if amount <= 0:
+            raise ValueError("Deposit amount must be positive.")
+        self._balance += amount
+        self._transactions.append(("deposit", amount))
+        print(f"  Deposited ${amount:.2f}. New balance: ${self._balance:.2f}")
+
+    def withdraw(self, amount):
+        if amount <= 0:
+            raise ValueError("Withdrawal amount must be positive.")
+        if amount > self._balance:
+            print(f"  Insufficient funds. Balance: ${self._balance:.2f}")
+            return False
+        self._balance -= amount
+        self._transactions.append(("withdrawal", amount))
+        print(f"  Withdrew ${amount:.2f}. New balance: ${self._balance:.2f}")
+        return True
+
+    def get_balance(self):
+        return self._balance
+
+    def statement(self):
+        print(f"\n  {self.bank_name} Statement — {self.owner} ({self.account_number})")
+        print(f"  {'='*45}")
+        for t_type, amount in self._transactions:
+            symbol = "+" if t_type == "deposit" else "-"
+            print(f"  {symbol} ${amount:.2f}  ({t_type})")
+        print(f"  {'='*45}")
+        print(f"  Current Balance: ${self._balance:.2f}\n")
+
+    def __str__(self):
+        return f"BankAccount({self.owner}, ${self._balance:.2f})"
+
+
+# Use the class
+acc = BankAccount("Alice", "ACC-1001", initial_balance=1000)
+acc.deposit(500)
+acc.withdraw(200)
+acc.withdraw(2000)   # should fail
+acc.deposit(100)
+acc.statement()</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+  Deposited $500.00. New balance: $1500.00
+  Withdrew $200.00. New balance: $1300.00
+  Insufficient funds. Balance: $1300.00
+  Deposited $100.00. New balance: $1400.00
+
+  PyBank Statement — Alice (ACC-1001)
+  =============================================
+  + $500.00  (deposit)
+  - $200.00  (withdrawal)
+  + $100.00  (deposit)
+  =============================================
+  Current Balance: $1400.00
+          </div>
+
+          <h2 id="car-example">Real-World Example: Car</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class Car:
+    """Represents a car with fuel management."""
+
+    def __init__(self, make, model, year, fuel_capacity=60):
+        self.make = make
+        self.model = model
+        self.year = year
+        self.fuel_capacity = fuel_capacity  # litres
+        self._fuel_level = 0
+        self._odometer = 0
+
+    def fuel_up(self, litres=None):
+        """Fill to specified amount, or top up completely."""
+        if litres is None:
+            litres = self.fuel_capacity - self._fuel_level
+        added = min(litres, self.fuel_capacity - self._fuel_level)
+        self._fuel_level += added
+        print(f"  Added {added:.1f}L. Fuel: {self._fuel_level:.1f}/{self.fuel_capacity}L")
+
+    def drive(self, km, fuel_per_100km=8):
+        """Drive a number of km, consuming fuel."""
+        fuel_needed = (km / 100) * fuel_per_100km
+        if fuel_needed > self._fuel_level:
+            possible_km = (self._fuel_level / fuel_per_100km) * 100
+            print(f"  Not enough fuel! Can drive ~{possible_km:.0f} km.")
+            return
+        self._fuel_level -= fuel_needed
+        self._odometer += km
+        print(f"  Drove {km}km. Odometer: {self._odometer}km. Fuel left: {self._fuel_level:.1f}L")
+
+    def __str__(self):
+        return f"{self.year} {self.make} {self.model}"
+
+    def __repr__(self):
+        return f"Car('{self.make}', '{self.model}', {self.year})"
+
+
+my_car = Car("Toyota", "Camry", 2022)
+print(my_car)
+my_car.fuel_up(50)
+my_car.drive(200)
+my_car.drive(400)   # not enough fuel</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+2022 Toyota Camry
+  Added 50.0L. Fuel: 50.0/60L
+  Drove 200km. Odometer: 200km. Fuel left: 34.0L
+  Not enough fuel! Can drive ~425 km.
+          </div>
+
+          <h2 id="student-example">Real-World Example: Student</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class Student:
+    """Represents a university student with grade tracking."""
+
+    def __init__(self, name, student_id, major):
+        self.name = name
+        self.student_id = student_id
+        self.major = major
+        self._grades = {}  # {subject: grade}
+
+    def add_grade(self, subject, grade):
+        if not (0 <= grade <= 100):
+            raise ValueError("Grade must be between 0 and 100.")
+        self._grades[subject] = grade
+        print(f"  Added {subject}: {grade}")
+
+    def gpa(self):
+        if not self._grades:
+            return 0.0
+        return sum(self._grades.values()) / len(self._grades)
+
+    def letter_grade(self, score):
+        if score >= 90: return "A"
+        if score >= 80: return "B"
+        if score >= 70: return "C"
+        if score >= 60: return "D"
+        return "F"
+
+    def transcript(self):
+        print(f"\n  Transcript — {self.name} ({self.student_id})")
+        print(f"  Major: {self.major}")
+        print(f"  {'-'*35}")
+        for subject, grade in self._grades.items():
+            print(f"  {subject:<20}: {grade:>3}  ({self.letter_grade(grade)})")
+        print(f"  {'-'*35}")
+        print(f"  GPA: {self.gpa():.1f}  ({self.letter_grade(self.gpa())})\n")
+
+    def __str__(self):
+        return f"Student({self.name}, {self.student_id})"
+
+
+alice = Student("Alice Nguyen", "S20230042", "Computer Science")
+alice.add_grade("Python Programming", 95)
+alice.add_grade("Data Structures", 88)
+alice.add_grade("Mathematics", 92)
+alice.add_grade("English", 79)
+alice.transcript()</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+  Added Python Programming: 95
+  Added Data Structures: 88
+  Added Mathematics: 92
+  Added English: 79
+
+  Transcript — Alice Nguyen (S20230042)
+  Major: Computer Science
+  -----------------------------------
+  Python Programming   :  95  (A)
+  Data Structures      :  88  (B)
+  Mathematics          :  92  (A)
+  English              :  79  (C)
+  -----------------------------------
+  GPA: 88.5  (B)
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Single Underscore Convention</strong>
+              <p>Attributes prefixed with a single underscore (<code>_balance</code>, <code>_grades</code>) signal "internal/private — don't access directly from outside." Python doesn't enforce this, but it's a widely respected convention. Double underscore (<code>__attr</code>) triggers name mangling and provides slightly stronger protection.</p>
+            </div>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create a <code>Rectangle</code> class with <code>width</code> and <code>height</code> attributes. Add methods <code>area()</code>, <code>perimeter()</code>, and <code>is_square()</code>. Implement <code>__str__</code> to return something like <code>"Rectangle(4 x 6)"</code>.</li>
+              <li>Create a <code>Counter</code> class with a class attribute <code>instances_created = 0</code> that tracks how many Counter objects have ever been instantiated. Each Counter has an instance attribute <code>count = 0</code>, and methods <code>increment()</code>, <code>decrement()</code>, <code>reset()</code>, and <code>value()</code>.</li>
+              <li>Build a <code>Temperature</code> class that stores temperature in Celsius. Add methods <code>to_fahrenheit()</code>, <code>to_kelvin()</code>, and a <code>__str__</code> that shows the value in all three units.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge</h3>
+            <p>Design a <strong>Library Management System</strong> using two classes: <code>Book</code> (title, author, isbn, copies_available) and <code>Library</code> (name, collection of books). The <code>Library</code> class should have methods: <code>add_book(book)</code>, <code>checkout(isbn)</code> (reduce copies by 1; raise error if unavailable), <code>return_book(isbn)</code> (increase copies by 1), <code>search(query)</code> (return books where title or author contains the query), and <code>catalog()</code> (print all books with availability). Demonstrate checking out and returning books, and searching the catalog.</p>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions on Python Classes &amp; OOP</h2>
+          <ul class="interview-list">
+            <li>What is the difference between a class and an object (instance)?</li>
+            <li>What is <code>__init__</code> and when is it called?</li>
+            <li>What is <code>self</code>? Why must it be the first parameter of instance methods?</li>
+            <li>What is the difference between instance attributes and class attributes?</li>
+            <li>What are <code>__str__</code> and <code>__repr__</code>? How do they differ?</li>
+            <li>What do the four pillars of OOP stand for: Encapsulation, Abstraction, Inheritance, Polymorphism?</li>
+            <li>What does the single underscore prefix (<code>_attr</code>) signal? What about double underscore (<code>__attr</code>)?</li>
+            <li>How does Python's class-based OOP differ from classical OOP languages like Java?</li>
+          </ul>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A <strong>class</strong> is a blueprint; an <strong>object (instance)</strong> is a concrete entity built from that blueprint.</li>
+              <li>Define classes with <code>class ClassName:</code> using PascalCase naming.</li>
+              <li><code>__init__(self, ...)</code> is the constructor — it initialises instance attributes when an object is created.</li>
+              <li><code>self</code> refers to the current object; it must be the first parameter of every instance method.</li>
+              <li><strong>Instance attributes</strong> (<code>self.x</code>) are unique to each object; <strong>class attributes</strong> are shared by all instances.</li>
+              <li>Methods are functions defined inside a class that operate on <code>self</code>.</li>
+              <li><code>__str__</code> controls <code>print(obj)</code> output (human-readable); <code>__repr__</code> provides a developer/debug representation.</li>
+              <li>OOP enables encapsulation, reusability, and modelling of real-world entities — making large programs easier to manage.</li>
+            </ul>
+          </div>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/oop/constructors.html" class="topic-tag">🔨 Constructors</a>
+            <a href="/python/oop/inheritance.html" class="topic-tag">🧬 Inheritance</a>
+            <a href="/python/oop/encapsulation.html" class="topic-tag">🔒 Encapsulation</a>
+            <a href="/python/oop/magic-methods.html" class="topic-tag">✨ Magic Methods</a>
+            <a href="/python/functions/function-basics.html" class="topic-tag">⚙️ Functions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+
+            <div class="faq-item">
+              <div class="faq-question">Can you create a class without __init__? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. If you don't define <code>__init__</code>, Python uses the default inherited from <code>object</code> (every class implicitly inherits from <code>object</code>). The resulting instances have no instance attributes until you set them manually with <code>obj.attr = value</code>. In practice, almost all real classes define <code>__init__</code> to set up a predictable starting state.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between a method and a function? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A function is defined with <code>def</code> at the module level. A method is a function defined inside a class. The key difference is that an instance method automatically receives the object (<code>self</code>) as its first argument. Technically in Python, methods are just functions that belong to a class and are called via an object.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">What happens if you forget to include self as the first parameter? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Python raises a <code>TypeError</code> when you call the method. For example, if you define <code>def bark():</code> inside a class and call <code>dog.bark()</code>, Python passes the <code>dog</code> instance as the first positional argument, but the function has no parameter to receive it — hence the error: <em>"bark() takes 0 positional arguments but 1 was given."</em></p></div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">How do class methods and static methods differ from instance methods? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Instance methods receive <code>self</code> (the object). <strong>Class methods</strong> (decorated with <code>@classmethod</code>) receive <code>cls</code> (the class itself) — useful for alternative constructors. <strong>Static methods</strong> (decorated with <code>@staticmethod</code>) receive neither <code>self</code> nor <code>cls</code> — they're utility functions logically grouped inside the class but not needing access to the class or instance.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">What is name mangling with double underscore? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>If you name an attribute with two leading underscores (e.g., <code>self.__secret</code>), Python renames it internally to <code>_ClassName__secret</code>. This makes it harder (but not impossible) to accidentally access or override from outside or from subclasses. It's a stronger hint than a single underscore that the attribute is truly internal. Access it externally with <code>obj._ClassName__secret</code> if you must.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/intermediate/virtual-environments.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Virtual Environments</span>
+          </a>
+          <a href="/python/oop/constructors.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Constructors</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 YLearner Python Tutorial</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

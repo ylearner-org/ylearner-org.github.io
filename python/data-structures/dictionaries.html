@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Dictionaries – Keys, Values, Methods, Nested Dicts | YLearner</title>
+  <meta name="description" content="Complete guide to Python dictionaries: create, access, add, update and delete keys, use dict methods (keys, values, items, get, update, pop), iterate, nest dicts, and write dict comprehensions.">
+  <meta name="keywords" content="python dictionaries, python dict methods, python dict comprehension, python keys values items, python nested dictionary, python get update pop, dictionary python">
+  <link rel="canonical" href="https://ylearner-org.github.io/python/data-structures/dictionaries.html">
+  <meta property="og:title" content="Python Dictionaries – Complete Guide | YLearner">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo">
+      <div class="logo-icon">Py</div>
+      <span class="logo-text">Y<span>Learner</span></span>
+    </a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar">
+      <nav id="sidebarNav"></nav>
+    </aside>
+
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/data-structures/">Data Structures</a><span class="separator">›</span>
+          <span class="current">Dictionaries</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">📦 Data Structures</div>
+          <h1>Python Dictionaries – The Complete Guide</h1>
+          <p class="lesson-intro">Dictionaries are Python's premier <em>key-value</em> data structure. Where lists use integer positions to find items, dictionaries use <em>meaningful keys</em> — like a real-world dictionary where you look up "Python" to find its definition. They are unordered (insertion-ordered since Python 3.7), mutable, and blazing-fast for lookups. This lesson covers creating dictionaries, accessing and modifying data, all built-in dict methods, iteration patterns, nested dictionaries, and dictionary comprehensions.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 28 min read</span>
+            <span>🎯 Beginner–Intermediate</span>
+            <span>📅 Updated 2024</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="creating-dicts">Creating Dictionaries</h2>
+          <p>A dictionary is created with curly braces <code>{}</code>. Each entry is a <strong>key: value</strong> pair separated by a colon, and pairs are separated by commas.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Literal syntax (most common)
+person = {
+    "name": "Alice",
+    "age": 30,
+    "city": "New York",
+    "is_student": False
+}
+
+# Empty dictionary
+empty_dict = {}
+
+# Using dict() constructor
+car = dict(make="Toyota", model="Camry", year=2022)
+
+# From a list of pairs
+pairs = [("a", 1), ("b", 2), ("c", 3)]
+from_pairs = dict(pairs)
+
+print(person)
+print(car)
+print(from_pairs)
+print(f"Number of keys: {len(person)}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+{'name': 'Alice', 'age': 30, 'city': 'New York', 'is_student': False}
+{'make': 'Toyota', 'model': 'Camry', 'year': 2022}
+{'a': 1, 'b': 2, 'c': 3}
+Number of keys: 4
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>What Can Be a Key?</strong>
+              <p>Dictionary keys must be <strong>immutable</strong>: strings, integers, floats, booleans, and tuples are valid keys. Lists and other dicts cannot be keys because they're mutable. String keys are by far the most common in real-world code.</p>
+            </div>
+          </div>
+
+          <h2 id="accessing-values">Accessing Values</h2>
+          <p>Access values using the key in square brackets. If the key doesn't exist, it raises a <code>KeyError</code>. Use the <code>.get()</code> method to safely access keys that may not exist.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">product = {
+    "name": "Laptop",
+    "brand": "TechBrand",
+    "price": 999.99,
+    "in_stock": True
+}
+
+# Direct access (raises KeyError if missing)
+print(product["name"])      # Laptop
+print(product["price"])     # 999.99
+
+# Safe access with .get() - returns None if missing
+print(product.get("brand"))          # TechBrand
+print(product.get("color"))          # None
+print(product.get("color", "N/A"))   # N/A  (default value)
+
+# Check if a key exists
+if "in_stock" in product:
+    print("Stock info available")
+
+# Check if key NOT in dict
+if "discount" not in product:
+    print("No discount key")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Laptop
+999.99
+TechBrand
+None
+N/A
+Stock info available
+No discount key
+          </div>
+
+          <h2 id="adding-updating">Adding and Updating Keys</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">student = {"name": "Bob", "age": 20}
+
+# Add a new key
+student["grade"] = "A"
+student["major"] = "Computer Science"
+print(student)
+
+# Update an existing key (overwrites the value)
+student["age"] = 21
+print("After update:", student)
+
+# Update multiple keys at once with .update()
+student.update({
+    "year": 2,
+    "gpa": 3.8,
+    "age": 22   # also updates existing key
+})
+print("After .update():", student)</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+{'name': 'Bob', 'age': 20, 'grade': 'A', 'major': 'Computer Science'}
+After update: {'name': 'Bob', 'age': 21, 'grade': 'A', 'major': 'Computer Science'}
+After .update(): {'name': 'Bob', 'age': 22, 'grade': 'A', 'major': 'Computer Science', 'year': 2, 'gpa': 3.8}
+          </div>
+
+          <h2 id="deleting-keys">Deleting Keys</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">config = {
+    "host": "localhost",
+    "port": 8080,
+    "debug": True,
+    "timeout": 30,
+    "retries": 3
+}
+
+# del - raises KeyError if key not found
+del config["debug"]
+print(config)
+
+# .pop() - removes and returns the value; optional default
+timeout = config.pop("timeout")
+print(f"Removed timeout: {timeout}")
+
+missing = config.pop("nonexistent", "default_val")
+print(f"Pop missing key: {missing}")
+
+# .popitem() - removes and returns the last inserted pair (Python 3.7+)
+last_key, last_val = config.popitem()
+print(f"Popped last item: {last_key} = {last_val}")
+
+# .clear() - empties the dictionary
+temp = {"a": 1, "b": 2}
+temp.clear()
+print("After clear:", temp)</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+{'host': 'localhost', 'port': 8080, 'timeout': 30, 'retries': 3}
+Removed timeout: 30
+Pop missing key: default_val
+Popped last item: retries = 3
+After clear: {}
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="dict-methods">Key Dictionary Methods</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Method</th><th>Description</th><th>Returns</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>d.keys()</code></td><td>All keys</td><td>dict_keys view</td></tr>
+                <tr><td><code>d.values()</code></td><td>All values</td><td>dict_values view</td></tr>
+                <tr><td><code>d.items()</code></td><td>All key-value pairs as tuples</td><td>dict_items view</td></tr>
+                <tr><td><code>d.get(k, default)</code></td><td>Value for key k, or default</td><td>value or default</td></tr>
+                <tr><td><code>d.update(other)</code></td><td>Merge another dict into d</td><td>None</td></tr>
+                <tr><td><code>d.pop(k, default)</code></td><td>Remove key k and return value</td><td>value or default</td></tr>
+                <tr><td><code>d.popitem()</code></td><td>Remove and return last item</td><td>(key, value) tuple</td></tr>
+                <tr><td><code>d.setdefault(k, default)</code></td><td>Return value; insert default if missing</td><td>value</td></tr>
+                <tr><td><code>d.clear()</code></td><td>Remove all items</td><td>None</td></tr>
+                <tr><td><code>d.copy()</code></td><td>Shallow copy</td><td>new dict</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="iteration">Iterating Over Dictionaries</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">scores = {
+    "Alice": 95,
+    "Bob": 82,
+    "Carol": 91,
+    "David": 78
+}
+
+# Iterate keys (default)
+print("Students:")
+for name in scores:
+    print(f"  {name}")
+
+# Iterate values
+print("\nScores:")
+for score in scores.values():
+    print(f"  {score}")
+
+# Iterate key-value pairs (most common)
+print("\nFull report:")
+for name, score in scores.items():
+    grade = "Pass" if score >= 80 else "Fail"
+    print(f"  {name:<8}: {score}  ({grade})")
+
+# Find the top scorer
+top = max(scores, key=lambda name: scores[name])
+print(f"\nTop scorer: {top} with {scores[top]}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Students:
+  Alice
+  Bob
+  Carol
+  David
+
+Scores:
+  95
+  82
+  91
+  78
+
+Full report:
+  Alice   : 95  (Pass)
+  Bob     : 82  (Pass)
+  Carol   : 91  (Pass)
+  David   : 78  (Fail)
+
+Top scorer: Alice with 95
+          </div>
+
+          <h2 id="setdefault">setdefault() – Powerful Grouping Pattern</h2>
+          <p><code>setdefault(key, default)</code> returns the value for a key if it exists, or inserts the key with the default value and returns it. This is perfect for building dictionaries of lists (grouping items).</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Group words by their first letter
+words = ["apple", "avocado", "banana", "blueberry", "cherry", "apricot", "coconut"]
+
+grouped = {}
+for word in words:
+    letter = word[0]
+    grouped.setdefault(letter, []).append(word)
+
+for letter, group in sorted(grouped.items()):
+    print(f"  {letter}: {group}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+  a: ['apple', 'avocado', 'apricot']
+  b: ['banana', 'blueberry']
+  c: ['cherry', 'coconut']
+          </div>
+
+          <h2 id="nested-dicts">Nested Dictionaries</h2>
+          <p>Dictionary values can themselves be dictionaries. This is used frequently to represent structured data like records, configurations, and API responses.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">company = {
+    "name": "TechCorp",
+    "employees": {
+        "E001": {
+            "name": "Alice",
+            "role": "Engineer",
+            "salary": 95000
+        },
+        "E002": {
+            "name": "Bob",
+            "role": "Manager",
+            "salary": 110000
+        },
+        "E003": {
+            "name": "Carol",
+            "role": "Designer",
+            "salary": 85000
+        }
+    }
+}
+
+# Access nested values
+print(company["name"])
+print(company["employees"]["E001"]["name"])   # Alice
+print(company["employees"]["E002"]["salary"])  # 110000
+
+# Update a nested value
+company["employees"]["E003"]["salary"] = 90000
+
+# Add a new nested record
+company["employees"]["E004"] = {
+    "name": "David",
+    "role": "DevOps",
+    "salary": 100000
+}
+
+# Iterate nested dict
+print("\nAll employees:")
+for emp_id, info in company["employees"].items():
+    print(f"  {emp_id}: {info['name']} ({info['role']}) — ${info['salary']:,}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+TechCorp
+Alice
+110000
+
+All employees:
+  E001: Alice (Engineer) — $95,000
+  E002: Bob (Manager) — $110,000
+  E003: Carol (Designer) — $90,000
+  E004: David (DevOps) — $100,000
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Accessing Missing Nested Keys</strong>
+              <p>Chaining bracket access on a nested dict raises <code>KeyError</code> if any level is missing. Use <code>.get()</code> at each level: <code>d.get("a", {}).get("b", default)</code>. Or use the <code>collections.defaultdict</code> for auto-creating nested structures.</p>
+            </div>
+          </div>
+
+          <h2 id="dict-comprehension">Dictionary Comprehensions</h2>
+          <p>Like list comprehensions, dict comprehensions let you build dictionaries in a single line using the syntax <code>{key: value for item in iterable}</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Square each number as a key-value pair
+squares = {n: n**2 for n in range(1, 6)}
+print(squares)   # {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}
+
+# Filter: only include even squares
+even_squares = {n: n**2 for n in range(1, 11) if n % 2 == 0}
+print(even_squares)   # {2: 4, 4: 16, 6: 36, 8: 64, 10: 100}
+
+# Invert a dictionary (swap keys and values)
+original = {"a": 1, "b": 2, "c": 3}
+inverted = {v: k for k, v in original.items()}
+print(inverted)   # {1: 'a', 2: 'b', 3: 'c'}
+
+# Build a word-length mapping
+words = ["python", "is", "awesome", "programming"]
+word_lengths = {word: len(word) for word in words}
+print(word_lengths)</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+{1: 1, 2: 4, 3: 9, 4: 16, 5: 25}
+{2: 4, 4: 16, 6: 36, 8: 64, 10: 100}
+{1: 'a', 2: 'b', 3: 'c'}
+{'python': 6, 'is': 2, 'awesome': 7, 'programming': 11}
+          </div>
+
+          <h2 id="practical-example">Practical Real-World Example</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def word_frequency(text):
+    """Count how many times each word appears in a text."""
+    words = text.lower().split()
+    freq = {}
+    for word in words:
+        # Remove basic punctuation
+        word = word.strip(".,!?;:")
+        freq[word] = freq.get(word, 0) + 1
+    return freq
+
+text = """Python is great. Python is easy to learn.
+Python is used for data science and web development.
+Learning Python is fun!"""
+
+freq = word_frequency(text)
+
+# Sort by frequency (most common first)
+sorted_freq = dict(sorted(freq.items(), key=lambda item: item[1], reverse=True))
+
+print("Word frequencies:")
+for word, count in list(sorted_freq.items())[:8]:
+    bar = "█" * count
+    print(f"  {word:<12}: {count}  {bar}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Word frequencies:
+  python      : 4  ████
+  is          : 4  ████
+  great       : 1  █
+  easy        : 1  █
+  to          : 2  ██
+  learn       : 1  █
+  used        : 1  █
+  for         : 1  █
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create a dictionary representing a book (title, author, year, pages, genre). Print each field using a <code>for</code> loop over <code>.items()</code>.</li>
+              <li>Write code that safely retrieves a key that might not exist, providing a meaningful default value using <code>.get()</code>.</li>
+              <li>Given a list of numbers, use a dict comprehension to create a dictionary where each number is a key and its cube is the value.</li>
+              <li>Write a function <code>count_chars(text)</code> that returns a dictionary of character frequencies for letters only (ignore spaces and punctuation).</li>
+              <li>Create a nested dictionary of 3 cities, each with keys for population, country, and timezone. Write code to print a formatted summary of each city.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge</h3>
+            <p>Build a simple <strong>inventory management system</strong> using a dictionary. Each product name is a key; each value is a nested dict with <code>price</code>, <code>quantity</code>, and <code>category</code>. Implement functions: <code>add_product(inventory, name, price, qty, category)</code>, <code>sell(inventory, name, qty)</code> (reduce quantity; warn if insufficient stock), <code>restock(inventory, name, qty)</code>, and <code>report(inventory)</code> (print a table with total values per item and overall inventory value). Test all functions with sample data.</p>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions on Python Dictionaries</h2>
+          <ul class="interview-list">
+            <li>What types can be used as dictionary keys? Why can't lists be keys?</li>
+            <li>What is the difference between <code>dict[key]</code> and <code>dict.get(key)</code>?</li>
+            <li>How do you merge two dictionaries? Describe two ways (including Python 3.9+ syntax).</li>
+            <li>What does <code>dict.setdefault(key, default)</code> do? Give a real-world use case.</li>
+            <li>What is the time complexity of a dictionary lookup in Python? Why is it so fast?</li>
+            <li>How do you iterate over a dictionary's key-value pairs simultaneously?</li>
+            <li>What is a dictionary comprehension? Write one that inverts a dictionary.</li>
+            <li>How are Python dictionaries ordered? Was this always the case?</li>
+          </ul>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Dictionaries store <strong>key-value pairs</strong> in curly braces <code>{}</code>. Keys must be immutable.</li>
+              <li>Access values with <code>dict[key]</code> (raises <code>KeyError</code> if missing) or <code>dict.get(key, default)</code> (safe).</li>
+              <li>Add or update a key with assignment: <code>dict[key] = value</code>. Use <code>.update()</code> to merge multiple pairs.</li>
+              <li>Delete with <code>del dict[key]</code>, <code>dict.pop(key)</code> (returns value), or <code>dict.popitem()</code> (returns last pair).</li>
+              <li><code>.keys()</code>, <code>.values()</code>, and <code>.items()</code> return live views of the dict's data.</li>
+              <li><code>.setdefault(key, default)</code> is ideal for grouping patterns.</li>
+              <li>Nested dicts can represent complex structured data; chain bracket access carefully.</li>
+              <li>Dict comprehensions <code>{k: v for ...}</code> create dicts concisely from any iterable.</li>
+              <li>Since Python 3.7, dicts maintain <strong>insertion order</strong>.</li>
+            </ul>
+          </div>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/data-structures/lists.html" class="topic-tag">📋 Lists</a>
+            <a href="/python/data-structures/sets.html" class="topic-tag">🔵 Sets</a>
+            <a href="/python/data-structures/list-comprehensions.html" class="topic-tag">⚡ List Comprehensions</a>
+            <a href="/python/control-flow/for-loop.html" class="topic-tag">🔀 For Loop</a>
+            <a href="/python/functions/function-basics.html" class="topic-tag">⚙️ Functions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+
+            <div class="faq-item">
+              <div class="faq-question">Are Python dictionaries ordered? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Since Python 3.7, dictionaries maintain <strong>insertion order</strong> as a language guarantee (it was an implementation detail in CPython 3.6). If you iterate a dict, items come out in the order they were added. For Python 3.6 and earlier you needed <code>collections.OrderedDict</code> for guaranteed ordering.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">How do you merge two dictionaries in Python? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Several ways: (1) <code>d1.update(d2)</code> — modifies d1 in place. (2) <code>{**d1, **d2}</code> — creates a new merged dict (Python 3.5+). (3) <code>d1 | d2</code> — new merged dict (Python 3.9+). (4) <code>d1 |= d2</code> — merge d2 into d1 in place (Python 3.9+). In all cases, if both dicts share a key, the right-side value wins.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">Why are dictionary lookups so fast? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Dictionaries are implemented as <strong>hash tables</strong>. When you store a key, Python computes a hash of it (a fixed-size integer) and uses that hash to determine where to store the value. Retrieval computes the same hash and goes directly to that location — O(1) average time, independent of dictionary size. This is why dict keys must be hashable (immutable).</p></div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">Can a dictionary have duplicate keys? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Dictionary keys are unique. If you write <code>d = {"a": 1, "a": 2}</code>, the second value silently overwrites the first, giving <code>{"a": 2}</code>. Python won't raise an error — so be careful when building dicts programmatically that you don't accidentally overwrite important data.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between dict.items() and dict.keys()? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>dict.keys()</code> returns a view of all keys. <code>dict.items()</code> returns a view of all key-value pairs as 2-tuples. <code>dict.values()</code> returns just the values. These are <em>view objects</em> — they reflect the dict in real time, so if you modify the dict, the views update. Convert to <code>list()</code> if you need a snapshot.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/data-structures/sets.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Sets</span>
+          </a>
+          <a href="/python/data-structures/list-comprehensions.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">List Comprehensions</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 YLearner Python Tutorial</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

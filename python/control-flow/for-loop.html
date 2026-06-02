@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python For Loop – range(), enumerate(), zip(), Nested Loops | YLearner</title>
+  <meta name="description" content="Master Python for loops: iterate over lists, strings, dicts, use range(), enumerate(), zip(), nested loops, and control flow with break and continue.">
+  <meta name="keywords" content="python for loop, python range, python enumerate, python zip, python nested loops, python break continue, for loop python">
+  <link rel="canonical" href="https://ylearner-org.github.io/python/control-flow/for-loop.html">
+  <meta property="og:title" content="Python For Loop – Complete Guide | YLearner">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo">
+      <div class="logo-icon">Py</div>
+      <span class="logo-text">Y<span>Learner</span></span>
+    </a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar">
+      <nav id="sidebarNav"></nav>
+    </aside>
+
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/control-flow/">Control Flow</a><span class="separator">›</span>
+          <span class="current">For Loop</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🔀 Control Flow</div>
+          <h1>Python For Loop – The Complete Guide</h1>
+          <p class="lesson-intro">The <code>for</code> loop is one of the most powerful constructs in Python. It lets you <em>iterate</em> — walk through items one by one — over any sequence: a list, a string, a range of numbers, a dictionary, and much more. Whether you're processing hundreds of records, generating sequences, or building nested data structures, the <code>for</code> loop is your go-to tool. This lesson covers everything from the basics to advanced patterns including <code>enumerate()</code>, <code>zip()</code>, nested loops, and loop control with <code>break</code> and <code>continue</code>.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min read</span>
+            <span>🎯 Beginner–Intermediate</span>
+            <span>📅 Updated 2024</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="what-is-for-loop">What is a For Loop?</h2>
+          <p>A <strong>for loop</strong> repeats a block of code for each item in a sequence. Think of it as an instruction: "For every item in this collection, do this." The loop automatically stops once every item has been processed.</p>
+
+          <p>The basic syntax is:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">for variable in iterable:
+    # code to execute for each item
+    print(variable)</code></pre>
+          </div>
+
+          <p>Here, <code>variable</code> takes the value of each item in the <code>iterable</code> one at a time. An <strong>iterable</strong> is anything Python can step through — lists, tuples, strings, ranges, dictionaries, files, and more.</p>
+
+          <h2 id="iterating-lists">Iterating Over Lists</h2>
+          <p>The most common use of <code>for</code> is looping through a list:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">fruits = ["apple", "banana", "cherry", "date"]
+
+for fruit in fruits:
+    print(f"I like {fruit}")
+
+print("Loop finished!")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+I like apple
+I like banana
+I like cherry
+I like date
+Loop finished!
+          </div>
+
+          <p>You can also loop over a list of numbers and perform calculations:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">scores = [88, 95, 72, 61, 99, 84]
+total = 0
+
+for score in scores:
+    total += score
+
+average = total / len(scores)
+print(f"Total: {total}")
+print(f"Average: {average:.1f}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Total: 499
+Average: 83.2
+          </div>
+
+          <h2 id="range-function">Using range() with For Loops</h2>
+          <p>The built-in <code>range()</code> function generates a sequence of numbers. It's extremely useful when you need to loop a specific number of times or work with indices.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Syntax</th><th>Generates</th><th>Example</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>range(n)</code></td><td>0 to n-1</td><td><code>range(5)</code> → 0,1,2,3,4</td></tr>
+                <tr><td><code>range(start, stop)</code></td><td>start to stop-1</td><td><code>range(2, 7)</code> → 2,3,4,5,6</td></tr>
+                <tr><td><code>range(start, stop, step)</code></td><td>start to stop-1 by step</td><td><code>range(0, 10, 2)</code> → 0,2,4,6,8</td></tr>
+                <tr><td><code>range(n, 0, -1)</code></td><td>Countdown</td><td><code>range(5, 0, -1)</code> → 5,4,3,2,1</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Basic range - print 0 through 4
+for i in range(5):
+    print(i, end=" ")
+print()  # newline
+
+# Start and stop
+for i in range(1, 6):
+    print(i, end=" ")
+print()
+
+# Step of 2 (even numbers)
+for i in range(0, 11, 2):
+    print(i, end=" ")
+print()
+
+# Countdown using negative step
+for i in range(10, 0, -1):
+    print(i, end=" ")
+print("Blast off!")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+0 1 2 3 4
+1 2 3 4 5
+0 2 4 6 8 10
+10 9 8 7 6 5 4 3 2 1 Blast off!
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>range() is Memory Efficient</strong>
+              <p><code>range()</code> does NOT create a list in memory — it generates numbers one at a time. This means <code>range(1000000)</code> uses almost no memory, making it perfect for large loops.</p>
+            </div>
+          </div>
+
+          <h2 id="iterating-strings">Iterating Over Strings</h2>
+          <p>Strings are iterable — you can loop over each character:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">word = "Python"
+
+for char in word:
+    print(char, end="-")
+print()
+
+# Count vowels in a string
+text = "Hello, World!"
+vowels = "aeiouAEIOU"
+count = 0
+
+for char in text:
+    if char in vowels:
+        count += 1
+
+print(f"Vowel count: {count}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+P-y-t-h-o-n-
+Vowel count: 3
+          </div>
+
+          <h2 id="iterating-dicts">Iterating Over Dictionaries</h2>
+          <p>When you loop over a dictionary directly, you iterate over its <strong>keys</strong>. Use <code>.items()</code> to get both key and value, <code>.values()</code> for just values, and <code>.keys()</code> for just keys (same as looping directly).</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">student = {
+    "name": "Alice",
+    "age": 20,
+    "grade": "A",
+    "major": "Computer Science"
+}
+
+# Loop over keys
+print("Keys:")
+for key in student:
+    print(f"  {key}")
+
+# Loop over values
+print("\nValues:")
+for value in student.values():
+    print(f"  {value}")
+
+# Loop over key-value pairs
+print("\nKey-Value pairs:")
+for key, value in student.items():
+    print(f"  {key}: {value}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Keys:
+  name
+  age
+  grade
+  major
+
+Values:
+  Alice
+  20
+  A
+  Computer Science
+
+Key-Value pairs:
+  name: Alice
+  age: 20
+  grade: A
+  major: Computer Science
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="enumerate">enumerate() – Loop with Index</h2>
+          <p><code>enumerate()</code> is a built-in function that adds an automatic counter to any iterable. Instead of just getting the item, you get <strong>both the index and the item</strong> as a pair. This eliminates the need for a separate counter variable.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">colors = ["red", "green", "blue", "yellow"]
+
+# Without enumerate (old way)
+for i in range(len(colors)):
+    print(f"{i}: {colors[i]}")
+
+print()
+
+# With enumerate (Pythonic way)
+for index, color in enumerate(colors):
+    print(f"{index}: {color}")
+
+print()
+
+# Start counting from 1 instead of 0
+for num, color in enumerate(colors, start=1):
+    print(f"Color #{num}: {color}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+0: red
+1: green
+2: blue
+3: yellow
+
+0: red
+1: green
+2: blue
+3: yellow
+
+Color #1: red
+Color #2: green
+Color #3: blue
+Color #4: yellow
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Prefer enumerate() Over Manual Counters</strong>
+              <p>Using <code>enumerate()</code> is considered more Pythonic than writing <code>i = 0; i += 1</code> manually. It's cleaner and less error-prone. Use it whenever you need both the index and value from a sequence.</p>
+            </div>
+          </div>
+
+          <h2 id="zip">zip() – Loop Over Multiple Sequences</h2>
+          <p><code>zip()</code> lets you iterate over two or more sequences <strong>in parallel</strong>, pairing up elements at the same position. It stops at the shortest sequence.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">names = ["Alice", "Bob", "Carol"]
+scores = [95, 87, 92]
+grades = ["A", "B+", "A-"]
+
+# Pair up corresponding elements
+for name, score, grade in zip(names, scores, grades):
+    print(f"{name}: {score} ({grade})")
+
+print()
+
+# zip() stops at the shortest sequence
+letters = ["a", "b", "c", "d", "e"]
+numbers = [1, 2, 3]
+
+for letter, number in zip(letters, numbers):
+    print(f"{letter} → {number}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Alice: 95 (A)
+Bob: 87 (B+)
+Carol: 92 (A-)
+
+a → 1
+b → 2
+c → 3
+          </div>
+
+          <p>You can combine <code>zip()</code> and <code>enumerate()</code> together:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">students = ["Alice", "Bob", "Carol"]
+marks = [88, 74, 95]
+
+for i, (student, mark) in enumerate(zip(students, marks), start=1):
+    print(f"Rank {i}: {student} scored {mark}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Rank 1: Alice scored 88
+Rank 2: Bob scored 74
+Rank 3: Carol scored 95
+          </div>
+
+          <h2 id="nested-loops">Nested For Loops</h2>
+          <p>A nested loop is a loop inside another loop. The inner loop runs to completion for every single iteration of the outer loop. This is commonly used for working with 2D data, generating combinations, or building tables.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Multiplication table (3x3)
+for i in range(1, 4):
+    for j in range(1, 4):
+        print(f"{i} × {j} = {i*j}", end="   ")
+    print()  # newline after each row
+
+print()
+
+# Nested loop over a list of lists (2D grid)
+matrix = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+
+for row in matrix:
+    for element in row:
+        print(element, end="\t")
+    print()</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+1 × 1 = 1   1 × 2 = 2   1 × 3 = 3
+2 × 1 = 2   2 × 2 = 4   2 × 3 = 6
+3 × 1 = 3   3 × 2 = 6   3 × 3 = 9
+
+1	2	3
+4	5	6
+7	8	9
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Watch Out for Deep Nesting</strong>
+              <p>While nested loops are useful, deeply nested loops (3+ levels) can slow your program dramatically and become hard to read. If you find yourself writing 3+ nested loops, consider refactoring into functions or using list comprehensions.</p>
+            </div>
+          </div>
+
+          <h2 id="break-continue">break and continue in For Loops</h2>
+          <p>These two keywords give you fine-grained control over loop execution:</p>
+          <ul>
+            <li><strong><code>break</code></strong> — immediately exits the entire loop</li>
+            <li><strong><code>continue</code></strong> — skips the rest of the current iteration and moves to the next item</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># break: stop when we find "banana"
+fruits = ["apple", "cherry", "banana", "date", "elderberry"]
+
+for fruit in fruits:
+    if fruit == "banana":
+        print(f"Found banana! Stopping search.")
+        break
+    print(f"Checked: {fruit}")
+
+print()
+
+# continue: skip even numbers, print only odds
+for num in range(1, 11):
+    if num % 2 == 0:
+        continue  # skip this number
+    print(num, end=" ")
+print()</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Checked: apple
+Checked: cherry
+Found banana! Stopping search.
+
+1 3 5 7 9
+          </div>
+
+          <h2 id="for-else">The for…else Clause</h2>
+          <p>Python's <code>for</code> loop has an optional <code>else</code> block that runs <strong>only if the loop completed normally</strong> (without hitting a <code>break</code>). This is a unique Python feature useful for search patterns.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def find_item(items, target):
+    for item in items:
+        if item == target:
+            print(f"Found '{target}'!")
+            break
+    else:
+        # Only runs if break was never hit
+        print(f"'{target}' was not found in the list.")
+
+inventory = ["keyboard", "mouse", "monitor", "webcam"]
+find_item(inventory, "mouse")     # Found!
+find_item(inventory, "headset")   # Not found</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Found 'mouse'!
+'headset' was not found in the list.
+          </div>
+
+          <h2 id="list-comprehension-preview">Sneak Peek: List Comprehensions</h2>
+          <p>List comprehensions are a concise one-line way to build a list using a <code>for</code> loop. They're covered in full in the List Comprehensions lesson, but here's a quick taste:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Traditional for loop to build a list
+squares = []
+for n in range(1, 6):
+    squares.append(n ** 2)
+print(squares)
+
+# Equivalent list comprehension (one line!)
+squares = [n ** 2 for n in range(1, 6)]
+print(squares)
+
+# With condition: only even squares
+even_squares = [n ** 2 for n in range(1, 11) if n % 2 == 0]
+print(even_squares)</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+[1, 4, 9, 16, 25]
+[1, 4, 9, 16, 25]
+[4, 16, 36, 64, 100]
+          </div>
+
+          <h2 id="practical-examples">Practical Real-World Examples</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Example 1: Shopping cart total
+cart = [
+    {"item": "Book", "price": 12.99, "qty": 2},
+    {"item": "Pen", "price": 1.49, "qty": 5},
+    {"item": "Notebook", "price": 4.99, "qty": 3},
+]
+
+total = 0
+print("Receipt:")
+print("-" * 35)
+for product in cart:
+    subtotal = product["price"] * product["qty"]
+    total += subtotal
+    print(f"  {product['item']:<12} x{product['qty']}  ${subtotal:.2f}")
+print("-" * 35)
+print(f"  {'TOTAL':<15}       ${total:.2f}")
+
+print()
+
+# Example 2: Finding the maximum without max()
+temperatures = [23, 17, 31, 28, 14, 35, 22]
+highest = temperatures[0]
+
+for temp in temperatures:
+    if temp > highest:
+        highest = temp
+
+print(f"Highest temperature: {highest}°C")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Receipt:
+-----------------------------------
+  Book         x2  $25.98
+  Pen          x5  $7.45
+  Notebook     x3  $14.97
+-----------------------------------
+  TOTAL               $48.40
+
+Highest temperature: 35°C
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Write Python programs for each of the following:</p>
+            <ol>
+              <li>Use a <code>for</code> loop with <code>range()</code> to print the first 10 multiples of 7.</li>
+              <li>Given a list of words, use <code>enumerate()</code> to print each word with its position number (starting at 1).</li>
+              <li>Given two lists — <code>cities</code> and <code>populations</code> — use <code>zip()</code> to print each city with its population.</li>
+              <li>Use a nested loop to print a 5×5 grid of asterisks (<code>*</code>).</li>
+              <li>Write a loop that searches a list of names for a specific name and prints "Found!" or "Not found." using <code>for…else</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge</h3>
+            <p>Write a program that generates a simple <strong>number pyramid</strong> using nested loops:</p>
+            <pre>
+1
+1 2
+1 2 3
+1 2 3 4
+1 2 3 4 5</pre>
+            <p>Then modify it to reverse the pyramid (widest row first). Finally, use <code>zip()</code> to pair up a list of student names with their test scores and print a formatted leaderboard sorted by score (highest first — you may use <code>sorted()</code>).</p>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions on For Loops</h2>
+          <ul class="interview-list">
+            <li>What is the difference between a <code>for</code> loop and a <code>while</code> loop? When would you use each?</li>
+            <li>What does <code>range(1, 10, 2)</code> produce? What about <code>range(10, 0, -1)</code>?</li>
+            <li>What is <code>enumerate()</code> and why is it preferred over manually tracking an index?</li>
+            <li>How does <code>zip()</code> behave when the two lists have different lengths?</li>
+            <li>What is the difference between <code>break</code> and <code>continue</code> inside a loop?</li>
+            <li>What does the <code>else</code> clause on a <code>for</code> loop do? When does it execute?</li>
+            <li>How would you iterate over a dictionary to access both keys and values simultaneously?</li>
+            <li>What is the time complexity of nested loops? Give an example where O(n²) complexity appears.</li>
+          </ul>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>The <code>for</code> loop iterates over any iterable: lists, strings, ranges, dicts, tuples, and more.</li>
+              <li><code>range(start, stop, step)</code> generates integer sequences and is memory-efficient.</li>
+              <li>Iterating a dict directly yields keys; use <code>.items()</code> for key-value pairs, <code>.values()</code> for values only.</li>
+              <li><code>enumerate(iterable, start=0)</code> provides both index and value — prefer it over manual counters.</li>
+              <li><code>zip(a, b, ...)</code> pairs elements from multiple iterables and stops at the shortest.</li>
+              <li>Nested loops run the inner loop completely for each iteration of the outer loop.</li>
+              <li><code>break</code> exits the entire loop; <code>continue</code> skips to the next iteration.</li>
+              <li>The <code>else</code> block on a <code>for</code> loop only runs when the loop completes without a <code>break</code>.</li>
+            </ul>
+          </div>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/control-flow/while-loop.html" class="topic-tag">🔁 While Loop</a>
+            <a href="/python/control-flow/break-continue-pass.html" class="topic-tag">⏭️ Break &amp; Continue</a>
+            <a href="/python/data-structures/lists.html" class="topic-tag">📦 Lists</a>
+            <a href="/python/data-structures/list-comprehensions.html" class="topic-tag">⚡ List Comprehensions</a>
+            <a href="/python/functions/function-basics.html" class="topic-tag">⚙️ Functions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+
+            <div class="faq-item">
+              <div class="faq-question">Can I change a list while iterating over it? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>You should not modify a list while iterating over it — this can cause items to be skipped or processed twice, leading to bugs. Instead, iterate over a <em>copy</em> of the list (<code>for item in my_list[:]:</code>) and modify the original, or collect changes and apply them after the loop.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between range() and list()? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>range()</code> returns a lazy range object that generates numbers on demand — it doesn't create all values in memory at once. <code>list(range(5))</code> converts it to an actual list <code>[0, 1, 2, 3, 4]</code>. For loops, use <code>range()</code> directly as it's more memory-efficient.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">How do I loop through a list in reverse? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Two common ways: <code>for item in reversed(my_list):</code> (lazy, no copy) or <code>for item in my_list[::-1]:</code> (creates a reversed copy). You can also use <code>for i in range(len(my_list)-1, -1, -1):</code> if you need the index too.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">Does Python's for loop have a traditional index counter like C? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Python's <code>for</code> loop doesn't have a built-in counter, but <code>enumerate()</code> provides one elegantly. If you truly need C-style index-based looping (e.g., modifying elements in place), you can use <code>for i in range(len(my_list)):</code>, but this is generally not the Pythonic way.</p></div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">What is an iterable vs an iterator in Python? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>An <strong>iterable</strong> is any object you can loop over (lists, strings, dicts, ranges). An <strong>iterator</strong> is an object that keeps track of its current position and returns the next value on each <code>next()</code> call. When you use a <code>for</code> loop, Python automatically calls <code>iter()</code> on the iterable to get an iterator, then calls <code>next()</code> repeatedly.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/control-flow/match-case.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Match Case</span>
+          </a>
+          <a href="/python/control-flow/while-loop.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">While Loop</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 YLearner Python Tutorial</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

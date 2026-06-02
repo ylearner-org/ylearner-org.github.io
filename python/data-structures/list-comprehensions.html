@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python List Comprehensions – Concise &amp; Powerful | YLearner</title>
+  <meta name="description" content="Master Python list comprehensions: basic syntax, conditions, nested comprehensions, generator expressions, set comprehensions, and when to use (and avoid) them.">
+  <meta name="keywords" content="python list comprehension, python list comprehension with condition, python nested list comprehension, python generator expression, python set comprehension, python for loop vs list comprehension">
+  <link rel="canonical" href="https://ylearner-org.github.io/python/data-structures/list-comprehensions.html">
+  <meta property="og:title" content="Python List Comprehensions – Concise &amp; Powerful | YLearner">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo">
+      <div class="logo-icon">Py</div>
+      <span class="logo-text">Y<span>Learner</span></span>
+    </a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar">
+      <nav id="sidebarNav"></nav>
+    </aside>
+
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/data-structures/">Data Structures</a><span class="separator">›</span>
+          <span class="current">List Comprehensions</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">📦 Data Structures</div>
+          <h1>Python List Comprehensions – Concise &amp; Powerful</h1>
+          <p class="lesson-intro">List comprehensions are one of Python's most loved features — a compact, readable way to create lists from existing iterables. They let you replace verbose <code>for</code> loops with a single expressive line. This lesson covers the complete syntax: basic comprehensions, conditional filtering, nested comprehensions, their performance characteristics, and when you should (and shouldn't) use them. You'll also learn generator expressions, set comprehensions, and how they all fit together.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2024</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="intro">Introduction – The Problem They Solve</h2>
+          <p>Suppose you want to create a list of squares of numbers from 1 to 10. The traditional approach uses a <code>for</code> loop:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Traditional for loop
+squares = []
+for n in range(1, 11):
+    squares.append(n ** 2)
+print(squares)
+# [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+
+# Same result with a list comprehension – one line!
+squares = [n ** 2 for n in range(1, 11)]
+print(squares)
+# [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+[1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+[1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+          </div>
+
+          <p>The list comprehension is shorter, more expressive, and often faster than the equivalent loop.</p>
+
+          <h2 id="syntax">The Basic Syntax</h2>
+          <p>The general form of a list comprehension is:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># [expression  for  variable  in  iterable]
+result = [expression for variable in iterable]
+
+# Common patterns:
+words = ["hello", "world", "python"]
+
+# 1. Transform each element
+upper = [w.upper() for w in words]
+print(upper)   # ['HELLO', 'WORLD', 'PYTHON']
+
+# 2. Apply a function
+lengths = [len(w) for w in words]
+print(lengths)  # [5, 5, 6]
+
+# 3. From any iterable
+chars = [c for c in "Python"]
+print(chars)    # ['P', 'y', 't', 'h', 'o', 'n']
+
+# 4. From a range
+evens = [x * 2 for x in range(10)]
+print(evens)    # [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]</code></pre>
+          </div>
+
+          <h2 id="conditions">Comprehensions with Conditions</h2>
+          <p>Add an <code>if</code> clause at the end to filter elements. Only items where the condition is <code>True</code> are included:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># [expression  for  variable  in  iterable  if  condition]
+
+numbers = range(1, 21)
+
+# Only even numbers
+evens = [n for n in numbers if n % 2 == 0]
+print(evens)   # [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+
+# Only odd numbers > 10
+big_odds = [n for n in numbers if n % 2 != 0 and n > 10]
+print(big_odds)  # [11, 13, 15, 17, 19]
+
+# Filter strings by length
+words = ["cat", "elephant", "ant", "butterfly", "bee", "hippopotamus"]
+long_words = [w for w in words if len(w) > 4]
+print(long_words)  # ['elephant', 'butterfly', 'hippopotamus']
+
+# Filter and transform together
+scores = [45, 88, 92, 31, 70, 65, 99, 12]
+passing_grades = [s for s in scores if s >= 60]
+print(passing_grades)   # [88, 92, 70, 65, 99]
+print(f"Average of passing: {sum(passing_grades)/len(passing_grades):.1f}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+[2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+[11, 13, 15, 17, 19]
+['elephant', 'butterfly', 'hippopotamus']
+[88, 92, 70, 65, 99]
+Average of passing: 82.8
+          </div>
+
+          <h2 id="if-else-expression">if-else Inside the Expression</h2>
+          <p>You can use a ternary expression in the <em>expression</em> part (before <code>for</code>) to transform elements differently based on a condition. This is different from the filtering <code>if</code> after <code>for</code>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># [value_if_true  if  condition  else  value_if_false  for  var  in  iterable]
+
+numbers = range(-5, 6)
+
+# Replace negatives with 0, keep positives
+non_negative = [n if n >= 0 else 0 for n in numbers]
+print(non_negative)  # [0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5]
+
+# Label even/odd
+labels = ["even" if n % 2 == 0 else "odd" for n in range(1, 8)]
+print(labels)  # ['odd', 'even', 'odd', 'even', 'odd', 'even', 'odd']
+
+# Clamp values to a [0, 100] range
+raw = [120, -10, 85, 101, 50, -5, 99]
+clamped = [max(0, min(100, v)) for v in raw]
+print(clamped)  # [100, 0, 85, 100, 50, 0, 99]</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+[0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5]
+['odd', 'even', 'odd', 'even', 'odd', 'even', 'odd']
+[100, 0, 85, 100, 50, 0, 99]
+          </div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="nested">Nested Comprehensions</h2>
+          <p>You can nest one comprehension inside another. This is equivalent to nested <code>for</code> loops:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Flatten a 2D list (list of lists)
+matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+flat = [num for row in matrix for num in row]
+print(flat)   # [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# Equivalent loop:
+# flat = []
+# for row in matrix:
+#     for num in row:
+#         flat.append(num)
+
+# Generate a multiplication table as a 2D list
+table = [[i * j for j in range(1, 6)] for i in range(1, 6)]
+for row in table:
+    print(row)
+
+# Cartesian product of two lists
+colors = ["red", "blue"]
+sizes  = ["S", "M", "L"]
+products = [(color, size) for color in colors for size in sizes]
+print(products)
+# [('red', 'S'), ('red', 'M'), ('red', 'L'),
+#  ('blue', 'S'), ('blue', 'M'), ('blue', 'L')]</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+[1, 2, 3, 4, 5, 6, 7, 8, 9]
+[1, 2, 3, 4, 5]
+[2, 4, 6, 8, 10]
+[3, 6, 9, 12, 15]
+[4, 8, 12, 16, 20]
+[5, 10, 15, 20, 25]
+[('red', 'S'), ('red', 'M'), ('red', 'L'), ('blue', 'S'), ('blue', 'M'), ('blue', 'L')]
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Don't Overdo Nesting</strong>
+              <p>A comprehension with two <code>for</code> clauses can still be readable. Three or more nested <code>for</code> clauses usually produce code that is harder to understand than a plain loop. Readability always wins.</p>
+            </div>
+          </div>
+
+          <h2 id="generator-expressions">Generator Expressions</h2>
+          <p>Replace the square brackets with parentheses and you get a <strong>generator expression</strong> — it produces values lazily on demand instead of building the entire list in memory. This is critical for large datasets:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import sys
+
+# List comprehension – builds entire list in RAM
+squares_list = [n ** 2 for n in range(1_000_000)]
+print(f"List size: {sys.getsizeof(squares_list):,} bytes")
+
+# Generator expression – produces one value at a time
+squares_gen = (n ** 2 for n in range(1_000_000))
+print(f"Generator size: {sys.getsizeof(squares_gen):,} bytes")
+
+# Use a generator when you only need to iterate once
+total = sum(n ** 2 for n in range(1_000_000))   # no [] needed inside sum()!
+print(f"Sum of squares: {total:,}")
+
+# Generator with condition
+large_squares = (n ** 2 for n in range(100) if n % 7 == 0)
+for val in large_squares:
+    print(val, end=" ")
+print()
+
+# Generators are exhausted after one pass
+gen = (x * 2 for x in range(5))
+print(list(gen))  # [0, 2, 4, 6, 8]
+print(list(gen))  # []  ← generator is now empty!</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+List size: 8,448,728 bytes
+Generator size: 104 bytes
+Sum of squares: 333,332,833,333,500,000
+0 49 196 441 784 1225 1764 2401 3136 3969 4900 5929 7056 8281 9604
+[0, 2, 4, 6, 8]
+[]
+          </div>
+
+          <h2 id="set-dict-comprehensions">Set and Dict Comprehensions</h2>
+          <p>The same comprehension syntax works for sets (<code>{expr for ...}</code>) and dictionaries (<code>{key: value for ...}</code>):</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Set comprehension – automatically removes duplicates
+words = ["apple", "banana", "apple", "cherry", "banana", "date"]
+unique_lengths = {len(w) for w in words}
+print(unique_lengths)   # {4, 5, 6} (order may vary)
+
+# Dict comprehension
+# Build a word → length mapping
+word_length = {w: len(w) for w in words}
+print(word_length)
+# {'apple': 5, 'banana': 6, 'cherry': 6, 'date': 4}
+
+# Invert a dictionary (swap keys and values)
+original = {"a": 1, "b": 2, "c": 3}
+inverted = {v: k for k, v in original.items()}
+print(inverted)    # {1: 'a', 2: 'b', 3: 'c'}
+
+# Dict comprehension with condition
+scores = {"Alice": 88, "Bob": 42, "Carol": 95, "Dave": 58}
+passing = {name: score for name, score in scores.items() if score >= 60}
+print(passing)     # {'Alice': 88, 'Carol': 95}
+
+# Square numbers as a dict
+square_map = {n: n**2 for n in range(1, 8)}
+print(square_map)  # {1: 1, 2: 4, 3: 9, 4: 16, 5: 25, 6: 36, 7: 49}</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+{4, 5, 6}
+{'apple': 5, 'banana': 6, 'cherry': 6, 'date': 4}
+{1: 'a', 2: 'b', 3: 'c'}
+{'Alice': 88, 'Carol': 95}
+{1: 1, 2: 4, 3: 9, 4: 16, 5: 25, 6: 36, 7: 49}
+          </div>
+
+          <h2 id="performance">Performance: Comprehension vs for Loop</h2>
+          <p>List comprehensions are generally faster than equivalent <code>for</code> loops because they are optimised at the CPython bytecode level. Here is a comparison:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import timeit
+
+# Method 1: for loop with append
+def using_loop(n):
+    result = []
+    for i in range(n):
+        result.append(i ** 2)
+    return result
+
+# Method 2: list comprehension
+def using_comprehension(n):
+    return [i ** 2 for i in range(n)]
+
+# Method 3: map() with lambda
+def using_map(n):
+    return list(map(lambda i: i ** 2, range(n)))
+
+n = 100_000
+t_loop = timeit.timeit(lambda: using_loop(n), number=50)
+t_comp = timeit.timeit(lambda: using_comprehension(n), number=50)
+t_map  = timeit.timeit(lambda: using_map(n), number=50)
+
+print(f"for loop:        {t_loop:.3f}s")
+print(f"comprehension:   {t_comp:.3f}s")
+print(f"map(lambda):     {t_map:.3f}s")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Typical Output</div>
+for loop:        2.847s
+comprehension:   1.923s
+map(lambda):     2.541s
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Syntax</th><th>Result type</th><th>Memory</th><th>Use when…</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>[... for ...]</code></td><td>list</td><td>All in RAM</td><td>Need to index, sort, or reuse multiple times</td></tr>
+                <tr><td><code>(... for ...)</code></td><td>generator</td><td>One item at a time</td><td>Large data; only iterate once</td></tr>
+                <tr><td><code>{... for ...}</code></td><td>set</td><td>All in RAM</td><td>Need unique values</td></tr>
+                <tr><td><code>{k: v for ...}</code></td><td>dict</td><td>All in RAM</td><td>Build key-value mappings</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="when-not-to-use">When NOT to Use List Comprehensions</h2>
+          <p>List comprehensions are powerful but not always the right tool. Avoid them when:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># ❌ BAD: using a comprehension just for side effects
+# This creates a list that's thrown away immediately
+[print(x) for x in range(5)]     # Wasteful!
+
+# ✅ GOOD: use a regular loop for side effects
+for x in range(5):
+    print(x)
+
+# ❌ BAD: comprehension that's too complex to read at a glance
+result = [f(x) for x in [g(y) for y in data if pred(y)] if condition(x)]
+
+# ✅ GOOD: break complex logic into named steps
+filtered_y   = [g(y) for y in data if pred(y)]
+transformed  = [f(x) for x in filtered_y if condition(x)]
+
+# ❌ BAD: building a huge list you only iterate once
+for item in [process(x) for x in huge_data]:   # builds entire list first!
+    do_something(item)
+
+# ✅ GOOD: use a generator expression
+for item in (process(x) for x in huge_data):   # one item at a time
+    do_something(item)</code></pre>
+          </div>
+
+          <h2 id="real-world">Real-World Examples</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import os
+from pathlib import Path
+
+# 1. Get all Python files in a directory
+py_files = [f for f in Path(".").iterdir() if f.suffix == ".py"]
+
+# 2. Parse CSV rows into dicts (without the csv module)
+csv_lines = [
+    "Alice,30,Engineer",
+    "Bob,25,Designer",
+    "Carol,35,Manager",
+]
+headers = ["name", "age", "role"]
+records = [
+    dict(zip(headers, line.split(",")))
+    for line in csv_lines
+]
+print(records)
+# [{'name': 'Alice', 'age': '30', 'role': 'Engineer'}, ...]
+
+# 3. Remove duplicates while preserving order
+seen = set()
+data = [1, 3, 2, 1, 4, 3, 5, 2]
+unique_ordered = [x for x in data if not (x in seen or seen.add(x))]
+print(unique_ordered)  # [1, 3, 2, 4, 5]
+
+# 4. Transpose a matrix
+matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+transposed = [[row[i] for row in matrix] for i in range(len(matrix[0]))]
+for row in transposed:
+    print(row)
+# [1, 4, 7]
+# [2, 5, 8]
+# [3, 6, 9]
+
+# 5. Extract numbers from mixed list
+mixed = [1, "hello", 3.14, True, "world", 42, None, 7]
+numbers_only = [x for x in mixed if isinstance(x, (int, float)) and not isinstance(x, bool)]
+print(numbers_only)   # [1, 3.14, 42, 7]</code></pre>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Using only list comprehensions (no loops), write solutions for:</p>
+            <ol>
+              <li>Generate all prime numbers between 2 and 50.</li>
+              <li>From a list of sentences, extract only those that contain the word "Python" (case-insensitive).</li>
+              <li>Flatten this 3D list: <code>[[[1,2],[3,4]],[[5,6],[7,8]]]</code> into a 1D list.</li>
+              <li>Build a dict mapping each word in a sentence to the number of vowels it contains.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a function <code>parse_log(filepath)</code> that reads a log file line by line using a generator expression and returns:</p>
+            <ul>
+              <li>A list of all <code>ERROR</code> level messages (list comprehension).</li>
+              <li>A dict mapping log levels to the count of their occurrences (dict comprehension).</li>
+              <li>A set of unique IP addresses mentioned in the log (set comprehension).</li>
+            </ul>
+            <p>Process a file of 100,000+ lines memory-efficiently using generators.</p>
+          </div>
+
+          <h2 id="interview">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a list comprehension and how does it differ from a regular for loop?</li>
+            <li>What is the syntax for a list comprehension with a filter condition?</li>
+            <li>How does a generator expression differ from a list comprehension?</li>
+            <li>When should you use a generator expression instead of a list comprehension?</li>
+            <li>How do you write a nested list comprehension? What is the equivalent for loop?</li>
+            <li>What does <code>[x for x in range(5) if x % 2 == 0]</code> produce?</li>
+            <li>What is the difference between <code>[x if x &gt; 0 else 0 for x in lst]</code> and <code>[x for x in lst if x &gt; 0]</code>?</li>
+            <li>Why is using a list comprehension for side effects (like printing) considered bad practice?</li>
+            <li>What is a set comprehension? When is it useful?</li>
+            <li>How do you invert a dictionary using a dict comprehension?</li>
+          </ul>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>List comprehension syntax: <code>[expression for variable in iterable]</code>.</li>
+              <li>Add a filter: <code>[expression for variable in iterable if condition]</code>.</li>
+              <li>Transform with condition: <code>[a if cond else b for variable in iterable]</code>.</li>
+              <li>Nested comprehension: <code>[expr for x in outer for y in inner]</code> — equivalent to nested for loops.</li>
+              <li>Generator expressions use <code>()</code> instead of <code>[]</code> and produce values lazily, saving memory.</li>
+              <li>Set comprehensions use <code>{}</code>; dict comprehensions use <code>{key: value for ...}</code>.</li>
+              <li>Comprehensions are typically faster than equivalent <code>for</code> loops with <code>.append()</code>.</li>
+              <li>Avoid comprehensions for side effects, deeply nested logic, or very large datasets where generators are better.</li>
+            </ul>
+          </div>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/data-structures/dictionaries.html" class="topic-tag">📚 Dictionaries</a>
+            <a href="/python/data-structures/dict-comprehensions.html" class="topic-tag">🗂️ Dict Comprehensions</a>
+            <a href="/python/advanced/generators.html" class="topic-tag">⚙️ Generators</a>
+            <a href="/python/functions/lambda.html" class="topic-tag">λ Lambda Functions</a>
+            <a href="/python/functions/map-filter.html" class="topic-tag">🔧 map() &amp; filter()</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Are list comprehensions always faster than for loops? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For simple transformations, yes — list comprehensions are typically 20–40% faster than <code>for</code> loops with <code>.append()</code> in CPython, because they use a specialised <code>LIST_APPEND</code> bytecode internally. However, for very complex logic with multiple conditions and function calls, the difference narrows, and readability should be your primary guide.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use walrus operator (:=) inside a list comprehension? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes! Python 3.8+ supports the walrus operator (assignment expression) inside comprehensions. This is useful when you want to both compute a value and filter on it without computing it twice: <code>[y for x in data if (y := expensive(x)) &gt; threshold]</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Do variables defined in a list comprehension leak into the outer scope? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. In Python 3, list comprehensions have their own scope — the loop variable does not leak. This is different from Python 2 behaviour where the loop variable would be accessible in the outer scope after the comprehension. Generator expressions and set/dict comprehensions have always had their own scope.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the maximum number of nested for clauses in a comprehension? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Python imposes no hard limit, but readability is the practical constraint. Two levels of nesting are common (e.g., flattening a 2D list). Three or more levels should almost always be refactored into named variables, helper functions, or explicit loops for maintainability.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/data-structures/dictionaries.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Dictionaries</span>
+          </a>
+          <a href="/python/data-structures/dict-comprehensions.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Dict Comprehensions</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 YLearner Python Tutorial</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

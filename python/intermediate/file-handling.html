@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python File Handling – Read, Write, and Manage Files | YLearner</title>
+  <meta name="description" content="Learn Python file handling: open(), read/write/append modes, context managers, reading line by line, writing files, os module, pathlib, and handling file errors.">
+  <meta name="keywords" content="python file handling, python open file, python read file, python write file, python with statement, python pathlib, python os module, python file errors">
+  <link rel="canonical" href="https://ylearner-org.github.io/python/intermediate/file-handling.html">
+  <meta property="og:title" content="Python File Handling – Read, Write, and Manage Files | YLearner">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo">
+      <div class="logo-icon">Py</div>
+      <span class="logo-text">Y<span>Learner</span></span>
+    </a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar">
+      <nav id="sidebarNav"></nav>
+    </aside>
+
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/intermediate/">Intermediate</a><span class="separator">›</span>
+          <span class="current">File Handling</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">⚡ Intermediate</div>
+          <h1>Python File Handling – Read, Write, and Manage Files</h1>
+          <p class="lesson-intro">Nearly every real program touches the filesystem — reading configuration files, saving user data, processing logs, or importing datasets. Python makes file I/O straightforward with the built-in <code>open()</code> function, context managers for safe resource handling, and powerful standard-library modules like <code>os</code> and <code>pathlib</code>. This lesson covers everything from reading a simple text file to navigating directory trees and handling errors gracefully.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2024</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="intro">Introduction – Files in Python</h2>
+          <p>A file is a sequence of bytes stored on disk. Python treats files as objects you interact with through a <strong>file handle</strong> returned by <code>open()</code>. There are two broad categories:</p>
+          <ul>
+            <li><strong>Text files</strong> – contain human-readable characters (e.g., <code>.txt</code>, <code>.csv</code>, <code>.json</code>). Python handles newline translation and encoding for you.</li>
+            <li><strong>Binary files</strong> – contain raw bytes (e.g., images, PDFs, executables). You work with <code>bytes</code> objects instead of strings.</li>
+          </ul>
+          <p>Before any operation you must open the file; after you're done you must close it. Python's <code>with</code> statement automates the closing step, even when exceptions occur.</p>
+
+          <h2 id="open-function">The open() Function</h2>
+          <p>The signature of <code>open()</code> is:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">open(file, mode='r', encoding=None, errors=None, newline=None)</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Mode</th><th>Meaning</th><th>Creates file?</th><th>Truncates?</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>'r'</code></td><td>Read (default)</td><td>No – raises FileNotFoundError</td><td>No</td></tr>
+                <tr><td><code>'w'</code></td><td>Write</td><td>Yes</td><td>Yes – overwrites existing content</td></tr>
+                <tr><td><code>'a'</code></td><td>Append</td><td>Yes</td><td>No – adds to end of file</td></tr>
+                <tr><td><code>'x'</code></td><td>Exclusive create</td><td>Yes – fails if exists</td><td>N/A</td></tr>
+                <tr><td><code>'r+'</code></td><td>Read + write</td><td>No</td><td>No</td></tr>
+                <tr><td><code>'b'</code> suffix</td><td>Binary mode (e.g., <code>'rb'</code>)</td><td>—</td><td>—</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always specify encoding for text files</strong>
+              <p>Use <code>encoding="utf-8"</code> to avoid surprises across different operating systems. Windows defaults to the system codepage (e.g., cp1252), which differs from the UTF-8 default on Linux/macOS.</p>
+            </div>
+          </div>
+
+          <h2 id="context-manager">Context Managers – The with Statement</h2>
+          <p>The <code>with</code> statement is the correct way to open files. It guarantees <code>file.close()</code> is called even if an exception is raised:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># ❌ Old-style (risky if an exception occurs before close)
+f = open("notes.txt", "r", encoding="utf-8")
+content = f.read()
+f.close()   # might not run if read() raises!
+
+# ✅ Modern style – close is guaranteed
+with open("notes.txt", "r", encoding="utf-8") as f:
+    content = f.read()
+# f is automatically closed here, even on exception
+
+print(f.closed)   # True</code></pre>
+          </div>
+
+          <h2 id="reading-files">Reading Files</h2>
+          <p>Python provides several methods for reading file content depending on how much you need at once:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Assume "haiku.txt" contains three lines of a haiku
+
+# read() – entire file as one string
+with open("haiku.txt", "r", encoding="utf-8") as f:
+    entire = f.read()
+    print(repr(entire))
+# 'An old silent pond\nA frog jumps into the pond\nSplash! Silence again.\n'
+
+# readline() – one line at a time (including '\n')
+with open("haiku.txt", "r", encoding="utf-8") as f:
+    first_line = f.readline()
+    second_line = f.readline()
+    print(first_line.strip())   # An old silent pond
+    print(second_line.strip())  # A frog jumps into the pond
+
+# readlines() – list of all lines
+with open("haiku.txt", "r", encoding="utf-8") as f:
+    lines = f.readlines()
+    print(f"Line count: {len(lines)}")  # 3
+
+# Iteration (most memory-efficient – processes one line at a time)
+with open("haiku.txt", "r", encoding="utf-8") as f:
+    for line_no, line in enumerate(f, start=1):
+        print(f"{line_no}: {line.rstrip()}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+1: An old silent pond
+2: A frog jumps into the pond
+3: Splash! Silence again.
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Prefer Iteration for Large Files</strong>
+              <p>For files that are megabytes or gigabytes in size, <code>file.read()</code> loads everything into RAM. Iterating over the file object reads one line at a time, keeping memory usage constant regardless of file size.</p>
+            </div>
+          </div>
+
+          <h2 id="writing-files">Writing Files</h2>
+          <p>Use mode <code>'w'</code> to create or overwrite, and <code>'a'</code> to append without touching existing content:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># write() – write a string
+with open("output.txt", "w", encoding="utf-8") as f:
+    f.write("Line 1\n")
+    f.write("Line 2\n")
+    f.write("Line 3\n")
+
+# writelines() – write a list of strings (does NOT add newlines automatically)
+lines = ["alpha\n", "beta\n", "gamma\n"]
+with open("output.txt", "w", encoding="utf-8") as f:
+    f.writelines(lines)
+
+# Append mode – add to an existing file
+with open("log.txt", "a", encoding="utf-8") as f:
+    f.write("2024-01-15 09:23:01 INFO  Server started\n")
+    f.write("2024-01-15 09:23:05 DEBUG Listening on port 8080\n")
+
+# Write multiple lines cleanly with print()
+with open("report.txt", "w", encoding="utf-8") as f:
+    for i in range(1, 6):
+        print(f"Item {i}: {'★' * i}", file=f)
+
+# Verify the written content
+with open("report.txt", "r", encoding="utf-8") as f:
+    print(f.read())</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Item 1: ★
+Item 2: ★★
+Item 3: ★★★
+Item 4: ★★★★
+Item 5: ★★★★★
+          </div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="binary-files">Working with Binary Files</h2>
+          <p>Use <code>'rb'</code> and <code>'wb'</code> modes for images, audio files, compressed archives, or any non-text data:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Copy a file in binary mode (works for any file type)
+def copy_file(src, dst, chunk_size=65536):
+    """Copy src to dst reading chunk_size bytes at a time."""
+    with open(src, "rb") as source, open(dst, "wb") as dest:
+        while True:
+            chunk = source.read(chunk_size)
+            if not chunk:
+                break
+            dest.write(chunk)
+    print(f"Copied '{src}' → '{dst}'")
+
+# Read the first 4 bytes (magic bytes) of a PNG file
+def is_png(filepath):
+    PNG_MAGIC = b'\x89PNG'
+    try:
+        with open(filepath, "rb") as f:
+            return f.read(4) == PNG_MAGIC
+    except (FileNotFoundError, IOError):
+        return False</code></pre>
+          </div>
+
+          <h2 id="file-position">File Position – seek() and tell()</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">with open("output.txt", "r", encoding="utf-8") as f:
+    print(f.tell())          # 0 – at the start
+
+    first = f.read(5)
+    print(f"Read: {first!r}")
+    print(f.tell())          # 5
+
+    f.seek(0)                # rewind to start
+    print(f.tell())          # 0
+
+    f.seek(0, 2)             # seek to end (0 bytes from end)
+    print(f"File size: {f.tell()} bytes")</code></pre>
+          </div>
+
+          <h2 id="os-module">The os Module – File System Operations</h2>
+          <p>The <code>os</code> module provides functions for creating, removing, and inspecting files and directories:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import os
+
+# Current working directory
+print(os.getcwd())           # /home/user/project
+
+# Check existence
+print(os.path.exists("notes.txt"))   # True or False
+print(os.path.isfile("notes.txt"))   # True if it's a regular file
+print(os.path.isdir("data"))         # True if it's a directory
+
+# File metadata
+size = os.path.getsize("notes.txt")
+print(f"Size: {size} bytes")
+
+# Create a directory (and nested directories)
+os.makedirs("data/output", exist_ok=True)
+
+# List directory contents
+for entry in os.listdir("."):
+    print(entry)
+
+# Rename / move a file
+os.rename("old_name.txt", "new_name.txt")
+
+# Delete a file (raises FileNotFoundError if missing)
+if os.path.exists("temp.txt"):
+    os.remove("temp.txt")
+
+# Walk a directory tree
+for root, dirs, files in os.walk("project"):
+    for filename in files:
+        full_path = os.path.join(root, filename)
+        print(full_path)</code></pre>
+          </div>
+
+          <h2 id="pathlib">Modern File Paths with pathlib</h2>
+          <p><code>pathlib.Path</code> (introduced in Python 3.4) provides an object-oriented API for paths. It is more readable and cross-platform than string-based <code>os.path</code> manipulation:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from pathlib import Path
+
+# Create a Path object
+p = Path("data/notes.txt")
+
+# Path inspection
+print(p.name)        # notes.txt
+print(p.stem)        # notes
+print(p.suffix)      # .txt
+print(p.parent)      # data
+print(p.absolute())  # /home/user/project/data/notes.txt
+
+# Build paths with / operator (cross-platform!)
+base = Path("project")
+config = base / "config" / "settings.json"
+print(config)        # project/config/settings.json
+
+# Check existence
+print(p.exists())    # True / False
+print(p.is_file())
+print(p.is_dir())
+
+# Read / write text directly
+config_path = Path("config.txt")
+config_path.write_text("debug=true\nport=8080\n", encoding="utf-8")
+content = config_path.read_text(encoding="utf-8")
+print(content)
+
+# Read / write bytes directly
+Path("data.bin").write_bytes(b'\x00\x01\x02\x03')
+
+# Create directories
+Path("logs/2024").mkdir(parents=True, exist_ok=True)
+
+# List files matching a pattern (glob)
+project = Path(".")
+for py_file in project.glob("**/*.py"):
+    print(py_file)
+
+# File size
+print(f"Size: {p.stat().st_size} bytes")</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>pathlib vs os.path</strong>
+              <p>For new code, prefer <code>pathlib</code>. It handles path separators on Windows (<code>\</code>) and Unix (<code>/</code>) automatically, and the dot-attribute API is far more readable than nested <code>os.path.join(os.path.dirname(...))</code> calls.</p>
+            </div>
+          </div>
+
+          <h2 id="csv-json">Working with CSV and JSON Files</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import csv
+import json
+
+# ── CSV ──────────────────────────────────────────────────────
+# Writing a CSV
+students = [
+    {"name": "Alice", "grade": "A", "score": 95},
+    {"name": "Bob",   "grade": "B", "score": 82},
+    {"name": "Carol", "grade": "A", "score": 91},
+]
+with open("students.csv", "w", newline="", encoding="utf-8") as f:
+    writer = csv.DictWriter(f, fieldnames=["name", "grade", "score"])
+    writer.writeheader()
+    writer.writerows(students)
+
+# Reading a CSV
+with open("students.csv", "r", newline="", encoding="utf-8") as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        print(f"{row['name']}: {row['score']}")
+
+# ── JSON ─────────────────────────────────────────────────────
+config = {
+    "debug": True,
+    "port": 8080,
+    "allowed_hosts": ["localhost", "127.0.0.1"],
+}
+
+# Write JSON
+with open("config.json", "w", encoding="utf-8") as f:
+    json.dump(config, f, indent=2)
+
+# Read JSON
+with open("config.json", "r", encoding="utf-8") as f:
+    loaded = json.load(f)
+    print(loaded["port"])   # 8080</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Alice: 95
+Bob: 82
+Carol: 91
+8080
+          </div>
+
+          <h2 id="error-handling">Handling File Errors</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from pathlib import Path
+
+def safe_read(filepath):
+    """Read a file and return its content or None on failure."""
+    try:
+        return Path(filepath).read_text(encoding="utf-8")
+    except FileNotFoundError:
+        print(f"File not found: {filepath}")
+    except PermissionError:
+        print(f"Permission denied: {filepath}")
+    except IsADirectoryError:
+        print(f"Expected a file, got a directory: {filepath}")
+    except OSError as e:
+        print(f"OS error ({e.errno}): {e.strerror}")
+    return None
+
+def safe_write(filepath, content):
+    """Write content to filepath, creating parent directories as needed."""
+    try:
+        path = Path(filepath)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8")
+        return True
+    except (PermissionError, OSError) as e:
+        print(f"Could not write {filepath}: {e}")
+        return False
+
+result = safe_read("data/report.txt")
+if result:
+    print(result[:100])</code></pre>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Write a <code>word_frequency(filepath)</code> function that:</p>
+            <ol>
+              <li>Reads a text file line by line (efficient for large files).</li>
+              <li>Splits each line into words, converts to lowercase, and strips punctuation.</li>
+              <li>Counts how often each word appears using a dictionary.</li>
+              <li>Returns the 10 most common words with their counts.</li>
+              <li>Handles <code>FileNotFoundError</code> and <code>PermissionError</code> gracefully.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a <strong>simple logging system</strong> using only file I/O and <code>pathlib</code>. Create a <code>Logger</code> class that:</p>
+            <ul>
+              <li>Accepts a log directory path and a log level (<code>DEBUG</code>, <code>INFO</code>, <code>WARNING</code>, <code>ERROR</code>).</li>
+              <li>Writes each log message to a daily log file named <code>YYYY-MM-DD.log</code>.</li>
+              <li>Rotates (compresses or moves) logs older than 7 days.</li>
+              <li>Exposes <code>.debug()</code>, <code>.info()</code>, <code>.warning()</code>, and <code>.error()</code> methods.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does the <code>with</code> statement guarantee when working with files?</li>
+            <li>What is the difference between <code>'w'</code> and <code>'a'</code> file modes?</li>
+            <li>How do you read a very large file without loading it entirely into memory?</li>
+            <li>What is the difference between <code>os.path</code> and <code>pathlib.Path</code>?</li>
+            <li>What does <code>newline=""</code> do when opening a CSV file?</li>
+            <li>How do you create nested directories in one call in Python?</li>
+            <li>What exception is raised when you try to open a file that doesn't exist?</li>
+            <li>What is the difference between <code>read()</code>, <code>readline()</code>, and <code>readlines()</code>?</li>
+            <li>How do you check if a path exists and is a file (not a directory)?</li>
+            <li>What does <code>seek(0)</code> do to a file handle?</li>
+          </ul>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Use <code>open(file, mode, encoding="utf-8")</code> to get a file handle.</li>
+              <li>Always use the <code>with</code> statement — it closes the file automatically, even on exceptions.</li>
+              <li>Modes: <code>'r'</code> (read), <code>'w'</code> (write/overwrite), <code>'a'</code> (append), <code>'x'</code> (exclusive create); append <code>'b'</code> for binary.</li>
+              <li>Read methods: <code>read()</code> (all at once), <code>readline()</code> (one line), <code>readlines()</code> (list), or iterate the file object (memory-efficient).</li>
+              <li>Write methods: <code>write(str)</code>, <code>writelines(list)</code>, or <code>print(..., file=f)</code>.</li>
+              <li><code>pathlib.Path</code> provides a modern, object-oriented API; use <code>/</code> to join paths.</li>
+              <li><code>os.makedirs(..., exist_ok=True)</code> creates nested directories safely.</li>
+              <li>Always handle <code>FileNotFoundError</code>, <code>PermissionError</code>, and <code>OSError</code> when doing file I/O.</li>
+            </ul>
+          </div>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/intermediate/exception-handling.html" class="topic-tag">🛡️ Exception Handling</a>
+            <a href="/python/intermediate/packages.html" class="topic-tag">📦 Packages</a>
+            <a href="/python/data-structures/dictionaries.html" class="topic-tag">📚 Dictionaries</a>
+            <a href="/python/advanced/generators.html" class="topic-tag">⚙️ Generators</a>
+            <a href="/python/intermediate/datetime.html" class="topic-tag">📅 Date &amp; Time</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does Python automatically flush written data to disk? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>By default, Python buffers writes and flushes when the buffer is full or when the file is closed. Call <code>f.flush()</code> to force an immediate flush without closing. The <code>with</code> block closes the file (and thus flushes) when it exits, so you rarely need to call <code>flush()</code> manually.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I read a file that might not be UTF-8? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>errors='replace'</code> or <code>errors='ignore'</code> in <code>open()</code> to handle bad bytes. For unknown encodings, install the <code>chardet</code> library (<code>pip install chardet</code>) and call <code>chardet.detect(raw_bytes)</code> to detect the encoding before opening.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I open two files at the same time with a single with statement? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Separate them with a comma: <code>with open("src.txt") as src, open("dst.txt", "w") as dst:</code>. Both files are opened and both are closed when the block exits, regardless of exceptions.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When should I use pathlib instead of os.path? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For new code, always prefer <code>pathlib</code>. It is more Pythonic, cross-platform by design, and supports method chaining. Use <code>os.path</code> only when working with legacy codebases or libraries that require string paths (though <code>Path</code> objects can be passed to most modern APIs).</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/intermediate/packages.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Packages</span>
+          </a>
+          <a href="/python/intermediate/exception-handling.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Exception Handling</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 YLearner Python Tutorial</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

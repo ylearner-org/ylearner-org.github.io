@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Inheritance – Single, Multiple, and Multilevel | YLearner</title>
+  <meta name="description" content="Master Python inheritance: single, multiple, and multilevel inheritance, super(), method overriding, MRO, abstract classes, isinstance(), and issubclass() with clear examples.">
+  <meta name="keywords" content="python inheritance, python super(), python multiple inheritance, python MRO, python method overriding, python abstract class, python isinstance, python issubclass">
+  <link rel="canonical" href="https://ylearner-org.github.io/python/oop/inheritance.html">
+  <meta property="og:title" content="Python Inheritance – Single, Multiple, and Multilevel | YLearner">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo">
+      <div class="logo-icon">Py</div>
+      <span class="logo-text">Y<span>Learner</span></span>
+    </a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar">
+      <nav id="sidebarNav"></nav>
+    </aside>
+
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/oop/">OOP</a><span class="separator">›</span>
+          <span class="current">Inheritance</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🏗️ OOP</div>
+          <h1>Python Inheritance – Single, Multiple, and Multilevel</h1>
+          <p class="lesson-intro">Inheritance is one of the four pillars of object-oriented programming. It lets a class <em>inherit</em> attributes and methods from another class, promoting code reuse and establishing clear hierarchies of related types. Python supports single, multiple, and multilevel inheritance — along with powerful tools like <code>super()</code>, the Method Resolution Order (MRO), abstract base classes, and built-in type-checking functions. This lesson covers all of them with real-world examples.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 28 min read</span>
+            <span>🎯 Intermediate / OOP</span>
+            <span>📅 Updated 2024</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="intro">What Is Inheritance?</h2>
+          <p>Inheritance is the mechanism by which one class (the <strong>child</strong> or <strong>subclass</strong>) acquires the properties and behaviour of another class (the <strong>parent</strong> or <strong>superclass</strong>). Instead of repeating code, you write it once in the parent and let children extend or specialise it.</p>
+
+          <p>Real-world analogy: a <em>Dog</em> and a <em>Cat</em> are both <em>Animals</em>. They share common behaviour (eat, sleep, breathe) defined in <code>Animal</code>, but each has its own specific behaviour (<code>bark</code> vs <code>meow</code>).</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class Animal:
+    """Parent / Base class."""
+    def __init__(self, name, species):
+        self.name = name
+        self.species = species
+
+    def breathe(self):
+        return f"{self.name} breathes air."
+
+    def eat(self, food):
+        return f"{self.name} eats {food}."
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(name={self.name!r})"
+
+
+# ─── Single Inheritance ───────────────────────────────────────
+class Dog(Animal):
+    """Child class inheriting from Animal."""
+    def bark(self):
+        return f"{self.name} says: Woof!"
+
+class Cat(Animal):
+    """Another child class."""
+    def meow(self):
+        return f"{self.name} says: Meow!"
+
+dog = Dog("Rex", "Canis lupus familiaris")
+cat = Cat("Whiskers", "Felis catus")
+
+# Inherited methods work on child instances
+print(dog.breathe())        # Rex breathes air.
+print(dog.eat("kibble"))    # Rex eats kibble.
+print(dog.bark())           # Rex says: Woof!
+print(cat.meow())           # Whiskers says: Meow!</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Rex breathes air.
+Rex eats kibble.
+Rex says: Woof!
+Whiskers says: Meow!
+          </div>
+
+          <h2 id="super">Using super() – Calling the Parent</h2>
+          <p><code>super()</code> returns a proxy object that lets you call methods from the parent class. It is essential in <code>__init__</code> to initialise the parent's attributes before adding child-specific ones:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class Animal:
+    def __init__(self, name, species):
+        self.name = name
+        self.species = species
+        print(f"Animal.__init__: created {name}")
+
+class Dog(Animal):
+    def __init__(self, name, breed):
+        # Call parent's __init__ first
+        super().__init__(name, "Canis lupus familiaris")
+        self.breed = breed
+        print(f"Dog.__init__: breed set to {breed}")
+
+    def info(self):
+        return f"{self.name} is a {self.breed} ({self.species})"
+
+rex = Dog("Rex", "German Shepherd")
+print(rex.info())</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Animal.__init__: created Rex
+Dog.__init__: breed set to German Shepherd
+Rex is a German Shepherd (Canis lupus familiaris)
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always Call super().__init__() in Child Classes</strong>
+              <p>Forgetting to call <code>super().__init__()</code> means the parent's initialisation code never runs. This leads to missing attributes and mysterious <code>AttributeError</code>s. Make it a habit.</p>
+            </div>
+          </div>
+
+          <h2 id="method-overriding">Method Overriding</h2>
+          <p>A child class can <strong>override</strong> a parent method by defining a method with the same name. The child version replaces the parent's version for instances of the child class:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class Shape:
+    def area(self):
+        raise NotImplementedError("Subclasses must implement area()")
+
+    def describe(self):
+        return f"I am a {self.__class__.__name__} with area {self.area():.2f}"
+
+class Circle(Shape):
+    def __init__(self, radius):
+        self.radius = radius
+
+    def area(self):                      # Overrides Shape.area()
+        return 3.14159 * self.radius ** 2
+
+class Rectangle(Shape):
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    def area(self):                      # Overrides Shape.area()
+        return self.width * self.height
+
+class Square(Rectangle):
+    def __init__(self, side):
+        super().__init__(side, side)     # Reuse Rectangle.__init__
+
+# Polymorphism: same method name, different behaviour
+shapes = [Circle(5), Rectangle(4, 6), Square(3)]
+for shape in shapes:
+    print(shape.describe())</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+I am a Circle with area 78.54
+I am a Rectangle with area 24.00
+I am a Square with area 9.00
+          </div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="multilevel">Multilevel Inheritance</h2>
+          <p>A class can inherit from a class that itself inherits from another, creating a chain. Each level can extend or override the behaviour above it:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class Vehicle:
+    def __init__(self, make, model, year):
+        self.make = make
+        self.model = model
+        self.year = year
+
+    def start(self):
+        return f"{self.make} {self.model} starts."
+
+class Car(Vehicle):
+    def __init__(self, make, model, year, doors):
+        super().__init__(make, model, year)
+        self.doors = doors
+
+    def honk(self):
+        return "Beep beep!"
+
+class ElectricCar(Car):
+    def __init__(self, make, model, year, doors, battery_kwh):
+        super().__init__(make, model, year, doors)
+        self.battery_kwh = battery_kwh
+
+    def charge_status(self):
+        return f"Battery: {self.battery_kwh} kWh"
+
+    def start(self):   # Override Vehicle.start()
+        return f"{self.make} {self.model} starts silently."
+
+tesla = ElectricCar("Tesla", "Model 3", 2024, 4, 75)
+print(tesla.start())          # ElectricCar override
+print(tesla.honk())           # From Car
+print(tesla.charge_status())  # From ElectricCar
+print(f"Year: {tesla.year}")  # From Vehicle</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Tesla Model 3 starts silently.
+Beep beep!
+Battery: 75 kWh
+Year: 2024
+          </div>
+
+          <h2 id="multiple">Multiple Inheritance</h2>
+          <p>Python allows a class to inherit from more than one parent. This is powerful but must be used carefully to avoid ambiguity:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class Flyable:
+    def fly(self):
+        return f"{self.__class__.__name__} is flying!"
+
+    def describe(self):
+        return "I can fly."
+
+class Swimmable:
+    def swim(self):
+        return f"{self.__class__.__name__} is swimming!"
+
+    def describe(self):
+        return "I can swim."
+
+class Duck(Flyable, Swimmable):
+    """Duck can both fly and swim."""
+    def quack(self):
+        return "Quack!"
+
+    # Python uses MRO to resolve describe() – Flyable wins (listed first)
+    # We can be explicit:
+    def describe(self):
+        return "I can fly AND swim."
+
+donald = Duck()
+print(donald.fly())       # Duck is flying!
+print(donald.swim())      # Duck is swimming!
+print(donald.quack())     # Quack!
+print(donald.describe())  # I can fly AND swim.
+
+# Mixins – the most common use of multiple inheritance
+class JSONMixin:
+    """Add JSON serialisation to any class."""
+    import json as _json
+    def to_json(self):
+        import json
+        return json.dumps(self.__dict__, default=str)
+
+class LogMixin:
+    """Add simple logging to any class."""
+    def log(self, msg):
+        print(f"[{self.__class__.__name__}] {msg}")
+
+class UserService(LogMixin, JSONMixin):
+    def __init__(self, user_id, email):
+        self.user_id = user_id
+        self.email = email
+
+svc = UserService(42, "alice@example.com")
+svc.log("User service initialised")
+print(svc.to_json())</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+[UserService] User service initialised
+{"user_id": 42, "email": "alice@example.com"}
+          </div>
+
+          <h2 id="mro">Method Resolution Order (MRO)</h2>
+          <p>When Python searches for a method in a class hierarchy, it follows a deterministic algorithm called the <strong>C3 linearisation</strong>. You can inspect the MRO via <code>ClassName.__mro__</code> or <code>help(ClassName)</code>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class A:
+    def method(self): return "A"
+
+class B(A):
+    def method(self): return "B"
+
+class C(A):
+    def method(self): return "C"
+
+class D(B, C):
+    pass
+
+# MRO: D → B → C → A → object
+print(D.__mro__)
+# (&lt;class '__main__.D'&gt;, &lt;class '__main__.B'&gt;, &lt;class '__main__.C'&gt;,
+#  &lt;class '__main__.A'&gt;, &lt;class 'object'&gt;)
+
+d = D()
+print(d.method())   # "B"  – first in MRO after D that defines method()
+
+# mro() method returns a list
+for cls in D.mro():
+    print(cls.__name__)</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+D
+B
+C
+A
+object
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>The Diamond Problem</strong>
+              <p>The classic problem with multiple inheritance: if D inherits from B and C which both inherit from A, which A.<code>__init__</code> gets called? Python's C3 MRO and cooperative <code>super()</code> resolve this cleanly — each class in the MRO is called exactly once when all classes use <code>super()</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="isinstance-issubclass">isinstance() and issubclass()</h2>
+          <p>These two built-in functions let you check type relationships at runtime:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class Animal: pass
+class Dog(Animal): pass
+class Cat(Animal): pass
+
+rex = Dog()
+whiskers = Cat()
+
+# isinstance checks if an object is an instance of a class (or its subclasses)
+print(isinstance(rex, Dog))     # True
+print(isinstance(rex, Animal))  # True  ← Dog IS-A Animal
+print(isinstance(rex, Cat))     # False
+
+# Check against multiple types using a tuple
+print(isinstance(rex, (Dog, Cat)))   # True – matches Dog
+
+# issubclass checks class relationships, not instances
+print(issubclass(Dog, Animal))  # True
+print(issubclass(Cat, Dog))     # False
+print(issubclass(Dog, object))  # True – everything inherits from object
+
+# Practical use: type-safe function
+def make_sound(animal):
+    if not isinstance(animal, Animal):
+        raise TypeError(f"Expected Animal, got {type(animal).__name__}")
+    if isinstance(animal, Dog):
+        return "Woof!"
+    if isinstance(animal, Cat):
+        return "Meow!"
+    return "..."
+
+print(make_sound(rex))       # Woof!
+print(make_sound(whiskers))  # Meow!</code></pre>
+          </div>
+
+          <h2 id="abstract-classes">Abstract Base Classes</h2>
+          <p>Abstract classes define a contract: subclasses <em>must</em> implement certain methods. Python enforces this with the <code>abc</code> module:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from abc import ABC, abstractmethod
+
+class PaymentGateway(ABC):
+    """Abstract base class — cannot be instantiated directly."""
+
+    @abstractmethod
+    def charge(self, amount: float) -> bool:
+        """Charge the customer. Return True on success."""
+        ...
+
+    @abstractmethod
+    def refund(self, amount: float) -> bool:
+        """Refund the customer. Return True on success."""
+        ...
+
+    # Concrete method shared by all gateways
+    def process(self, amount: float) -> str:
+        if amount <= 0:
+            raise ValueError("Amount must be positive")
+        success = self.charge(amount)
+        return f"Payment of ${amount:.2f} {'succeeded' if success else 'failed'}."
+
+class StripeGateway(PaymentGateway):
+    def charge(self, amount: float) -> bool:
+        print(f"[Stripe] Charging ${amount:.2f}...")
+        return True
+
+    def refund(self, amount: float) -> bool:
+        print(f"[Stripe] Refunding ${amount:.2f}...")
+        return True
+
+class PayPalGateway(PaymentGateway):
+    def charge(self, amount: float) -> bool:
+        print(f"[PayPal] Charging ${amount:.2f}...")
+        return True
+
+    def refund(self, amount: float) -> bool:
+        print(f"[PayPal] Refunding ${amount:.2f}...")
+        return True
+
+# Cannot instantiate abstract class:
+# gateway = PaymentGateway()  → TypeError!
+
+stripe = StripeGateway()
+print(stripe.process(49.99))
+
+paypal = PayPalGateway()
+print(paypal.process(19.99))</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+[Stripe] Charging $49.99...
+Payment of $49.99 succeeded.
+[PayPal] Charging $19.99...
+Payment of $19.99 succeeded.
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Inheritance Type</th><th>Syntax</th><th>Use case</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Single</td><td><code>class B(A)</code></td><td>Standard extension / specialisation</td></tr>
+                <tr><td>Multilevel</td><td><code>class C(B)</code> where B extends A</td><td>Deep taxonomies, layered frameworks</td></tr>
+                <tr><td>Multiple</td><td><code>class D(A, B)</code></td><td>Mixins, combining orthogonal capabilities</td></tr>
+                <tr><td>Abstract</td><td><code>class E(ABC)</code> with <code>@abstractmethod</code></td><td>Defining interfaces / contracts</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Design a small OOP hierarchy for a library system:</p>
+            <ol>
+              <li>Create an abstract class <code>LibraryItem</code> with abstract method <code>get_info()</code>, and concrete attributes <code>title</code>, <code>item_id</code>.</li>
+              <li>Create <code>Book(LibraryItem)</code> that adds <code>author</code> and <code>pages</code>.</li>
+              <li>Create <code>DVD(LibraryItem)</code> that adds <code>director</code> and <code>runtime_minutes</code>.</li>
+              <li>Create <code>EBook(Book)</code> that adds <code>file_size_mb</code> and overrides <code>get_info()</code> to note it is digital.</li>
+              <li>Write a function that accepts a list of <code>LibraryItem</code> objects and prints info for each.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Implement a <strong>plugin system</strong> using abstract base classes. Create an abstract <code>DataSource</code> with methods <code>connect()</code>, <code>fetch(query)</code>, and <code>disconnect()</code>. Implement two concrete classes: <code>CSVDataSource</code> and <code>JSONDataSource</code>. Write a <code>DataPipeline</code> class that accepts any <code>DataSource</code>, calls its methods, and is completely agnostic of the concrete implementation. Use <code>isinstance</code> to validate input types.</p>
+          </div>
+
+          <h2 id="interview">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is inheritance and what problem does it solve?</li>
+            <li>What is the difference between a base class and a derived class?</li>
+            <li>What does <code>super()</code> do? Why is it preferred over calling the parent class directly?</li>
+            <li>What is method overriding and how does Python resolve it?</li>
+            <li>What is the Method Resolution Order (MRO) in Python?</li>
+            <li>What is the diamond problem in multiple inheritance and how does Python solve it?</li>
+            <li>What is the difference between <code>isinstance()</code> and <code>type()</code>?</li>
+            <li>What is an abstract class and when would you use one?</li>
+            <li>What is the difference between <code>@abstractmethod</code> and a regular method that raises <code>NotImplementedError</code>?</li>
+            <li>What does <code>issubclass(X, Y)</code> return when X and Y are the same class?</li>
+          </ul>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Inheritance allows a child class to reuse attributes and methods from a parent class.</li>
+              <li><strong>Single inheritance</strong>: one parent. <strong>Multilevel</strong>: chain of parents. <strong>Multiple</strong>: more than one parent.</li>
+              <li>Always call <code>super().__init__()</code> in a child's <code>__init__</code> to ensure the parent is properly initialised.</li>
+              <li>Method overriding lets a child class replace a parent method; <code>super().method()</code> calls the parent version.</li>
+              <li>The MRO (C3 linearisation) determines which class's method is found first; inspect it with <code>ClassName.__mro__</code>.</li>
+              <li><code>isinstance(obj, Class)</code> returns <code>True</code> if <code>obj</code> is an instance of <code>Class</code> or any subclass.</li>
+              <li><code>issubclass(Child, Parent)</code> returns <code>True</code> if <code>Child</code> inherits from <code>Parent</code>.</li>
+              <li>Abstract base classes (via <code>abc.ABC</code> and <code>@abstractmethod</code>) enforce that subclasses implement required methods.</li>
+            </ul>
+          </div>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/oop/constructors.html" class="topic-tag">🏗️ Constructors</a>
+            <a href="/python/oop/encapsulation.html" class="topic-tag">🔒 Encapsulation</a>
+            <a href="/python/oop/magic-methods.html" class="topic-tag">✨ Magic Methods</a>
+            <a href="/python/advanced/decorators.html" class="topic-tag">🎨 Decorators</a>
+            <a href="/python/intermediate/exception-handling.html" class="topic-tag">🛡️ Exception Handling</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does Python support multiple inheritance? Is it safe to use? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, Python fully supports multiple inheritance. It is safe when used with care — particularly the Mixin pattern, where classes add narrow, orthogonal capabilities (e.g., <code>LogMixin</code>, <code>JSONMixin</code>) without sharing state. Avoid deep multiple-inheritance hierarchies where classes share attributes and methods, as this creates ambiguity and maintainability issues.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When should I use composition over inheritance? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The rule of thumb is: use inheritance when the relationship is "IS-A" (a <code>Dog</code> IS-A <code>Animal</code>), and use composition when it is "HAS-A" (a <code>Car</code> HAS-A <code>Engine</code>). Composition is often more flexible because you can swap out the composed object at runtime, whereas changing a parent class affects the entire hierarchy.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What does every Python class inherit from if no parent is specified? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Every class implicitly inherits from <code>object</code> in Python 3. This gives all classes access to methods like <code>__init__</code>, <code>__str__</code>, <code>__repr__</code>, <code>__eq__</code>, and <code>__hash__</code>. You can verify this with <code>MyClass.__mro__</code> — <code>object</code> always appears at the end.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between an interface (abstract class) and a mixin? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>An abstract base class (interface) defines a contract: it declares what methods must exist but provides no implementation. A mixin provides a concrete implementation of one specific capability that is designed to be mixed into many unrelated classes. In practice, Python uses abstract base classes for type checking and mixins for code reuse through multiple inheritance.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/oop/constructors.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Constructors</span>
+          </a>
+          <a href="/python/oop/encapsulation.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Encapsulation</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 YLearner Python Tutorial</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

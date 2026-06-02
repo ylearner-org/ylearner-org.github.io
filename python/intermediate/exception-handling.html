@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Exception Handling – try, except, finally, raise | YLearner</title>
+  <meta name="description" content="Master Python exception handling with try, except, else, finally, raise, and custom exceptions. Real-world error handling patterns with clear code examples.">
+  <meta name="keywords" content="python exception handling, python try except, python finally, python raise, python custom exceptions, python error handling, python exception hierarchy">
+  <link rel="canonical" href="https://ylearner-org.github.io/python/intermediate/exception-handling.html">
+  <meta property="og:title" content="Python Exception Handling – try, except, finally, raise | YLearner">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo">
+      <div class="logo-icon">Py</div>
+      <span class="logo-text">Y<span>Learner</span></span>
+    </a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar">
+      <nav id="sidebarNav"></nav>
+    </aside>
+
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/intermediate/">Intermediate</a><span class="separator">›</span>
+          <span class="current">Exception Handling</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">⚡ Intermediate</div>
+          <h1>Python Exception Handling – try, except, finally &amp; raise</h1>
+          <p class="lesson-intro">Every program encounters errors — a missing file, bad user input, a network timeout, a division by zero. Python's exception handling system lets you <em>anticipate</em> these failures and respond gracefully instead of crashing. This lesson teaches you the full toolkit: <code>try/except/else/finally</code>, the exception hierarchy, raising your own exceptions, creating custom exception classes, and the patterns professional developers use every day.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2024</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="intro">Introduction – Why Errors Happen</h2>
+          <p>In Python, when something goes wrong at runtime, it raises an <strong>exception</strong> — a signal that an error has occurred. If that exception is not <em>caught and handled</em>, Python prints a traceback and the program stops immediately.</p>
+
+          <p>There are two fundamental categories of errors:</p>
+          <ul>
+            <li><strong>Syntax errors</strong> – caught before the program runs (e.g., missing colon, mismatched brackets). You fix these in your editor.</li>
+            <li><strong>Exceptions (runtime errors)</strong> – occur while the program is running. These can be caught and handled with <code>try/except</code>.</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Without exception handling – program crashes
+number = int("abc")   # ValueError: invalid literal for int()
+print("This line never runs")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+ValueError: invalid literal for int() with base 10: 'abc'
+          </div>
+
+          <p>Exception handling transforms this hard crash into a controlled response your program can recover from.</p>
+
+          <h2 id="try-except">The try / except Block</h2>
+          <p>The most basic form wraps risky code in a <code>try</code> block and places your recovery code in the <code>except</code> block:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">try:
+    number = int(input("Enter a number: "))
+    result = 100 / number
+    print(f"100 divided by {number} is {result}")
+except ValueError:
+    print("That's not a valid integer.")
+except ZeroDivisionError:
+    print("You can't divide by zero!")
+
+print("Program continues running...")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output (user enters "abc")</div>
+That's not a valid integer.
+Program continues running...
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always Catch Specific Exceptions</strong>
+              <p>Catch the most specific exception type you expect. Using a bare <code>except:</code> or <code>except Exception:</code> as your only clause silences bugs you didn't intend to handle. Be precise.</p>
+            </div>
+          </div>
+
+          <h2 id="catching-multiple">Catching Multiple Exceptions</h2>
+          <p>You can have as many <code>except</code> clauses as you need, and you can also group multiple exception types into one clause with a tuple:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def safe_divide(a, b):
+    try:
+        return a / b
+    except ZeroDivisionError:
+        print("Error: Cannot divide by zero")
+        return None
+    except TypeError:
+        print("Error: Both arguments must be numbers")
+        return None
+
+# Group multiple exceptions in one clause
+def parse_input(value):
+    try:
+        return int(value)
+    except (ValueError, TypeError) as e:
+        print(f"Conversion failed: {e}")
+        return 0
+
+print(safe_divide(10, 2))    # 5.0
+print(safe_divide(10, 0))    # Error: Cannot divide by zero → None
+print(parse_input("42"))     # 42
+print(parse_input("hello"))  # Conversion failed: ... → 0</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+5.0
+Error: Cannot divide by zero
+None
+42
+Conversion failed: invalid literal for int() with base 10: 'hello'
+0
+          </div>
+
+          <h2 id="else-finally">The else and finally Clauses</h2>
+          <p>Python's <code>try</code> block supports two additional optional clauses that give you finer control:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Clause</th><th>When it runs</th><th>Use case</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>else</code></td><td>Only when <strong>no exception</strong> was raised in <code>try</code></td><td>Code that should run only on success</td></tr>
+                <tr><td><code>finally</code></td><td><strong>Always</strong> – whether or not an exception occurred</td><td>Cleanup: closing files, releasing connections</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def read_and_process(filename):
+    file = None
+    try:
+        file = open(filename, "r")
+        data = file.read()
+    except FileNotFoundError:
+        print(f"File '{filename}' not found.")
+    except PermissionError:
+        print(f"No permission to read '{filename}'.")
+    else:
+        # Runs only if open() and read() succeeded
+        print(f"File read successfully: {len(data)} characters")
+        return data
+    finally:
+        # ALWAYS runs – perfect for cleanup
+        if file:
+            file.close()
+            print("File handle closed.")
+    return None
+
+read_and_process("notes.txt")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output (file exists)</div>
+File read successfully: 412 characters
+File handle closed.
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>finally Always Runs — Even After return</strong>
+              <p>Even if your <code>try</code> or <code>except</code> block has a <code>return</code> statement, the <code>finally</code> block still executes before the function returns. This makes it the safest place for cleanup code.</p>
+            </div>
+          </div>
+
+          <h2 id="exception-info">Accessing Exception Information</h2>
+          <p>Use <code>as e</code> in the <code>except</code> clause to capture the exception object. This gives you access to the error message and other attributes:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import traceback
+
+try:
+    result = 10 / 0
+except ZeroDivisionError as e:
+    print(f"Exception type : {type(e).__name__}")
+    print(f"Exception message: {e}")
+    print(f"Args: {e.args}")
+
+# Getting a full traceback as a string
+try:
+    x = int("bad")
+except ValueError as e:
+    tb = traceback.format_exc()
+    print("Full traceback:")
+    print(tb)</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Exception type : ZeroDivisionError
+Exception message: division by zero
+Args: ('division by zero',)
+Full traceback:
+Traceback (most recent call last):
+  File "...", line 10, in &lt;module&gt;
+    x = int("bad")
+ValueError: invalid literal for int() with base 10: 'bad'
+          </div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="hierarchy">The Exception Hierarchy</h2>
+          <p>Python's built-in exceptions are organized in an inheritance tree. Catching a parent catches all children. Knowing the hierarchy helps you catch at the right level of specificity:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Simplified exception hierarchy
+# BaseException
+#   ├── SystemExit          (sys.exit())
+#   ├── KeyboardInterrupt   (Ctrl+C)
+#   └── Exception           ← catch here for general errors
+#         ├── ArithmeticError
+#         │     ├── ZeroDivisionError
+#         │     └── OverflowError
+#         ├── LookupError
+#         │     ├── IndexError
+#         │     └── KeyError
+#         ├── ValueError
+#         ├── TypeError
+#         ├── AttributeError
+#         ├── NameError
+#         ├── IOError / OSError
+#         │     └── FileNotFoundError
+#         └── RuntimeError
+
+# Catching a parent catches all children:
+try:
+    my_list = [1, 2, 3]
+    print(my_list[10])       # IndexError
+except LookupError as e:
+    # Catches both IndexError and KeyError
+    print(f"Lookup failed: {e}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Lookup failed: list index out of range
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Never Catch BaseException Directly</strong>
+              <p><code>BaseException</code> includes <code>SystemExit</code> and <code>KeyboardInterrupt</code>. Catching it would prevent <code>Ctrl+C</code> from stopping your program. Always use <code>Exception</code> as the broadest catch, and only when genuinely needed.</p>
+            </div>
+          </div>
+
+          <h2 id="raise">Raising Exceptions with raise</h2>
+          <p>You can deliberately trigger exceptions using the <code>raise</code> statement. This is useful for enforcing constraints, signaling invalid states, or re-raising caught exceptions:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def set_age(age):
+    if not isinstance(age, int):
+        raise TypeError(f"Age must be an integer, got {type(age).__name__}")
+    if age < 0 or age > 150:
+        raise ValueError(f"Age {age} is not realistic (expected 0–150)")
+    return age
+
+# Re-raising: catch, log, then let it propagate
+def load_config(path):
+    try:
+        with open(path) as f:
+            return f.read()
+    except FileNotFoundError as e:
+        print(f"[ERROR] Config file missing: {path}")
+        raise   # Re-raises the same exception
+
+# Chaining exceptions with 'raise ... from ...'
+def fetch_user(user_id):
+    try:
+        # simulate a database error
+        raise ConnectionError("DB connection refused")
+    except ConnectionError as e:
+        raise RuntimeError("Failed to fetch user") from e
+
+try:
+    set_age("thirty")
+except TypeError as e:
+    print(e)
+
+try:
+    set_age(200)
+except ValueError as e:
+    print(e)</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Age must be an integer, got str
+Age 200 is not realistic (expected 0–150)
+          </div>
+
+          <h2 id="custom-exceptions">Custom Exception Classes</h2>
+          <p>For larger applications you should define your own exception types. This makes error handling code self-documenting and lets callers distinguish between different failure modes precisely.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Base custom exception for the entire application
+class AppError(Exception):
+    """Base class for all application errors."""
+    pass
+
+# Domain-specific exceptions
+class ValidationError(AppError):
+    """Raised when input data fails validation."""
+    def __init__(self, field, message):
+        self.field = field
+        self.message = message
+        super().__init__(f"Validation error on '{field}': {message}")
+
+class DatabaseError(AppError):
+    """Raised when a database operation fails."""
+    def __init__(self, operation, detail=""):
+        self.operation = operation
+        super().__init__(f"Database {operation} failed. {detail}".strip())
+
+class AuthenticationError(AppError):
+    """Raised when authentication fails."""
+    pass
+
+# Using custom exceptions
+def register_user(username, email, password):
+    if len(username) < 3:
+        raise ValidationError("username", "Must be at least 3 characters")
+    if "@" not in email:
+        raise ValidationError("email", "Must be a valid email address")
+    if len(password) < 8:
+        raise ValidationError("password", "Must be at least 8 characters")
+    print(f"User '{username}' registered successfully!")
+
+try:
+    register_user("Al", "not-an-email", "pass")
+except ValidationError as e:
+    print(f"[{e.field.upper()}] {e.message}")
+except AppError as e:
+    print(f"Application error: {e}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+[USERNAME] Must be at least 3 characters
+          </div>
+
+          <h2 id="context-managers">Exception Handling with Context Managers</h2>
+          <p>The <code>with</code> statement is Python's preferred way to handle resources that need cleanup. Context managers guarantee the cleanup code runs — even if an exception occurs — without writing <code>finally</code> manually.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from contextlib import contextmanager
+
+# The 'with' statement handles file closing automatically
+def count_words(filename):
+    try:
+        with open(filename, "r") as f:
+            content = f.read()
+            return len(content.split())
+    except FileNotFoundError:
+        print(f"File not found: {filename}")
+        return 0
+
+# Custom context manager for database-like transactions
+@contextmanager
+def managed_transaction(name):
+    print(f"[TX] Starting transaction: {name}")
+    try:
+        yield
+        print(f"[TX] Committed: {name}")
+    except Exception as e:
+        print(f"[TX] Rolled back: {name} — {e}")
+        raise
+
+# Using the custom context manager
+try:
+    with managed_transaction("create_user"):
+        print("Inserting user record...")
+        raise DatabaseError("INSERT", "Duplicate key")
+except DatabaseError as e:
+    print(f"Caught outside: {e}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+[TX] Starting transaction: create_user
+Inserting user record...
+[TX] Rolled back: create_user — Database INSERT failed. Duplicate key
+Caught outside: Database INSERT failed. Duplicate key
+          </div>
+
+          <h2 id="best-practices">Best Practices for Exception Handling</h2>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Best Practice Checklist</strong>
+              <ul>
+                <li><strong>Be specific:</strong> catch the exact exception type, not a broad parent.</li>
+                <li><strong>Don't swallow exceptions silently:</strong> always log or re-raise if you can't truly handle the error.</li>
+                <li><strong>Use finally for cleanup:</strong> close files, connections, and locks.</li>
+                <li><strong>Prefer context managers:</strong> <code>with open(...)</code> is safer than manual <code>file.close()</code>.</li>
+                <li><strong>Create custom exceptions:</strong> makes your API self-documenting and catches precise errors.</li>
+                <li><strong>Don't use exceptions for flow control:</strong> they are for <em>exceptional</em> conditions, not regular logic.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import logging
+
+logging.basicConfig(level=logging.ERROR)
+
+# ❌ Anti-pattern: silent exception swallowing
+def bad_parse(text):
+    try:
+        return int(text)
+    except Exception:
+        pass  # Bug disappears here — never do this!
+
+# ✅ Good pattern: log and return a meaningful default
+def good_parse(text, default=0):
+    try:
+        return int(text)
+    except ValueError:
+        logging.error("Could not parse '%s' as int, using default %d", text, default)
+        return default
+
+# ❌ Anti-pattern: catching too broadly
+def bad_process(data):
+    try:
+        result = complex_operation(data)
+    except Exception:  # Catches everything including bugs in your code!
+        return None
+
+# ✅ Good pattern: only catch what you expect
+def good_process(data):
+    try:
+        result = complex_operation(data)
+    except (ValueError, KeyError) as e:
+        logging.warning("Expected error during processing: %s", e)
+        return None
+    # Other unexpected exceptions will propagate correctly</code></pre>
+          </div>
+
+          <h2 id="real-world">Real-World Error Handling Patterns</h2>
+          <p>Here is a realistic example combining everything: a function that fetches JSON from a file with robust error handling at each stage.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import json
+import logging
+
+class ConfigLoadError(Exception):
+    pass
+
+def load_config(filepath):
+    """
+    Load and parse a JSON configuration file.
+    Returns a dict on success, raises ConfigLoadError on failure.
+    """
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            raw = f.read()
+    except FileNotFoundError:
+        raise ConfigLoadError(f"Config file not found: {filepath}")
+    except PermissionError:
+        raise ConfigLoadError(f"No read permission for: {filepath}")
+    except OSError as e:
+        raise ConfigLoadError(f"OS error reading {filepath}: {e}") from e
+
+    try:
+        config = json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise ConfigLoadError(
+            f"Invalid JSON in {filepath} at line {e.lineno}: {e.msg}"
+        ) from e
+
+    if not isinstance(config, dict):
+        raise ConfigLoadError("Config file must contain a JSON object at top level")
+
+    logging.info("Config loaded successfully from %s", filepath)
+    return config
+
+# Caller handles the single, descriptive exception type
+try:
+    cfg = load_config("app_config.json")
+    print("Database host:", cfg.get("db_host"))
+except ConfigLoadError as e:
+    print(f"Startup failed: {e}")
+    # In a real app you'd exit(1) here</code></pre>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Write a function <code>safe_calculator()</code> that:</p>
+            <ol>
+              <li>Accepts two inputs from the user and an operator (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>).</li>
+              <li>Converts both inputs to floats (handle <code>ValueError</code>).</li>
+              <li>Performs the operation (handle <code>ZeroDivisionError</code> for <code>/</code>).</li>
+              <li>Raises a custom <code>InvalidOperatorError</code> if the operator is not one of the four supported.</li>
+              <li>Uses <code>finally</code> to print "Calculation attempt complete." regardless of outcome.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a mini <strong>retry decorator</strong>. Write a decorator <code>@retry(times=3, delay=1)</code> that calls the decorated function up to <code>times</code> attempts if it raises an exception, waits <code>delay</code> seconds between attempts, and raises the last exception if all attempts fail. Test it with a function that randomly raises <code>ConnectionError</code>.</p>
+          </div>
+
+          <h2 id="interview">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between a syntax error and an exception in Python?</li>
+            <li>Explain the full <code>try / except / else / finally</code> flow. When does each block execute?</li>
+            <li>Why should you always catch specific exceptions rather than using a bare <code>except</code>?</li>
+            <li>What is exception chaining? How do you use <code>raise ... from ...</code>?</li>
+            <li>How do you create a custom exception class in Python?</li>
+            <li>What is the difference between <code>BaseException</code> and <code>Exception</code>?</li>
+            <li>When would you re-raise an exception with a bare <code>raise</code>?</li>
+            <li>How does a context manager (<code>with</code> statement) relate to exception handling?</li>
+            <li>What does the <code>else</code> clause of a <code>try</code> block do?</li>
+            <li>What is the <code>finally</code> block guaranteed to do even when an exception is raised?</li>
+          </ul>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>try/except</code> catches and handles exceptions, preventing program crashes.</li>
+              <li>Always catch the most specific exception type possible.</li>
+              <li>The <code>else</code> clause runs only when no exception occurred in <code>try</code>.</li>
+              <li>The <code>finally</code> clause always runs — use it for cleanup (closing files, connections).</li>
+              <li>Use <code>as e</code> to capture the exception object and inspect its message and type.</li>
+              <li><code>raise</code> triggers an exception; <code>raise ... from ...</code> chains exceptions.</li>
+              <li>Custom exception classes (inheriting from <code>Exception</code>) make your code self-documenting.</li>
+              <li>Context managers (<code>with</code>) are the cleanest way to guarantee resource cleanup.</li>
+              <li>Never silently swallow exceptions — always log or re-raise.</li>
+            </ul>
+          </div>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/intermediate/file-handling.html" class="topic-tag">📁 File Handling</a>
+            <a href="/python/intermediate/datetime.html" class="topic-tag">📅 Date &amp; Time</a>
+            <a href="/python/advanced/decorators.html" class="topic-tag">🎨 Decorators</a>
+            <a href="/python/oop/inheritance.html" class="topic-tag">🧬 Inheritance</a>
+            <a href="/python/advanced/generators.html" class="topic-tag">⚙️ Generators</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I have multiple except clauses for the same try block? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. You can add as many <code>except</code> clauses as you need. Python checks them top to bottom and executes only the first matching one. Put more specific exceptions before more general ones — otherwise the general one will match first.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens if an exception is raised inside a finally block? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>If an exception is raised inside <code>finally</code>, it replaces any exception that was already being propagated. This can hide the original error. Avoid raising exceptions in <code>finally</code> blocks — or use a try/except inside <code>finally</code> to handle them locally.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I always use exception handling instead of checking conditions? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Python encourages the EAFP style ("Easier to Ask Forgiveness than Permission") — try it and catch failures — rather than LBYL ("Look Before You Leap") — check conditions first. EAFP is often cleaner and avoids race conditions (e.g., checking if a file exists before opening it has a race; just open it and catch FileNotFoundError).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I log exceptions properly in production? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use the <code>logging</code> module with <code>logging.exception("message")</code> inside an <code>except</code> block. Unlike <code>logging.error()</code>, <code>logging.exception()</code> automatically appends the full traceback to the log entry, which is invaluable for debugging in production.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/intermediate/file-handling.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">File Handling</span>
+          </a>
+          <a href="/python/intermediate/datetime.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Date &amp; Time</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 YLearner Python Tutorial</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

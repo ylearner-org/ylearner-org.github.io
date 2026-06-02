@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NumPy Tutorial – Arrays, Operations &amp; Data Science Basics | YLearner</title>
+  <meta name="description" content="Complete NumPy tutorial: create and manipulate ndarrays, understand indexing/slicing, broadcasting, vectorized operations, and why NumPy is the foundation of data science in Python.">
+  <meta name="keywords" content="numpy tutorial, numpy arrays, ndarray, numpy indexing, numpy broadcasting, numpy operations, data science python, numpy vs list">
+  <link rel="canonical" href="https://ylearner-org.github.io/python/data-science/numpy.html">
+  <meta property="og:title" content="NumPy Tutorial – Arrays, Operations &amp; Data Science Basics | YLearner">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">Y<span>Learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/data-science/">Data Science</a><span class="separator">›</span>
+          <span class="current">NumPy</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">📊 Data Science</div>
+          <h1>NumPy Tutorial – Arrays, Operations &amp; Data Science Basics</h1>
+          <p class="lesson-intro">NumPy (Numerical Python) is the bedrock of the entire Python data science ecosystem. Pandas, Scikit-learn, TensorFlow, and PyTorch all build on top of NumPy's <code>ndarray</code>. Understanding NumPy deeply means understanding <em>why</em> data science in Python is so fast and expressive. In this lesson you will go from installation to advanced broadcasting and vectorized operations.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 30 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2024</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="what-is-numpy">What is NumPy?</h2>
+          <p>NumPy provides a fixed-type, multi-dimensional array object — the <code>ndarray</code> — and a large library of mathematical functions to operate on it. The key advantage over Python lists is <strong>speed</strong>: NumPy operations are implemented in C and operate on contiguous memory blocks, making them 10–100x faster than equivalent Python loops.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Feature</th><th>Python List</th><th>NumPy ndarray</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Type</td><td>Heterogeneous (any type)</td><td>Homogeneous (one dtype)</td></tr>
+                <tr><td>Memory</td><td>Scattered (pointers)</td><td>Contiguous block</td></tr>
+                <tr><td>Speed</td><td>Slow (Python loops)</td><td>Fast (C vectorized)</td></tr>
+                <tr><td>Dimensions</td><td>Nested lists (ugly)</td><td>Native N-D arrays</td></tr>
+                <tr><td>Math ops</td><td>Must loop manually</td><td>Element-wise by default</td></tr>
+                <tr><td>Memory usage</td><td>Higher</td><td>Lower (no boxing)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="installing-numpy">Installing NumPy</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Shell</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-bash">pip install numpy
+
+# Verify
+python -c "import numpy as np; print(np.__version__)"
+# 1.26.x or 2.x</code></pre>
+          </div>
+
+          <p>The conventional import alias is <code>np</code>. Every NumPy tutorial and library in the world uses <code>import numpy as np</code>.</p>
+
+          <h2 id="creating-arrays">Creating Arrays</h2>
+          <p>NumPy provides many ways to create arrays. The most common starting point is converting a Python list:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import numpy as np
+
+# From a Python list — 1D array
+a = np.array([1, 2, 3, 4, 5])
+print(a)          # [1 2 3 4 5]
+print(type(a))    # &lt;class 'numpy.ndarray'&gt;
+print(a.dtype)    # int64
+
+# From a nested list — 2D array (matrix)
+matrix = np.array([[1, 2, 3],
+                   [4, 5, 6],
+                   [7, 8, 9]])
+print(matrix.shape)   # (3, 3)
+print(matrix.ndim)    # 2
+print(matrix.size)    # 9
+
+# Specify dtype
+floats = np.array([1, 2, 3], dtype=np.float64)
+print(floats)    # [1. 2. 3.]
+print(floats.dtype)  # float64</code></pre>
+          </div>
+
+          <h3 id="array-creation-functions">Array Creation Functions</h3>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import numpy as np
+
+# zeros — filled with 0.0
+z = np.zeros((3, 4))
+print(z.shape)   # (3, 4)
+
+# ones — filled with 1.0
+o = np.ones((2, 3))
+print(o)
+# [[1. 1. 1.]
+#  [1. 1. 1.]]
+
+# full — filled with a specific value
+f = np.full((2, 2), 7)
+print(f)
+# [[7 7]
+#  [7 7]]
+
+# eye — identity matrix
+I = np.eye(4)      # 4×4 identity
+print(I.diagonal())  # [1. 1. 1. 1.]
+
+# arange — like Python range() but returns ndarray
+r = np.arange(0, 20, 2)   # start, stop, step
+print(r)   # [ 0  2  4  6  8 10 12 14 16 18]
+
+# linspace — evenly spaced values between start and stop (inclusive)
+ls = np.linspace(0, 1, 5)
+print(ls)   # [0.   0.25 0.5  0.75 1.  ]
+
+# Random arrays
+np.random.seed(42)   # for reproducibility
+rand_uniform = np.random.rand(3, 3)      # uniform [0, 1)
+rand_normal  = np.random.randn(3, 3)     # standard normal (mean=0, std=1)
+rand_int     = np.random.randint(1, 100, size=(3, 4))  # random ints
+print(rand_int)</code></pre>
+          </div>
+
+          <h2 id="array-attributes">Key Array Attributes</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import numpy as np
+
+a = np.array([[1, 2, 3], [4, 5, 6]])
+
+print(a.shape)    # (2, 3) — 2 rows, 3 columns
+print(a.ndim)     # 2      — number of dimensions
+print(a.size)     # 6      — total number of elements
+print(a.dtype)    # int64  — data type
+print(a.itemsize) # 8      — bytes per element
+print(a.nbytes)   # 48     — total bytes in memory</code></pre>
+          </div>
+
+          <h2 id="indexing-slicing">Array Indexing and Slicing</h2>
+          <p>NumPy indexing works like Python lists for 1D arrays, and extends naturally to multiple dimensions:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import numpy as np
+
+# 1D indexing
+a = np.array([10, 20, 30, 40, 50])
+print(a[0])      # 10
+print(a[-1])     # 50
+print(a[1:4])    # [20 30 40]
+print(a[::2])    # [10 30 50] — every other element
+
+# 2D indexing — [row, col]
+m = np.array([[1, 2, 3],
+              [4, 5, 6],
+              [7, 8, 9]])
+
+print(m[0, 0])   # 1
+print(m[1, 2])   # 6
+print(m[2, :])   # [7 8 9]  — entire row 2
+print(m[:, 1])   # [2 5 8]  — entire column 1
+print(m[0:2, 1:3])  # [[2 3] [5 6]] — submatrix
+
+# Fancy indexing — using arrays of indices
+idx = np.array([0, 2])
+print(m[idx])    # [[1 2 3] [7 8 9]] — rows 0 and 2
+
+# Boolean (mask) indexing — extremely common in data work
+data = np.array([15, 3, 42, 7, 28, 11])
+mask = data > 10
+print(mask)        # [True False True False True False]
+print(data[mask])  # [15 42 28] — only elements > 10
+print(data[data % 2 == 0])  # [42 28] — even numbers only</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Slices are Views, Not Copies</strong>
+              <p>NumPy slices return a <em>view</em> of the original array for efficiency — modifying the slice modifies the original. Use <code>.copy()</code> if you need an independent copy: <code>b = a[1:3].copy()</code>.</p>
+            </div>
+          </div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="array-operations">Array Operations</h2>
+          <p>NumPy operations are <strong>element-wise by default</strong> — they apply to every element simultaneously without a Python loop:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import numpy as np
+
+a = np.array([1, 2, 3, 4])
+b = np.array([10, 20, 30, 40])
+
+# Arithmetic — all element-wise
+print(a + b)    # [11 22 33 44]
+print(a - b)    # [-9 -18 -27 -36]
+print(a * b)    # [10 40 90 160]
+print(b / a)    # [10. 10. 10. 10.]
+print(a ** 2)   # [1 4 9 16]
+print(b % 3)    # [1 2 0 1]
+
+# Scalar operations — broadcasts the scalar to all elements
+print(a * 5)    # [5 10 15 20]
+print(a + 100)  # [101 102 103 104]
+
+# Comparison — returns boolean array
+print(a > 2)    # [False False  True  True]
+print(a == b)   # [False False False False]
+
+# Universal functions (ufuncs) — fast element-wise math
+print(np.sqrt(a))       # [1. 1.414 1.732 2.]
+print(np.exp(a))        # [e^1 e^2 e^3 e^4]
+print(np.log(b))        # [2.302 2.995 3.401 3.688]
+print(np.abs(np.array([-3, -1, 2, 4])))   # [3 1 2 4]
+print(np.sin(np.linspace(0, np.pi, 5)))   # [0. 0.707 1. 0.707 0.]</code></pre>
+          </div>
+
+          <h2 id="dot-product">Matrix Multiplication and Dot Product</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import numpy as np
+
+# Dot product of 1D vectors
+a = np.array([1, 2, 3])
+b = np.array([4, 5, 6])
+print(np.dot(a, b))    # 1*4 + 2*5 + 3*6 = 32
+print(a @ b)           # Same with @ operator (Python 3.5+)
+
+# Matrix multiplication
+A = np.array([[1, 2], [3, 4]])
+B = np.array([[5, 6], [7, 8]])
+
+print(A @ B)           # Matrix product (not element-wise!)
+# [[19 22]
+#  [43 50]]
+
+print(A * B)           # Element-wise product (Hadamard)
+# [[ 5 12]
+#  [21 32]]
+
+# Transpose
+print(A.T)
+# [[1 3]
+#  [2 4]]
+
+print(A.T @ A)         # A^T A  — common in linear regression
+# [[ 10 14]
+#  [ 14 20]]</code></pre>
+          </div>
+
+          <h2 id="reshape-transpose">Reshape and Transpose</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import numpy as np
+
+a = np.arange(12)
+print(a)         # [ 0  1  2  3  4  5  6  7  8  9 10 11]
+
+# reshape — change shape without changing data
+m = a.reshape(3, 4)   # 3 rows, 4 columns
+print(m)
+# [[ 0  1  2  3]
+#  [ 4  5  6  7]
+#  [ 8  9 10 11]]
+
+# Use -1 to let NumPy infer one dimension
+m2 = a.reshape(4, -1)   # 4 rows, NumPy figures out 3 columns
+print(m2.shape)  # (4, 3)
+
+# Flatten — always returns a copy
+flat = m.flatten()
+print(flat)   # [ 0  1  2  3  4  5  6  7  8  9 10 11]
+
+# ravel — returns a view if possible (faster)
+flat_view = m.ravel()
+
+# Add dimensions with np.newaxis
+col = a[:, np.newaxis]    # shape (12,) → (12, 1)
+row = a[np.newaxis, :]    # shape (12,) → (1, 12)
+print(col.shape, row.shape)  # (12, 1) (1, 12)</code></pre>
+          </div>
+
+          <h2 id="broadcasting">Broadcasting</h2>
+          <p>Broadcasting is NumPy's powerful mechanism for performing operations on arrays of <em>different shapes</em> without copying data. It works by "stretching" the smaller array along dimensions of size 1.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import numpy as np
+
+# Scalar broadcast
+a = np.array([1, 2, 3])
+print(a + 10)    # [11 12 13] — 10 is broadcast to match a's shape
+
+# 1D + 2D broadcasting
+matrix = np.ones((3, 3))    # shape (3, 3)
+row    = np.array([1, 2, 3])  # shape (3,) — treated as (1, 3)
+print(matrix + row)
+# [[2. 3. 4.]
+#  [2. 3. 4.]
+#  [2. 3. 4.]]
+
+# Column vector broadcast
+col = np.array([[10], [20], [30]])   # shape (3, 1)
+print(matrix + col)
+# [[11. 11. 11.]
+#  [21. 21. 21.]
+#  [31. 31. 31.]]
+
+# Practical: mean-center each column of a dataset
+data = np.random.randn(100, 5)   # 100 samples, 5 features
+column_means = data.mean(axis=0)  # shape (5,)
+centered = data - column_means    # broadcasts: (100,5) - (5,) → (100,5)
+print(centered.mean(axis=0).round(10))  # near-zero column means</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Broadcasting Rules</strong>
+              <p>NumPy aligns shapes from the right. If dimensions match or one of them is 1, the operation proceeds. A shape <code>(3,)</code> is treated as <code>(1, 3)</code> when broadcast against a 2D array.</p>
+            </div>
+          </div>
+
+          <h2 id="aggregate-functions">Aggregate Functions</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import numpy as np
+
+data = np.array([[4, 7, 2],
+                 [1, 8, 5],
+                 [9, 3, 6]])
+
+# Global aggregates — across all elements
+print(data.sum())     # 45
+print(data.mean())    # 5.0
+print(data.max())     # 9
+print(data.min())     # 1
+print(data.std())     # 2.581...
+print(data.var())     # 6.666...
+print(np.median(data))  # 5.0
+
+# Axis-wise aggregates
+# axis=0 → collapse rows (result has same columns)
+print(data.sum(axis=0))    # [14 18 13] — column sums
+print(data.max(axis=0))    # [9 8 6]    — column maxima
+
+# axis=1 → collapse columns (result has same rows)
+print(data.sum(axis=1))    # [13 14 18] — row sums
+print(data.mean(axis=1))   # [4.33 4.67 6.0]
+
+# Index of min/max
+print(np.argmax(data))          # 6 (flat index of 9)
+print(np.argmax(data, axis=0))  # [2 1 2] — row index of max per column
+print(np.argmin(data, axis=1))  # [2 0 1] — col index of min per row
+
+# Cumulative operations
+print(np.cumsum(np.array([1, 2, 3, 4])))   # [1 3 6 10]
+print(np.cumprod(np.array([1, 2, 3, 4])))  # [1 2 6 24]</code></pre>
+          </div>
+
+          <h2 id="numpy-vs-list-speed">NumPy vs Python Lists – Speed Comparison</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import numpy as np
+import time
+
+n = 1_000_000
+
+# Python list: square each element
+py_list = list(range(n))
+
+start = time.time()
+result = [x ** 2 for x in py_list]
+py_time = time.time() - start
+print(f"Python list: {py_time * 1000:.1f} ms")
+
+# NumPy array: square each element
+np_array = np.arange(n)
+
+start = time.time()
+result = np_array ** 2
+np_time = time.time() - start
+print(f"NumPy array: {np_time * 1000:.1f} ms")
+
+print(f"NumPy is {py_time / np_time:.0f}x faster")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Typical Output</div>
+Python list: 187.3 ms
+NumPy array: 2.1 ms
+NumPy is 89x faster
+          </div>
+
+          <h2 id="common-operations">Common Data Science Operations</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import numpy as np
+
+# Normalise data to [0, 1]
+data = np.array([10, 25, 5, 50, 30])
+normalised = (data - data.min()) / (data.max() - data.min())
+print(normalised.round(3))   # [0.111 0.444 0.    1.    0.556]
+
+# Standardise data (z-score)
+standardised = (data - data.mean()) / data.std()
+print(standardised.round(3)) # [-0.521  0.391 -1.042  1.824  0.651]
+
+# Count elements satisfying a condition
+print((data > 20).sum())     # 3
+
+# Unique values and counts
+arr = np.array([1, 2, 2, 3, 3, 3])
+values, counts = np.unique(arr, return_counts=True)
+print(values)   # [1 2 3]
+print(counts)   # [1 2 3]
+
+# Sort
+arr2 = np.array([5, 1, 4, 2, 3])
+print(np.sort(arr2))          # [1 2 3 4 5]
+print(np.argsort(arr2))       # [1 3 4 2 0] — indices that would sort
+
+# Clip values to a range
+raw = np.array([-5, 0, 3, 10, 20])
+clipped = np.clip(raw, 0, 10)
+print(clipped)   # [0 0 3 10 10]
+
+# Where — conditional selection
+a = np.array([1, 2, 3, 4, 5])
+result = np.where(a > 3, "big", "small")
+print(result)    # ['small' 'small' 'small' 'big' 'big']</code></pre>
+          </div>
+
+          <h2 id="stacking-splitting">Stacking and Splitting</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import numpy as np
+
+a = np.array([[1, 2], [3, 4]])
+b = np.array([[5, 6], [7, 8]])
+
+# Stack vertically (row-wise)
+v = np.vstack([a, b])
+print(v.shape)   # (4, 2)
+
+# Stack horizontally (column-wise)
+h = np.hstack([a, b])
+print(h.shape)   # (2, 4)
+
+# Concatenate along an axis
+c = np.concatenate([a, b], axis=0)   # same as vstack
+print(c.shape)   # (4, 2)
+
+# Split
+arr = np.arange(12).reshape(4, 3)
+top, bottom = np.vsplit(arr, 2)   # split into 2 equal halves
+print(top.shape, bottom.shape)    # (2, 3) (2, 3)
+
+left, right = np.hsplit(arr, 3)   # split into 3 columns
+print(left.shape)   # (4, 1)</code></pre>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercises</h3>
+            <ol>
+              <li>Create a 5×5 array of random integers between 1 and 100. Find the max of each row, min of each column, and the sum of the diagonal.</li>
+              <li>Generate an array of 1000 normally-distributed random numbers. Calculate the percentage of values within 1, 2, and 3 standard deviations of the mean (should be ~68%, ~95%, ~99.7%).</li>
+              <li>Implement matrix multiplication from scratch using NumPy slicing and verify with <code>@</code> operator.</li>
+              <li>Reshape a 1D array of 24 elements into a 2×3×4 three-dimensional array and access specific elements using multi-dimensional indexing.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge: Image as an Array</h3>
+            <p>A grayscale image is just a 2D NumPy array where each value is a pixel intensity (0–255). Load an image using <code>matplotlib.pyplot.imread()</code>, which returns a NumPy array. Perform: (1) flip it horizontally using slicing, (2) crop to the center 50%, (3) adjust brightness by multiplying all values by 1.2 and clipping to 255, (4) convert to black and white by thresholding at 128 using <code>np.where()</code>. Display each result using <code>matplotlib.pyplot.imshow()</code>.</p>
+          </div>
+
+          <ul class="interview-list">
+            <li>What is an ndarray and how does it differ from a Python list?</li>
+            <li>What does it mean for NumPy operations to be vectorized?</li>
+            <li>Explain NumPy broadcasting with an example.</li>
+            <li>What is the difference between <code>np.dot(A, B)</code> and <code>A * B</code> for 2D arrays?</li>
+            <li>What is the difference between <code>.flatten()</code> and <code>.ravel()</code>?</li>
+            <li>What does <code>axis=0</code> vs <code>axis=1</code> mean for aggregation functions?</li>
+            <li>How does boolean indexing work in NumPy?</li>
+            <li>What is the difference between a view and a copy in NumPy?</li>
+            <li>How would you normalise an array to have zero mean and unit variance?</li>
+          </ul>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>NumPy's <code>ndarray</code> is a fixed-type, contiguous array that is the foundation of Python data science.</li>
+              <li>Create arrays with <code>np.array()</code>, <code>np.zeros()</code>, <code>np.ones()</code>, <code>np.arange()</code>, <code>np.linspace()</code>, and <code>np.random</code>.</li>
+              <li>Key attributes: <code>.shape</code>, <code>.ndim</code>, <code>.size</code>, <code>.dtype</code>.</li>
+              <li>Indexing uses <code>[row, col]</code> syntax; slices return views (not copies).</li>
+              <li>All arithmetic operations are element-wise by default.</li>
+              <li>Use <code>@</code> or <code>np.dot()</code> for matrix multiplication.</li>
+              <li>Broadcasting allows operations on arrays of different shapes by "stretching" size-1 dimensions.</li>
+              <li>Aggregate functions (<code>sum</code>, <code>mean</code>, <code>max</code>, etc.) accept an <code>axis</code> parameter.</li>
+              <li>NumPy is typically 10–100x faster than equivalent Python list operations.</li>
+            </ul>
+          </div>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/data-science/pandas.html" class="topic-tag">🐼 Pandas</a>
+            <a href="/python/frameworks/flask.html" class="topic-tag">⚡ Flask</a>
+            <a href="/python/advanced/generators.html" class="topic-tag">🚀 Generators</a>
+            <a href="/python/frameworks/fastapi.html" class="topic-tag">⚡ FastAPI</a>
+            <a href="/python/projects/calculator.html" class="topic-tag">🛠️ Projects</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">When should I use NumPy vs a Python list? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use NumPy whenever you need to perform mathematical operations on large collections of numbers. NumPy is 10–100x faster for numerical work. Use plain lists for small collections of mixed-type objects or when you need to frequently append/remove elements (list append is O(1); NumPy concatenate is O(n)).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between np.float64 and Python's float? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Python's <code>float</code> is a Python object with a lot of overhead. <code>np.float64</code> is a raw 64-bit IEEE 754 double stored in a contiguous C array — no overhead. NumPy also offers <code>float32</code> (half the memory, less precision), which is often used in deep learning.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the relationship between NumPy and Pandas? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A Pandas DataFrame is built on top of NumPy arrays. Each column in a DataFrame is a NumPy array. Pandas adds labels (index), heterogeneous column types, and a rich API for tabular data on top of NumPy's numerical core.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I handle NaN values in NumPy? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>np.nan</code> to represent missing values. Most aggregate functions have "NaN-safe" versions: <code>np.nansum()</code>, <code>np.nanmean()</code>, <code>np.nanmax()</code>, etc. Detect NaN with <code>np.isnan(arr)</code>, which returns a boolean mask.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/frameworks/fastapi.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">FastAPI</span>
+          </a>
+          <a href="/python/data-science/pandas.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Pandas</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 YLearner Python Tutorial</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>
