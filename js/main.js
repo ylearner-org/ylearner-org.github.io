@@ -1,5 +1,5 @@
 /* ========================================
-   YLearner Python Tutorial - Main JS
+   ylearner – Learn to Code | Main JS
    ======================================== */
 
 (function () {
@@ -456,6 +456,45 @@
   }
 
   // ========================
+  // Algorid Footer Credit
+  // ========================
+  function injectAlgoridCredit() {
+    document.querySelectorAll('.footer-bottom').forEach(footer => {
+      if (footer.querySelector('.algorid-credit')) return;
+      const credit = document.createElement('span');
+      credit.className = 'algorid-credit';
+      credit.innerHTML = 'Developed by <a href="https://algorid.com/" target="_blank" rel="noopener noreferrer" style="color:var(--python-blue);font-weight:600;">Algorid Limited</a>';
+      footer.appendChild(credit);
+    });
+  }
+
+  // ========================
+  // Course Nav Header (Sidebar top label)
+  // ========================
+  function renderCourseLabel(container) {
+    const path = window.location.pathname;
+    let course = null;
+    if (path.includes('/python/')) course = { name: 'Python Course', icon: '🐍', color: '#3776AB' };
+    else if (path.includes('/javascript/')) course = { name: 'JavaScript Course', icon: '⚡', color: '#F7DF1E' };
+    else if (path.includes('/c/') && !path.includes('/cpp/')) course = { name: 'C Course', icon: '⚙️', color: '#A8B9CC' };
+    else if (path.includes('/cpp/')) course = { name: 'C++ Course', icon: '🔷', color: '#00599C' };
+
+    if (course) {
+      const label = document.createElement('div');
+      label.className = 'course-sidebar-label';
+      label.innerHTML = `
+        <a href="/" style="display:flex;align-items:center;gap:0.5rem;padding:0.75rem 1.25rem;font-size:0.8rem;color:var(--text-muted);text-decoration:none;border-bottom:1px solid var(--border-color);margin-bottom:0.5rem;">
+          ← All Courses
+        </a>
+        <div style="padding:0.5rem 1.25rem 0.75rem;font-size:0.8rem;font-weight:700;color:${course.color};display:flex;align-items:center;gap:0.4rem;">
+          ${course.icon} ${course.name}
+        </div>
+      `;
+      container.insertBefore(label, container.firstChild);
+    }
+  }
+
+  // ========================
   // Init All
   // ========================
   function init() {
@@ -465,6 +504,7 @@
     if (navContainer) {
       renderNav(navContainer);
       setActiveNavLink();
+      renderCourseLabel(navContainer);
     }
 
     initSearch();
@@ -475,6 +515,7 @@
     initFAQ();
     initScrollTop();
     initHighlight();
+    injectAlgoridCredit();
 
     // Theme toggle button
     const themeBtn = document.getElementById('themeToggle');
