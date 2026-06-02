@@ -6,6 +6,39 @@
   'use strict';
 
   // ========================
+  // Base URL — file:// compat
+  // ========================
+  // On a real server (https/http) absolute /paths work fine.
+  // With file:// protocol, /path resolves to filesystem root — wrong.
+  // Detect project root so all links work both locally and on GitHub Pages.
+  const BASE = (function () {
+    if (location.protocol !== 'file:') return '';
+    const path = location.pathname;
+    const parts = path.split('/').filter(Boolean);
+    parts.pop(); // remove filename
+    const depth2Folders = ['beginner','control-flow','functions','data-structures',
+      'intermediate','oop','advanced','real-world','frameworks','data-science','interview','projects'];
+    const isDepth2 = depth2Folders.some(f => path.includes('/' + f + '/'));
+    const isDepth1 = !isDepth2 && ['/python/','/javascript/','/c/','/cpp/','/java/','/sql/'].some(s => path.includes(s));
+    if (isDepth2) parts.splice(-2);
+    else if (isDepth1) parts.splice(-1);
+    return 'file:///' + parts.join('/');
+  }());
+
+  // Intercept absolute link clicks when running via file://
+  if (BASE) {
+    document.addEventListener('click', function (e) {
+      const link = e.target.closest('a[href]');
+      if (!link) return;
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('/') && !href.startsWith('//')) {
+        e.preventDefault();
+        location.href = BASE + href;
+      }
+    }, true);
+  }
+
+  // ========================
   // Navigation Data
   // ========================
   const NAV_DATA = [
@@ -161,12 +194,12 @@
     },
   ];
 
-  // Search index
+  // Search index (with BASE-prefixed URLs for file:// searches)
   const SEARCH_INDEX = NAV_DATA.flatMap(section =>
     section.items.map(item => ({
       title: item.title,
       category: section.title.replace(/^.{2}\s/, ''),
-      url: item.url,
+      url: BASE + item.url,  // prefixed for file:// compat
     }))
   );
 
@@ -178,17 +211,16 @@
     const currentPath = window.location.pathname;
 
     const html = NAV_DATA.map((section, i) => {
-      const isActive = section.items.some(item => currentPath.includes(item.url.replace('.html', '')));
-
       const links = section.items.map(item => {
-        const active = currentPath === item.url || currentPath.endsWith(item.url.replace('/python', '').replace('.html', '')) ||
-          currentPath.includes(item.url.replace('.html', '').split('/').pop());
+        const slug = item.url.replace('.html', '').split('/').pop();
+        const active = currentPath.includes(slug) && slug.length > 2;
         const badge = item.badge ? `<span class="nav-badge badge-${item.badge}">${item.badge.toUpperCase()}</span>` : '';
-        return `<li><a href="${item.url}" ${active ? 'class="active"' : ''}>${item.title}${badge}</a></li>`;
+        const href = BASE + item.url; // BASE='' on server, BASE='file:///...' locally
+        return `<li><a href="${href}" ${active ? 'class="active"' : ''}>${item.title}${badge}</a></li>`;
       }).join('');
 
       return `
-        <div class="nav-section ${isActive ? '' : ''}">
+        <div class="nav-section">
           <div class="nav-section-title" data-section="${i}">
             <span>${section.title}</span>
             <span class="arrow">▼</span>
