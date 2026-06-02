@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Scope Explained – LEGB Rule, global, nonlocal | ylearner | ylearner</title>
+  <meta name="description" content="Understand Python scope: local, enclosing, global, and built-in (LEGB rule). Learn the global and nonlocal keywords, closures, and common scope mistakes.">
+  <meta name="keywords" content="python scope, python local global scope, python LEGB, python global keyword, python nonlocal, python variable scope">
+  <link rel="canonical" href="https://ylearner.org/python/functions/scope.html">
+  <meta property="og:title" content="Python Scope Explained – LEGB Rule, global, nonlocal | ylearner">
+  <meta property="og:description" content="Understand Python scope: local, enclosing, global, and built-in (LEGB rule). Learn the global and nonlocal keywords, closures, and common scope mistakes.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Python Scope – Local, Global, Enclosing, and Built-in (LEGB Rule)","description":"Understand Python scope: local, enclosing, global, and built-in (LEGB rule). Learn the global and nonlocal keywords, closures, and common scope mistakes.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/functions/function-basics.html">Functions</a><span class="separator">›</span>
+          <span class="current">Scope</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Functions</div>
+          <h1>Python Scope – Local, Global, Enclosing, and Built-in (LEGB Rule)</h1>
+          <p class="lesson-intro">Scope determines where a variable is visible and accessible in your code. Python follows the LEGB rule to look up variable names: Local → Enclosing → Global → Built-in. Misunderstanding scope causes some of the most confusing bugs in Python.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2024</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="legb">The LEGB Rule</h2>
+          <p>When Python encounters a variable name, it searches in this order: <strong>L</strong>ocal (inside the current function), <strong>E</strong>nclosing (outer function in nested functions), <strong>G</strong>lobal (module-level), <strong>B</strong>uilt-in (Python's built-in names like len, print, range).</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">x = "global"     # G - global scope
+
+def outer():
+    x = "enclosing"  # E - enclosing scope
+    def inner():
+        x = "local"  # L - local scope
+        print(x)     # Finds "local" first
+    inner()
+    print(x)         # Finds "enclosing"
+
+outer()
+print(x)             # Finds "global"</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+local
+enclosing
+global
+          </div>
+
+          <h2 id="global">The global Keyword</h2>
+          <p>To modify a global variable inside a function, declare it with the global keyword.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">count = 0  # Global
+
+def increment():
+    global count   # Tell Python to use the global count
+    count += 1
+
+increment()
+increment()
+increment()
+print(count)  # 3 - global was modified</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+3
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>Tip</strong><p>Using global is generally discouraged. Prefer passing values as arguments and returning them instead.</p></div>
+          </div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="nonlocal">The nonlocal Keyword (Closures)</h2>
+          <p>In nested functions, nonlocal refers to the enclosing function's variable (not global).</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def make_counter():
+    count = 0
+    def counter():
+        nonlocal count   # Refers to outer function's count
+        count += 1
+        return count
+    return counter
+
+my_counter = make_counter()
+print(my_counter())  # 1
+print(my_counter())  # 2
+print(my_counter())  # 3</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+1
+2
+3
+          </div>
+
+          <h2 id="builtin">Built-in Scope</h2>
+          <p>Built-in scope contains Python's built-in functions and constants. Be careful not to shadow them with your own variable names.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># ❌ Don't shadow built-ins!
+list = [1, 2, 3]   # Overwrites the built-in list!
+print = "hi"       # Overwrites print! Now you can't print!
+
+# ✅ Use descriptive names
+my_list = [1, 2, 3]
+message = "hi"
+print(message)     # Works fine</code></pre>
+          </div>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/functions/lambda.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Lambda Functions</span>
+          </a>
+          <a href="/python/functions/recursion.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Recursion</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

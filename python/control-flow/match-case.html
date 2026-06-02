@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Match Case Statement – Structural Pattern Matching Guide | ylearner</title>
+  <meta name="description" content="Learn Python 3.10+ match-case statement: basic matching, patterns with guards, matching sequences and dicts, and when to use match-case over if-elif chains.">
+  <meta name="keywords" content="python match case, python pattern matching, python 3.10 match, python structural pattern matching, python switch case">
+  <link rel="canonical" href="https://ylearner.org/python/control-flow/match-case.html">
+  <meta property="og:title" content="Python Match Case Statement – Structural Pattern Matching Guide">
+  <meta property="og:description" content="Learn Python 3.10+ match-case statement: basic matching, patterns with guards, matching sequences and dicts, and when to use match-case over if-elif chains.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Python Match Case – Pattern Matching (Python 3.10+)","description":"Learn Python 3.10+ match-case statement: basic matching, patterns with guards, matching sequences and dicts, and when to use match-case over if-elif chains.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/control-flow/if-statements.html">Control Flow</a><span class="separator">›</span>
+          <span class="current">Match Case</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🔀 Control Flow</div>
+          <h1>Python Match Case – Pattern Matching (Python 3.10+)</h1>
+          <p class="lesson-intro">Python 3.10 introduced the <code>match</code> statement — Python's version of switch/case found in other languages, but far more powerful. It supports structural pattern matching: matching against values, types, sequences, mappings, and object attributes. It requires Python 3.10 or newer.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2024</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="basic">Basic Match-Case Syntax</h2>
+          <p>The match statement compares a value against multiple patterns. The first matching pattern executes its block. The <code>case _:</code> is the wildcard (matches anything — like "else").</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def describe_http_status(status):
+    match status:
+        case 200:
+            return "OK"
+        case 404:
+            return "Not Found"
+        case 500:
+            return "Server Error"
+        case _:              # wildcard - matches anything
+            return f"Unknown status: {status}"
+
+print(describe_http_status(200))
+print(describe_http_status(404))
+print(describe_http_status(999))</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+OK
+Not Found
+Unknown status: 999
+          </div>
+
+          <h2 id="or-patterns">OR Patterns – Multiple Values</h2>
+          <p>Use | to match multiple values in a single case.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def day_type(day):
+    match day:
+        case "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday":
+            return "Weekday"
+        case "Saturday" | "Sunday":
+            return "Weekend"
+        case _:
+            return "Invalid day"
+
+print(day_type("Monday"))    # Weekday
+print(day_type("Saturday"))  # Weekend</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Weekday
+Weekend
+          </div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="guard">Guard Conditions with if</h2>
+          <p>Add an if guard to a case for additional conditions.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def classify(value):
+    match value:
+        case x if x < 0:
+            return f"{x} is negative"
+        case 0:
+            return "zero"
+        case x if x > 0 and x <= 100:
+            return f"{x} is between 1 and 100"
+        case _:
+            return f"{value} is over 100"
+
+print(classify(-5))
+print(classify(0))
+print(classify(42))</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+-5 is negative
+zero
+42 is between 1 and 100
+          </div>
+
+          <h2 id="sequence">Matching Sequences and Dicts</h2>
+          <p>Match can destructure lists, tuples, and dicts directly.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Match sequences (lists/tuples)
+def describe_point(point):
+    match point:
+        case [0, 0]:
+            return "Origin"
+        case [x, 0]:
+            return f"On X-axis at {x}"
+        case [0, y]:
+            return f"On Y-axis at {y}"
+        case [x, y]:
+            return f"Point at ({x}, {y})"
+
+print(describe_point([0, 0]))
+print(describe_point([3, 0]))
+print(describe_point([4, 5]))</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Origin
+On X-axis at 3
+Point at (4, 5)
+          </div>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/control-flow/nested-if.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Nested If</span>
+          </a>
+          <a href="/python/control-flow/for-loop.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">For Loop</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>
