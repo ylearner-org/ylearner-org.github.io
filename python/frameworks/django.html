@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Django Tutorial – MVT, Models, Views, URLs & Admin | ylearner | ylearner</title>
+  <meta name="description" content="Get started with Django: MVT architecture, project setup, models, views, URL routing, templates, admin panel, and building your first Django web application.">
+  <meta name="keywords" content="django tutorial, django python, django for beginners, django MVT, django models views, django getting started">
+  <link rel="canonical" href="https://ylearner.org/python/frameworks/django.html">
+  <meta property="og:title" content="Django Tutorial – MVT, Models, Views, URLs & Admin | ylearner">
+  <meta property="og:description" content="Get started with Django: MVT architecture, project setup, models, views, URL routing, templates, admin panel, and building your first Django web application.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Django Python Tutorial – Full-Stack Web Framework","description":"Get started with Django: MVT architecture, project setup, models, views, URL routing, templates, admin panel, and building your first Django web application.","educationalLevel":"Advanced","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/frameworks/flask.html">Frameworks</a><span class="separator">›</span><span class="current">Django</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚡ Frameworks</div>
+          <h1>Django Python Tutorial – Full-Stack Web Framework</h1>
+          <p class="lesson-intro">Django is Python's most popular full-stack web framework — used by Instagram, Pinterest, Disqus, and Mozilla. It follows the MVT (Model-View-Template) pattern and comes "batteries included": authentication, admin panel, ORM, form validation, and security features out of the box.</p>
+          <div class="lesson-meta"><span>⏱️ 35 min read</span><span>🎯 Advanced</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="setup">Installing and Creating a Django Project</h2>
+          <p>Install Django with pip and use <code>django-admin</code> to scaffold a project.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># Install Django
+# pip install django
+
+# Create a new project
+# django-admin startproject mysite
+# cd mysite
+
+# Create an app within the project
+# python manage.py startapp blog
+
+# Project structure:
+# mysite/
+#   manage.py       ← CLI tool
+#   mysite/
+#     settings.py   ← Configuration
+#     urls.py       ← URL routing
+#     wsgi.py       ← WSGI server entry
+#   blog/
+#     models.py     ← Database models
+#     views.py      ← View functions
+#     urls.py       ← App URL patterns</code></pre></div>
+
+          <h2 id="models">Models – Database Tables as Python Classes</h2>
+          <p>Django models map directly to database tables. Django generates and runs SQL migrations automatically.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># blog/models.py
+from django.db import models
+
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    author = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    published = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.title
+
+# Run migrations:
+# python manage.py makemigrations
+# python manage.py migrate</code></pre></div>
+
+          <h2 id="views">Views – Handling HTTP Requests</h2>
+          <p>Views receive HTTP requests and return responses.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># blog/views.py
+from django.shortcuts import render, get_object_or_404
+from .models import Post
+
+def post_list(request):
+    posts = Post.objects.filter(published=True)
+    return render(request, "blog/post_list.html", {"posts": posts})
+
+def post_detail(request, pk):
+    post = get_object_or_404(Post, pk=pk, published=True)
+    return render(request, "blog/post_detail.html", {"post": post})</code></pre></div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="urls">URL Routing</h2>
+          <p>Map URLs to view functions using URLconf.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># blog/urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("",           views.post_list,   name="post-list"),
+    path("posts/<int:pk>/", views.post_detail, name="post-detail"),
+]
+
+# mysite/urls.py
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("blog/",  include("blog.urls")),
+]</code></pre></div>
+
+          <h2 id="admin">The Django Admin Panel</h2>
+          <p>Register models to get a fully-featured CRUD admin UI automatically.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># blog/admin.py
+from django.contrib import admin
+from .models import Post
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    list_display = ["title", "author", "published", "created_at"]
+    list_filter  = ["published", "created_at"]
+    search_fields = ["title", "content"]
+
+# Create superuser:
+# python manage.py createsuperuser
+# Visit http://127.0.0.1:8000/admin/</code></pre></div>
+          <div class="callout callout-tip"><span class="callout-icon">💡</span><div class="callout-content"><strong>Tip</strong><p>Django's admin is one of its killer features. You get a full CRUD interface for all your models with zero additional code.</p></div></div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/frameworks/flask.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Flask</span></a>
+          <a href="/python/frameworks/fastapi.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">FastAPI</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

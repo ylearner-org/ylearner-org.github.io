@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Dataclasses – @dataclass, fields, post_init | ylearner | ylearner</title>
+  <meta name="description" content="Learn Python dataclasses: @dataclass decorator, automatic __init__/__repr__/__eq__, field(), default_factory, __post_init__, frozen dataclasses, and comparison with NamedTuple.">
+  <meta name="keywords" content="python dataclass, python @dataclass, python dataclasses, python field(), python frozen dataclass, python data class">
+  <link rel="canonical" href="https://ylearner.org/python/advanced/dataclasses.html">
+  <meta property="og:title" content="Python Dataclasses – @dataclass, fields, post_init | ylearner">
+  <meta property="og:description" content="Learn Python dataclasses: @dataclass decorator, automatic __init__/__repr__/__eq__, field(), default_factory, __post_init__, frozen dataclasses, and comparison with NamedTuple.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Dataclasses – Clean Data Container Classes","description":"Learn Python dataclasses: @dataclass decorator, automatic __init__/__repr__/__eq__, field(), default_factory, __post_init__, frozen dataclasses, and comparison with NamedTuple.","educationalLevel":"Advanced","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/advanced/generators.html">Advanced Python</a><span class="separator">›</span><span class="current">Dataclasses</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Advanced Python</div>
+          <h1>Python Dataclasses – Clean Data Container Classes</h1>
+          <p class="lesson-intro">Dataclasses (Python 3.7+) automatically generate boilerplate methods (<code>__init__</code>, <code>__repr__</code>, <code>__eq__</code>) based on type-annotated class variables. They dramatically reduce the code needed to create data-holding classes while maintaining all the power of regular classes.</p>
+          <div class="lesson-meta"><span>⏱️ 18 min read</span><span>🎯 Advanced</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="basic">Basic Dataclass</h2>
+          <p>Decorate a class with <code>@dataclass</code> and annotate fields. Python generates <code>__init__</code>, <code>__repr__</code>, and <code>__eq__</code> automatically.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from dataclasses import dataclass
+
+# Without @dataclass (verbose)
+class PersonManual:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    def __repr__(self):
+        return f"Person(name={self.name!r}, age={self.age!r})"
+
+# With @dataclass (clean!)
+@dataclass
+class Person:
+    name: str
+    age: int
+
+p = Person("Alice", 30)
+print(p)            # Person(name='Alice', age=30)
+print(p.name)       # Alice
+print(Person("Bob", 25) == Person("Bob", 25))  # True</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Person(name='Alice', age=30)
+Alice
+True</div>
+
+          <h2 id="defaults">Default Values and field()</h2>
+          <p>Use <code>field()</code> for mutable defaults (lists, dicts). Never use mutable defaults directly.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from dataclasses import dataclass, field
+
+@dataclass
+class Student:
+    name: str
+    grade: float = 0.0
+    courses: list = field(default_factory=list)  # Correct!
+    # courses: list = []  ← WRONG — shared across instances!
+
+s1 = Student("Alice")
+s2 = Student("Bob")
+
+s1.courses.append("Python")
+print(s1.courses)  # ['Python']
+print(s2.courses)  # []  — independent list!</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>['Python']
+[]</div>
+
+          <h2 id="post_init">__post_init__ – Computed Fields</h2>
+          <p>Run code after <code>__init__</code> for validation or computed attributes.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from dataclasses import dataclass, field
+
+@dataclass
+class Rectangle:
+    width: float
+    height: float
+    area: float = field(init=False)  # Not a constructor param
+
+    def __post_init__(self):
+        if self.width <= 0 or self.height <= 0:
+            raise ValueError("Dimensions must be positive")
+        self.area = self.width * self.height
+
+r = Rectangle(5, 3)
+print(r)        # Rectangle(width=5, height=3, area=15)
+print(r.area)   # 15</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Rectangle(width=5, height=3, area=15)
+15</div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="frozen">Frozen Dataclasses – Immutable Objects</h2>
+          <p><code>frozen=True</code> makes all fields read-only and the object hashable (usable as dict key).</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Point:
+    x: float
+    y: float
+
+p = Point(3.0, 4.0)
+print(p)          # Point(x=3.0, y=4.0)
+
+try:
+    p.x = 10     # AttributeError!
+except Exception as e:
+    print(e)
+
+# Hashable — can be dict key or set member
+locations = {p: "Home"}
+print(locations[Point(3.0, 4.0)])  # Home</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Point(x=3.0, y=4.0)
+cannot assign to field 'x'
+Home</div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/advanced/type-hinting.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Type Hinting</span></a>
+          <a href="/python/real-world/api-development.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">API Development</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

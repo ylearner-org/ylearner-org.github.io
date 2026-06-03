@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Type Hints – Annotations, typing Module & mypy | ylearner | ylearner</title>
+  <meta name="description" content="Learn Python type hints: function annotations, variable annotations, Optional, Union, List, Dict, Tuple, Callable, TypeVar, Protocol, and static type checking with mypy.">
+  <meta name="keywords" content="python type hints, python type annotations, python typing, python mypy, python Optional, python Union, python type checking">
+  <link rel="canonical" href="https://ylearner.org/python/advanced/type-hinting.html">
+  <meta property="og:title" content="Python Type Hints – Annotations, typing Module & mypy | ylearner">
+  <meta property="og:description" content="Learn Python type hints: function annotations, variable annotations, Optional, Union, List, Dict, Tuple, Callable, TypeVar, Protocol, and static type checking with mypy.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Type Hinting – Type Annotations and mypy","description":"Learn Python type hints: function annotations, variable annotations, Optional, Union, List, Dict, Tuple, Callable, TypeVar, Protocol, and static type checking with mypy.","educationalLevel":"Advanced","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/advanced/generators.html">Advanced Python</a><span class="separator">›</span><span class="current">Type Hinting</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Advanced Python</div>
+          <h1>Python Type Hinting – Type Annotations and mypy</h1>
+          <p class="lesson-intro">Type hints are optional annotations that declare the expected types of function parameters, return values, and variables. They don't affect runtime behaviour — Python still runs untyped code. But they enable static analysis tools like <code>mypy</code>, better IDE autocomplete, and self-documenting code.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Advanced</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="basics">Basic Type Annotations</h2>
+          <p>Annotate function parameters and return types with <code>: type</code> and <code>-> type</code>.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># Before type hints (ambiguous)
+def add(a, b):
+    return a + b
+
+# With type hints (self-documenting)
+def add(a: int, b: int) -> int:
+    return a + b
+
+def greet(name: str, times: int = 1) -> str:
+    return (f"Hello, {name}! " * times).strip()
+
+# Variable annotations
+age: int = 25
+name: str = "Alice"
+prices: list[float] = [1.99, 2.49, 0.99]</code></pre></div>
+          <div class="callout callout-tip"><span class="callout-icon">💡</span><div class="callout-content"><strong>Tip</strong><p>Type hints are optional and not enforced at runtime. Use them for documentation and tooling benefits.</p></div></div>
+
+          <h2 id="typing">The typing Module</h2>
+          <p>For complex types use <code>Optional</code>, <code>Union</code>, <code>Callable</code>, <code>Tuple</code>.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from typing import Optional, Union, Callable, Tuple
+
+# Optional: value can be None
+def find_user(user_id: int) -> Optional[str]:
+    users = {1: "Alice", 2: "Bob"}
+    return users.get(user_id)  # Returns str or None
+
+# Union: one of several types
+def process(value: Union[int, float, str]) -> str:
+    return str(value)
+
+# Callable: function type
+def apply(func: Callable[[int], int], n: int) -> int:
+    return func(n)
+
+# Tuple with specific types
+Point = Tuple[float, float]
+def distance(p: Point) -> float:
+    return (p[0]**2 + p[1]**2) ** 0.5</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>None
+"42"
+25.0</div>
+
+          <h2 id="modern">Modern Type Hints (Python 3.10+)</h2>
+          <p>Python 3.10+ allows cleaner syntax for Union and Optional.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># Python 3.10+ — use | instead of Union
+def process(value: int | float | str) -> str:
+    return str(value)
+
+# Optional is just X | None
+def find(id: int) -> str | None:
+    return None
+
+# Built-in generics (no need to import from typing)
+def average(numbers: list[float]) -> float:
+    return sum(numbers) / len(numbers)
+
+def get_config() -> dict[str, str]:
+    return {"host": "localhost"}</code></pre></div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="dataclasses">Type Hints with dataclasses</h2>
+          <p>Type hints are required in dataclasses to define fields.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from dataclasses import dataclass
+from typing import ClassVar
+
+@dataclass
+class Product:
+    name: str
+    price: float
+    quantity: int = 0
+    tax_rate: ClassVar[float] = 0.08  # Class variable
+
+    def total_price(self) -> float:
+        return self.price * (1 + self.tax_rate)
+
+p = Product("Coffee", 3.50, 10)
+print(p.name, p.total_price())</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Coffee 3.78</div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/advanced/async.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Async Programming</span></a>
+          <a href="/python/advanced/dataclasses.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Dataclasses</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

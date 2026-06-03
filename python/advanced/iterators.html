@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Iterators – How Iteration Works Under the Hood | ylearner | ylearner</title>
+  <meta name="description" content="Understand Python iterators: __iter__ and __next__ protocol, creating custom iterators, iter() and next() built-ins, and how for loops work internally.">
+  <meta name="keywords" content="python iterators, python __iter__, python __next__, python iterator protocol, python custom iterator, python iter()">
+  <link rel="canonical" href="https://ylearner.org/python/advanced/iterators.html">
+  <meta property="og:title" content="Python Iterators – How Iteration Works Under the Hood | ylearner">
+  <meta property="og:description" content="Understand Python iterators: __iter__ and __next__ protocol, creating custom iterators, iter() and next() built-ins, and how for loops work internally.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Iterators – __iter__, __next__, and the Iterator Protocol","description":"Understand Python iterators: __iter__ and __next__ protocol, creating custom iterators, iter() and next() built-ins, and how for loops work internally.","educationalLevel":"Advanced","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/advanced/generators.html">Advanced Python</a><span class="separator">›</span><span class="current">Iterators</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Advanced Python</div>
+          <h1>Python Iterators – __iter__, __next__, and the Iterator Protocol</h1>
+          <p class="lesson-intro">Iterators are the engine behind Python's <code>for</code> loops, list comprehensions, and unpacking. Everything you iterate over — lists, strings, dicts, files, generators — is an iterator or iterable under the hood. Understanding the iterator protocol lets you create custom sequences and work efficiently with large data.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Advanced</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="protocol">The Iterator Protocol</h2>
+          <p>An object is an iterator if it implements two methods: <code>__iter__()</code> (returns the iterator itself) and <code>__next__()</code> (returns the next value, raises <code>StopIteration</code> when done).</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># What a for loop actually does:
+my_list = [1, 2, 3]
+iterator = iter(my_list)   # calls __iter__()
+
+print(next(iterator))   # 1 — calls __next__()
+print(next(iterator))   # 2
+print(next(iterator))   # 3
+# next(iterator)        # Raises StopIteration</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>1
+2
+3</div>
+
+          <h2 id="custom">Creating a Custom Iterator</h2>
+          <p>Implement <code>__iter__</code> and <code>__next__</code> to make any class iterable.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Countdown:
+    """Counts from n down to 1."""
+    def __init__(self, start):
+        self.current = start
+
+    def __iter__(self):
+        return self   # The iterator IS the object
+
+    def __next__(self):
+        if self.current <= 0:
+            raise StopIteration
+        value = self.current
+        self.current -= 1
+        return value
+
+for num in Countdown(5):
+    print(num, end=" ")</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>5 4 3 2 1 </div>
+
+          <h2 id="vs-generator">Iterators vs Generators</h2>
+          <p>Generators are iterators created with <code>yield</code> — much less code for the same result.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># Iterator (verbose)
+class EvenNumbers:
+    def __init__(self, limit):
+        self.num, self.limit = 0, limit
+    def __iter__(self): return self
+    def __next__(self):
+        if self.num > self.limit: raise StopIteration
+        val = self.num; self.num += 2; return val
+
+# Generator (same thing, 4 lines)
+def even_numbers(limit):
+    for n in range(0, limit+1, 2):
+        yield n
+
+print(list(even_numbers(10)))</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>[0, 2, 4, 6, 8, 10]</div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="itertools">itertools – Powerful Iterator Combinators</h2>
+          <p>The <code>itertools</code> module provides fast, memory-efficient iterator tools.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import itertools
+
+# chain: combine multiple iterables
+result = list(itertools.chain([1,2], [3,4], [5]))
+print(result)   # [1, 2, 3, 4, 5]
+
+# islice: slice any iterator
+result = list(itertools.islice(range(100), 5))
+print(result)   # [0, 1, 2, 3, 4]
+
+# cycle: repeat infinitely
+counter = 0
+for item in itertools.cycle(["A","B","C"]):
+    print(item, end=" ")
+    counter += 1
+    if counter == 7: break</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>[1, 2, 3, 4, 5]
+[0, 1, 2, 3, 4]
+A B C A B C A </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/advanced/generators.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Generators</span></a>
+          <a href="/python/advanced/context-managers.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Context Managers</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

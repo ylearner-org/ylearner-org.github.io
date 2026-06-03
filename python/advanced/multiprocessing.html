@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Multiprocessing – Process, Pool & Parallel Execution | ylearner | ylearner</title>
+  <meta name="description" content="Learn Python multiprocessing: Process class, Pool, map(), ProcessPoolExecutor, shared memory, and when to use multiprocessing vs threading for CPU-bound tasks.">
+  <meta name="keywords" content="python multiprocessing, python Process, python Pool, python parallel processing, python cpu bound, python multiprocessing vs threading">
+  <link rel="canonical" href="https://ylearner.org/python/advanced/multiprocessing.html">
+  <meta property="og:title" content="Python Multiprocessing – Process, Pool & Parallel Execution | ylearner">
+  <meta property="og:description" content="Learn Python multiprocessing: Process class, Pool, map(), ProcessPoolExecutor, shared memory, and when to use multiprocessing vs threading for CPU-bound tasks.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Multiprocessing – True Parallelism for CPU-Bound Tasks","description":"Learn Python multiprocessing: Process class, Pool, map(), ProcessPoolExecutor, shared memory, and when to use multiprocessing vs threading for CPU-bound tasks.","educationalLevel":"Advanced","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/advanced/generators.html">Advanced Python</a><span class="separator">›</span><span class="current">Multiprocessing</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Advanced Python</div>
+          <h1>Python Multiprocessing – True Parallelism for CPU-Bound Tasks</h1>
+          <p class="lesson-intro">Python multiprocessing bypasses the GIL by running separate Python processes. Each process has its own memory space and Python interpreter, enabling true CPU parallelism. Use multiprocessing when you have CPU-intensive work: number crunching, image processing, machine learning training.</p>
+          <div class="lesson-meta"><span>⏱️ 22 min read</span><span>🎯 Advanced</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="process">The Process Class</h2>
+          <p><code>multiprocessing.Process</code> spawns a new OS process.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from multiprocessing import Process
+import os
+
+def worker(name):
+    print(f"Worker {name} | PID: {os.getpid()}")
+
+if __name__ == "__main__":  # Required on Windows!
+    processes = []
+    for i in range(3):
+        p = Process(target=worker, args=(i,))
+        processes.append(p)
+        p.start()
+
+    for p in processes:
+        p.join()</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Worker 0 | PID: 12345
+Worker 1 | PID: 12346
+Worker 2 | PID: 12347</div>
+          <div class="callout callout-tip"><span class="callout-icon">💡</span><div class="callout-content"><strong>Tip</strong><p>Always put multiprocessing code inside <code>if __name__ == "__main__":</code> to prevent recursive spawning on Windows.</p></div></div>
+
+          <h2 id="pool">Pool – Parallel Map Operations</h2>
+          <p><code>Pool</code> distributes work across multiple CPU cores automatically.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from multiprocessing import Pool
+import time
+
+def square(n):
+    time.sleep(0.1)   # Simulate work
+    return n * n
+
+if __name__ == "__main__":
+    numbers = list(range(8))
+
+    # Sequential: 0.8s
+    # With 4 workers: ~0.2s
+    with Pool(processes=4) as pool:
+        results = pool.map(square, numbers)
+
+    print(results)</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>[0, 1, 4, 9, 16, 25, 36, 49]</div>
+
+          <h2 id="executor">ProcessPoolExecutor – Modern API</h2>
+          <p><code>concurrent.futures.ProcessPoolExecutor</code> is the high-level interface for multiprocessing.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from concurrent.futures import ProcessPoolExecutor
+
+def heavy_computation(n):
+    return sum(i**2 for i in range(n))
+
+if __name__ == "__main__":
+    inputs = [1_000_000, 2_000_000, 3_000_000]
+
+    with ProcessPoolExecutor(max_workers=3) as exe:
+        results = list(exe.map(heavy_computation, inputs))
+
+    print(results)</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>[333332833333500000, 2666666000000, 9000001500000]</div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="vs-threading">Multiprocessing vs Threading</h2>
+          <p>Choose the right tool for the job.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># I/O bound (waiting for network, disk, DB)
+# → Use threading or asyncio
+# → Threads share memory, low overhead
+
+# CPU bound (calculation, image processing)
+# → Use multiprocessing
+# → Each process gets full CPU core
+# → Bypasses the GIL
+
+# Rule of thumb:
+import os
+CPU_COUNT = os.cpu_count()
+print(f"Available cores: {CPU_COUNT}")</code></pre></div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/advanced/multithreading.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Multithreading</span></a>
+          <a href="/python/advanced/async.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Async Programming</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
