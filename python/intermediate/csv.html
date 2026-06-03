@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python CSV Files – csv.reader, DictReader, writer | ylearner | ylearner</title>
+  <meta name="description" content="Learn Python CSV handling: reading with csv.reader and DictReader, writing with csv.writer and DictWriter, handling headers, dialects, and real-world data processing.">
+  <meta name="keywords" content="python csv, python read csv, python write csv, python csv reader, python csv dictreader, python csv file tutorial">
+  <link rel="canonical" href="https://ylearner.org/python/intermediate/csv.html">
+  <meta property="og:title" content="Python CSV Files – csv.reader, DictReader, writer | ylearner">
+  <meta property="og:description" content="Learn Python CSV handling: reading with csv.reader and DictReader, writing with csv.writer and DictWriter, handling headers, dialects, and real-world data processing.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python CSV – Reading and Writing CSV Files","description":"Learn Python CSV handling: reading with csv.reader and DictReader, writing with csv.writer and DictWriter, handling headers, dialects, and real-world data processing.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/intermediate/modules.html">Intermediate</a><span class="separator">›</span><span class="current">CSV Files</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Intermediate</div>
+          <h1>Python CSV – Reading and Writing CSV Files</h1>
+          <p class="lesson-intro">CSV (Comma-Separated Values) is the most common format for exchanging tabular data — spreadsheets, databases, reports. Python's built-in <code>csv</code> module provides robust reading and writing without any third-party dependencies.</p>
+          <div class="lesson-meta"><span>⏱️ 18 min read</span><span>🎯 Intermediate</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="read">Reading CSV Files</h2>
+          <p><code>csv.reader</code> reads each row as a list of strings.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import csv
+
+# Example CSV (students.csv):
+# name,grade,score
+# Alice,A,95
+# Bob,B,82
+# Charlie,A,91
+
+with open("students.csv", "r") as f:
+    reader = csv.reader(f)
+    header = next(reader)     # Skip header row
+    print(f"Columns: {header}")
+    for row in reader:
+        print(f"{row[0]}: {row[2]}")</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Columns: ['name', 'grade', 'score']
+Alice: 95
+Bob: 82
+Charlie: 91</div>
+
+          <h2 id="dictreader">DictReader – Rows as Dictionaries</h2>
+          <p><code>csv.DictReader</code> maps each row to a dict using the header row as keys.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import csv
+
+with open("students.csv", "r") as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        print(f"{row['name']} scored {row['score']} (grade {row['grade']})")</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Alice scored 95 (grade A)
+Bob scored 82 (grade B)
+Charlie scored 91 (grade A)</div>
+
+          <h2 id="write">Writing CSV Files</h2>
+          <p><code>csv.writer</code> writes lists as CSV rows.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import csv
+
+students = [
+    ["name", "grade", "score"],  # header
+    ["Alice", "A", 95],
+    ["Bob", "B", 82],
+    ["Charlie", "A", 91]
+]
+
+with open("output.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerows(students)
+
+print("CSV written successfully")</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>CSV written successfully</div>
+          <div class="callout callout-tip"><span class="callout-icon">💡</span><div class="callout-content"><strong>Tip</strong><p>Always pass newline="" when opening CSV files on Windows to prevent extra blank lines.</p></div></div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="dictwriter">DictWriter – Write from Dicts</h2>
+          <p>Use <code>DictWriter</code> when your data is in dictionary form.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import csv
+
+rows = [
+    {"name": "Alice", "grade": "A", "score": 95},
+    {"name": "Bob",   "grade": "B", "score": 82},
+]
+
+with open("output.csv", "w", newline="") as f:
+    fields = ["name", "grade", "score"]
+    writer = csv.DictWriter(f, fieldnames=fields)
+    writer.writeheader()     # Write column names
+    writer.writerows(rows)   # Write all rows</code></pre></div>
+
+          <h2 id="real">Real-World: Analyse CSV Data</h2>
+          <p>Compute statistics from a CSV without pandas.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import csv
+
+total, count = 0, 0
+with open("students.csv", "r") as f:
+    for row in csv.DictReader(f):
+        total += int(row["score"])
+        count += 1
+
+print(f"Average score: {total/count:.1f}")</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Average score: 89.3</div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/intermediate/json.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">JSON</span></a>
+          <a href="/python/intermediate/virtual-environments.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Virtual Environments</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

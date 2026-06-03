@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Magic Methods (Dunder Methods) – Complete Guide | ylearner | ylearner</title>
+  <meta name="description" content="Learn Python magic methods (__str__, __repr__, __len__, __add__, __eq__, __lt__, __enter__, __exit__) with real examples and when to implement each.">
+  <meta name="keywords" content="python magic methods, python dunder methods, python __str__, python __repr__, python __len__, python special methods">
+  <link rel="canonical" href="https://ylearner.org/python/oop/magic-methods.html">
+  <meta property="og:title" content="Python Magic Methods (Dunder Methods) – Complete Guide | ylearner">
+  <meta property="og:description" content="Learn Python magic methods (__str__, __repr__, __len__, __add__, __eq__, __lt__, __enter__, __exit__) with real examples and when to implement each.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Magic Methods – Dunder Methods Explained","description":"Learn Python magic methods (__str__, __repr__, __len__, __add__, __eq__, __lt__, __enter__, __exit__) with real examples and when to implement each.","educationalLevel":"Advanced","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/oop/classes.html">OOP</a><span class="separator">›</span><span class="current">Magic Methods</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🏗️ OOP</div>
+          <h1>Python Magic Methods – Dunder Methods Explained</h1>
+          <p class="lesson-intro">Magic methods (also called dunder methods — double underscore) are special Python methods that define how objects behave with built-in operations. They let you define what happens when you print an object, add two objects, compare them, use them in a <code>with</code> statement, or iterate over them.</p>
+          <div class="lesson-meta"><span>⏱️ 22 min read</span><span>🎯 Advanced</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="str-repr">__str__ and __repr__</h2>
+          <p><code>__str__</code>: human-readable string (for print). <code>__repr__</code>: developer representation (unambiguous, for debugging).</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Point:
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+    def __str__(self):
+        return f"Point({self.x}, {self.y})"
+
+    def __repr__(self):
+        return f"Point(x={self.x!r}, y={self.y!r})"
+
+p = Point(3, 4)
+print(str(p))   # Point(3, 4)      — uses __str__
+print(repr(p))  # Point(x=3, y=4)  — uses __repr__
+print(p)        # Point(3, 4)      — print uses __str__</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Point(3, 4)
+Point(x=3, y=4)
+Point(3, 4)</div>
+
+          <h2 id="comparison">Comparison Methods</h2>
+          <p>Define how objects are compared with ==, <, >, <=, >= operators.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Temperature:
+    def __init__(self, celsius):
+        self.celsius = celsius
+
+    def __eq__(self, other):
+        return self.celsius == other.celsius
+
+    def __lt__(self, other):
+        return self.celsius < other.celsius
+
+    def __le__(self, other):
+        return self.celsius <= other.celsius
+
+t1 = Temperature(25)
+t2 = Temperature(30)
+
+print(t1 == t2)   # False
+print(t1 < t2)    # True
+temps = [Temperature(30), Temperature(10), Temperature(20)]
+print([t.celsius for t in sorted(temps)])  # [10, 20, 30]</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>False
+True
+[10, 20, 30]</div>
+
+          <h2 id="arithmetic">Arithmetic Methods</h2>
+          <p>Make + - * / work on your objects.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Money:
+    def __init__(self, amount, currency="USD"):
+        self.amount = amount
+        self.currency = currency
+
+    def __add__(self, other):
+        if self.currency != other.currency:
+            raise ValueError("Cannot add different currencies")
+        return Money(self.amount + other.amount, self.currency)
+
+    def __str__(self):
+        return f"{self.currency} {self.amount:.2f}"
+
+wallet = Money(50) + Money(30)
+print(wallet)   # USD 80.00</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>USD 80.00</div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="container">Container Methods</h2>
+          <p><code>__len__</code>, <code>__getitem__</code>, <code>__contains__</code> make custom objects behave like sequences.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Library:
+    def __init__(self):
+        self._books = []
+
+    def add(self, book): self._books.append(book)
+    def __len__(self): return len(self._books)
+    def __getitem__(self, idx): return self._books[idx]
+    def __contains__(self, book): return book in self._books
+
+lib = Library()
+lib.add("Python Crash Course")
+lib.add("Fluent Python")
+
+print(len(lib))                    # 2
+print(lib[0])                      # Python Crash Course
+print("Fluent Python" in lib)      # True</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>2
+Python Crash Course
+True</div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/oop/abstraction.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Abstraction</span></a>
+          <a href="/python/advanced/decorators.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Decorators</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

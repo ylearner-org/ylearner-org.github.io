@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Encapsulation – Private Variables & @property | ylearner | ylearner</title>
+  <meta name="description" content="Learn Python encapsulation: private and protected attributes with underscore conventions, @property decorator for getters/setters, and data hiding principles.">
+  <meta name="keywords" content="python encapsulation, python private attribute, python @property, python getter setter, python data hiding, python underscore convention">
+  <link rel="canonical" href="https://ylearner.org/python/oop/encapsulation.html">
+  <meta property="og:title" content="Python Encapsulation – Private Variables & @property | ylearner">
+  <meta property="og:description" content="Learn Python encapsulation: private and protected attributes with underscore conventions, @property decorator for getters/setters, and data hiding principles.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Encapsulation – Private Attributes and Property Decorators","description":"Learn Python encapsulation: private and protected attributes with underscore conventions, @property decorator for getters/setters, and data hiding principles.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/oop/classes.html">OOP</a><span class="separator">›</span><span class="current">Encapsulation</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🏗️ OOP</div>
+          <h1>Python Encapsulation – Private Attributes and Property Decorators</h1>
+          <p class="lesson-intro">Encapsulation is the principle of hiding an object's internal state and requiring all interaction to go through well-defined methods. In Python, this is achieved through naming conventions (underscores) and the <code>@property</code> decorator, which lets you control how attributes are accessed and modified.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Intermediate</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="convention">Python's Underscore Convention</h2>
+          <p>Python uses naming conventions rather than strict access modifiers. Single underscore = "internal use". Double underscore = name-mangled (harder to access from outside).</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class BankAccount:
+    def __init__(self, owner, balance):
+        self.owner = owner        # Public
+        self._balance = balance   # Protected (convention only)
+        self.__pin = "1234"       # Private (name-mangled)
+
+acc = BankAccount("Alice", 1000)
+print(acc.owner)      # Alice — OK
+print(acc._balance)   # 1000 — works but discouraged
+# print(acc.__pin)    # AttributeError!
+print(acc._BankAccount__pin)  # "1234" — mangled name</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Alice
+1000
+1234</div>
+
+          <h2 id="property">@property – Clean Getters and Setters</h2>
+          <p><code>@property</code> lets you use attribute-style access while running code behind the scenes.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Temperature:
+    def __init__(self, celsius):
+        self._celsius = celsius
+
+    @property
+    def celsius(self):
+        return self._celsius
+
+    @celsius.setter
+    def celsius(self, value):
+        if value < -273.15:
+            raise ValueError("Below absolute zero!")
+        self._celsius = value
+
+    @property
+    def fahrenheit(self):
+        return self._celsius * 9/5 + 32
+
+t = Temperature(25)
+print(t.celsius)     # 25
+print(t.fahrenheit)  # 77.0
+t.celsius = 100
+print(t.fahrenheit)  # 212.0</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>25
+77.0
+212.0</div>
+
+          <h2 id="validation">Using Properties for Validation</h2>
+          <p>Properties enforce data integrity by validating values before setting them.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Student:
+    def __init__(self, name, grade):
+        self.name = name
+        self.grade = grade  # calls setter
+
+    @property
+    def grade(self):
+        return self._grade
+
+    @grade.setter
+    def grade(self, value):
+        if not 0 <= value <= 100:
+            raise ValueError(f"Grade must be 0-100, got {value}")
+        self._grade = value
+
+s = Student("Alice", 95)
+print(s.grade)   # 95
+s.grade = 110    # Raises ValueError</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>95
+ValueError: Grade must be 0-100, got 110</div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="readonly">Read-Only Properties</h2>
+          <p>Omit the setter to make a property read-only.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Circle:
+    def __init__(self, radius):
+        self._radius = radius
+
+    @property
+    def radius(self): return self._radius
+
+    @property
+    def area(self):   # Computed, read-only
+        import math
+        return math.pi * self._radius ** 2
+
+c = Circle(5)
+print(round(c.area, 2))  # 78.54
+# c.area = 100           # AttributeError: can't set</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>78.54</div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/oop/inheritance.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Inheritance</span></a>
+          <a href="/python/oop/polymorphism.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Polymorphism</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2024 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
