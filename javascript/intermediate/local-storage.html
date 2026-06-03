@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Local Storage – localStorage, sessionStorage &amp; Cookies | ylearner</title>
+  <meta name="description" content="Learn browser storage in JavaScript: localStorage API, sessionStorage, storing objects with JSON, storage limits, storage events for cross-tab communication, cookies comparison, and secure storage practices.">
+  <meta name="keywords" content="javascript localStorage, javascript sessionStorage, browser storage javascript, localStorage setItem getItem, storage events javascript, cookies vs localStorage, IndexedDB javascript, persist data browser javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/intermediate/local-storage.html">
+  <meta property="og:title" content="JavaScript Local Storage – localStorage, sessionStorage &amp; Cookies | ylearner">
+  <meta property="og:description" content="Learn browser storage in JavaScript: localStorage API, sessionStorage, storing objects with JSON, storage limits, storage events for cross-tab communication, cookies comparison, and secure storage practices.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/intermediate/es6-features.html">Intermediate JS</a><span class="separator">›</span>
+          <span class="current">Local Storage</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Intermediate JS</div>
+          <h1>JavaScript Local Storage – Persisting Data in the Browser</h1>
+          <p class="lesson-intro">Browser storage APIs let you persist data across page reloads and sessions. <code>localStorage</code> retains data indefinitely; <code>sessionStorage</code> clears when the tab closes; cookies travel with every HTTP request. Knowing when and how to use each one — safely — is an important skill for building real-world web applications.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="localstorage-api">localStorage API</h2>
+          <p><code>localStorage</code> is a synchronous key-value store scoped to the current origin (protocol + domain + port). Data persists until explicitly cleared.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// setItem(key, value) – both key and value must be strings
+localStorage.setItem('username', 'Alice');
+localStorage.setItem('theme', 'dark');
+
+// getItem(key) – returns string or null (not undefined)
+const name = localStorage.getItem('username'); // 'Alice'
+const missing = localStorage.getItem('nonexistent'); // null
+
+// removeItem(key) – delete one entry
+localStorage.removeItem('username');
+
+// clear() – delete ALL entries for this origin
+localStorage.clear();
+
+// length – number of stored keys
+console.log(localStorage.length); // 0 (after clear)
+
+// Iterating all entries
+localStorage.setItem('a', '1');
+localStorage.setItem('b', '2');
+for (let i = 0; i < localStorage.length; i++) {
+  const key = localStorage.key(i);
+  const value = localStorage.getItem(key);
+  console.log(key, value);
+}
+
+// Property-style access (works but not recommended – can shadow API methods)
+localStorage.theme = 'light';      // sets 'theme' key
+console.log(localStorage.theme);   // 'light'</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>// After setItem / getItem:
+Alice        // getItem('username')
+null         // getItem('nonexistent')
+// After iterating:
+a  1
+b  2</pre>
+          </div>
+
+          <h2 id="storing-objects">Storing Objects with JSON</h2>
+          <p>localStorage only stores strings. To store objects or arrays, serialise with <code>JSON.stringify</code> on write and deserialise with <code>JSON.parse</code> on read.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Storing an object
+const user = { name: 'Alice', role: 'admin', lastLogin: new Date().toISOString() };
+localStorage.setItem('user', JSON.stringify(user));
+
+// Reading it back
+const stored = localStorage.getItem('user');
+const parsedUser = stored ? JSON.parse(stored) : null;
+console.log(parsedUser?.name); // 'Alice'
+
+// Helper wrapper for safer access
+const storage = {
+  get(key, fallback = null) {
+    try {
+      const item = localStorage.getItem(key);
+      return item !== null ? JSON.parse(item) : fallback;
+    } catch {
+      return fallback;
+    }
+  },
+  set(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+      return true;
+    } catch (e) {
+      console.warn('localStorage.setItem failed:', e.message);
+      return false;
+    }
+  },
+  remove(key) {
+    localStorage.removeItem(key);
+  }
+};
+
+// Usage
+storage.set('cartItems', [{ id: 1, qty: 2 }, { id: 3, qty: 1 }]);
+const cart = storage.get('cartItems', []);
+console.log(cart.length); // 2</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always Wrap localStorage in try/catch</strong>
+              <p>localStorage can throw in private/incognito mode (quota exceeded or access denied), when the storage quota is full, or in certain browser extensions. Always wrap <code>setItem</code> in try/catch to handle these cases gracefully instead of crashing the app.</p>
+            </div>
+          </div>
+
+          <h2 id="session-storage">sessionStorage</h2>
+          <p><code>sessionStorage</code> has the same API as <code>localStorage</code> but data is cleared when the browser tab is closed. Separate tabs get separate sessionStorage instances even for the same origin.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Same API as localStorage
+sessionStorage.setItem('formDraft', JSON.stringify({ name: 'Alice', age: '' }));
+const draft = JSON.parse(sessionStorage.getItem('formDraft') ?? '{}');
+
+// Use case: save form state while user navigates away and back
+function saveFormState(formId) {
+  const form = document.getElementById(formId);
+  const data = {};
+  for (const el of form.elements) {
+    if (el.name) data[el.name] = el.value;
+  }
+  sessionStorage.setItem(`form_${formId}`, JSON.stringify(data));
+}
+
+function restoreFormState(formId) {
+  const saved = sessionStorage.getItem(`form_${formId}`);
+  if (!saved) return;
+  const data = JSON.parse(saved);
+  const form = document.getElementById(formId);
+  for (const [name, value] of Object.entries(data)) {
+    const el = form.elements[name];
+    if (el) el.value = value;
+  }
+}
+
+// Tab-specific wizard state
+sessionStorage.setItem('wizardStep', '3');
+const step = parseInt(sessionStorage.getItem('wizardStep') ?? '1', 10);</code></pre>
+          </div>
+
+          <h2 id="storage-events">Storage Events (Cross-Tab Communication)</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// The 'storage' event fires in OTHER tabs (not the one that made the change)
+window.addEventListener('storage', (event) => {
+  console.log('Key changed:', event.key);
+  console.log('Old value:', event.oldValue);
+  console.log('New value:', event.newValue);
+  console.log('Storage area:', event.storageArea); // localStorage or sessionStorage
+  console.log('URL of tab that changed:', event.url);
+
+  // React to theme changes from another tab
+  if (event.key === 'theme') {
+    applyTheme(event.newValue);
+  }
+
+  // React to logout in another tab
+  if (event.key === 'user' && event.newValue === null) {
+    window.location.href = '/login';
+  }
+});
+
+// Broadcast a message to all same-origin tabs
+function broadcastLogout() {
+  localStorage.setItem('logout', Date.now().toString());
+  localStorage.removeItem('logout'); // clean up after firing event
+}
+
+// Better cross-tab communication: BroadcastChannel API
+const channel = new BroadcastChannel('app_updates');
+channel.postMessage({ type: 'THEME_CHANGED', theme: 'dark' });
+channel.onmessage = (event) => {
+  console.log('Message from another tab:', event.data);
+};</code></pre>
+          </div>
+
+          <h2 id="comparison">localStorage vs sessionStorage vs Cookies</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Feature</th><th>localStorage</th><th>sessionStorage</th><th>Cookies</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Capacity</td><td>~5–10 MB</td><td>~5–10 MB</td><td>~4 KB</td></tr>
+                <tr><td>Persistence</td><td>Until cleared</td><td>Until tab closes</td><td>Until expiry date</td></tr>
+                <tr><td>Scope</td><td>Origin-wide</td><td>Per tab</td><td>Domain (+ path)</td></tr>
+                <tr><td>Sent to server</td><td>No</td><td>No</td><td>Yes (every request)</td></tr>
+                <tr><td>Accessible from JS</td><td>Yes</td><td>Yes</td><td>Yes (unless HttpOnly)</td></tr>
+                <tr><td>Cross-tab sync</td><td>Yes (via storage event)</td><td>No</td><td>Yes</td></tr>
+                <tr><td>Best for</td><td>User prefs, cache</td><td>Form state, wizard steps</td><td>Authentication tokens (HttpOnly)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="practical-examples">Practical Examples</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// 1. Theme preference
+function initTheme() {
+  const saved = localStorage.getItem('theme') ?? 'light';
+  document.documentElement.dataset.theme = saved;
+  return saved;
+}
+function setTheme(theme) {
+  localStorage.setItem('theme', theme);
+  document.documentElement.dataset.theme = theme;
+}
+
+// 2. Shopping cart persistence
+class Cart {
+  constructor() {
+    this.items = storage.get('cart', []);
+  }
+  add(product) {
+    const existing = this.items.find(i => i.id === product.id);
+    if (existing) existing.qty++;
+    else this.items.push({ ...product, qty: 1 });
+    this.save();
+  }
+  remove(productId) {
+    this.items = this.items.filter(i => i.id !== productId);
+    this.save();
+  }
+  get total() {
+    return this.items.reduce((sum, i) => sum + i.price * i.qty, 0);
+  }
+  save() {
+    storage.set('cart', this.items);
+  }
+  clear() {
+    this.items = [];
+    localStorage.removeItem('cart');
+  }
+}
+
+// 3. Recently visited pages
+function trackVisit(page) {
+  const recent = storage.get('recentPages', []);
+  const updated = [page, ...recent.filter(p => p !== page)].slice(0, 10);
+  storage.set('recentPages', updated);
+}
+trackVisit('/javascript/intermediate/local-storage.html');</code></pre>
+          </div>
+
+          <h2 id="indexeddb-intro">IndexedDB – Brief Introduction</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// IndexedDB is an asynchronous, structured database in the browser
+// Use it when localStorage's ~5MB or string-only limitation is too restrictive
+
+// Opening a database
+const request = indexedDB.open('myDatabase', 1);
+
+request.onupgradeneeded = (event) => {
+  const db = event.target.result;
+  // Create an object store (like a table)
+  const store = db.createObjectStore('users', { keyPath: 'id' });
+  store.createIndex('name', 'name', { unique: false });
+};
+
+request.onsuccess = (event) => {
+  const db = event.target.result;
+  // Add a record
+  const tx = db.transaction('users', 'readwrite');
+  tx.objectStore('users').add({ id: 1, name: 'Alice', age: 28 });
+};
+
+// For real projects, use the idb library (a Promise-based wrapper)
+// import { openDB } from 'idb';
+// const db = await openDB('myDB', 1, { upgrade(db) { db.createObjectStore('kv'); }});
+// await db.put('kv', 'hello', 'greeting');
+// const value = await db.get('kv', 'greeting'); // 'hello'</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Never Store Sensitive Data in localStorage</strong>
+              <p>Any JavaScript on the page can read localStorage. Never store authentication tokens, passwords, payment information, or any sensitive personal data in localStorage or sessionStorage. Use HttpOnly cookies for auth tokens (they cannot be read by JavaScript) and keep sensitive data server-side.</p>
+            </div>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between <code>localStorage</code> and <code>sessionStorage</code>?</li>
+            <li>Why does the <code>storage</code> event not fire in the tab that made the change?</li>
+            <li>How do you store an object in <code>localStorage</code>?</li>
+            <li>What are the security risks of using localStorage for authentication?</li>
+            <li>When would you use IndexedDB instead of localStorage?</li>
+            <li>What happens when the localStorage quota is exceeded?</li>
+          </ul>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a <code>useLocalStorage(key, initialValue)</code> function (not a React hook — a plain JS utility) that:</p>
+            <ol>
+              <li>Returns the current stored value (or <code>initialValue</code> if not set).</li>
+              <li>Accepts a setter function that updates both the stored value and localStorage.</li>
+              <li>Handles JSON serialisation/deserialisation automatically.</li>
+              <li>Listens to the <code>storage</code> event so the returned value stays in sync across tabs.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Create a <code>StorageManager</code> class that abstracts over localStorage with these features: automatic expiry (store data with a TTL and return <code>null</code> when expired), namespacing (all keys prefixed to avoid collisions), a <code>subscribe(key, callback)</code> method for reactive updates via the storage event, and automatic compression detection using <code>localStorage.length</code> to warn when nearing the 5MB limit.</p>
+          </div>
+
+          <h2 id="faq">Frequently Asked Questions</h2>
+          <dl>
+            <dt>Is localStorage synchronous and does that matter?</dt>
+            <dd>Yes, it is synchronous. For small amounts of data this is fine. For large reads/writes or high-frequency operations (e.g., saving on every keystroke in a complex app), the synchronous I/O can block the main thread. In those cases, debounce saves or switch to IndexedDB which is fully asynchronous.</dd>
+            <dt>Can localStorage be accessed from a Service Worker?</dt>
+            <dd>No. Service Workers run in a separate thread and do not have access to localStorage or sessionStorage. For Service Worker storage, use the Cache API or IndexedDB.</dd>
+            <dt>Why do cookies have a much smaller size limit than localStorage?</dt>
+            <dd>Cookies are sent with every HTTP request to the matching domain. Keeping them small (~4KB) minimises the HTTP overhead on every request. localStorage and sessionStorage exist purely client-side and are never sent automatically to the server, so they can afford a much larger limit (~5–10MB).</dd>
+            <dt>Is data in localStorage encrypted?</dt>
+            <dd>No. Data is stored as plain text on the user's disk. Any code running in the same origin can read it, and an attacker with physical access to the device can read it too. For sensitive data, always encrypt before storing, use HttpOnly cookies, or keep the data on the server.</dd>
+            <dt>What is the difference between <code>localStorage.getItem('key')</code> and <code>localStorage.key</code>?</dt>
+            <dd>Both return the stored value for most keys. However, property-style access can accidentally shadow the localStorage API if a key has the same name as an API method (e.g., <code>localStorage.clear</code> would give you the stored value, not the function). Always use <code>getItem/setItem</code> for safety.</dd>
+          </dl>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>localStorage</code> stores data indefinitely; <code>sessionStorage</code> clears when the tab closes.</li>
+              <li>Both use the same API: <code>setItem</code>, <code>getItem</code>, <code>removeItem</code>, <code>clear</code>, <code>length</code>, <code>key(i)</code>.</li>
+              <li>All stored values are strings — use <code>JSON.stringify</code>/<code>JSON.parse</code> for objects.</li>
+              <li>Always wrap storage calls in try/catch to handle quota exceeded and private mode errors.</li>
+              <li>The <code>storage</code> event fires in other tabs when localStorage changes — use it for sync.</li>
+              <li>Use cookies (HttpOnly) for authentication tokens; localStorage for UI preferences and caches.</li>
+              <li>Never store passwords, tokens, or sensitive personal data in localStorage.</li>
+              <li>Use IndexedDB (or the <code>idb</code> library) when you need more than ~5MB or structured querying.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/javascript/intermediate/json.html" class="topic-tag">JSON</a>
+            <a href="/javascript/intermediate/regex.html" class="topic-tag">Regular Expressions</a>
+            <a href="/javascript/oop/classes.html" class="topic-tag">Classes &amp; Objects</a>
+            <a href="/javascript/dom/dom-basics.html" class="topic-tag">DOM Basics</a>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/intermediate/regex.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Regular Expressions</span></a>
+          <a href="/javascript/oop/classes.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Classes &amp; Objects</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
