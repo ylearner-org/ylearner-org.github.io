@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Numbers – Math Object, parseInt, parseFloat | ylearner</title>
+  <meta name="description" content="Master JavaScript numbers. Learn integers, floats, floating-point precision issues, NaN, Infinity, Number methods (toFixed, parseInt, parseFloat), the Math object, BigInt, and Intl.NumberFormat.">
+  <meta name="keywords" content="javascript numbers, javascript math object, parseint javascript, parsefloat javascript, javascript toFixed, javascript NaN, javascript Infinity, javascript bigint, javascript number formatting">
+  <link rel="canonical" href="https://ylearner.org/javascript/beginner/numbers.html">
+  <meta property="og:title" content="JavaScript Numbers – Math Object, parseInt, parseFloat | ylearner">
+  <meta property="og:description" content="Master JavaScript numbers: integers, floats, precision issues, NaN, Infinity, Number methods, the Math object, BigInt, and Intl.NumberFormat.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/beginner/setting-up.html">Beginner</a><span class="separator">›</span>
+          <span class="current">Numbers</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌱 Beginner</div>
+          <h1>JavaScript Numbers – Integers, Floats, and the Math Object</h1>
+          <p class="lesson-intro">JavaScript has a single numeric type that handles both integers and floating-point numbers — but this design comes with some famous gotchas like <code>0.1 + 0.2 !== 0.3</code>. This lesson covers how JavaScript numbers work, special values like <code>NaN</code> and <code>Infinity</code>, the full suite of <code>Number</code> methods, the powerful <code>Math</code> object, a brief introduction to <code>BigInt</code>, and how to format numbers for display.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 24 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="number-type">The Number Type – 64-bit Float</h2>
+          <p>JavaScript uses the IEEE 754 double-precision 64-bit floating-point standard for all numbers. This means there is no separate <code>int</code> type — <code>42</code> and <code>42.0</code> are the same value.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// All of these are the same type
+let integer = 42;
+let float   = 3.14;
+let negative = -100;
+let large   = 1_000_000;     // Numeric separators (ES2021) for readability
+
+console.log(typeof integer);  // "number"
+console.log(typeof float);    // "number"
+console.log(42 === 42.0);     // true — same value!
+
+// Special numeric literals
+console.log(0xFF);    // 255  — hexadecimal
+console.log(0b1010);  // 10   — binary
+console.log(0o17);    // 15   — octal</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>number
+number
+true
+255
+10
+15</div>
+
+          <h2 id="precision-issues">Floating-Point Precision Issues</h2>
+          <p>The most famous JavaScript number quirk: <code>0.1 + 0.2</code> is not exactly <code>0.3</code>. This is not a JavaScript bug — it's a consequence of how IEEE 754 binary floating-point works in all programming languages.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">console.log(0.1 + 0.2);          // 0.30000000000000004
+console.log(0.1 + 0.2 === 0.3);  // false!
+
+// Solution 1: Use toFixed() for display (returns string)
+console.log((0.1 + 0.2).toFixed(2));   // "0.30"
+
+// Solution 2: Compare with an epsilon tolerance
+const EPSILON = Number.EPSILON;
+console.log(Math.abs(0.1 + 0.2 - 0.3) < EPSILON);  // true
+
+// Solution 3: Use integer math (work in cents, not dollars)
+const price1 = 10;  // 10 cents = $0.10
+const price2 = 20;  // 20 cents = $0.20
+console.log((price1 + price2) / 100 + " dollars");   // "0.3 dollars"</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>0.30000000000000004
+false
+0.30
+true
+0.3 dollars</div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content"><strong>Never Use Floats for Money</strong><p>When building financial applications, always represent monetary values as integers (e.g., cents) or use a dedicated decimal library. <code>0.1 + 0.2 = 0.30000000000000004</code> can cause real financial errors if you're not careful.</p></div>
+          </div>
+
+          <!-- place ad-in-content after 2nd or 3rd h2 -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="special-values">NaN, Infinity, and -Infinity</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// NaN — Not a Number (but typeof NaN === "number"!)
+console.log(parseInt("hello"));    // NaN
+console.log(Math.sqrt(-1));        // NaN
+console.log(NaN === NaN);          // false — NaN is not equal to itself
+console.log(Number.isNaN(NaN));    // true — correct way to check
+console.log(Number.isNaN("hello")); // false (unlike global isNaN!)
+
+// Infinity
+console.log(1 / 0);                // Infinity
+console.log(-1 / 0);               // -Infinity
+console.log(Infinity + 1);         // Infinity
+console.log(Number.isFinite(42));  // true
+console.log(Number.isFinite(Infinity)); // false
+
+// Useful constants
+console.log(Number.MAX_SAFE_INTEGER);  // 9007199254740991
+console.log(Number.MIN_SAFE_INTEGER);  // -9007199254740991
+console.log(Number.MAX_VALUE);         // 1.7976931348623157e+308</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>NaN
+NaN
+false
+true
+false
+Infinity
+-Infinity
+Infinity
+true
+false
+9007199254740991
+-9007199254740991
+1.7976931348623157e+308</div>
+
+          <h2 id="number-methods">Number Methods</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const n = 123.456;
+
+// toFixed — rounds to N decimal places (returns string)
+console.log(n.toFixed(2));        // "123.46"
+console.log(n.toFixed(0));        // "123"
+
+// toString — converts to string, optional radix
+console.log(n.toString());        // "123.456"
+console.log((255).toString(16));  // "ff" (hexadecimal)
+console.log((10).toString(2));    // "1010" (binary)
+
+// Parsing strings to numbers
+console.log(parseInt("42px"));      // 42 (stops at non-numeric)
+console.log(parseInt("3.9"));       // 3  (truncates decimal)
+console.log(parseFloat("3.14abc")); // 3.14
+console.log(Number("42"));          // 42
+console.log(Number("42.5"));        // 42.5
+console.log(Number("42px"));        // NaN — strict, no partial parsing
+console.log(Number(""));            // 0
+
+// Number.isInteger
+console.log(Number.isInteger(42));    // true
+console.log(Number.isInteger(42.0));  // true (same value!)
+console.log(Number.isInteger(42.5));  // false</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>"123.46"
+"123"
+"123.456"
+"ff"
+"1010"
+42
+3
+3.14
+42
+42.5
+NaN
+0
+true
+true
+false</div>
+
+          <h2 id="math-object">The Math Object</h2>
+          <p>The built-in <code>Math</code> object provides mathematical constants and functions. You don't create an instance — you use it directly as <code>Math.method()</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Constants
+console.log(Math.PI);    // 3.141592653589793
+console.log(Math.E);     // 2.718281828459045
+
+// Rounding
+console.log(Math.round(4.5));  // 5  — rounds to nearest
+console.log(Math.floor(4.9));  // 4  — rounds down (toward -Infinity)
+console.log(Math.ceil(4.1));   // 5  — rounds up (toward +Infinity)
+console.log(Math.trunc(4.9));  // 4  — removes decimal part
+console.log(Math.trunc(-4.9)); // -4 (unlike floor which gives -5)
+
+// Min, Max, Absolute value
+console.log(Math.min(3, 1, 4, 1, 5, 9));   // 1
+console.log(Math.max(3, 1, 4, 1, 5, 9));   // 9
+console.log(Math.abs(-42));                 // 42
+
+// Power and roots
+console.log(Math.pow(2, 10));   // 1024
+console.log(Math.sqrt(144));    // 12
+console.log(Math.cbrt(27));     // 3
+
+// Random — returns float in [0, 1)
+console.log(Math.random());
+// Random integer between min (inclusive) and max (exclusive)
+const randomInt = (min, max) => Math.floor(Math.random() * (max - min)) + min;
+console.log(randomInt(1, 7));   // Random number 1–6 (like a die)</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>3.141592653589793
+2.718281828459045
+5
+4
+5
+4
+-4
+1
+9
+42
+1024
+12
+3
+0.7341... (random)
+4 (random 1-6)</div>
+
+          <table>
+            <thead>
+              <tr><th>Math Method</th><th>Description</th><th>Example</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>Math.round(x)</code></td><td>Round to nearest integer</td><td><code>Math.round(4.5) → 5</code></td></tr>
+              <tr><td><code>Math.floor(x)</code></td><td>Round down</td><td><code>Math.floor(4.9) → 4</code></td></tr>
+              <tr><td><code>Math.ceil(x)</code></td><td>Round up</td><td><code>Math.ceil(4.1) → 5</code></td></tr>
+              <tr><td><code>Math.abs(x)</code></td><td>Absolute value</td><td><code>Math.abs(-5) → 5</code></td></tr>
+              <tr><td><code>Math.sqrt(x)</code></td><td>Square root</td><td><code>Math.sqrt(9) → 3</code></td></tr>
+              <tr><td><code>Math.pow(x, y)</code></td><td>x raised to power y</td><td><code>Math.pow(2, 8) → 256</code></td></tr>
+              <tr><td><code>Math.random()</code></td><td>Random float [0, 1)</td><td><code>Math.random() → 0.742...</code></td></tr>
+              <tr><td><code>Math.log(x)</code></td><td>Natural logarithm</td><td><code>Math.log(Math.E) → 1</code></td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="bigint">BigInt</h2>
+          <p><code>BigInt</code> handles integers larger than <code>Number.MAX_SAFE_INTEGER</code> (2<sup>53</sup>–1). Create one by appending <code>n</code> to an integer literal.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const big = 9007199254740993n;
+const huge = BigInt("123456789012345678901234567890");
+
+console.log(big + 1n);           // 9007199254740994n
+console.log(typeof big);         // "bigint"
+
+// Cannot mix BigInt and Number directly
+console.log(big + 1);            // TypeError!
+console.log(big + BigInt(1));    // OK: 9007199254740994n</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content"><strong>Intl.NumberFormat for Display</strong><p>Use <code>Intl.NumberFormat</code> to format numbers for display according to locale: <code>new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(1234.5)</code> gives <code>"$1,234.50"</code>. This handles locale-specific separators and currency symbols automatically.</p></div>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Use <code>Math.random()</code> to generate a random integer between 1 and 100 (inclusive).</li>
+              <li>Use <code>toFixed(2)</code> to format <code>0.1 + 0.2</code> for display.</li>
+              <li>Compute the area of a circle with radius 7 using <code>Math.PI</code>. Round the result to 2 decimal places.</li>
+              <li>Use <code>parseInt()</code> and <code>parseFloat()</code> to extract numbers from <code>"42px"</code>, <code>"3.14em"</code>, and <code>"$9.99"</code>.</li>
+              <li>Format the number <code>1234567.89</code> as a US dollar currency string using <code>Intl.NumberFormat</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a function <code>rollDice(sides, count)</code> that simulates rolling <code>count</code> dice each with <code>sides</code> faces. Return an object containing: <code>rolls</code> (array of individual results), <code>total</code> (sum of all rolls), <code>average</code> (rounded to 1 decimal place), <code>min</code>, and <code>max</code>. Test it with <code>rollDice(6, 5)</code>.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>JavaScript uses one 64-bit float type for all numbers — no separate int type.</li>
+              <li>Floating-point precision: <code>0.1 + 0.2 !== 0.3</code>. Use <code>toFixed()</code> for display or integer math for money.</li>
+              <li><code>NaN</code> is a number type; use <code>Number.isNaN()</code> (not global <code>isNaN()</code>) to check for it.</li>
+              <li><code>parseInt()</code> extracts leading integer; <code>parseFloat()</code> extracts leading float; <code>Number()</code> requires a valid number string.</li>
+              <li>The <code>Math</code> object provides: <code>round</code>, <code>floor</code>, <code>ceil</code>, <code>abs</code>, <code>sqrt</code>, <code>pow</code>, <code>random</code>, <code>min</code>, <code>max</code>, <code>PI</code>, <code>E</code>.</li>
+              <li>Use <code>BigInt</code> (append <code>n</code>) for integers beyond <code>Number.MAX_SAFE_INTEGER</code>.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>Why does <code>0.1 + 0.2 !== 0.3</code> in JavaScript?</li>
+            <li>What is the difference between <code>parseInt()</code>, <code>parseFloat()</code>, and <code>Number()</code>?</li>
+            <li>Why should you use <code>Number.isNaN()</code> instead of the global <code>isNaN()</code>?</li>
+            <li>What is <code>Number.MAX_SAFE_INTEGER</code> and why does it matter?</li>
+            <li>How do you generate a random integer between two values in JavaScript?</li>
+          </ul>
+
+          <div class="related-topics">
+            <a href="/javascript/beginner/strings.html" class="topic-tag">⚡ Strings</a>
+            <a href="/javascript/beginner/type-conversion.html" class="topic-tag">⚡ Type Conversion</a>
+            <a href="/javascript/beginner/operators.html" class="topic-tag">⚡ Operators</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why does Number("") return 0 instead of NaN? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>This is a JavaScript coercion quirk — an empty string is considered "empty" and coerces to <code>0</code> rather than <code>NaN</code>. The global <code>isNaN("")</code> also returns <code>false</code> for this reason. Always validate input before converting: check that the string is non-empty and matches a numeric pattern before calling <code>Number()</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between Math.floor() and Math.trunc()? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For positive numbers they behave identically. For negative numbers: <code>Math.floor(-4.7)</code> gives <code>-5</code> (rounds toward negative infinity), while <code>Math.trunc(-4.7)</code> gives <code>-4</code> (simply removes the decimal, rounding toward zero). Use <code>Math.floor()</code> when you need consistent "round down" behavior.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I get a random integer between min and max inclusive? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use: <code>Math.floor(Math.random() * (max - min + 1)) + min</code>. For example, to get a random number from 1 to 6 (inclusive): <code>Math.floor(Math.random() * 6) + 1</code>. The <code>+ 1</code> inside the range and the <code>+ min</code> at the end are crucial for the bounds to be correct.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use BigInt with the Math object? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. <code>Math</code> methods don't support <code>BigInt</code> — passing a BigInt to <code>Math.sqrt()</code> or similar will throw a <code>TypeError</code>. BigInt arithmetic uses regular operators (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>%</code>, <code>**</code>) with all operands being BigInt. You must convert to Number first if you need Math operations.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I check if a number is an integer? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>Number.isInteger(n)</code> — it returns <code>true</code> if the value is a number and has no fractional part. Note: <code>Number.isInteger(42.0)</code> returns <code>true</code> because <code>42.0 === 42</code> in JavaScript. Avoid <code>n % 1 === 0</code> — it works but is less readable and semantic.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/beginner/strings.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">JavaScript Strings</span>
+          </a>
+          <a href="/javascript/beginner/type-conversion.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">JavaScript Type Conversion</span>
+          </a>
+        </nav>
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

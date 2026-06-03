@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Type Conversion – Explicit &amp; Implicit Coercion | ylearner</title>
+  <meta name="description" content="Master JavaScript type conversion. Learn implicit coercion pitfalls, explicit conversion with String(), Number(), Boolean(), truthy and falsy values, the == vs === trap, and practical coercion bug examples.">
+  <meta name="keywords" content="javascript type conversion, javascript coercion, javascript truthy falsy, javascript implicit coercion, String() Number() Boolean() javascript, javascript == vs ===, type casting javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/beginner/type-conversion.html">
+  <meta property="og:title" content="JavaScript Type Conversion – Explicit &amp; Implicit Coercion | ylearner">
+  <meta property="og:description" content="Master JavaScript type conversion: implicit coercion pitfalls, explicit conversion methods, truthy/falsy values, and practical examples of coercion bugs.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/beginner/setting-up.html">Beginner</a><span class="separator">›</span>
+          <span class="current">Type Conversion</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌱 Beginner</div>
+          <h1>JavaScript Type Conversion – Explicit and Implicit Coercion</h1>
+          <p class="lesson-intro">JavaScript is a dynamically typed language that will silently convert values between types in many situations — sometimes helpfully, sometimes surprisingly. This automatic conversion is called <em>implicit coercion</em>. You can also convert types intentionally using functions like <code>String()</code>, <code>Number()</code>, and <code>Boolean()</code> — that's <em>explicit conversion</em>. Understanding both is essential for writing bug-free code and explaining the most common JavaScript interview questions.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 23 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="implicit-coercion">Implicit Coercion – When JavaScript Decides</h2>
+          <p>Implicit coercion happens automatically when JavaScript applies an operator to values of different types. The most famous cases involve the <code>+</code> operator:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// + with a string: everything becomes a string
+console.log("5" + 3);       // "53"  — number coerced to string
+console.log("5" + true);    // "5true"
+console.log("5" + null);    // "5null"
+console.log("5" + undefined); // "5undefined"
+
+// - * / % trigger numeric coercion (they only do math)
+console.log("5" - 3);       // 2    — string coerced to number
+console.log("5" * "2");     // 10
+console.log("6" / "2");     // 3
+console.log("hello" - 1);   // NaN  — "hello" can't become a number
+
+// Comparison operators also coerce
+console.log("5" > 3);       // true — "5" becomes 5
+console.log(null > 0);      // false
+console.log(null == 0);     // false (null only == undefined)
+console.log(null >= 0);     // true  — bizarre but true!</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>"53"
+"5true"
+"5null"
+"5undefined"
+2
+10
+3
+NaN
+true
+false
+false
+true</div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content"><strong>The + Operator is Special</strong><p>The <code>+</code> operator does double duty: addition for numbers, concatenation for strings. If <em>either</em> operand is a string, it concatenates. This is why <code>"10" + 5</code> gives <code>"105"</code> but <code>"10" - 5</code> gives <code>5</code>. Always convert inputs explicitly before arithmetic.</p></div>
+          </div>
+
+          <h2 id="explicit-conversion">Explicit Conversion</h2>
+          <p>Explicit conversion means you intentionally convert a value using a built-in function. This is always preferred over relying on implicit coercion.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// String() — converts any value to string
+console.log(String(42));          // "42"
+console.log(String(true));        // "true"
+console.log(String(null));        // "null"
+console.log(String(undefined));   // "undefined"
+console.log(String([1, 2, 3]));   // "1,2,3"
+
+// Number() — converts to number (strict: invalid = NaN)
+console.log(Number("42"));        // 42
+console.log(Number("42.5"));      // 42.5
+console.log(Number(""));          // 0
+console.log(Number(true));        // 1
+console.log(Number(false));       // 0
+console.log(Number(null));        // 0
+console.log(Number(undefined));   // NaN
+console.log(Number("hello"));     // NaN
+
+// parseInt / parseFloat — more lenient
+console.log(parseInt("42px"));    // 42 (ignores trailing text)
+console.log(parseFloat("3.14em")); // 3.14
+
+// Boolean() — converts to boolean
+console.log(Boolean(1));          // true
+console.log(Boolean(0));          // false
+console.log(Boolean("hello"));    // true
+console.log(Boolean(""));         // false
+console.log(Boolean(null));       // false</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>"42"
+"true"
+"null"
+"undefined"
+"1,2,3"
+42
+42.5
+0
+1
+0
+0
+NaN
+NaN
+42
+3.14
+true
+false
+true
+false
+false</div>
+
+          <!-- place ad-in-content after 2nd or 3rd h2 -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="truthy-falsy">Truthy and Falsy Values</h2>
+          <p>In a boolean context (like an <code>if</code> condition), every value is either truthy or falsy. There are exactly <strong>8 falsy values</strong> in JavaScript — everything else is truthy.</p>
+
+          <table>
+            <thead>
+              <tr><th>Falsy Values</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>false</code></td><td>The literal false</td></tr>
+              <tr><td><code>0</code></td><td>Zero</td></tr>
+              <tr><td><code>-0</code></td><td>Negative zero</td></tr>
+              <tr><td><code>0n</code></td><td>BigInt zero</td></tr>
+              <tr><td><code>""</code></td><td>Empty string</td></tr>
+              <tr><td><code>null</code></td><td>Intentional absence</td></tr>
+              <tr><td><code>undefined</code></td><td>Unassigned</td></tr>
+              <tr><td><code>NaN</code></td><td>Not a Number</td></tr>
+            </tbody>
+          </table>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// All falsy — these if blocks do NOT run
+if (false)     console.log("false");
+if (0)         console.log("zero");
+if ("")        console.log("empty string");
+if (null)      console.log("null");
+if (undefined) console.log("undefined");
+if (NaN)       console.log("NaN");
+
+// Truthy surprises — these DO run!
+if ("0")       console.log('"0" is truthy!');  // non-empty string
+if ("false")   console.log('"false" is truthy!');  // non-empty string
+if ([])        console.log('[] is truthy!');   // empty array
+if ({})        console.log('{} is truthy!');   // empty object
+if (-1)        console.log('-1 is truthy!');   // any non-zero number</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>"0" is truthy!
+"false" is truthy!
+[] is truthy!
+{} is truthy!
+-1 is truthy!</div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>Double-Bang !! Converts to Boolean</strong><p><code>!!</code> is a common idiom to explicitly convert any value to a boolean. <code>!!null</code> gives <code>false</code>, <code>!!"hello"</code> gives <code>true</code>. The first <code>!</code> negates and coerces to boolean; the second <code>!</code> negates back to get the correct boolean value.</p></div>
+          </div>
+
+          <h2 id="loose-vs-strict">The == vs === Coercion Table</h2>
+          <p>Loose equality (<code>==</code>) applies type coercion using complex rules. Here are the most important cases to memorize:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Surprising loose equality results
+console.log(false == 0);        // true
+console.log(false == "");       // true
+console.log(false == "0");      // false (!)
+console.log(0 == "");           // true
+console.log(0 == "0");          // true
+console.log("" == "0");         // false
+console.log(null == undefined); // true
+console.log(null == 0);         // false
+console.log(undefined == 0);   // false
+console.log(NaN == NaN);        // false (NaN is never equal to anything)
+
+// The same with ===
+console.log(false === 0);       // false
+console.log(null === undefined);// false</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>true
+true
+false
+true
+true
+false
+true
+false
+false
+false
+false
+false</div>
+
+          <h2 id="objects-to-string">Converting Objects and Arrays to Strings</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const arr = [1, 2, 3];
+const obj = { name: "Alice", age: 30 };
+
+// Array to string
+console.log(String(arr));          // "1,2,3"
+console.log(arr.toString());       // "1,2,3"
+console.log(arr.join(" - "));      // "1 - 2 - 3"
+
+// Object to string (not very useful)
+console.log(String(obj));          // "[object Object]"
+console.log(obj.toString());       // "[object Object]"
+
+// JSON.stringify — proper object/array serialization
+console.log(JSON.stringify(obj));  // '{"name":"Alice","age":30}'
+console.log(JSON.stringify(obj, null, 2));
+// Pretty-printed JSON with 2-space indent
+
+// JSON.parse — convert JSON string back to object
+const json = '{"name":"Bob","score":99}';
+const parsed = JSON.parse(json);
+console.log(parsed.name);          // "Bob"</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>1,2,3
+1,2,3
+1 - 2 - 3
+[object Object]
+[object Object]
+{"name":"Alice","age":30}
+{
+  "name": "Alice",
+  "age": 30
+}
+Bob</div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content"><strong>Common Coercion Bug: Form Input</strong><p>HTML form inputs always return strings. If you read a number from an input field and try to add it to another number without converting, you get concatenation: <code>input.value + 5</code> gives <code>"105"</code> instead of <code>15</code>. Always use <code>Number(input.value)</code> or <code>+input.value</code> first.</p></div>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Convert the string <code>"123"</code> to a number three ways: <code>Number()</code>, <code>parseInt()</code>, and the unary <code>+</code> operator (<code>+"123"</code>).</li>
+              <li>Use <code>!!</code> to convert these to booleans and predict the result: <code>0</code>, <code>""</code>, <code>"0"</code>, <code>[]</code>, <code>null</code>.</li>
+              <li>Demonstrate the <code>+</code> operator coercion bug: <code>"10" + 5 + 5</code> vs <code>10 + 5 + "5"</code>.</li>
+              <li>Use <code>JSON.stringify()</code> to serialize an object and <code>JSON.parse()</code> to restore it.</li>
+              <li>Write a guard for a function that receives user input: convert it to a number and return <code>NaN</code> feedback if the conversion fails.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Create a function <code>safeAdd(a, b)</code> that takes two values (which might be strings or numbers), converts both to numbers, checks that neither is <code>NaN</code>, and returns their sum. If either can't be converted, return an error message string like <code>"Error: 'hello' is not a valid number"</code>. Test it with <code>safeAdd("5", 3)</code>, <code>safeAdd("5.5", "2.2")</code>, <code>safeAdd("abc", 10)</code>, and <code>safeAdd(null, 5)</code>.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Implicit coercion: JavaScript auto-converts types. The <code>+</code> operator concatenates if either operand is a string.</li>
+              <li>Explicit: <code>String()</code>, <code>Number()</code>, <code>Boolean()</code>, <code>parseInt()</code>, <code>parseFloat()</code>.</li>
+              <li>Only 8 falsy values: <code>false</code>, <code>0</code>, <code>-0</code>, <code>0n</code>, <code>""</code>, <code>null</code>, <code>undefined</code>, <code>NaN</code>. Everything else is truthy.</li>
+              <li>Empty arrays <code>[]</code> and objects <code>{}</code> are truthy!</li>
+              <li>Use <code>===</code> always. The <code>==</code> coercion rules are complex and surprising.</li>
+              <li>Use <code>JSON.stringify()</code> to properly convert objects/arrays to strings.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What are the falsy values in JavaScript?</li>
+            <li>What is the difference between implicit and explicit type conversion?</li>
+            <li>Why does <code>"5" + 3</code> give <code>"53"</code> but <code>"5" - 3</code> gives <code>2</code>?</li>
+            <li>Is an empty array <code>[]</code> truthy or falsy?</li>
+            <li>How would you convert a value to boolean in JavaScript?</li>
+          </ul>
+
+          <div class="related-topics">
+            <a href="/javascript/beginner/numbers.html" class="topic-tag">⚡ Numbers</a>
+            <a href="/javascript/beginner/operators.html" class="topic-tag">⚡ Operators</a>
+            <a href="/javascript/beginner/data-types.html" class="topic-tag">⚡ Data Types</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why is [] truthy but [] == false is also true? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>This is one of the most confusing JavaScript quirks. <code>[]</code> is truthy in boolean contexts (like <code>if ([])</code>). But <code>[] == false</code> uses loose equality, which converts <code>[]</code> to a number (via string): <code>[] → "" → 0</code>, and <code>false → 0</code>, so <code>0 == 0</code> is <code>true</code>. This illustrates why using <code>==</code> is so dangerous — just use <code>===</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What does + in front of a value do? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The unary <code>+</code> operator converts a value to a number, just like <code>Number()</code>: <code>+"42"</code> gives <code>42</code>, <code>+true</code> gives <code>1</code>, <code>+""</code> gives <code>0</code>, <code>+"hello"</code> gives <code>NaN</code>. It's a compact shorthand, but <code>Number()</code> is more readable — use whichever your team prefers.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Does JSON.stringify handle all JavaScript values? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. <code>JSON.stringify</code> cannot serialize: <code>undefined</code> (omitted from objects, becomes <code>null</code> in arrays), functions (silently omitted), <code>Symbol</code> values, circular references (throws an error), <code>BigInt</code> (throws a TypeError), and special objects like <code>Date</code> (converted to ISO string). For complex serialization needs, use a library like <code>superjson</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the safest way to check if a value is null or undefined? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>value == null</code> — this is one of the few good uses of loose equality. It returns <code>true</code> for both <code>null</code> and <code>undefined</code> but <code>false</code> for everything else (including <code>0</code>, <code>""</code>, and <code>false</code>). Alternatively, use <code>value === null || value === undefined</code> for explicit clarity.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I check if a string represents a valid number? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>!Number.isNaN(Number(str)) &amp;&amp; str.trim() !== ""</code>. The <code>str.trim() !== ""</code> check is necessary because <code>Number("")</code> and <code>Number("   ")</code> both return <code>0</code> instead of <code>NaN</code>. Or use a regex: <code>/^-?\d+(\.\d+)?$/.test(str)</code> for basic integer/float validation.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/beginner/numbers.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">JavaScript Numbers</span>
+          </a>
+          <a href="/javascript/beginner/user-input.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">JavaScript User Input</span>
+          </a>
+        </nav>
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
