@@ -17,7 +17,7 @@
     const parts = path.split('/').filter(Boolean);
     parts.pop(); // remove filename
     const depth2Folders = ['beginner','control-flow','functions','data-structures',
-      'intermediate','oop','advanced','real-world','frameworks','data-science','interview','projects'];
+      'intermediate','oop','advanced','real-world','frameworks','data-science','interview','projects','dom'];
     const isDepth2 = depth2Folders.some(f => path.includes('/' + f + '/'));
     const isDepth1 = !isDepth2 && ['/python/','/javascript/','/c/','/cpp/','/java/','/sql/'].some(s => path.includes(s));
     if (isDepth2) parts.splice(-2);
@@ -194,12 +194,157 @@
     },
   ];
 
+  // ========================
+  // JavaScript Navigation Data
+  // ========================
+  const JS_NAV_DATA = [
+    {
+      title: '⚡ Introduction',
+      items: [
+        { title: 'What is JavaScript?', url: '/javascript/what-is-javascript.html' },
+        { title: 'History of JavaScript', url: '/javascript/history-of-javascript.html' },
+        { title: 'Why Learn JavaScript?', url: '/javascript/why-learn-javascript.html' },
+        { title: 'JavaScript Applications', url: '/javascript/javascript-applications.html' },
+        { title: 'JavaScript Career Paths', url: '/javascript/javascript-career-paths.html' },
+      ]
+    },
+    {
+      title: '🌱 Beginner',
+      items: [
+        { title: 'Setting Up JavaScript', url: '/javascript/beginner/setting-up.html' },
+        { title: 'Hello, World!', url: '/javascript/beginner/hello-world.html' },
+        { title: 'Variables (let, const, var)', url: '/javascript/beginner/variables.html' },
+        { title: 'Data Types', url: '/javascript/beginner/data-types.html' },
+        { title: 'Operators', url: '/javascript/beginner/operators.html' },
+        { title: 'Strings', url: '/javascript/beginner/strings.html' },
+        { title: 'Numbers & Math', url: '/javascript/beginner/numbers.html' },
+        { title: 'Type Conversion', url: '/javascript/beginner/type-conversion.html' },
+        { title: 'User Input', url: '/javascript/beginner/user-input.html' },
+        { title: 'Comments', url: '/javascript/beginner/comments.html' },
+      ]
+    },
+    {
+      title: '🔀 Control Flow',
+      items: [
+        { title: 'If Statements', url: '/javascript/control-flow/if-statements.html' },
+        { title: 'Nested If', url: '/javascript/control-flow/nested-if.html' },
+        { title: 'Switch Statement', url: '/javascript/control-flow/switch.html' },
+        { title: 'For Loop', url: '/javascript/control-flow/for-loop.html' },
+        { title: 'While Loop', url: '/javascript/control-flow/while-loop.html' },
+        { title: 'Break & Continue', url: '/javascript/control-flow/break-continue.html' },
+      ]
+    },
+    {
+      title: '⚙️ Functions',
+      items: [
+        { title: 'Function Basics', url: '/javascript/functions/function-basics.html' },
+        { title: 'Parameters & Arguments', url: '/javascript/functions/parameters.html' },
+        { title: 'Return Values', url: '/javascript/functions/return-values.html' },
+        { title: 'Arrow Functions', url: '/javascript/functions/arrow-functions.html' },
+        { title: 'Scope', url: '/javascript/functions/scope.html' },
+        { title: 'Closures', url: '/javascript/functions/closures.html' },
+        { title: 'Higher-Order Functions', url: '/javascript/functions/higher-order-functions.html' },
+      ]
+    },
+    {
+      title: '📦 Data Structures',
+      items: [
+        { title: 'Arrays', url: '/javascript/data-structures/arrays.html' },
+        { title: 'Objects', url: '/javascript/data-structures/objects.html' },
+        { title: 'Maps & Sets', url: '/javascript/data-structures/maps-sets.html' },
+        { title: 'Destructuring', url: '/javascript/data-structures/destructuring.html' },
+        { title: 'Spread & Rest', url: '/javascript/data-structures/spread-rest.html' },
+        { title: 'Array Methods', url: '/javascript/data-structures/array-methods.html' },
+      ]
+    },
+    {
+      title: '🔧 Intermediate JS',
+      items: [
+        { title: 'ES6+ Features', url: '/javascript/intermediate/es6-features.html' },
+        { title: 'Modules (import/export)', url: '/javascript/intermediate/modules.html' },
+        { title: 'Error Handling', url: '/javascript/intermediate/error-handling.html' },
+        { title: 'JSON', url: '/javascript/intermediate/json.html' },
+        { title: 'Date & Time', url: '/javascript/intermediate/date-time.html' },
+        { title: 'Regular Expressions', url: '/javascript/intermediate/regex.html' },
+        { title: 'Local Storage', url: '/javascript/intermediate/local-storage.html' },
+      ]
+    },
+    {
+      title: '🏗️ OOP',
+      items: [
+        { title: 'Classes & Objects', url: '/javascript/oop/classes.html' },
+        { title: 'Constructors', url: '/javascript/oop/constructors.html' },
+        { title: 'Inheritance', url: '/javascript/oop/inheritance.html' },
+        { title: 'Encapsulation', url: '/javascript/oop/encapsulation.html' },
+        { title: 'Polymorphism', url: '/javascript/oop/polymorphism.html' },
+        { title: 'Prototypes', url: '/javascript/oop/prototypes.html' },
+      ]
+    },
+    {
+      title: '🚀 Advanced JS',
+      items: [
+        { title: 'Callbacks', url: '/javascript/advanced/callbacks.html' },
+        { title: 'Promises', url: '/javascript/advanced/promises.html' },
+        { title: 'Async / Await', url: '/javascript/advanced/async-await.html' },
+        { title: 'Event Loop', url: '/javascript/advanced/event-loop.html' },
+        { title: 'Generators & Iterators', url: '/javascript/advanced/generators.html' },
+        { title: 'Proxy & Reflect', url: '/javascript/advanced/proxy-reflect.html' },
+        { title: 'Symbols', url: '/javascript/advanced/symbols.html' },
+      ]
+    },
+    {
+      title: '🌐 DOM & Browser',
+      items: [
+        { title: 'DOM Manipulation', url: '/javascript/dom/dom-manipulation.html' },
+        { title: 'Events', url: '/javascript/dom/events.html' },
+        { title: 'Event Delegation', url: '/javascript/dom/event-delegation.html' },
+        { title: 'Forms & Validation', url: '/javascript/dom/forms.html' },
+        { title: 'Fetch API', url: '/javascript/dom/fetch-api.html' },
+        { title: 'AJAX', url: '/javascript/dom/ajax.html' },
+        { title: 'Web Storage', url: '/javascript/dom/web-storage.html' },
+      ]
+    },
+    {
+      title: '⚡ Frameworks',
+      items: [
+        { title: 'React', url: '/javascript/frameworks/react.html', badge: 'hot' },
+        { title: 'Vue.js', url: '/javascript/frameworks/vue.html' },
+        { title: 'Node.js', url: '/javascript/frameworks/nodejs.html', badge: 'hot' },
+      ]
+    },
+    {
+      title: '🎯 Interview Prep',
+      items: [
+        { title: 'Interview Questions', url: '/javascript/interview/questions.html', badge: 'hot' },
+        { title: 'Coding Challenges', url: '/javascript/interview/coding-challenges.html' },
+        { title: 'Practical Exercises', url: '/javascript/interview/exercises.html' },
+      ]
+    },
+    {
+      title: '🛠️ Projects',
+      items: [
+        { title: 'Calculator', url: '/javascript/projects/calculator.html' },
+        { title: 'Todo App', url: '/javascript/projects/todo-app.html' },
+        { title: 'Weather App', url: '/javascript/projects/weather-app.html' },
+        { title: 'Quiz App', url: '/javascript/projects/quiz-app.html' },
+        { title: 'Expense Tracker', url: '/javascript/projects/expense-tracker.html' },
+        { title: 'Memory Game', url: '/javascript/projects/memory-game.html' },
+      ]
+    },
+  ];
+
+  function getNavData() {
+    const path = window.location.pathname;
+    if (path.includes('/javascript/')) return JS_NAV_DATA;
+    return NAV_DATA;
+  }
+
   // Search index (with BASE-prefixed URLs for file:// searches)
-  const SEARCH_INDEX = NAV_DATA.flatMap(section =>
+  const SEARCH_INDEX = [...NAV_DATA, ...JS_NAV_DATA].flatMap(section =>
     section.items.map(item => ({
       title: item.title,
       category: section.title.replace(/^.{2}\s/, ''),
-      url: BASE + item.url,  // prefixed for file:// compat
+      url: BASE + item.url,
     }))
   );
 
@@ -210,7 +355,7 @@
     if (!container) return;
     const currentPath = window.location.pathname;
 
-    const html = NAV_DATA.map((section, i) => {
+    const html = getNavData().map((section, i) => {
       const links = section.items.map(item => {
         const slug = item.url.replace('.html', '').split('/').pop();
         const active = currentPath.includes(slug) && slug.length > 2;
