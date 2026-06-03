@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Web Scraper Project – Build a News Aggregator | ylearner</title>
+  <meta name="description" content="Build a Python news aggregator that scrapes headlines, deduplicates, saves to JSON/CSV, and can email digests.">
+  <meta name="keywords" content="python web scraper project, python news scraper, python beautifulsoup project, python data collection">
+  <link rel="canonical" href="https://ylearner.org/python/projects/web-scraper.html">
+  <meta property="og:title" content="Python Web Scraper Project – Build a News Aggregator | ylearner">
+  <meta property="og:description" content="Build a Python news aggregator that scrapes headlines, deduplicates, saves to JSON/CSV, and can email digests.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Web Scraper Project","description":"Python news aggregator project: multi-source scraping, deduplication, and data export.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/projects/calculator.html">Projects</a><span class="separator">›</span><span class="current">Web Scraper</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🕷️ Projects</div>
+          <h1>Python Web Scraper – News Aggregator</h1>
+          <p class="lesson-intro">Scrape news headlines from multiple sources, deduplicate, save to JSON/CSV, and optionally email a digest. Combines web scraping, data processing, and automation.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Projects</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="code">Complete Implementation</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import requests, csv, json, hashlib
+from datetime import datetime
+from pathlib import Path
+from bs4 import BeautifulSoup
+from dataclasses import dataclass, asdict
+
+@dataclass
+class Article:
+    title: str
+    url: str
+    source: str
+    scraped_at: str = ""
+    def __post_init__(self):
+        if not self.scraped_at:
+            self.scraped_at = datetime.now().isoformat()
+    @property
+    def id(self):
+        return hashlib.md5(self.url.encode()).hexdigest()[:8]
+
+SOURCES = {
+    "Hacker News": {
+        "url": "https://news.ycombinator.com",
+        "selector": ".storylink",
+        "attr": "href",
+    },
+}
+
+def scrape(name, config):
+    try:
+        r = requests.get(config["url"], headers={"User-Agent": "NewsBot/1.0"}, timeout=15)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "lxml")
+        return [
+            Article(title=a.get_text(strip=True), url=a.get(config["attr"], ""), source=name)
+            for a in soup.select(config["selector"])[:20]
+            if a.get_text(strip=True)
+        ]
+    except Exception as e:
+        print(f"Failed {name}: {e}"); return []
+
+def deduplicate(articles):
+    seen, unique = set(), []
+    for a in articles:
+        if a.id not in seen:
+            seen.add(a.id); unique.append(a)
+    return unique
+
+all_articles = []
+for name, config in SOURCES.items():
+    arts = scrape(name, config)
+    all_articles.extend(arts)
+    print(f"{name}: {len(arts)} articles")
+
+unique = deduplicate(all_articles)
+out = Path("news_data"); out.mkdir(exist_ok=True)
+date = datetime.now().strftime("%Y%m%d")
+
+Path(out / f"news_{date}.json").write_text(json.dumps([asdict(a) for a in unique], indent=2))
+with open(out / f"news_{date}.csv", "w", newline="") as f:
+    w = csv.DictWriter(f, fieldnames=["title","url","source","scraped_at"])
+    w.writeheader(); w.writerows([asdict(a) for a in unique])
+
+print(f"\nSaved {len(unique)} articles to {out}/")
+for i, a in enumerate(unique[:5], 1):
+    print(f"  {i}. [{a.source}] {a.title}")</code></pre></div>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Bash</span><button class="copy-btn">Copy</button></div><pre><code class="language-bash">pip install requests beautifulsoup4 lxml
+python scraper.py</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> Schedule with cron to run daily and build a historical news archive.</div>
+        </article>
+        <div class="ad-container ad-mid">Ad – 728×90</div>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/" class="prev-lesson">← Back to Home</a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-brand"><a href="/" class="footer-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a><p>Free Python tutorials for everyone.</p></div>
+      <div class="footer-links"><h4>Learn</h4><ul><li><a href="/python/basics/introduction.html">Python Basics</a></li><li><a href="/python/intermediate/modules.html">Intermediate</a></li><li><a href="/python/advanced/iterators.html">Advanced</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2024 ylearner by <a href="https://algorid.com" target="_blank" rel="noopener">Algorid Limited</a>. All rights reserved.</p></div>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

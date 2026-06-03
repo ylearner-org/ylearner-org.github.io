@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Logging – logging Module Tutorial & Best Practices | ylearner</title>
+  <meta name="description" content="Master Python logging: log levels, formatters, file handlers, rotating logs, structured JSON logging, and production best practices.">
+  <meta name="keywords" content="python logging, python logging module, python log file, python logging levels, python logging format, python structured logging">
+  <link rel="canonical" href="https://ylearner.org/python/real-world/logging.html">
+  <meta property="og:title" content="Python Logging – logging Module Tutorial & Best Practices | ylearner">
+  <meta property="og:description" content="Master Python logging: log levels, formatters, file handlers, rotating logs, structured JSON logging, and production best practices.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Logging","description":"Python logging: levels, formatters, file handlers, rotating logs, structured JSON logging.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/real-world/api-development.html">Real-World Python</a><span class="separator">›</span><span class="current">Logging</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📋 Real-World</div>
+          <h1>Python Logging – logging Module & Best Practices</h1>
+          <p class="lesson-intro">Print statements break in production. Python's built-in <code>logging</code> module provides levels, formatting, file output, and rotation — everything needed to debug and monitor real applications.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Real-World</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="basics">Basic Setup</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import logging
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+
+logger = logging.getLogger(__name__)
+logger.debug("Diagnostic info")
+logger.info("Normal event")
+logger.warning("Unexpected but non-fatal")
+logger.error("Something failed")
+logger.critical("System cannot continue")</code></pre></div>
+          <h2 id="handlers">File & Rotating Handlers</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from logging.handlers import RotatingFileHandler
+
+logger = logging.getLogger("myapp")
+logger.setLevel(logging.DEBUG)
+
+fmt = logging.Formatter("%(asctime)s | %(levelname)-8s | %(name)s:%(lineno)d | %(message)s")
+
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+console.setFormatter(fmt)
+
+# Rotate at 5 MB, keep 3 backups
+file_h = RotatingFileHandler("app.log", maxBytes=5_000_000, backupCount=3)
+file_h.setLevel(logging.DEBUG)
+file_h.setFormatter(fmt)
+
+logger.addHandler(console)
+logger.addHandler(file_h)</code></pre></div>
+          <h2 id="json">Structured JSON Logging</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import json
+
+class JSONFormatter(logging.Formatter):
+    def format(self, record):
+        entry = {
+            "time": self.formatTime(record),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+        }
+        if record.exc_info:
+            entry["exception"] = self.formatException(record.exc_info)
+        return json.dumps(entry)
+
+handler = logging.StreamHandler()
+handler.setFormatter(JSONFormatter())
+logging.getLogger("api").addHandler(handler)</code></pre></div>
+          <h2 id="exc">Logging Exceptions</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">try:
+    result = 10 / 0
+except ZeroDivisionError:
+    logger.exception("Division failed")  # Auto-includes traceback
+
+logger.info("User login", extra={"user_id": 42, "ip": "127.0.0.1"})</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> Use logging.getLogger(__name__) in every module — creates a hierarchy so you can control log levels per module.</div>
+        </article>
+        <div class="ad-container ad-mid">Ad – 728×90</div>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/" class="prev-lesson">← Back to Home</a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-brand"><a href="/" class="footer-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a><p>Free Python tutorials for everyone.</p></div>
+      <div class="footer-links"><h4>Learn</h4><ul><li><a href="/python/basics/introduction.html">Python Basics</a></li><li><a href="/python/intermediate/modules.html">Intermediate</a></li><li><a href="/python/advanced/iterators.html">Advanced</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2024 ylearner by <a href="https://algorid.com" target="_blank" rel="noopener">Algorid Limited</a>. All rights reserved.</p></div>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

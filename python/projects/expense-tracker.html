@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Expense Tracker – Budget Tracking Project | ylearner</title>
+  <meta name="description" content="Build a Python expense tracker with categories, monthly summaries, budget alerts, and CSV export. Data persistence with JSON.">
+  <meta name="keywords" content="python expense tracker project, python budget app, python finance project, python csv project">
+  <link rel="canonical" href="https://ylearner.org/python/projects/expense-tracker.html">
+  <meta property="og:title" content="Python Expense Tracker – Budget Tracking Project | ylearner">
+  <meta property="og:description" content="Build a Python expense tracker with categories, monthly summaries, budget alerts, and CSV export. Data persistence with JSON.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Expense Tracker Project","description":"Python expense tracker with categories, budget alerts, monthly summaries, and CSV export.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/projects/calculator.html">Projects</a><span class="separator">›</span><span class="current">Expense Tracker</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">💰 Projects</div>
+          <h1>Python Expense Tracker</h1>
+          <p class="lesson-intro">Track income and expenses by category, view monthly summaries, set budget limits, and export reports to CSV.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Projects</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="code">Complete Implementation</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import csv, json
+from datetime import datetime
+from pathlib import Path
+from collections import defaultdict
+
+DATA_FILE = Path("expenses.json")
+
+class ExpenseTracker:
+    def __init__(self):
+        self.expenses, self.budgets = [], {}
+        if DATA_FILE.exists():
+            data = json.loads(DATA_FILE.read_text())
+            self.expenses = data.get("expenses", [])
+            self.budgets = data.get("budgets", {})
+
+    def save(self):
+        DATA_FILE.write_text(json.dumps({"expenses": self.expenses, "budgets": self.budgets}, indent=2))
+
+    def add(self, amount, category, description, date=""):
+        self.expenses.append({
+            "id": len(self.expenses) + 1,
+            "amount": amount, "category": category,
+            "description": description,
+            "date": date or datetime.now().strftime("%Y-%m-%d"),
+        })
+        self.save()
+
+    def monthly_summary(self, year, month):
+        totals = defaultdict(float)
+        for e in self.expenses:
+            y, m, _ = e["date"].split("-")
+            if int(y) == year and int(m) == month:
+                totals[e["category"]] += e["amount"]
+        return dict(totals)
+
+    def check_budget(self, year, month):
+        summary = self.monthly_summary(year, month)
+        return [
+            f"OVER BUDGET {cat}: spent ${spent:.2f} / limit ${self.budgets[cat]:.2f}"
+            for cat, spent in summary.items()
+            if cat in self.budgets and spent > self.budgets[cat]
+        ]
+
+    def export_csv(self, filepath):
+        with open(filepath, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=["id","date","category","amount","description"])
+            writer.writeheader()
+            writer.writerows(self.expenses)
+
+# Demo
+t = ExpenseTracker()
+t.add(45.50, "Food", "Grocery")
+t.add(120.00, "Housing", "Electricity")
+t.budgets["Food"] = 300.00
+
+now = datetime.now()
+for cat, total in t.monthly_summary(now.year, now.month).items():
+    print(f"{cat}: ${total:.2f}")
+for alert in t.check_budget(now.year, now.month):
+    print(alert)
+t.export_csv("expenses.csv")</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> Add a matplotlib bar chart of monthly spending per category — turns this into a data visualization project too.</div>
+        </article>
+        <div class="ad-container ad-mid">Ad – 728×90</div>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/" class="prev-lesson">← Back to Home</a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-brand"><a href="/" class="footer-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a><p>Free Python tutorials for everyone.</p></div>
+      <div class="footer-links"><h4>Learn</h4><ul><li><a href="/python/basics/introduction.html">Python Basics</a></li><li><a href="/python/intermediate/modules.html">Intermediate</a></li><li><a href="/python/advanced/iterators.html">Advanced</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2024 ylearner by <a href="https://algorid.com" target="_blank" rel="noopener">Algorid Limited</a>. All rights reserved.</p></div>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

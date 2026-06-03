@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Debugging – pdb, breakpoint(), and Debugging Techniques | ylearner</title>
+  <meta name="description" content="Master Python debugging: pdb debugger, breakpoint(), reading tracebacks, common error types, and systematic debugging techniques.">
+  <meta name="keywords" content="python debugging, python pdb, python breakpoint, python traceback, debug python code, python error types">
+  <link rel="canonical" href="https://ylearner.org/python/real-world/debugging.html">
+  <meta property="og:title" content="Python Debugging – pdb, breakpoint(), and Debugging Techniques | ylearner">
+  <meta property="og:description" content="Master Python debugging: pdb debugger, breakpoint(), reading tracebacks, common error types, and systematic debugging techniques.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Debugging","description":"Python debugging with pdb, breakpoint(), reading tracebacks, and systematic debugging.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/real-world/api-development.html">Real-World Python</a><span class="separator">›</span><span class="current">Debugging</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🐛 Real-World</div>
+          <h1>Python Debugging – pdb & Debugging Techniques</h1>
+          <p class="lesson-intro">Debugging is half of programming. Python provides <code>pdb</code>, <code>breakpoint()</code>, and rich tracebacks. Learn to read errors fast and squash bugs systematically.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Real-World</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="traceback">Reading Tracebacks</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># Read tracebacks BOTTOM to TOP
+# Bottom = actual error, Top = call entry point
+
+def calculate(data):
+    return sum(data) / len(data)
+
+calculate([])  # ZeroDivisionError
+
+# Traceback (most recent call last):
+#   File "app.py", line 6, in <module>
+#     calculate([])
+#   File "app.py", line 2, in calculate
+#     return sum(data) / len(data)
+# ZeroDivisionError: division by zero</code></pre></div>
+          <h2 id="breakpoint">breakpoint() – Interactive Debugger</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">def process_order(order):
+    total = 0
+    for item in order["items"]:
+        breakpoint()  # Execution pauses here
+        # pdb commands: n=next, s=step, c=continue, p x=print, q=quit
+        total += item["price"] * item["qty"]
+    return total</code></pre></div>
+          <h2 id="common">Common Error Types</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># NameError – variable doesn't exist
+print(x)            # NameError: name 'x' is not defined
+
+# TypeError – wrong type
+"2" + 2             # TypeError: can only concatenate str to str
+
+# KeyError – dict key missing
+d = {"a": 1}
+d["b"]              # KeyError: 'b'
+d.get("b", None)    # Safe alternative
+
+# AttributeError – bad attribute
+None.upper()        # AttributeError: 'NoneType' has no attribute 'upper'
+
+# IndexError – out of range
+[1, 2][5]           # IndexError: list index out of range
+
+# ValueError – right type, bad value
+int("abc")          # ValueError: invalid literal</code></pre></div>
+          <h2 id="tips">Debug Techniques</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># f-string debugging (Python 3.8+)
+x = compute_something()
+print(f"{x=}")           # prints: x=42
+
+# Early assertions
+assert isinstance(data, list), f"Expected list, got {type(data)}"
+assert len(data) > 0, "Data cannot be empty"
+
+# Post-mortem in shell
+import pdb; pdb.pm()    # after uncaught exception</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> Install icecream (pip install icecream) for better debug printing: ic(variable) prints variable name + value.</div>
+        </article>
+        <div class="ad-container ad-mid">Ad – 728×90</div>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/" class="prev-lesson">← Back to Home</a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-brand"><a href="/" class="footer-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a><p>Free Python tutorials for everyone.</p></div>
+      <div class="footer-links"><h4>Learn</h4><ul><li><a href="/python/basics/introduction.html">Python Basics</a></li><li><a href="/python/intermediate/modules.html">Intermediate</a></li><li><a href="/python/advanced/iterators.html">Advanced</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2024 ylearner by <a href="https://algorid.com" target="_blank" rel="noopener">Algorid Limited</a>. All rights reserved.</p></div>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python API Development – Build REST APIs with FastAPI & Flask | ylearner</title>
+  <meta name="description" content="Learn to build REST APIs in Python using FastAPI and Flask. Covers routing, request/response models, authentication, and deployment.">
+  <meta name="keywords" content="python api development, python rest api, python fastapi tutorial, python flask api, build api python">
+  <link rel="canonical" href="https://ylearner.org/python/real-world/api-development.html">
+  <meta property="og:title" content="Python API Development – Build REST APIs with FastAPI & Flask | ylearner">
+  <meta property="og:description" content="Learn to build REST APIs in Python using FastAPI and Flask. Covers routing, request/response models, authentication, and deployment.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python API Development","description":"Build REST APIs in Python using FastAPI and Flask with routing, authentication, and deployment.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/real-world/web-scraping.html">Real-World Python</a><span class="separator">›</span><span class="current">API Development</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 Real-World</div>
+          <h1>Python API Development – Build REST APIs</h1>
+          <p class="lesson-intro">APIs are the backbone of modern web services. Python offers FastAPI for high performance and Flask for simplicity to build production-ready REST APIs quickly.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Real-World</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="fastapi">FastAPI – Quick Start</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Item(BaseModel):
+    name: str
+    price: float
+    in_stock: bool = True
+
+items_db = {}
+
+@app.get("/items/{item_id}")
+def get_item(item_id: int):
+    if item_id not in items_db:
+        return {"error": "Not found"}
+    return items_db[item_id]
+
+@app.post("/items/{item_id}")
+def create_item(item_id: int, item: Item):
+    items_db[item_id] = item
+    return {"message": "Created", "item": item}
+
+@app.put("/items/{item_id}")
+def update_item(item_id: int, item: Item):
+    items_db[item_id] = item
+    return {"message": "Updated"}
+
+@app.delete("/items/{item_id}")
+def delete_item(item_id: int):
+    items_db.pop(item_id, None)
+    return {"message": "Deleted"}</code></pre></div>
+          <h2 id="run">Running the API</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Bash</span><button class="copy-btn">Copy</button></div><pre><code class="language-bash">pip install fastapi uvicorn
+uvicorn main:app --reload
+# Visit http://localhost:8000/docs for Swagger UI</code></pre></div>
+          <h2 id="flask">Flask Alternative</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+items = {}
+
+@app.route("/items/<int:item_id>", methods=["GET"])
+def get_item(item_id):
+    return jsonify(items.get(item_id, {"error": "Not found"}))
+
+@app.route("/items/<int:item_id>", methods=["POST"])
+def create_item(item_id):
+    data = request.get_json()
+    items[item_id] = data
+    return jsonify({"message": "Created"}), 201
+
+if __name__ == "__main__":
+    app.run(debug=True)</code></pre></div>
+          <h2 id="auth">Token Authentication</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+import secrets
+
+security = HTTPBearer()
+API_KEY = "secret-token-123"
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    if not secrets.compare_digest(credentials.credentials, API_KEY):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+    return credentials.credentials
+
+@app.get("/secure", dependencies=[Depends(verify_token)])
+def secure_endpoint():
+    return {"data": "Protected resource"}</code></pre></div>
+          <h2 id="validation">Pydantic Validation</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from pydantic import BaseModel, validator, Field
+
+class UserCreate(BaseModel):
+    username: str = Field(..., min_length=3, max_length=50)
+    email: str
+    age: int = Field(..., ge=0, le=150)
+
+    @validator("email")
+    def validate_email(cls, v):
+        if "@" not in v:
+            raise ValueError("Invalid email")
+        return v.lower()
+
+@app.post("/users/")
+def create_user(user: UserCreate):
+    return {"created": user.dict()}</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> Use FastAPI for new projects — auto-generated Swagger docs at /docs, async support, and Pydantic validation built-in.</div>
+        </article>
+        <div class="ad-container ad-mid">Ad – 728×90</div>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/" class="prev-lesson">← Back to Home</a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-brand"><a href="/" class="footer-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a><p>Free Python tutorials for everyone.</p></div>
+      <div class="footer-links"><h4>Learn</h4><ul><li><a href="/python/basics/introduction.html">Python Basics</a></li><li><a href="/python/intermediate/modules.html">Intermediate</a></li><li><a href="/python/advanced/iterators.html">Advanced</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2024 ylearner by <a href="https://algorid.com" target="_blank" rel="noopener">Algorid Limited</a>. All rights reserved.</p></div>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

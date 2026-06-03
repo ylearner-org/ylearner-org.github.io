@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Automation – Automate Tasks with Python Scripts | ylearner</title>
+  <meta name="description" content="Learn Python automation: file operations, task scheduling, sending emails, Excel manipulation, and browser automation.">
+  <meta name="keywords" content="python automation, automate tasks python, python file automation, python schedule, python send email, python openpyxl">
+  <link rel="canonical" href="https://ylearner.org/python/real-world/automation.html">
+  <meta property="og:title" content="Python Automation – Automate Tasks with Python Scripts | ylearner">
+  <meta property="og:description" content="Learn Python automation: file operations, task scheduling, sending emails, Excel manipulation, and browser automation.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Automation","description":"Automate tasks with Python: file operations, scheduling, emails, and Excel manipulation.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/real-world/api-development.html">Real-World Python</a><span class="separator">›</span><span class="current">Automation</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🤖 Real-World</div>
+          <h1>Python Automation – Automate Repetitive Tasks</h1>
+          <p class="lesson-intro">Python excels at automation. From renaming thousands of files to sending daily reports, Python scripts eliminate hours of manual work.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Real-World</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="files">File Automation with pathlib</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from pathlib import Path
+import shutil
+
+downloads = Path.home() / "Downloads"
+categories = {
+    ".pdf": "Documents",
+    ".jpg": "Images", ".jpeg": "Images", ".png": "Images",
+    ".mp4": "Videos",
+    ".zip": "Archives",
+}
+
+for file in downloads.iterdir():
+    if file.is_file() and file.suffix.lower() in categories:
+        dest_dir = downloads / categories[file.suffix.lower()]
+        dest_dir.mkdir(exist_ok=True)
+        shutil.move(str(file), dest_dir / file.name)
+        print(f"Moved {file.name}")</code></pre></div>
+          <h2 id="schedule">Scheduling Tasks</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import schedule
+import time
+
+def daily_report():
+    print("Generating report...")
+
+schedule.every().day.at("09:00").do(daily_report)
+schedule.every().hour.do(lambda: print("Heartbeat"))
+
+while True:
+    schedule.run_pending()
+    time.sleep(60)</code></pre></div>
+          <h2 id="email">Sending Emails</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+def send_email(to, subject, body, smtp_pass):
+    msg = MIMEMultipart()
+    msg["From"] = "you@gmail.com"
+    msg["To"] = to
+    msg["Subject"] = subject
+    msg.attach(MIMEText(body, "html"))
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login("you@gmail.com", smtp_pass)
+        server.sendmail("you@gmail.com", to, msg.as_string())</code></pre></div>
+          <h2 id="excel">Excel with openpyxl</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import openpyxl
+from openpyxl.styles import Font, PatternFill
+
+wb = openpyxl.Workbook()
+ws = wb.active
+ws.title = "Report"
+
+headers = ["Product", "Units", "Revenue"]
+for col, h in enumerate(headers, 1):
+    cell = ws.cell(row=1, column=col, value=h)
+    cell.font = Font(bold=True)
+
+data = [("Widget A", 150, 7500), ("Widget B", 230, 11500)]
+for row_idx, row_data in enumerate(data, 2):
+    for col_idx, value in enumerate(row_data, 1):
+        ws.cell(row=row_idx, column=col_idx, value=value)
+
+wb.save("report.xlsx")</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> Store credentials in a .env file and load with python-dotenv — never hardcode passwords in scripts.</div>
+        </article>
+        <div class="ad-container ad-mid">Ad – 728×90</div>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/" class="prev-lesson">← Back to Home</a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-brand"><a href="/" class="footer-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a><p>Free Python tutorials for everyone.</p></div>
+      <div class="footer-links"><h4>Learn</h4><ul><li><a href="/python/basics/introduction.html">Python Basics</a></li><li><a href="/python/intermediate/modules.html">Intermediate</a></li><li><a href="/python/advanced/iterators.html">Advanced</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2024 ylearner by <a href="https://algorid.com" target="_blank" rel="noopener">Algorid Limited</a>. All rights reserved.</p></div>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

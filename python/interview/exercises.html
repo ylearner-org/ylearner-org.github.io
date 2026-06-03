@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Interview Exercises – Practice Questions with Solutions | ylearner</title>
+  <meta name="description" content="Python interview exercises: OOP design, decorators, generators, context managers, and functional patterns with complete solutions.">
+  <meta name="keywords" content="python interview questions, python interview exercises, python practice problems, python oop interview, python coding interview">
+  <link rel="canonical" href="https://ylearner.org/python/interview/exercises.html">
+  <meta property="og:title" content="Python Interview Exercises – Practice Questions with Solutions | ylearner">
+  <meta property="og:description" content="Python interview exercises: OOP design, decorators, generators, context managers, and functional patterns with complete solutions.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Interview Exercises","description":"Python interview exercises: OOP, decorators, generators, and functional patterns with solutions.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/interview/coding-challenges.html">Interview Prep</a><span class="separator">›</span><span class="current">Exercises</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📝 Interview Prep</div>
+          <h1>Python Interview Exercises</h1>
+          <p class="lesson-intro">These exercises cover OOP design, built-in data structures, generators, and functional patterns — concepts commonly tested in Python interviews.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Interview Prep</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="cache">Exercise 1 – Cache Decorator</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">def cache(func):
+    memo = {}
+    def wrapper(*args):
+        if args not in memo:
+            memo[args] = func(*args)
+        return memo[args]
+    return wrapper
+
+@cache
+def expensive(n):
+    print(f"Computing {n}...")
+    return n * n
+
+expensive(5)  # Computing 5... → 25
+expensive(5)  # from cache → 25</code></pre></div>
+          <h2 id="stack">Exercise 2 – Stack Class</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Stack:
+    def __init__(self):
+        self._items = []
+
+    def push(self, item): self._items.append(item)
+
+    def pop(self):
+        if not self._items:
+            raise IndexError("Stack is empty")
+        return self._items.pop()
+
+    def peek(self):
+        if not self._items:
+            raise IndexError("Stack is empty")
+        return self._items[-1]
+
+    def __len__(self): return len(self._items)
+    def __bool__(self): return bool(self._items)
+
+s = Stack()
+s.push(1); s.push(2); s.push(3)
+print(s.peek())  # 3
+print(s.pop())   # 3</code></pre></div>
+          <h2 id="gen">Exercise 3 – Infinite Counter Generator</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">def counter(start=0, step=1):
+    n = start
+    while True:
+        yield n
+        n += step
+
+import itertools
+evens = list(itertools.islice(counter(0, 2), 5))
+print(evens)  # [0, 2, 4, 6, 8]</code></pre></div>
+          <h2 id="timer">Exercise 4 – Timer Context Manager</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import time
+from contextlib import contextmanager
+
+@contextmanager
+def timer(label=""):
+    start = time.perf_counter()
+    try:
+        yield
+    finally:
+        elapsed = time.perf_counter() - start
+        print(f"{label}: {elapsed:.4f}s")
+
+with timer("List comp"):
+    result = [x**2 for x in range(1_000_000)]</code></pre></div>
+          <h2 id="flatten">Exercise 5 – Flatten Nested List</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from collections.abc import Iterable
+
+def flatten(iterable):
+    for item in iterable:
+        if isinstance(item, Iterable) and not isinstance(item, str):
+            yield from flatten(item)
+        else:
+            yield item
+
+nested = [1, [2, [3, 4]], [5, 6], 7]
+print(list(flatten(nested)))  # [1, 2, 3, 4, 5, 6, 7]</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> In interviews: clarify requirements first, discuss time/space complexity, then handle edge cases before declaring done.</div>
+        </article>
+        <div class="ad-container ad-mid">Ad – 728×90</div>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/" class="prev-lesson">← Back to Home</a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-brand"><a href="/" class="footer-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a><p>Free Python tutorials for everyone.</p></div>
+      <div class="footer-links"><h4>Learn</h4><ul><li><a href="/python/basics/introduction.html">Python Basics</a></li><li><a href="/python/intermediate/modules.html">Intermediate</a></li><li><a href="/python/advanced/iterators.html">Advanced</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2024 ylearner by <a href="https://algorid.com" target="_blank" rel="noopener">Algorid Limited</a>. All rights reserved.</p></div>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

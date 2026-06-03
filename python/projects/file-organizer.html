@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python File Organizer – Automate File Sorting Project | ylearner</title>
+  <meta name="description" content="Build a Python file organizer CLI tool with dry-run preview, configurable categories, and move logging.">
+  <meta name="keywords" content="python file organizer project, python automation project, python sort files, python pathlib project">
+  <link rel="canonical" href="https://ylearner.org/python/projects/file-organizer.html">
+  <meta property="og:title" content="Python File Organizer – Automate File Sorting Project | ylearner">
+  <meta property="og:description" content="Build a Python file organizer CLI tool with dry-run preview, configurable categories, and move logging.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python File Organizer Project","description":"Python CLI file organizer with dry-run mode, categories, conflict handling, and logging.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/projects/calculator.html">Projects</a><span class="separator">›</span><span class="current">File Organizer</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📁 Projects</div>
+          <h1>Python File Organizer – Automation Project</h1>
+          <p class="lesson-intro">Sort files into categorized folders automatically. Features dry-run preview, conflict handling, and a move log for undo.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Projects</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="code">Complete Implementation</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">#!/usr/bin/env python3
+import shutil, json, argparse
+from pathlib import Path
+from datetime import datetime
+
+CATEGORIES = {
+    "Images":    [".jpg", ".jpeg", ".png", ".gif", ".webp"],
+    "Videos":    [".mp4", ".mkv", ".avi", ".mov"],
+    "Audio":     [".mp3", ".wav", ".flac", ".aac"],
+    "Documents": [".pdf", ".doc", ".docx", ".txt", ".md"],
+    "Code":      [".py", ".js", ".ts", ".html", ".css"],
+    "Archives":  [".zip", ".tar", ".gz", ".rar"],
+}
+
+def get_category(ext):
+    for cat, exts in CATEGORIES.items():
+        if ext.lower() in exts:
+            return cat
+    return "Other"
+
+def organize(source, dest, dry_run=False):
+    moves = []
+    for file in source.iterdir():
+        if not file.is_file() or file.name.startswith("."):
+            continue
+        cat = get_category(file.suffix)
+        target_dir = dest / cat
+        target = target_dir / file.name
+        if target.exists():
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+            target = target_dir / f"{file.stem}_{ts}{file.suffix}"
+        moves.append({"src": str(file), "dst": str(target), "category": cat})
+        if not dry_run:
+            target_dir.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(file), target)
+    return moves
+
+parser = argparse.ArgumentParser()
+parser.add_argument("source")
+parser.add_argument("-d", "--dest")
+parser.add_argument("--dry-run", action="store_true")
+args = parser.parse_args()
+
+src = Path(args.source).resolve()
+dst = Path(args.dest).resolve() if args.dest else src
+moves = organize(src, dst, args.dry_run)
+
+by_cat = {}
+for m in moves:
+    by_cat.setdefault(m["category"], []).append(m)
+
+for cat, items in sorted(by_cat.items()):
+    action = "Would move" if args.dry_run else "Moved"
+    print(f"\n{cat} ({len(items)} files)")
+    for item in items:
+        print(f"  {action}: {Path(item['src']).name}")
+
+if not args.dry_run and moves:
+    log = dst / ".organizer_log.json"
+    log.write_text(json.dumps(moves, indent=2))
+    print(f"\n{len(moves)} files moved. Log: {log}")</code></pre></div>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Bash</span><button class="copy-btn">Copy</button></div><pre><code class="language-bash">python organizer.py ~/Downloads --dry-run
+python organizer.py ~/Downloads -d ~/Organized</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> The --dry-run flag is essential for any file manipulation tool. Always let users preview before committing.</div>
+        </article>
+        <div class="ad-container ad-mid">Ad – 728×90</div>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/" class="prev-lesson">← Back to Home</a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-brand"><a href="/" class="footer-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a><p>Free Python tutorials for everyone.</p></div>
+      <div class="footer-links"><h4>Learn</h4><ul><li><a href="/python/basics/introduction.html">Python Basics</a></li><li><a href="/python/intermediate/modules.html">Intermediate</a></li><li><a href="/python/advanced/iterators.html">Advanced</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2024 ylearner by <a href="https://algorid.com" target="_blank" rel="noopener">Algorid Limited</a>. All rights reserved.</p></div>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

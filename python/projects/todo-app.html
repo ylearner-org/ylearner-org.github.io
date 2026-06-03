@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python To-Do App – Task Manager with JSON Storage | ylearner</title>
+  <meta name="description" content="Build a Python to-do app with add, complete, delete, priority levels, and JSON file persistence. Full CLI project with dataclasses.">
+  <meta name="keywords" content="python todo app project, python task manager, python beginner project, python json storage">
+  <link rel="canonical" href="https://ylearner.org/python/projects/todo-app.html">
+  <meta property="og:title" content="Python To-Do App – Task Manager with JSON Storage | ylearner">
+  <meta property="og:description" content="Build a Python to-do app with add, complete, delete, priority levels, and JSON file persistence. Full CLI project with dataclasses.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python To-Do App Project","description":"Python task manager with JSON persistence, priorities, and CLI interface.","educationalLevel":"Beginner","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/projects/calculator.html">Projects</a><span class="separator">›</span><span class="current">To-Do App</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">✅ Projects</div>
+          <h1>Python To-Do App – Task Manager</h1>
+          <p class="lesson-intro">Build a persistent to-do app that saves tasks to JSON. Supports adding, completing, deleting, and filtering by priority.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Projects</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="code">Complete Implementation</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import json
+from pathlib import Path
+from datetime import datetime
+from dataclasses import dataclass, asdict
+
+TODO_FILE = Path("todos.json")
+
+@dataclass
+class Task:
+    id: int
+    title: str
+    done: bool = False
+    priority: str = "medium"
+    created: str = ""
+    def __post_init__(self):
+        if not self.created:
+            self.created = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+class TodoApp:
+    def __init__(self):
+        self.tasks: list[Task] = []
+        self._next_id = 1
+        self.load()
+
+    def load(self):
+        if TODO_FILE.exists():
+            data = json.loads(TODO_FILE.read_text())
+            self.tasks = [Task(**t) for t in data["tasks"]]
+            self._next_id = data.get("next_id", len(self.tasks) + 1)
+
+    def save(self):
+        TODO_FILE.write_text(json.dumps(
+            {"tasks": [asdict(t) for t in self.tasks], "next_id": self._next_id}, indent=2
+        ))
+
+    def add(self, title, priority="medium"):
+        task = Task(id=self._next_id, title=title, priority=priority)
+        self.tasks.append(task); self._next_id += 1; self.save(); return task
+
+    def complete(self, task_id):
+        task = next((t for t in self.tasks if t.id == task_id), None)
+        if task: task.done = True; self.save()
+        return task
+
+    def delete(self, task_id):
+        task = next((t for t in self.tasks if t.id == task_id), None)
+        if task: self.tasks.remove(task); self.save(); return True
+        return False
+
+app = TodoApp()
+ICONS = {"high": "🔴", "medium": "🟡", "low": "🟢"}
+
+while True:
+    print("\n[1]List [2]Add [3]Complete [4]Delete [q]Quit")
+    c = input("> ").strip().lower()
+    if c == "q": break
+    elif c == "1":
+        for t in sorted(app.tasks, key=lambda x: {"high":0,"medium":1,"low":2}[x.priority]):
+            print(f"  [{t.id}] {'✓' if t.done else '○'} {ICONS[t.priority]} {t.title}")
+    elif c == "2":
+        title = input("Title: "); p = input("Priority [medium]: ") or "medium"
+        task = app.add(title, p); print(f"Added #{task.id}")
+    elif c == "3":
+        tid = int(input("Task ID: "))
+        print("Done!" if app.complete(tid) else "Not found.")
+    elif c == "4":
+        tid = int(input("Task ID: "))
+        print("Deleted." if app.delete(tid) else "Not found.")</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> Extend this project with due dates and tags, then wrap it in a Flask web app for a full-stack portfolio piece.</div>
+        </article>
+        <div class="ad-container ad-mid">Ad – 728×90</div>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/" class="prev-lesson">← Back to Home</a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-brand"><a href="/" class="footer-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a><p>Free Python tutorials for everyone.</p></div>
+      <div class="footer-links"><h4>Learn</h4><ul><li><a href="/python/basics/introduction.html">Python Basics</a></li><li><a href="/python/intermediate/modules.html">Intermediate</a></li><li><a href="/python/advanced/iterators.html">Advanced</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2024 ylearner by <a href="https://algorid.com" target="_blank" rel="noopener">Algorid Limited</a>. All rights reserved.</p></div>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

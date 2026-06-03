@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python API Project – Build a Quotes REST API with FastAPI | ylearner</title>
+  <meta name="description" content="Build a complete REST API in Python with FastAPI: CRUD endpoints, SQLite, Pydantic validation, and auto-generated Swagger docs.">
+  <meta name="keywords" content="python api project, python fastapi project, python rest api tutorial, python crud api, python sqlite fastapi">
+  <link rel="canonical" href="https://ylearner.org/python/projects/api-project.html">
+  <meta property="og:title" content="Python API Project – Build a Quotes REST API with FastAPI | ylearner">
+  <meta property="og:description" content="Build a complete REST API in Python with FastAPI: CRUD endpoints, SQLite, Pydantic validation, and auto-generated Swagger docs.">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Quotes REST API Project","description":"FastAPI quotes REST API with SQLite, CRUD, Pydantic validation, and auto-generated docs.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/projects/calculator.html">Projects</a><span class="separator">›</span><span class="current">API Project</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📡 Projects</div>
+          <h1>Python API Project – Quotes REST API</h1>
+          <p class="lesson-intro">Build a production-ready Quotes REST API using FastAPI and SQLite. Full CRUD, filtering, random endpoint, and Swagger docs in under 100 lines.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Projects</span><span>📅 Updated 2024</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="setup">Setup</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Bash</span><button class="copy-btn">Copy</button></div><pre><code class="language-bash">pip install fastapi uvicorn sqlalchemy
+uvicorn main:app --reload</code></pre></div>
+          <h2 id="code">Complete Implementation</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from fastapi import FastAPI, HTTPException, Query
+from pydantic import BaseModel
+from sqlalchemy import create_engine, Column, Integer, String, text
+from sqlalchemy.orm import DeclarativeBase, Session
+import random
+
+engine = create_engine("sqlite:///quotes.db")
+
+class Base(DeclarativeBase): pass
+
+class QuoteModel(Base):
+    __tablename__ = "quotes"
+    id = Column(Integer, primary_key=True, index=True)
+    text = Column(String, nullable=False)
+    author = Column(String, nullable=False)
+    category = Column(String, default="general")
+
+Base.metadata.create_all(engine)
+
+class QuoteCreate(BaseModel):
+    text: str
+    author: str
+    category: str = "general"
+
+class QuoteResponse(QuoteCreate):
+    id: int
+    class Config: from_attributes = True
+
+app = FastAPI(title="Quotes API")
+
+@app.get("/quotes", response_model=list[QuoteResponse])
+def list_quotes(category: str | None = Query(None), skip: int = 0, limit: int = 20):
+    with Session(engine) as db:
+        q = db.query(QuoteModel)
+        if category: q = q.filter(QuoteModel.category == category)
+        return q.offset(skip).limit(limit).all()
+
+@app.get("/quotes/random", response_model=QuoteResponse)
+def random_quote(category: str | None = None):
+    with Session(engine) as db:
+        q = db.query(QuoteModel)
+        if category: q = q.filter(QuoteModel.category == category)
+        quotes = q.all()
+        if not quotes: raise HTTPException(404, "No quotes")
+        return random.choice(quotes)
+
+@app.get("/quotes/{quote_id}", response_model=QuoteResponse)
+def get_quote(quote_id: int):
+    with Session(engine) as db:
+        q = db.get(QuoteModel, quote_id)
+        if not q: raise HTTPException(404, "Not found")
+        return q
+
+@app.post("/quotes", response_model=QuoteResponse, status_code=201)
+def create_quote(quote: QuoteCreate):
+    with Session(engine) as db:
+        q = QuoteModel(**quote.dict())
+        db.add(q); db.commit(); db.refresh(q)
+        return q
+
+@app.delete("/quotes/{quote_id}", status_code=204)
+def delete_quote(quote_id: int):
+    with Session(engine) as db:
+        q = db.get(QuoteModel, quote_id)
+        if not q: raise HTTPException(404, "Not found")
+        db.delete(q); db.commit()</code></pre></div>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Bash</span><button class="copy-btn">Copy</button></div><pre><code class="language-bash"># API docs: http://localhost:8000/docs</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> FastAPI auto-generates Swagger at /docs and ReDoc at /redoc — use them to test all endpoints without any client code.</div>
+        </article>
+        <div class="ad-container ad-mid">Ad – 728×90</div>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/" class="prev-lesson">← Back to Home</a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-brand"><a href="/" class="footer-logo"><div class="logo-icon">Py</div><span class="logo-text">y<span>learner</span></span></a><p>Free Python tutorials for everyone.</p></div>
+      <div class="footer-links"><h4>Learn</h4><ul><li><a href="/python/basics/introduction.html">Python Basics</a></li><li><a href="/python/intermediate/modules.html">Intermediate</a></li><li><a href="/python/advanced/iterators.html">Advanced</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2024 ylearner by <a href="https://algorid.com" target="_blank" rel="noopener">Algorid Limited</a>. All rights reserved.</p></div>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>
