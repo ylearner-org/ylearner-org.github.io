@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Date and Time – Date Object &amp; Intl API | ylearner</title>
+  <meta name="description" content="Master JavaScript Date and time: creating Date objects, getting and setting date parts, Date.now(), date arithmetic, formatting with toLocaleDateString and Intl.DateTimeFormat, and timezone considerations.">
+  <meta name="keywords" content="javascript date, javascript Date object, Date.now javascript, javascript date formatting, Intl.DateTimeFormat javascript, javascript date arithmetic, getMonth javascript, toLocaleDateString javascript, date-fns javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/intermediate/date-time.html">
+  <meta property="og:title" content="JavaScript Date and Time – Date Object &amp; Intl API | ylearner">
+  <meta property="og:description" content="Master JavaScript Date and time: creating Date objects, getting and setting date parts, Date.now(), date arithmetic, formatting with toLocaleDateString and Intl.DateTimeFormat, and timezone considerations.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/intermediate/es6-features.html">Intermediate JS</a><span class="separator">›</span>
+          <span class="current">Date &amp; Time</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Intermediate JS</div>
+          <h1>JavaScript Date and Time – Working with Dates in JavaScript</h1>
+          <p class="lesson-intro">The JavaScript <code>Date</code> object has been around since the very beginning of the language — and it shows. It has some notorious quirks (months start at 0!) but with the right knowledge, you can handle dates, times, formatting, and arithmetic reliably. This lesson also covers the modern <code>Intl</code> API for locale-aware formatting.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="creating-dates">Creating Date Objects</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Current date and time
+const now = new Date();
+console.log(now); // current timestamp
+
+// From a string (ISO 8601 recommended)
+const d1 = new Date('2026-06-15');              // date only (midnight UTC)
+const d2 = new Date('2026-06-15T10:30:00');     // local time
+const d3 = new Date('2026-06-15T10:30:00Z');    // UTC explicitly
+const d4 = new Date('2026-06-15T10:30:00+05:30'); // UTC+5:30 (IST)
+
+// From timestamp (milliseconds since Unix epoch: Jan 1 1970 UTC)
+const d5 = new Date(0);          // 1970-01-01T00:00:00.000Z
+const d6 = new Date(1000);       // 1970-01-01T00:00:01.000Z
+const d7 = new Date(Date.now()); // now (same as new Date())
+
+// From year, month, day, ... (month is 0-indexed!)
+const d8 = new Date(2026, 5, 15);          // June 15, 2026 local time
+//                        ↑ 5 = June (0=Jan, 1=Feb, ..., 11=Dec)
+const d9 = new Date(2026, 0, 1, 9, 30, 0); // Jan 1, 2026 09:30:00
+
+// Invalid date
+const invalid = new Date('not a date');
+console.log(isNaN(invalid)); // true
+console.log(invalid.toString()); // 'Invalid Date'
+
+// Date.now() – fastest way to get current timestamp (no object creation)
+const timestamp = Date.now(); // number of milliseconds
+console.log(typeof timestamp); // 'number'</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Month Indexing Gotcha</strong>
+              <p>In JavaScript's <code>Date</code> constructor and <code>getMonth()</code>, months are zero-indexed: January = 0, February = 1, ..., December = 11. This is one of the most common sources of off-by-one bugs. Always remember to add 1 when displaying the month: <code>date.getMonth() + 1</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="getting-parts">Getting Date Parts</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const d = new Date('2026-06-15T14:30:45.500');
+
+// All getters return LOCAL time (unless using UTC variants)
+console.log(d.getFullYear());     // 2026
+console.log(d.getMonth());        // 5  ← June (0-indexed!)
+console.log(d.getMonth() + 1);    // 6  ← human-readable
+console.log(d.getDate());         // 15 (day of month)
+console.log(d.getDay());          // day of week: 0=Sun, 1=Mon, ..., 6=Sat
+console.log(d.getHours());        // 14
+console.log(d.getMinutes());      // 30
+console.log(d.getSeconds());      // 45
+console.log(d.getMilliseconds()); // 500
+console.log(d.getTime());         // Unix timestamp in ms
+
+// UTC variants (always in UTC regardless of local timezone)
+console.log(d.getUTCHours());     // could differ from getHours()
+console.log(d.getUTCMonth());     // also 0-indexed
+
+// Compute age from birthdate
+function getAge(birthDate) {
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+}
+const age = getAge(new Date(1998, 2, 15)); // March 15, 1998
+console.log(age); // 28 (in 2026)</code></pre>
+          </div>
+
+          <h2 id="setting-parts">Setting Date Parts</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const d = new Date('2026-06-15');
+
+d.setFullYear(2027);   // change year
+d.setMonth(11);         // change to December (0-indexed)
+d.setDate(31);          // change day of month
+d.setHours(9);          // change hour
+d.setMinutes(30);
+d.setSeconds(0);
+d.setMilliseconds(0);
+
+console.log(d); // 2027-12-31T09:30:00.000...
+
+// JavaScript auto-adjusts overflow dates
+const overflow = new Date(2026, 1, 30); // Feb 30 doesn't exist
+console.log(overflow.toISOString()); // Automatically becomes Mar 2, 2026
+
+// Set to start/end of day
+function startOfDay(date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0); // hours, minutes, seconds, milliseconds
+  return d;
+}
+function endOfDay(date) {
+  const d = new Date(date);
+  d.setHours(23, 59, 59, 999);
+  return d;
+}</code></pre>
+          </div>
+
+          <h2 id="date-arithmetic">Date Arithmetic</h2>
+          <p>Dates are stored as milliseconds internally. Arithmetic is done by converting to milliseconds, calculating, and converting back.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+// Days between two dates
+function daysBetween(date1, date2) {
+  const ms = Math.abs(date2.getTime() - date1.getTime());
+  return Math.round(ms / MS_PER_DAY);
+}
+const start = new Date('2026-01-01');
+const end   = new Date('2026-06-15');
+console.log(daysBetween(start, end)); // 165 days
+
+// Add N days to a date
+function addDays(date, days) {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+}
+const tomorrow = addDays(new Date(), 1);
+const nextWeek = addDays(new Date(), 7);
+
+// Add months (handles variable month lengths)
+function addMonths(date, months) {
+  const result = new Date(date);
+  result.setMonth(result.getMonth() + months);
+  return result;
+}
+
+// Compare dates (convert to timestamps for comparison)
+const d1 = new Date('2026-01-01');
+const d2 = new Date('2026-12-31');
+console.log(d1 < d2);            // true
+console.log(d1.getTime() === d2.getTime()); // false
+
+// Is a date in the past?
+const isPast = (date) => date.getTime() < Date.now();</code></pre>
+          </div>
+
+          <h2 id="formatting">Formatting Dates</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const d = new Date('2026-06-15T14:30:00');
+
+// toLocaleDateString / toLocaleTimeString / toLocaleString
+console.log(d.toLocaleDateString('en-GB')); // '15/06/2026'
+console.log(d.toLocaleDateString('en-US')); // '6/15/2026'
+console.log(d.toLocaleDateString('ja-JP')); // '2026/6/15'
+
+console.log(d.toLocaleTimeString('en-US', { hour12: true }));
+// '2:30:00 PM'
+
+console.log(d.toLocaleString('en-GB', {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+}));
+// 'Monday, 15 June 2026 at 14:30'
+
+// Intl.DateTimeFormat – for repeated formatting (more efficient)
+const formatter = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: '2-digit',
+  timeZone: 'America/New_York'
+});
+const dates = [new Date('2026-01-15'), new Date('2026-06-15')];
+dates.forEach(date => console.log(formatter.format(date)));
+// Jan 15, 2026
+// Jun 15, 2026
+
+// Relative time formatting
+const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+console.log(rtf.format(-1, 'day'));    // 'yesterday'
+console.log(rtf.format(3, 'day'));     // 'in 3 days'
+console.log(rtf.format(-2, 'week'));   // '2 weeks ago'</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>15/06/2026
+6/15/2026
+2026/6/15
+2:30:00 PM
+Monday, 15 June 2026 at 14:30
+Jan 15, 2026
+Jun 15, 2026
+yesterday
+in 3 days
+2 weeks ago</pre>
+          </div>
+
+          <h2 id="timezones">Timezone Considerations</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// JavaScript Date always stores UTC internally
+// Display methods (getHours, toLocaleDateString) use local timezone
+
+const d = new Date('2026-06-15T00:00:00Z'); // midnight UTC
+console.log(d.getHours());       // could be 23, 1, etc. based on local TZ
+console.log(d.getUTCHours());    // always 0
+
+// Get local timezone offset (minutes from UTC; negative means ahead of UTC)
+const offsetMinutes = new Date().getTimezoneOffset();
+console.log(offsetMinutes); // e.g., -60 for UTC+1 (BST), 330 for IST
+
+// Format in a specific timezone with Intl
+const tokyoTime = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'Asia/Tokyo',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false
+}).format(new Date());
+console.log(`Tokyo: ${tokyoTime}`);
+
+// Best practice: store/transmit dates as UTC ISO strings
+const event = {
+  title: 'Conference',
+  startAt: new Date('2026-09-01T09:00:00Z').toISOString()
+  // '2026-09-01T09:00:00.000Z'
+};</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Use date-fns for Complex Date Logic</strong>
+              <p>For recurring events, business days, calendar grids, or complex timezone handling, reach for <code>date-fns</code> or <code>Temporal</code> (the upcoming built-in replacement for the Date API). The <code>date-fns</code> library is tree-shakeable, immutable, and covers virtually every date use case.</p>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Method</th><th>Returns</th><th>Note</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>getFullYear()</code></td><td>4-digit year</td><td>Use this, not deprecated <code>getYear()</code></td></tr>
+                <tr><td><code>getMonth()</code></td><td>0–11</td><td>Add 1 for human display</td></tr>
+                <tr><td><code>getDate()</code></td><td>1–31</td><td>Day of month</td></tr>
+                <tr><td><code>getDay()</code></td><td>0–6</td><td>0 = Sunday, 6 = Saturday</td></tr>
+                <tr><td><code>getHours()</code></td><td>0–23</td><td>Local time</td></tr>
+                <tr><td><code>getTime()</code></td><td>ms since epoch</td><td>Use for arithmetic and comparison</td></tr>
+                <tr><td><code>Date.now()</code></td><td>ms since epoch</td><td>Static, no object needed</td></tr>
+                <tr><td><code>toISOString()</code></td><td>ISO 8601 string</td><td>Always UTC</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>Why does <code>getMonth()</code> return 0 for January?</li>
+            <li>How do you calculate the number of days between two dates?</li>
+            <li>What is the difference between <code>getHours()</code> and <code>getUTCHours()</code>?</li>
+            <li>How do you format a date for display in a specific locale?</li>
+            <li>Why is <code>Date.now()</code> preferred over <code>new Date().getTime()</code>?</li>
+          </ul>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Write a <code>countdown(targetDate)</code> function that returns an object <code>{ days, hours, minutes, seconds }</code> representing the time remaining until the target date. If the target date has passed, return all zeros. Test it with a date 7 days in the future.</p>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a <code>Calendar</code> class that, given a year and month, generates a 2D array representing the month's grid (rows = weeks, cols = days Sun–Sat). Each cell should contain either <code>null</code> (empty) or a date object for that day. Ensure the first row correctly aligns to the right day of the week. Display the grid as a formatted string.</p>
+          </div>
+
+          <h2 id="faq">Frequently Asked Questions</h2>
+          <dl>
+            <dt>Why is working with dates in JavaScript so error-prone?</dt>
+            <dd>Several quirks combine: months are 0-indexed (Jan = 0), parsing behaviour varies by browser, local timezone vs UTC confusion is easy to make, and DST transitions can cause dates to shift. Libraries like <code>date-fns</code> or the upcoming <code>Temporal</code> API address these issues.</dd>
+            <dt>What is the Temporal API?</dt>
+            <dd><code>Temporal</code> is the upcoming TC39 proposal to replace the <code>Date</code> object. It has immutable date/time objects, proper timezone support, nanosecond precision, and no 0-indexed months. As of 2026, it is at Stage 3 and available behind flags in some environments.</dd>
+            <dt>How do I check if two Date objects represent the same day (ignoring time)?</dt>
+            <dd>Compare the year, month, and date parts: <code>a.getFullYear() === b.getFullYear() &amp;&amp; a.getMonth() === b.getMonth() &amp;&amp; a.getDate() === b.getDate()</code>. Alternatively, compare their ISO date strings: <code>a.toISOString().slice(0, 10) === b.toISOString().slice(0, 10)</code>.</dd>
+            <dt>Why does <code>new Date('2026-06-15')</code> parse as midnight UTC while <code>new Date('June 15 2026')</code> parses as local time?</dt>
+            <dd>ISO 8601 date-only strings are treated as UTC by the specification. Non-ISO strings are implementation-dependent and many engines treat them as local time. Always use ISO format or explicit timestamps to avoid ambiguity.</dd>
+            <dt>What is <code>Date.now()</code> useful for?</dt>
+            <dd>Any situation where you need a timestamp without creating a <code>Date</code> object: performance timing (<code>const start = Date.now()</code>), generating unique IDs, recording event times, or measuring elapsed time. It is slightly faster than <code>new Date().getTime()</code>.</dd>
+          </dl>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Create dates with <code>new Date()</code>, ISO strings, timestamps, or year/month/day arguments.</li>
+              <li><code>getMonth()</code> is 0-indexed — January is 0, December is 11. Always add 1 for display.</li>
+              <li>Use <code>Date.now()</code> for the current timestamp without creating a Date object.</li>
+              <li>Date arithmetic is done in milliseconds: convert to <code>.getTime()</code>, calculate, convert back.</li>
+              <li>Use <code>toLocaleDateString(locale, options)</code> or <code>Intl.DateTimeFormat</code> for locale-aware formatting.</li>
+              <li>Use <code>Intl.RelativeTimeFormat</code> for "3 days ago" / "in 2 hours" style formatting.</li>
+              <li>Always store and transmit dates as UTC ISO strings to avoid timezone confusion.</li>
+              <li>For complex date logic, use <code>date-fns</code> or wait for the <code>Temporal</code> API.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/javascript/intermediate/json.html" class="topic-tag">JSON</a>
+            <a href="/javascript/intermediate/regex.html" class="topic-tag">Regular Expressions</a>
+            <a href="/javascript/intermediate/es6-features.html" class="topic-tag">ES6+ Features</a>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/intermediate/json.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">JSON</span></a>
+          <a href="/javascript/intermediate/regex.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Regular Expressions</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

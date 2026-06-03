@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Regular Expressions – Patterns, Flags &amp; Methods | ylearner</title>
+  <meta name="description" content="Learn JavaScript regular expressions: regex syntax, flags (g,i,m,s,u), character classes, anchors, quantifiers, groups, lookahead/lookbehind, regex methods, and common patterns for email, URL, phone validation.">
+  <meta name="keywords" content="javascript regex, javascript regular expressions, regex flags javascript, character classes regex, regex groups javascript, lookahead lookbehind javascript, regex test match replace javascript, email validation regex">
+  <link rel="canonical" href="https://ylearner.org/javascript/intermediate/regex.html">
+  <meta property="og:title" content="JavaScript Regular Expressions – Patterns, Flags &amp; Methods | ylearner">
+  <meta property="og:description" content="Learn JavaScript regular expressions: regex syntax, flags (g,i,m,s,u), character classes, anchors, quantifiers, groups, lookahead/lookbehind, regex methods, and common patterns for email, URL, phone validation.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/intermediate/es6-features.html">Intermediate JS</a><span class="separator">›</span>
+          <span class="current">Regular Expressions</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Intermediate JS</div>
+          <h1>JavaScript Regular Expressions – Matching Patterns in Strings</h1>
+          <p class="lesson-intro">Regular expressions are a concise language for describing patterns in text. Validating emails, extracting data from URLs, sanitising input, replacing substrings — all of these are dramatically simpler with regex. This guide builds your regex vocabulary from first principles to advanced lookarounds.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 26 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="syntax-creation">Syntax and Creating Regex</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Regex literal – preferred for static patterns
+const pattern1 = /hello/;
+const pattern2 = /hello/gi; // with flags
+
+// RegExp constructor – for dynamic patterns
+const word = 'hello';
+const pattern3 = new RegExp(word, 'i');          // /hello/i
+const pattern4 = new RegExp(`\\b${word}\\b`, 'g'); // word boundary
+
+// Flags overview
+// g  – global: find ALL matches, not just first
+// i  – case-insensitive
+// m  – multiline: ^ and $ match start/end of each line
+// s  – dotAll: . matches newlines too (ES2018)
+// u  – unicode: full Unicode support
+// y  – sticky: match only at lastIndex position
+
+const re = /pattern/gim;
+console.log(re.flags);  // 'gim'
+console.log(re.global); // true
+console.log(re.source); // 'pattern'</code></pre>
+          </div>
+
+          <h2 id="character-classes">Character Classes and Anchors</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Character classes
+/[abc]/      // matches 'a', 'b', or 'c'
+/[a-z]/      // matches any lowercase letter
+/[A-Z]/      // matches any uppercase letter
+/[0-9]/      // matches any digit
+/[a-zA-Z0-9_]/ // alphanumeric + underscore
+/[^abc]/     // negated class: anything EXCEPT a, b, c
+
+// Shorthand classes
+// \d  digit        [0-9]
+// \D  non-digit    [^0-9]
+// \w  word char    [a-zA-Z0-9_]
+// \W  non-word
+// \s  whitespace   [ \t\n\r\f]
+// \S  non-whitespace
+// .   any char except newline (. in dotAll /s flag matches \n too)
+
+console.log(/\d+/.test('abc123'));  // true
+console.log(/^\d+$/.test('123'));   // true  (only digits)
+console.log(/^\d+$/.test('123a')); // false
+
+// Anchors
+// ^  start of string (or line with /m)
+// $  end of string (or line with /m)
+// \b word boundary
+// \B non-word boundary
+
+/^hello/.test('hello world');  // true (starts with 'hello')
+/world$/.test('hello world');  // true (ends with 'world')
+/\bcat\b/.test('cat');         // true
+/\bcat\b/.test('catch');       // false (no word boundary after 'cat')</code></pre>
+          </div>
+
+          <h2 id="quantifiers">Quantifiers</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Quantifiers
+// *    zero or more
+// +    one or more
+// ?    zero or one (also makes quantifiers lazy)
+// {n}  exactly n
+// {n,} n or more
+// {n,m} between n and m
+
+/\d*/.test('abc');    // true (zero digits is fine)
+/\d+/.test('abc');    // false (requires at least one)
+/\d?/.test('abc');    // true (zero or one)
+/\d{3}/.test('123');  // true
+/\d{3}/.test('12');   // false
+
+// Greedy vs lazy
+const html = '<p>First</p><p>Second</p>';
+html.match(/<p>.*<\/p>/)[0];   // '<p>First</p><p>Second</p>' GREEDY
+html.match(/<p>.*?<\/p>/)[0];  // '<p>First</p>'             LAZY (non-greedy)
+// Add ? after quantifier to make it lazy: *? +? {n,m}?</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>Greedy:  &lt;p&gt;First&lt;/p&gt;&lt;p&gt;Second&lt;/p&gt;
+Lazy:    &lt;p&gt;First&lt;/p&gt;</pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Greedy vs Lazy Matching</strong>
+              <p>By default quantifiers are greedy — they match as many characters as possible. Add <code>?</code> to make them lazy — match as few characters as possible. This matters when matching HTML tags, strings in quotes, or any pattern with repeated delimiters.</p>
+            </div>
+          </div>
+
+          <h2 id="groups">Groups and Alternation</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Capturing group (  )  – captures the matched substring
+const dateStr = '2026-06-15';
+const dateRe = /(\d{4})-(\d{2})-(\d{2})/;
+const match = dateStr.match(dateRe);
+console.log(match[0]); // '2026-06-15' (full match)
+console.log(match[1]); // '2026' (first group)
+console.log(match[2]); // '06'
+console.log(match[3]); // '15'
+
+// Named capturing groups (?<name>...)  (ES2018)
+const namedRe = /(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/;
+const { groups: { year, month, day } } = dateStr.match(namedRe);
+console.log(year, month, day); // 2026 06 15
+
+// Non-capturing group (?:...)  – group without capturing
+/(?:https?):\/\//.test('https://example.com'); // true
+
+// Alternation |
+/cat|dog/.test('I have a dog'); // true
+/^(cat|dog)$/.test('cat');      // true
+/^(cat|dog)$/.test('cats');     // false
+
+// Backreferences \1, \2 – reference earlier group
+/(['"])(.*?)\1/.test('"hello"');  // true (matching quotes)
+/(['"])(.*?)\1/.test('"hello\''); // false (mismatched)</code></pre>
+          </div>
+
+          <h2 id="lookahead-lookbehind">Lookahead and Lookbehind</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Lookahead (?=...)  – match X followed by Y (Y not consumed)
+const prices = ['$10', '€20', '$30', '£15'];
+const dollarAmounts = prices.filter(p => /\d+(?=\s*$)/.test(p));
+// Match dollar values
+'100USD'.match(/\d+(?=USD)/)[0]; // '100'
+
+// Negative lookahead (?!...)  – match X NOT followed by Y
+'hello world'.match(/\w+(?! world)/g); // ['hello'] is matched by \w+ not followed by ' world'... complex
+'foo123'.replace(/(\d)(?!.*\d)/, '$1!'); // '123!' — add ! after last digit
+
+// Lookbehind (?<=...)  – match X preceded by Y (ES2018)
+'$100 €200 £300'.match(/(?<=\$)\d+/g); // ['100'] — digits preceded by $
+
+// Negative lookbehind (?<!...)
+'100px 200em 300px'.match(/\d+(?<!px)(?=em)/g); // approach for em values
+
+// Practical: password strength check
+function checkPassword(pwd) {
+  const hasUpper   = /(?=.*[A-Z])/.test(pwd);
+  const hasLower   = /(?=.*[a-z])/.test(pwd);
+  const hasDigit   = /(?=.*\d)/.test(pwd);
+  const hasSpecial = /(?=.*[!@#$%^&*])/.test(pwd);
+  const isLong     = pwd.length >= 8;
+  return hasUpper && hasLower && hasDigit && hasSpecial && isLong;
+}
+console.log(checkPassword('Passw0rd!'));  // true
+console.log(checkPassword('password'));   // false</code></pre>
+          </div>
+
+          <h2 id="regex-methods">Regex Methods</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const text = 'The price is $42.50 and $18.99';
+const priceRe = /\$[\d.]+/g;
+
+// test(str) – returns boolean
+console.log(/\d/.test('abc123'));  // true
+
+// exec(str) – returns match array or null; advances lastIndex with /g
+const re = /\$[\d.]+/g;
+let m;
+while ((m = re.exec(text)) !== null) {
+  console.log(`Found ${m[0]} at index ${m.index}`);
+}
+// Found $42.50 at index 13
+// Found $18.99 at index 24
+
+// String methods that accept regex:
+// match(regex) – returns array of matches
+const matches = text.match(priceRe);
+console.log(matches); // ['$42.50', '$18.99']
+
+// matchAll(regex) – returns iterator of all matches with groups
+const allMatches = [...text.matchAll(/\$(\d+)\.(\d+)/g)];
+console.log(allMatches[0].groups);  // undefined (no named groups here)
+console.log(allMatches[0][1], allMatches[0][2]); // '42' '50'
+
+// search(regex) – returns index of first match (-1 if none)
+console.log(text.search(/\$/)); // 13
+
+// replace(regex, replacement)
+const sanitised = text.replace(/\$[\d.]+/g, '[PRICE]');
+console.log(sanitised); // 'The price is [PRICE] and [PRICE]'
+
+// replace with function
+const converted = text.replace(/\$([\d.]+)/g, (match, amount) =>
+  `£${(parseFloat(amount) * 0.79).toFixed(2)}`
+);
+console.log(converted); // 'The price is £33.58 and £15.00'
+
+// split(regex)
+'one1two2three3four'.split(/\d/); // ['one','two','three','four']</code></pre>
+          </div>
+
+          <h2 id="common-patterns">Common Patterns</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Email (simplified – RFC 5322 is far more complex)
+const emailRe = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+emailRe.test('user@example.com');    // true
+emailRe.test('not-an-email');        // false
+
+// URL
+const urlRe = /^https?:\/\/[^\s/$.?#].[^\s]*$/i;
+urlRe.test('https://ylearner.org');  // true
+urlRe.test('ftp://old.com');         // false
+
+// UK phone number (simplified)
+const ukPhoneRe = /^(\+44|0)[\d\s\-]{9,13}$/;
+ukPhoneRe.test('+44 7700 900123');   // true
+
+// IPv4 address
+const ipRe = /^(\d{1,3}\.){3}\d{1,3}$/;
+ipRe.test('192.168.1.1');  // true (does not validate ranges 0-255)
+
+// Hex colour
+const hexRe = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+hexRe.test('#FF5733');  // true
+hexRe.test('#FFF');     // true
+hexRe.test('#GGGGGG'); // false
+
+// Username (3-16 alphanumeric + underscore)
+const usernameRe = /^[a-zA-Z0-9_]{3,16}$/;
+usernameRe.test('alice_99'); // true
+usernameRe.test('ab');       // false (too short)</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Don't Over-Rely on Regex for Email Validation</strong>
+              <p>The full RFC 5322 email specification is so complex that a correct regex fills a page. For real validation, use a simple regex to catch obvious mistakes, then send a verification email. Server-side validation should always be the final gate.</p>
+            </div>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between <code>test</code> and <code>exec</code>?</li>
+            <li>Why does using a <code>/g</code> regex with <code>exec</code> in a loop work, but reusing the same regex variable between calls can cause bugs?</li>
+            <li>What is the difference between a capturing group and a non-capturing group?</li>
+            <li>How do lookaheads and lookbehinds differ from regular groups?</li>
+            <li>What does the <code>s</code> flag do, and when would you need it?</li>
+          </ul>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Write a <code>maskSensitiveData(text)</code> function that uses regex to:</p>
+            <ol>
+              <li>Replace credit card numbers (16 digits, optionally spaced in groups of 4) with <code>****-****-****-NNNN</code> (keep last 4 digits).</li>
+              <li>Replace email addresses with <code>***@domain.tld</code>.</li>
+              <li>Replace UK phone numbers with <code>***-****-****</code>.</li>
+            </ol>
+            <p>Test with a string that contains all three.</p>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a simple template engine using regex. Given a template string like <code>"Hello, {{name}}! You have {{count}} messages."</code> and a data object <code>{ name: 'Alice', count: 3 }</code>, write a <code>render(template, data)</code> function that replaces all <code>{{variable}}</code> placeholders with their values. Handle missing variables gracefully (substitute empty string), and support a pipe syntax for simple transforms: <code>{{name|upper}}</code> calls <code>.toUpperCase()</code>.</p>
+          </div>
+
+          <h2 id="faq">Frequently Asked Questions</h2>
+          <dl>
+            <dt>What is the <code>lastIndex</code> property and why does it cause bugs?</dt>
+            <dd>When you use a <code>/g</code> or <code>/y</code> regex with <code>exec</code> or <code>test</code>, it remembers where it left off via the <code>lastIndex</code> property. If you reuse the same regex object for two different strings without resetting <code>lastIndex = 0</code>, the second call starts from the wrong position. To avoid this, always use regex literals inline or create a new <code>RegExp</code> each time.</dd>
+            <dt>What is the difference between <code>match</code> and <code>matchAll</code>?</dt>
+            <dd>With a <code>/g</code> flag, <code>match</code> returns an array of all matched strings but loses group information. <code>matchAll</code> (ES2020) returns an iterator of full match objects — each with the full match, groups, and index — making it far more useful when you need capturing groups from multiple matches.</dd>
+            <dt>How do I escape special characters in a dynamic regex?</dt>
+            <dd>Use <code>str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')</code> to escape all regex metacharacters in a string before passing it to <code>new RegExp()</code>. Many environments also have a dedicated <code>RegExp.escape()</code> method coming in a future ES version.</dd>
+            <dt>Is regex always the best tool for parsing?</dt>
+            <dd>No. For HTML/XML use a proper DOM parser; for JSON use <code>JSON.parse()</code>; for complex grammars use a dedicated parser library. Regex excels at pattern matching in strings but becomes unreadable and unreliable for nested or context-sensitive structures.</dd>
+            <dt>What is catastrophic backtracking?</dt>
+            <dd>Certain regex patterns with nested quantifiers can cause exponential time complexity on specific inputs, hanging or crashing the engine. For example: <code>/^(a+)+$/</code> on a long string of 'a's followed by a non-matching character. Always test regex patterns against adversarial inputs before using them in production.</dd>
+          </dl>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Use regex literals <code>/pattern/flags</code> for static patterns; <code>new RegExp(str, flags)</code> for dynamic ones.</li>
+              <li>Common flags: <code>g</code> (global), <code>i</code> (case-insensitive), <code>m</code> (multiline), <code>s</code> (dotAll).</li>
+              <li>Shorthand classes: <code>\d</code> (digit), <code>\w</code> (word char), <code>\s</code> (space); uppercase negates (<code>\D</code>, etc.).</li>
+              <li>Add <code>?</code> after a quantifier (<code>*?</code>, <code>+?</code>) to make it lazy instead of greedy.</li>
+              <li>Capturing groups <code>()</code> capture matches; non-capturing <code>(?:)</code> group without capturing.</li>
+              <li>Named groups <code>(?&lt;name&gt;)</code> let you access matches by name via <code>match.groups</code>.</li>
+              <li>Lookahead <code>(?=)</code> and lookbehind <code>(?&lt;=)</code> assert context without consuming characters.</li>
+              <li>Use <code>matchAll</code> with <code>/g</code> to get all matches with group information.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/javascript/intermediate/date-time.html" class="topic-tag">Date &amp; Time</a>
+            <a href="/javascript/intermediate/local-storage.html" class="topic-tag">Local Storage</a>
+            <a href="/javascript/beginner/strings.html" class="topic-tag">Strings</a>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/intermediate/date-time.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Date &amp; Time</span></a>
+          <a href="/javascript/intermediate/local-storage.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Local Storage</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
