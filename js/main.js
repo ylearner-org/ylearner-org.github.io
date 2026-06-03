@@ -247,6 +247,12 @@
         if (!hasActive) section.classList.add('collapsed');
       });
     }
+
+    // Scroll active item into view within the sidebar
+    const activeLink = container.querySelector('a.active');
+    if (activeLink) {
+      activeLink.scrollIntoView({ block: 'center', behavior: 'instant' });
+    }
   }
 
   // ========================
