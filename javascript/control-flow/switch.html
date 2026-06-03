@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Switch Statement – Cases, Fall-through &amp; Best Practices | ylearner</title>
+  <meta name="description" content="Master the JavaScript switch statement: syntax, case, break, default, intentional fall-through, switch vs if-else, switch(true) pattern, and object lookup alternatives.">
+  <meta name="keywords" content="javascript switch statement, switch case, fall-through, break default, switch vs if else, switch true pattern, object lookup javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/control-flow/switch.html">
+  <meta property="og:title" content="JavaScript Switch Statement – Cases, Fall-through &amp; Best Practices | ylearner">
+  <meta property="og:description" content="Master the JavaScript switch statement: syntax, case, break, default, intentional fall-through, switch vs if-else, switch(true) pattern, and object lookup alternatives.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/control-flow/if-statements.html">Control Flow</a><span class="separator">›</span>
+          <span class="current">Switch Statement</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔀 Control Flow</div>
+          <h1>JavaScript Switch Statement – Multi-way Branching</h1>
+          <p class="lesson-intro">The switch statement is JavaScript's way of elegantly handling multiple discrete values. Learn its full syntax, the nuances of fall-through, when to prefer it over if-else, and modern alternatives like object lookup tables.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 17 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="switch-syntax">Switch Statement Syntax</h2>
+          <p>A switch statement evaluates an expression once and compares it against multiple <code>case</code> values using strict equality (<code>===</code>).</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">let day = 3;
+
+switch (day) {
+  case 1:
+    console.log("Monday");
+    break;
+  case 2:
+    console.log("Tuesday");
+    break;
+  case 3:
+    console.log("Wednesday");
+    break;
+  case 4:
+    console.log("Thursday");
+    break;
+  case 5:
+    console.log("Friday");
+    break;
+  default:
+    console.log("Weekend");
+}</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Wednesday</div>
+
+          <h2 id="break-and-default">break and default</h2>
+          <p><code>break</code> exits the switch block after a case executes. Without it, execution "falls through" to the next case. <code>default</code> runs when no case matches — it is equivalent to the <code>else</code> in an if/else chain.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">let fruit = "grape";
+
+switch (fruit) {
+  case "apple":
+    console.log("Apple selected.");
+    break;
+  case "banana":
+    console.log("Banana selected.");
+    break;
+  default:
+    console.log("Unknown fruit: " + fruit);
+}</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Unknown fruit: grape</div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>default Position</strong>
+              <p><code>default</code> does not have to be the last case — it can appear anywhere. However, placing it last is the conventional and most readable approach.</p>
+            </div>
+          </div>
+
+          <h2 id="fall-through">Fall-through Behavior</h2>
+          <p>When you omit <code>break</code>, execution continues ("falls through") into the next case block. This is a common source of bugs, but can also be used intentionally.</p>
+
+          <h3>Accidental Fall-through (Bug)</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">let color = "red";
+
+switch (color) {
+  case "red":
+    console.log("Red light — stop.");
+    // BUG: forgot break!
+  case "yellow":
+    console.log("Yellow light — caution.");
+    break;
+  case "green":
+    console.log("Green light — go.");
+    break;
+}</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Red light — stop.
+Yellow light — caution.</div>
+
+          <h3>Intentional Fall-through (Multiple Cases, Same Block)</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">let month = 4; // April
+
+switch (month) {
+  case 1:
+  case 3:
+  case 5:
+  case 7:
+  case 8:
+  case 10:
+  case 12:
+    console.log("31 days");
+    break;
+  case 4:
+  case 6:
+  case 9:
+  case 11:
+    console.log("30 days");
+    break;
+  case 2:
+    console.log("28 or 29 days");
+    break;
+}</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>30 days</div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Document Intentional Fall-through</strong>
+              <p>When you intentionally fall through, add a comment like <code>// falls through</code> to signal to readers (and linters) that the missing break is deliberate.</p>
+            </div>
+          </div>
+
+          <h2 id="switch-vs-if-else">Switch vs if-else — Comparison</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Feature</th><th>switch</th><th>if / else if</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Comparison type</td><td>Strict equality (===) only</td><td>Any expression/condition</td></tr>
+                <tr><td>Range checks</td><td>Not suitable</td><td>Works (age &gt; 18)</td></tr>
+                <tr><td>Multiple values → same block</td><td>Clean with fall-through</td><td>Verbose (multiple || conditions)</td></tr>
+                <tr><td>Readability for many values</td><td>Very clear</td><td>Gets long</td></tr>
+                <tr><td>Variable type checked</td><td>Any primitive</td><td>Any value</td></tr>
+                <tr><td>Default/else</td><td><code>default:</code></td><td><code>else</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="switch-with-strings">Switch with Strings</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function getStatusMessage(status) {
+  switch (status) {
+    case "pending":
+      return "Your order is being processed.";
+    case "shipped":
+      return "Your order is on its way!";
+    case "delivered":
+      return "Your order has been delivered.";
+    case "cancelled":
+      return "Your order was cancelled.";
+    default:
+      return "Unknown status: " + status;
+  }
+}
+
+console.log(getStatusMessage("shipped"));    // Your order is on its way!
+console.log(getStatusMessage("delivered"));  // Your order has been delivered.
+console.log(getStatusMessage("refunded"));   // Unknown status: refunded</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Your order is on its way!
+Your order has been delivered.
+Unknown status: refunded</div>
+
+          <h2 id="switch-true-pattern">switch(true) Pattern</h2>
+          <p>You can pass <code>true</code> as the switch expression, and then write boolean expressions as cases. This makes switch work like a chain of if/else if statements.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">let bmi = 27.5;
+
+switch (true) {
+  case bmi < 18.5:
+    console.log("Underweight");
+    break;
+  case bmi < 25:
+    console.log("Normal weight");
+    break;
+  case bmi < 30:
+    console.log("Overweight");
+    break;
+  default:
+    console.log("Obese");
+}</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Overweight</div>
+
+          <h2 id="object-lookup-pattern">Object Lookup — A Modern Alternative</h2>
+          <p>For simple value mappings, an object lookup can replace a switch with a single expression.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Switch version
+function getDayName(num) {
+  switch (num) {
+    case 1: return "Monday";
+    case 2: return "Tuesday";
+    case 3: return "Wednesday";
+    case 4: return "Thursday";
+    case 5: return "Friday";
+    default: return "Weekend";
+  }
+}
+
+// Object lookup version — same result, less code
+const dayNames = {
+  1: "Monday", 2: "Tuesday", 3: "Wednesday",
+  4: "Thursday", 5: "Friday"
+};
+
+function getDayNameClean(num) {
+  return dayNames[num] ?? "Weekend";
+}
+
+console.log(getDayNameClean(3)); // Wednesday
+console.log(getDayNameClean(7)); // Weekend</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Wednesday
+Weekend</div>
+
+          <h2 id="switch-limitations">Limitations of Switch</h2>
+          <ul>
+            <li>Can only use strict equality — no range or regex checks (unless using <code>switch(true)</code>).</li>
+            <li>Fall-through is a common source of bugs.</li>
+            <li>Cannot use <code>let</code>/<code>const</code> across cases without wrapping in a block <code>{}</code>.</li>
+            <li>Verbose for simple value-to-value mappings (object lookup is cleaner).</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Lexical declarations in switch cases need a block
+let action = "add";
+
+switch (action) {
+  case "add": {
+    const result = 1 + 2;   // Block scope — OK
+    console.log("Add: " + result);
+    break;
+  }
+  case "multiply": {
+    const result = 2 * 3;   // Same name — OK because separate block
+    console.log("Multiply: " + result);
+    break;
+  }
+}</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Add: 3</div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Write a function <code>getSeasonInfo(month)</code> using a switch statement that returns an object <code>{ season, emoji, months }</code>:</p>
+            <ul>
+              <li>Dec, Jan, Feb → Winter ❄️</li>
+              <li>Mar, Apr, May → Spring 🌸</li>
+              <li>Jun, Jul, Aug → Summer ☀️</li>
+              <li>Sep, Oct, Nov → Autumn 🍂</li>
+            </ul>
+            <p>Use intentional fall-through to group months that share a season.</p>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a simple calculator function <code>calculate(a, operator, b)</code> using switch that handles <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, and <code>%</code>. Guard against division by zero. Then refactor it to use an object lookup of functions instead of switch.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>switch</code> compares one expression against many cases using strict equality.</li>
+              <li>Always include <code>break</code> unless fall-through is intentional.</li>
+              <li><code>default</code> handles the unmatched case (like <code>else</code>).</li>
+              <li>Group multiple cases to share one block — a clean use of fall-through.</li>
+              <li><code>switch(true)</code> lets you use boolean expressions as cases.</li>
+              <li>Object lookup tables are often cleaner than switch for simple mappings.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What happens if you forget a <code>break</code> in a switch case?</li>
+            <li>Does switch use <code>==</code> or <code>===</code> for comparison?</li>
+            <li>When would you prefer switch over if/else if?</li>
+            <li>Explain the <code>switch(true)</code> pattern with a use case.</li>
+            <li>What is an object lookup table and when is it better than switch?</li>
+          </ul>
+
+          <div class="related-topics">
+            <a href="/javascript/control-flow/if-statements.html" class="topic-tag">If Statements</a>
+            <a href="/javascript/control-flow/nested-if.html" class="topic-tag">Nested If</a>
+            <a href="/javascript/control-flow/for-loop.html" class="topic-tag">For Loop</a>
+            <a href="/javascript/beginner/operators.html" class="topic-tag">Operators</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I use switch with objects or arrays?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No, because objects and arrays use reference equality. Two separate <code>[]</code> or <code>{}</code> are never strictly equal even if they have the same contents. Primitives (strings, numbers, booleans) work well with switch.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is switch faster than if/else?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Modern JavaScript engines optimize both similarly. For a very large number of cases (50+), a switch or object lookup may be slightly faster because the engine can build a jump table. For typical applications, the difference is negligible — optimize for readability.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can the default case be placed first?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, <code>default</code> can appear anywhere in a switch. If placed first and no specific case matches, execution falls through to default (unless there's a break). Conventionally it belongs last for clarity.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/control-flow/nested-if.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Nested If Statements</span></a>
+          <a href="/javascript/control-flow/for-loop.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">For Loop</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

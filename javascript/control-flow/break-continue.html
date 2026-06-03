@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Break and Continue – Loop Control Statements | ylearner</title>
+  <meta name="description" content="Learn JavaScript break and continue statements: exit loops early, skip iterations, use labeled break for nested loops, and discover array method alternatives.">
+  <meta name="keywords" content="javascript break statement, javascript continue statement, labeled break, labeled continue, loop control javascript, Array.find alternative break">
+  <link rel="canonical" href="https://ylearner.org/javascript/control-flow/break-continue.html">
+  <meta property="og:title" content="JavaScript Break and Continue – Loop Control Statements | ylearner">
+  <meta property="og:description" content="Learn JavaScript break and continue statements: exit loops early, skip iterations, use labeled break for nested loops, and discover array method alternatives.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/control-flow/if-statements.html">Control Flow</a><span class="separator">›</span>
+          <span class="current">Break &amp; Continue</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔀 Control Flow</div>
+          <h1>JavaScript Break and Continue – Controlling Loop Flow</h1>
+          <p class="lesson-intro">break and continue give you fine-grained control over loop execution. Learn how to exit a loop early, skip specific iterations, handle nested loops with labels, and use modern array methods as cleaner alternatives.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 14 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="break-statement">The break Statement</h2>
+          <p><code>break</code> immediately exits the nearest enclosing loop or switch statement. Execution continues with the statement after the loop.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Stop searching when target is found
+const items = ["pen", "notebook", "laptop", "phone", "tablet"];
+const target = "laptop";
+let foundIndex = -1;
+
+for (let i = 0; i < items.length; i++) {
+  if (items[i] === target) {
+    foundIndex = i;
+    break; // No need to search further
+  }
+}
+
+console.log('Found "' + target + '" at index ' + foundIndex);
+// Remaining items after break are NOT visited</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Found "laptop" at index 2</div>
+
+          <h2 id="continue-statement">The continue Statement</h2>
+          <p><code>continue</code> skips the rest of the current iteration and jumps to the next one. The loop itself continues running.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Skip null/undefined values
+const data = [1, null, 3, undefined, 5, null, 7];
+
+let sum = 0;
+for (const val of data) {
+  if (val == null) continue; // Skip nulls and undefineds
+  sum += val;
+}
+console.log("Sum (skipping nulls): " + sum); // 16
+
+// Print only even numbers
+for (let i = 1; i <= 10; i++) {
+  if (i % 2 !== 0) continue; // Skip odd numbers
+  console.log(i);
+}</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Sum (skipping nulls): 16
+2
+4
+6
+8
+10</div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>continue vs if Wrapper</strong>
+              <p>Instead of wrapping loop body in <code>if (valid) { ... }</code>, use <code>if (!valid) continue;</code> at the top. This is the loop version of a guard clause and keeps indentation flat.</p>
+            </div>
+          </div>
+
+          <h2 id="break-in-switch">break in switch (Recap)</h2>
+          <p>Remember that <code>break</code> in a switch exits the switch block, not any surrounding loop. If you want to break a loop from inside a switch, use a labeled break.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const commands = ["move", "attack", "quit", "move"];
+
+for (const cmd of commands) {
+  switch (cmd) {
+    case "move":
+      console.log("Moving...");
+      break; // Exits switch, NOT the for loop
+    case "attack":
+      console.log("Attacking!");
+      break;
+    case "quit":
+      console.log("Quitting game.");
+      // This break only exits switch
+      break;
+  }
+}
+// "quit" doesn't stop the for loop here</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Moving...
+Attacking!
+Quitting game.
+Moving...</div>
+
+          <h2 id="labeled-break">Labeled break – Exiting Nested Loops</h2>
+          <p>Labels allow you to break out of an outer loop from inside an inner loop. Attach a label before the outer loop, then use <code>break labelName</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const matrix = [
+  [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9]
+];
+
+const searchValue = 5;
+let row = -1, col = -1;
+
+outerLoop: for (let r = 0; r < matrix.length; r++) {
+  for (let c = 0; c < matrix[r].length; c++) {
+    if (matrix[r][c] === searchValue) {
+      row = r;
+      col = c;
+      break outerLoop; // Exits BOTH loops at once
+    }
+  }
+}
+
+console.log(`Found ${searchValue} at row ${row}, col ${col}`);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Found 5 at row 1, col 1</div>
+
+          <h2 id="labeled-continue">Labeled continue</h2>
+          <p>Similarly, <code>continue labelName</code> skips to the next iteration of the outer loop.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Skip entire outer row when a negative number is found
+const grid = [
+  [1, 2, 3],
+  [4, -1, 6],   // Has negative — skip whole row
+  [7, 8, 9]
+];
+
+let rowSums = [];
+
+outerLoop: for (let r = 0; r < grid.length; r++) {
+  let rowSum = 0;
+  for (let c = 0; c < grid[r].length; c++) {
+    if (grid[r][c] < 0) {
+      console.log(`Row ${r} skipped (contains negative)`);
+      continue outerLoop; // Skip to next outer iteration
+    }
+    rowSum += grid[r][c];
+  }
+  rowSums.push(rowSum);
+}
+
+console.log("Row sums:", rowSums);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Row 1 skipped (contains negative)
+Row sums: [ 6, 24 ]</div>
+
+          <h2 id="find-first-match">Find First Match Pattern</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Traditional: break when found
+function findFirstEven(nums) {
+  for (const n of nums) {
+    if (n % 2 === 0) {
+      return n; // return acts like break in a function
+    }
+  }
+  return null;
+}
+
+console.log(findFirstEven([1, 3, 5, 4, 6])); // 4
+
+// Modern alternative: Array.find()
+const nums = [1, 3, 5, 4, 6];
+const firstEven = nums.find(n => n % 2 === 0);
+console.log(firstEven); // 4</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>4
+4</div>
+
+          <h2 id="return-instead-of-break">return Instead of break in Functions</h2>
+          <p>Inside a function, use <code>return</code> to exit both the loop and the function in one step — it is cleaner than setting a flag and breaking.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// With flag + break — verbose
+function containsDuplicate(arr) {
+  let found = false;
+  const seen = new Set();
+  for (const item of arr) {
+    if (seen.has(item)) {
+      found = true;
+      break;
+    }
+    seen.add(item);
+  }
+  return found;
+}
+
+// With return — clean
+function containsDuplicateClean(arr) {
+  const seen = new Set();
+  for (const item of arr) {
+    if (seen.has(item)) return true; // Exit immediately
+    seen.add(item);
+  }
+  return false;
+}
+
+console.log(containsDuplicateClean([1, 2, 3, 2, 4])); // true
+console.log(containsDuplicateClean([1, 2, 3, 4, 5])); // false</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>true
+false</div>
+
+          <h2 id="array-method-alternatives">Array Method Alternatives to break</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Goal</th><th>Loop + break/continue</th><th>Array method alternative</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Find first match</td><td>for + break</td><td><code>Array.find()</code></td></tr>
+                <tr><td>Find index of first match</td><td>for + break</td><td><code>Array.findIndex()</code></td></tr>
+                <tr><td>Check if any match</td><td>for + break + flag</td><td><code>Array.some()</code></td></tr>
+                <tr><td>Check if all match</td><td>for + break + flag</td><td><code>Array.every()</code></td></tr>
+                <tr><td>Skip items</td><td>for + continue</td><td><code>Array.filter()</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const scores = [78, 92, 55, 88, 45, 97];
+
+// some() — equivalent to loop + break + flag
+const hasFailure = scores.some(s => s < 60);
+console.log("Has failure:", hasFailure); // true
+
+// every() — equivalent to loop + break on false
+const allPassed = scores.every(s => s >= 50);
+console.log("All passed (>=50):", allPassed); // true
+
+// find() — cleaner than loop + break
+const firstHigh = scores.find(s => s >= 90);
+console.log("First score >=90:", firstHigh); // 92</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Has failure: true
+All passed (>=50): true
+First score >=90: 92</div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Given an array of product objects <code>[{name, price, inStock}]</code>:</p>
+            <ol>
+              <li>Use a for loop with <code>continue</code> to build a list of in-stock products only.</li>
+              <li>Use a for loop with <code>break</code> to find and return the first product under $20.</li>
+              <li>Rewrite both using <code>Array.filter()</code> and <code>Array.find()</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a function <code>searchGrid(grid, target)</code> that searches a 2D array for a value using nested for loops with a labeled break. Return <code>{ found: true, row, col }</code> or <code>{ found: false }</code>. Then write a version using <code>Array.findIndex()</code> and <code>Array.find()</code>.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>break</code> exits the nearest loop or switch immediately.</li>
+              <li><code>continue</code> skips the current iteration and moves to the next.</li>
+              <li>Labeled break (<code>break outerLoop</code>) exits a specific outer loop from inside nested loops.</li>
+              <li>Inside functions, <code>return</code> is cleaner than a flag + break pattern.</li>
+              <li>Array methods like <code>find()</code>, <code>some()</code>, <code>every()</code>, and <code>filter()</code> are cleaner alternatives that implicitly handle early termination.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between break and continue?</li>
+            <li>How do you break out of a nested loop in JavaScript?</li>
+            <li>When should you use return instead of break?</li>
+            <li>Why can't you use break inside a forEach callback?</li>
+            <li>Name array methods that internally stop early (like break) and when you'd use each.</li>
+          </ul>
+
+          <div class="related-topics">
+            <a href="/javascript/control-flow/while-loop.html" class="topic-tag">While Loop</a>
+            <a href="/javascript/control-flow/for-loop.html" class="topic-tag">For Loop</a>
+            <a href="/javascript/control-flow/switch.html" class="topic-tag">Switch Statement</a>
+            <a href="/javascript/functions/higher-order-functions.html" class="topic-tag">Higher-Order Functions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I use break inside a forEach?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. <code>forEach</code> is a function call, not a loop construct. <code>break</code> is only valid in for, while, do-while, and switch. If you need to break early, use a for...of loop or array methods like <code>find()</code> and <code>some()</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Are labeled breaks common in real code?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Labeled breaks are rarely used. In most cases, extracting the nested loops into a function and using <code>return</code> is cleaner. Labeled breaks can be harder to read at a glance because the reader must track where the label is defined.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Does continue work in for...of and for...in?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, <code>continue</code> works in all loop types: classic for, for...of, for...in, while, and do...while. It skips the rest of the current iteration and proceeds to the next one.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/control-flow/while-loop.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">While Loop</span></a>
+          <a href="/javascript/functions/function-basics.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Function Basics</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

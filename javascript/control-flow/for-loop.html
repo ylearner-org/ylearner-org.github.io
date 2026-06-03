@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript For Loop – for, for...of, for...in Explained | ylearner</title>
+  <meta name="description" content="Learn all JavaScript for loops: classic for, for...of for iterables, for...in for object keys, nested loops, scope with let vs var, and when to use forEach instead.">
+  <meta name="keywords" content="javascript for loop, for of loop, for in loop, javascript iteration, nested for loop, forEach vs for loop, loop variable scope javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/control-flow/for-loop.html">
+  <meta property="og:title" content="JavaScript For Loop – for, for...of, for...in Explained | ylearner">
+  <meta property="og:description" content="Learn all JavaScript for loops: classic for, for...of for iterables, for...in for object keys, nested loops, scope with let vs var, and when to use forEach instead.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/control-flow/if-statements.html">Control Flow</a><span class="separator">›</span>
+          <span class="current">For Loop</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔀 Control Flow</div>
+          <h1>JavaScript For Loop – Iterating with for, for...of, and for...in</h1>
+          <p class="lesson-intro">JavaScript provides three distinct for-loop constructs: the classic indexed loop, the modern for...of for iterables, and for...in for object keys. Learn all three, understand their differences, and know exactly when to use each.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="classic-for-loop">The Classic for Loop</h2>
+          <p>The traditional for loop gives you full control with three parts: <strong>initializer</strong>, <strong>condition</strong>, and <strong>update expression</strong>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Syntax: for (init; condition; update) { body }
+for (let i = 0; i < 5; i++) {
+  console.log("Iteration " + i);
+}
+
+// Count down
+for (let i = 10; i >= 0; i -= 2) {
+  console.log(i);
+}
+
+// Iterate an array by index
+const colors = ["red", "green", "blue"];
+for (let i = 0; i < colors.length; i++) {
+  console.log(i + ": " + colors[i]);
+}</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Iteration 0
+Iteration 1
+Iteration 2
+Iteration 3
+Iteration 4
+10
+8
+6
+4
+2
+0
+0: red
+1: green
+2: blue</div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Cache the Length</strong>
+              <p>For large arrays, cache <code>arr.length</code> in a variable to avoid re-evaluating it each iteration: <code>for (let i = 0, len = arr.length; i &lt; len; i++)</code>. Modern engines optimize this anyway, but it is good practice.</p>
+            </div>
+          </div>
+
+          <h2 id="for-of">for...of Loop</h2>
+          <p>Introduced in ES6, <code>for...of</code> iterates over any <strong>iterable</strong> object — arrays, strings, Sets, Maps, NodeLists, generators, and more. It gives you the value directly, without an index.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Array
+const fruits = ["apple", "banana", "cherry"];
+for (const fruit of fruits) {
+  console.log(fruit);
+}
+
+// String — iterates characters
+for (const char of "Hello") {
+  process.stdout.write(char + " ");
+}
+console.log();
+
+// Set — only unique values
+const unique = new Set([1, 2, 2, 3, 3]);
+for (const val of unique) {
+  console.log(val);
+}
+
+// Map — [key, value] pairs via destructuring
+const scores = new Map([["Alice", 95], ["Bob", 87]]);
+for (const [name, score] of scores) {
+  console.log(name + ": " + score);
+}</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>apple
+banana
+cherry
+H e l l o
+1
+2
+3
+Alice: 95
+Bob: 87</div>
+
+          <h2 id="for-in">for...in Loop</h2>
+          <p><code>for...in</code> iterates over the <strong>enumerable property keys</strong> of an object. It is designed for plain objects, not arrays.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const person = { name: "Alice", age: 30, city: "London" };
+
+for (const key in person) {
+  console.log(key + ": " + person[key]);
+}</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>name: Alice
+age: 30
+city: London</div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Prototype Chain Warning</strong>
+              <p><code>for...in</code> also enumerates inherited properties. Use <code>hasOwnProperty()</code> or <code>Object.hasOwn()</code> to check that a key belongs directly to the object, not its prototype chain.</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function Animal(name) {
+  this.name = name;
+}
+Animal.prototype.type = "animal"; // Inherited property
+
+const dog = new Animal("Rex");
+
+// Without guard — includes inherited key
+for (const key in dog) {
+  console.log(key); // name, type
+}
+
+// With guard — own properties only
+for (const key in dog) {
+  if (Object.hasOwn(dog, key)) {
+    console.log(key); // name only
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="for-of-vs-for-in">for...of vs for...in — Comparison</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Feature</th><th>for...of</th><th>for...in</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Iterates over</td><td>Values of an iterable</td><td>Enumerable keys of an object</td></tr>
+                <tr><td>Works on arrays</td><td>Yes (preferred)</td><td>Yes (but gives indices as strings)</td></tr>
+                <tr><td>Works on objects</td><td>No (objects aren't iterable by default)</td><td>Yes</td></tr>
+                <tr><td>Works on strings</td><td>Yes (characters)</td><td>Yes (indices as strings)</td></tr>
+                <tr><td>Includes inherited</td><td>No</td><td>Yes — use hasOwnProperty guard</td></tr>
+                <tr><td>ES version</td><td>ES6+</td><td>ES1 (original)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="nested-for-loops">Nested For Loops</h2>
+          <p>A loop inside another loop — common for processing 2D arrays or generating combinations.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Multiplication table (3x3)
+for (let i = 1; i <= 3; i++) {
+  let row = "";
+  for (let j = 1; j <= 3; j++) {
+    row += (i * j).toString().padStart(4);
+  }
+  console.log(row);
+}
+
+// Traverse a 2D array
+const grid = [
+  [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9]
+];
+
+for (const row of grid) {
+  for (const cell of row) {
+    process.stdout.write(cell + " ");
+  }
+  console.log();
+}</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>   1   2   3
+   2   4   6
+   3   6   9
+1 2 3
+4 5 6
+7 8 9</div>
+
+          <h2 id="scope-let-vs-var">Loop Variable Scope: let vs var</h2>
+          <p>Using <code>var</code> in a for loop creates a function-scoped variable, which can cause bugs when the loop variable is captured in a closure.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Bug with var — all closures share the same i
+const funcsVar = [];
+for (var i = 0; i < 3; i++) {
+  funcsVar.push(function() { return i; });
+}
+console.log(funcsVar[0]()); // 3 (not 0!)
+console.log(funcsVar[1]()); // 3
+console.log(funcsVar[2]()); // 3
+
+// Fixed with let — each iteration gets its own i
+const funcsLet = [];
+for (let j = 0; j < 3; j++) {
+  funcsLet.push(function() { return j; });
+}
+console.log(funcsLet[0]()); // 0
+console.log(funcsLet[1]()); // 1
+console.log(funcsLet[2]()); // 2</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>3
+3
+3
+0
+1
+2</div>
+
+          <h2 id="foreach-vs-for">When to Use forEach Instead</h2>
+          <p><code>Array.prototype.forEach</code> is a functional alternative when you just want to do something with each element and don't need <code>break</code>, <code>continue</code>, or <code>await</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const nums = [1, 2, 3, 4, 5];
+
+// forEach — clean, but cannot break out
+nums.forEach((n, index) => {
+  console.log(index + ": " + n);
+});
+
+// Use for...of when you need to break
+for (const n of nums) {
+  if (n === 3) break; // forEach can't do this
+  console.log(n);
+}</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>0: 1
+1: 2
+2: 3
+3: 4
+4: 5
+1
+2</div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Given the array <code>const students = [{name:"Alice",grade:88},{name:"Bob",grade:72},{name:"Carol",grade:95}]</code>:</p>
+            <ol>
+              <li>Use a classic for loop to print each student's name and grade.</li>
+              <li>Use for...of with destructuring to compute the average grade.</li>
+              <li>Use for...in on the first student object to list all its keys.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a function <code>flattenMatrix(matrix)</code> that uses nested for loops to convert a 2D array into a 1D array. Then write a second version using <code>for...of</code> with destructuring. Test with a 3×4 matrix of your choice.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Classic <code>for (init; cond; update)</code> — precise control, index access.</li>
+              <li><code>for...of</code> — cleanest for iterating values of arrays, strings, Sets, Maps.</li>
+              <li><code>for...in</code> — for object keys; use <code>Object.hasOwn()</code> to skip inherited keys.</li>
+              <li>Always use <code>let</code> (not <code>var</code>) for loop counters to avoid closure bugs.</li>
+              <li><code>forEach</code> is clean but can't use <code>break</code>, <code>continue</code>, or <code>await</code>.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between for...of and for...in?</li>
+            <li>Why does using <code>var</code> in a for loop cause closure bugs? How does <code>let</code> fix it?</li>
+            <li>Can you use for...of on a plain object? Why or why not?</li>
+            <li>What are the limitations of forEach compared to a for loop?</li>
+            <li>How do you iterate over the entries (key-value pairs) of an object?</li>
+          </ul>
+
+          <div class="related-topics">
+            <a href="/javascript/control-flow/switch.html" class="topic-tag">Switch Statement</a>
+            <a href="/javascript/control-flow/while-loop.html" class="topic-tag">While Loop</a>
+            <a href="/javascript/control-flow/break-continue.html" class="topic-tag">Break &amp; Continue</a>
+            <a href="/javascript/functions/higher-order-functions.html" class="topic-tag">Higher-Order Functions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I use for...of on a DOM NodeList?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, <code>NodeList</code> is iterable since modern browsers implement the iterable protocol. You can write <code>for (const el of document.querySelectorAll('p')) { ... }</code>. For older browsers, convert first: <code>Array.from(nodeList)</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I get the index when using for...of?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>Array.entries()</code>: <code>for (const [index, value] of arr.entries()) { ... }</code>. This gives you both the index and the value with clean destructuring syntax.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is for...of slower than a classic for loop?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In micro-benchmarks, a classic for loop can be marginally faster. However, the difference is negligible for most applications. Prefer for...of for readability; switch to a classic loop only if you have measured a real performance bottleneck.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/control-flow/switch.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Switch Statement</span></a>
+          <a href="/javascript/control-flow/while-loop.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">While Loop</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

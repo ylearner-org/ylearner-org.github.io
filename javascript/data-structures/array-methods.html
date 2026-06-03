@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Array Methods – Complete Reference with Examples | ylearner</title>
+  <meta name="description" content="Complete reference for all JavaScript array methods: mutation methods, access methods, iteration methods, method chaining, performance tips, and a decision table for choosing the right method.">
+  <meta name="keywords" content="javascript array methods, array map filter reduce, array forEach javascript, array find findIndex, array sort reverse, array flat flatMap, javascript array reference, method chaining javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/data-structures/array-methods.html">
+  <meta property="og:title" content="JavaScript Array Methods – Complete Reference with Examples | ylearner">
+  <meta property="og:description" content="Complete reference for all JavaScript array methods: mutation methods, access methods, iteration methods, method chaining, performance tips, and a decision table for choosing the right method.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/data-structures/arrays.html">Data Structures</a><span class="separator">›</span>
+          <span class="current">Array Methods</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📦 Data Structures</div>
+          <h1>JavaScript Array Methods – The Complete Reference</h1>
+          <p class="lesson-intro">JavaScript arrays come with over 30 built-in methods. This reference covers every important method — grouped by category — with concise examples, a decision table, and tips for choosing the right tool for each job.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 30 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="mutation-methods">Mutation Methods</h2>
+          <p>These methods modify the original array in place. Be careful when using them in functional or React-style code where immutability matters.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const arr = [3, 1, 4, 1, 5];
+
+// push / pop – end of array
+arr.push(9, 2);       // [3,1,4,1,5,9,2] → returns new length: 7
+arr.pop();            // [3,1,4,1,5,9]   → returns 9
+
+// unshift / shift – beginning of array
+arr.unshift(0);       // [0,3,1,4,1,5,9] → returns new length
+arr.shift();          // [3,1,4,1,5,9]   → returns 0
+
+// splice(start, deleteCount, ...items)
+const removed = arr.splice(2, 2, 10, 20);
+// removed = [4, 1], arr = [3, 1, 10, 20, 5, 9]
+
+// sort – lexicographic by default! use comparator
+[3, 1, 10, 2].sort();               // [1, 10, 2, 3] — wrong for numbers!
+[3, 1, 10, 2].sort((a, b) => a-b);  // [1, 2, 3, 10] — ascending
+
+// reverse – in place
+[1, 2, 3].reverse(); // [3, 2, 1]
+
+// fill(value, start?, end?)
+new Array(5).fill(0);          // [0, 0, 0, 0, 0]
+[1,2,3,4,5].fill(0, 1, 3);    // [1, 0, 0, 4, 5]
+
+// copyWithin(target, start, end)
+[1,2,3,4,5].copyWithin(0, 3); // [4, 5, 3, 4, 5] (copies positions 3-4 to start)</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Non-Mutating Alternatives (ES2023)</strong>
+              <p>ES2023 added <code>toSorted()</code>, <code>toReversed()</code>, <code>toSpliced()</code>, and <code>with(index, value)</code> — all return new arrays without modifying the original. Use them in React state updates and functional code.</p>
+            </div>
+          </div>
+
+          <h2 id="access-methods">Access Methods</h2>
+          <p>These methods return information about or derived slices of the array without modifying it.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const fruits = ['apple', 'banana', 'cherry', 'banana'];
+
+// slice(start, end) – new array, does not mutate
+console.log(fruits.slice(1, 3)); // ['banana', 'cherry']
+console.log(fruits.slice(-2));   // ['cherry', 'banana']
+
+// concat – merge arrays into a new array
+const more = fruits.concat(['date', 'elderberry']);
+// ['apple','banana','cherry','banana','date','elderberry']
+
+// join(separator) – array to string
+console.log(fruits.join(', ')); // 'apple, banana, cherry, banana'
+console.log([1,2,3].join('-'));  // '1-2-3'
+
+// indexOf / lastIndexOf
+console.log(fruits.indexOf('banana'));     // 1
+console.log(fruits.lastIndexOf('banana')); // 3
+console.log(fruits.indexOf('grape'));      // -1
+
+// includes (uses SameValueZero — handles NaN correctly)
+console.log(fruits.includes('cherry')); // true
+console.log([NaN].includes(NaN));       // true ← unlike indexOf!
+
+// at(index) – supports negative indices (ES2022)
+console.log(fruits.at(0));   // 'apple'
+console.log(fruits.at(-1));  // 'banana' (last)
+
+// flat / flatMap
+console.log([[1,2],[3,[4]]].flat());    // [1, 2, 3, [4]]
+console.log([[1,2],[3,[4]]].flat(2));   // [1, 2, 3, 4]</code></pre>
+          </div>
+
+          <h2 id="iteration-methods">Iteration Methods</h2>
+          <p>Iteration methods accept a callback and process each element. They are the heart of functional-style JavaScript.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const nums = [1, 2, 3, 4, 5, 6];
+
+// forEach – side effects; returns undefined
+nums.forEach((n, i) => console.log(i, n));
+
+// map – transform; returns new array (same length)
+const doubled = nums.map(n => n * 2);
+// [2, 4, 6, 8, 10, 12]
+
+// filter – keep matching elements; returns new array
+const evens = nums.filter(n => n % 2 === 0);
+// [2, 4, 6]
+
+// reduce(callback, initialValue) – accumulate to single value
+const sum = nums.reduce((acc, n) => acc + n, 0);    // 21
+const product = nums.reduce((acc, n) => acc * n, 1); // 720
+
+// reduceRight – same as reduce, but right to left
+['a','b','c'].reduceRight((acc, s) => acc + s, ''); // 'cba'
+
+// find – first match or undefined
+const firstEven = nums.find(n => n % 2 === 0); // 2
+
+// findIndex – index of first match or -1
+const idx = nums.findIndex(n => n > 4); // 4
+
+// findLast / findLastIndex (ES2023)
+const lastEven = nums.findLast(n => n % 2 === 0);      // 6
+const lastEvenIdx = nums.findLastIndex(n => n % 2 === 0); // 5
+
+// some – returns true if ANY element passes test
+console.log(nums.some(n => n > 5));  // true
+console.log(nums.some(n => n > 10)); // false
+
+// every – returns true if ALL elements pass test
+console.log(nums.every(n => n > 0));  // true
+console.log(nums.every(n => n > 3));  // false
+
+// flatMap – map + flat(1) in one pass
+const sentences = ['hello world', 'foo bar'];
+const words = sentences.flatMap(s => s.split(' '));
+// ['hello', 'world', 'foo', 'bar']</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>[2, 4, 6, 8, 10, 12]
+[2, 4, 6]
+21
+720
+2
+4
+true
+false
+true
+false
+['hello', 'world', 'foo', 'bar']</pre>
+          </div>
+
+          <h2 id="static-methods">Static Array Methods</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Array.isArray – reliable type check
+Array.isArray([]);           // true
+Array.isArray('string');     // false
+Array.isArray({ length: 2 }); // false
+
+// Array.from – create from iterable or array-like
+Array.from('abc');                       // ['a', 'b', 'c']
+Array.from({ length: 3 }, (_, i) => i); // [0, 1, 2]
+Array.from(new Set([1, 2, 2, 3]));       // [1, 2, 3]
+
+// Array.of – create from arguments (unlike new Array)
+Array.of(7);       // [7]    (NOT [empty × 7])
+Array.of(1, 2, 3); // [1, 2, 3]</code></pre>
+          </div>
+
+          <h2 id="method-chaining">Method Chaining</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const orders = [
+  { id: 1, product: 'Laptop',  price: 999,  qty: 1, status: 'shipped' },
+  { id: 2, product: 'Mouse',   price: 29,   qty: 3, status: 'pending' },
+  { id: 3, product: 'Monitor', price: 399,  qty: 2, status: 'shipped' },
+  { id: 4, product: 'Keyboard',price: 79,   qty: 2, status: 'pending' },
+  { id: 5, product: 'Webcam',  price: 149,  qty: 1, status: 'shipped' }
+];
+
+// Find total revenue from shipped orders, sorted by value
+const report = orders
+  .filter(o => o.status === 'shipped')          // keep shipped
+  .map(o => ({ ...o, total: o.price * o.qty })) // add total field
+  .sort((a, b) => b.total - a.total)            // sort descending
+  .map(o => `${o.product}: $${o.total}`);        // format
+
+console.log(report);
+// ['Laptop: $999', 'Monitor: $798', 'Webcam: $149']
+
+// Total revenue
+const totalRevenue = orders
+  .filter(o => o.status === 'shipped')
+  .reduce((sum, o) => sum + o.price * o.qty, 0);
+console.log(totalRevenue); // 1946</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Chain Efficiently</strong>
+              <p>Put <code>filter</code> before <code>map</code> in a chain — this reduces the number of elements that subsequent steps need to process. For very large arrays, consider a single-pass <code>reduce</code> instead of multiple chained methods.</p>
+            </div>
+          </div>
+
+          <h2 id="decision-table">Choosing the Right Method</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Goal</th><th>Method</th><th>Mutates?</th><th>Returns</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Run side effects</td><td><code>forEach</code></td><td>No</td><td><code>undefined</code></td></tr>
+                <tr><td>Transform each element</td><td><code>map</code></td><td>No</td><td>New array (same length)</td></tr>
+                <tr><td>Keep matching elements</td><td><code>filter</code></td><td>No</td><td>New array (shorter)</td></tr>
+                <tr><td>Accumulate to one value</td><td><code>reduce</code></td><td>No</td><td>Single value</td></tr>
+                <tr><td>Find first match</td><td><code>find</code></td><td>No</td><td>Element or <code>undefined</code></td></tr>
+                <tr><td>Find index of first match</td><td><code>findIndex</code></td><td>No</td><td>Index or <code>-1</code></td></tr>
+                <tr><td>Check any element passes</td><td><code>some</code></td><td>No</td><td><code>boolean</code></td></tr>
+                <tr><td>Check all elements pass</td><td><code>every</code></td><td>No</td><td><code>boolean</code></td></tr>
+                <tr><td>Flatten nested arrays</td><td><code>flat(depth)</code></td><td>No</td><td>New array</td></tr>
+                <tr><td>Map + flatten one level</td><td><code>flatMap</code></td><td>No</td><td>New array</td></tr>
+                <tr><td>Add to end</td><td><code>push</code></td><td>Yes</td><td>New length</td></tr>
+                <tr><td>Remove from end</td><td><code>pop</code></td><td>Yes</td><td>Removed element</td></tr>
+                <tr><td>Sort in place</td><td><code>sort</code></td><td>Yes</td><td>Sorted array (same ref)</td></tr>
+                <tr><td>Sort without mutating</td><td><code>toSorted</code></td><td>No</td><td>New sorted array</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="performance-tips">Performance Tips</h2>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Break Early When Possible</strong>
+              <p><code>some</code> and <code>every</code> short-circuit: <code>some</code> stops at the first <code>true</code> result; <code>every</code> stops at the first <code>false</code>. Use them instead of <code>filter</code> or <code>forEach</code> when you only need a boolean answer — this can save iterating thousands of elements.</p>
+            </div>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between <code>map</code> and <code>forEach</code>?</li>
+            <li>When would you use <code>reduce</code> instead of a <code>for</code> loop?</li>
+            <li>How does <code>some</code> differ from <code>every</code>?</li>
+            <li>What does <code>flatMap</code> do that <code>map</code> alone cannot?</li>
+            <li>Name three mutation methods and three non-mutation equivalents.</li>
+            <li>Why should you put <code>filter</code> before <code>map</code> in a method chain?</li>
+          </ul>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Using only array methods (no loops), write a pipeline that takes an array of strings representing scores like <code>["Alice:95", "Bob:82", "Carol:88", "Dave:70"]</code> and produces:</p>
+            <ol>
+              <li>An array of objects <code>{ name, score }</code> parsed from each string.</li>
+              <li>Filter to only scores above 80.</li>
+              <li>Sort by score descending.</li>
+              <li>Return a formatted leaderboard string like <code>"1. Alice (95)\n2. Carol (88)"</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Implement the following array methods from scratch (without using the originals): <code>myMap(arr, fn)</code>, <code>myFilter(arr, fn)</code>, and <code>myReduce(arr, fn, initial)</code>. Then implement <code>myFlatMap(arr, fn)</code> using only your <code>myMap</code> and a flatten helper. All implementations must handle edge cases (empty arrays, missing initial value for reduce).</p>
+          </div>
+
+          <h2 id="faq">Frequently Asked Questions</h2>
+          <dl>
+            <dt>Can I use <code>map</code> to iterate without using its return value?</dt>
+            <dd>Technically yes, but you should use <code>forEach</code> instead. Using <code>map</code> for side effects creates a throw-away array, wastes memory, and confuses readers about your intent.</dd>
+            <dt>Does <code>filter</code> modify the original array?</dt>
+            <dd>No. <code>filter</code> always returns a new array. The original is untouched. This makes it safe to use in functional and React patterns.</dd>
+            <dt>What is the initial value in <code>reduce</code> and why is it important?</dt>
+            <dd>The initial value is the starting accumulator. Without it, <code>reduce</code> uses the first element as the accumulator and starts iterating from the second. This can cause bugs with empty arrays (it throws a TypeError) — always provide an initial value.</dd>
+            <dt>How does <code>sort</code> handle strings by default?</dt>
+            <dd>Without a comparator, <code>sort</code> converts each element to a string and compares by Unicode code points. This means <code>[10, 9, 2].sort()</code> returns <code>[10, 2, 9]</code>. Always pass <code>(a, b) =&gt; a - b</code> for numeric sorting.</dd>
+            <dt>What is the difference between <code>find</code> and <code>filter</code>?</dt>
+            <dd><code>find</code> returns the first matching element (and stops searching). <code>filter</code> returns all matching elements in a new array and processes every element. Use <code>find</code> when you expect a unique result.</dd>
+          </dl>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Mutation methods (<code>push</code>, <code>pop</code>, <code>sort</code>, <code>splice</code>, etc.) change the array in place.</li>
+              <li>ES2023 added non-mutating counterparts: <code>toSorted</code>, <code>toReversed</code>, <code>toSpliced</code>, <code>with</code>.</li>
+              <li>Iteration methods (<code>map</code>, <code>filter</code>, <code>reduce</code>, etc.) return new arrays or values.</li>
+              <li>Use <code>map</code> to transform, <code>filter</code> to select, <code>reduce</code> to accumulate.</li>
+              <li><code>some</code> and <code>every</code> short-circuit for early exit — prefer them for boolean checks.</li>
+              <li>Put <code>filter</code> before <code>map</code> in chains to reduce unnecessary iterations.</li>
+              <li>Always pass a comparator to <code>sort()</code> for numeric or custom sort order.</li>
+              <li>Always provide an initial value to <code>reduce()</code> to handle empty arrays safely.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/javascript/data-structures/arrays.html" class="topic-tag">Arrays</a>
+            <a href="/javascript/data-structures/spread-rest.html" class="topic-tag">Spread &amp; Rest</a>
+            <a href="/javascript/functions/higher-order-functions.html" class="topic-tag">Higher-Order Functions</a>
+            <a href="/javascript/intermediate/es6-features.html" class="topic-tag">ES6+ Features</a>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/data-structures/spread-rest.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Spread &amp; Rest</span></a>
+          <a href="/javascript/intermediate/es6-features.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">ES6+ Features</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

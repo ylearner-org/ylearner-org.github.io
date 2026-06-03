@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Destructuring – Arrays, Objects &amp; Nested Patterns | ylearner</title>
+  <meta name="description" content="Master JavaScript destructuring: array and object destructuring, default values, renaming, nested patterns, function parameter destructuring, and practical real-world patterns.">
+  <meta name="keywords" content="javascript destructuring, array destructuring javascript, object destructuring javascript, nested destructuring, default values destructuring, function parameter destructuring, swap variables javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/data-structures/destructuring.html">
+  <meta property="og:title" content="JavaScript Destructuring – Arrays, Objects &amp; Nested Patterns | ylearner">
+  <meta property="og:description" content="Master JavaScript destructuring: array and object destructuring, default values, renaming, nested patterns, function parameter destructuring, and practical real-world patterns.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/data-structures/arrays.html">Data Structures</a><span class="separator">›</span>
+          <span class="current">Destructuring</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📦 Data Structures</div>
+          <h1>JavaScript Destructuring – Extract Values Elegantly</h1>
+          <p class="lesson-intro">Destructuring is a concise ES6 syntax for unpacking values from arrays or properties from objects into distinct variables. It eliminates repetitive property access code and makes function signatures far more expressive. Once you start using it, you will wonder how you lived without it.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="array-destructuring">Array Destructuring</h2>
+          <p>Array destructuring extracts values by <em>position</em>. The left-hand side uses square brackets to mirror the array structure.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Basic array destructuring
+const rgb = [255, 128, 0];
+const [red, green, blue] = rgb;
+console.log(red, green, blue); // 255 128 0
+
+// Skip elements with commas
+const [first, , third] = [10, 20, 30];
+console.log(first, third); // 10 30
+
+// Rest element – collects remaining items
+const [head, ...tail] = [1, 2, 3, 4, 5];
+console.log(head); // 1
+console.log(tail); // [2, 3, 4, 5]
+
+// Default values – used when the value is undefined
+const [a = 0, b = 0, c = 0] = [1, 2];
+console.log(a, b, c); // 1 2 0
+
+// Swap variables – no temp variable needed!
+let x = 1, y = 2;
+[x, y] = [y, x];
+console.log(x, y); // 2 1
+
+// Nested array destructuring
+const matrix = [[1, 2], [3, 4]];
+const [[r1c1, r1c2], [r2c1]] = matrix;
+console.log(r1c1, r1c2, r2c1); // 1 2 3</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>255 128 0
+10 30
+1
+[2, 3, 4, 5]
+1 2 0
+2 1
+1 2 3</pre>
+          </div>
+
+          <h2 id="object-destructuring">Object Destructuring</h2>
+          <p>Object destructuring extracts values by <em>key name</em>. The left-hand side uses curly braces and must match property names (unless renamed).</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const user = {
+  id: 42,
+  name: 'Alice',
+  role: 'admin',
+  email: 'alice@example.com'
+};
+
+// Basic object destructuring
+const { name, role } = user;
+console.log(name, role); // Alice admin
+
+// Rename while destructuring  (key: newName)
+const { name: userName, email: userEmail } = user;
+console.log(userName, userEmail); // Alice alice@example.com
+
+// Default values
+const { name: n, country = 'Unknown' } = user;
+console.log(n, country); // Alice Unknown
+
+// Rest in object destructuring
+const { id, ...rest } = user;
+console.log(id);   // 42
+console.log(rest); // { name: 'Alice', role: 'admin', email: '...' }
+
+// Nested object destructuring
+const config = {
+  server: { host: 'localhost', port: 3000 },
+  db: { name: 'mydb' }
+};
+const { server: { host, port }, db: { name: dbName } } = config;
+console.log(host, port, dbName); // localhost 3000 mydb</code></pre>
+          </div>
+
+          <h2 id="function-parameter-destructuring">Function Parameter Destructuring</h2>
+          <p>Destructuring in function parameters makes it immediately clear which properties of an argument object are used — and can provide defaults inline.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Without destructuring (old way)
+function greetOld(user) {
+  return `Hello, ${user.name}! Role: ${user.role}`;
+}
+
+// With parameter destructuring
+function greet({ name, role = 'guest' }) {
+  return `Hello, ${name}! Role: ${role}`;
+}
+console.log(greet({ name: 'Bob' }));              // Hello, Bob! Role: guest
+console.log(greet({ name: 'Alice', role: 'admin' })); // Hello, Alice! Role: admin
+
+// Array parameter destructuring
+function getFirstAndLast([first, ...rest]) {
+  return { first, last: rest[rest.length - 1] };
+}
+console.log(getFirstAndLast([10, 20, 30, 40]));
+// { first: 10, last: 40 }
+
+// Multiple return values (via array)
+function minMax(arr) {
+  return [Math.min(...arr), Math.max(...arr)];
+}
+const [min, max] = minMax([3, 1, 4, 1, 5, 9, 2]);
+console.log(min, max); // 1 9
+
+// Default entire options object
+function createServer({ host = 'localhost', port = 3000, debug = false } = {}) {
+  return `${host}:${port} (debug: ${debug})`;
+}
+console.log(createServer());            // localhost:3000 (debug: false)
+console.log(createServer({ port: 8080 })); // localhost:8080 (debug: false)</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Default the Entire Options Object</strong>
+              <p>When a function accepts an options object, add <code>= {}</code> as the default for the entire parameter. This lets callers omit the argument entirely: <code>createServer()</code> rather than <code>createServer({})</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="for-of-destructuring">Destructuring in for...of Loops</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const users = [
+  { name: 'Alice', age: 28 },
+  { name: 'Bob', age: 34 },
+  { name: 'Carol', age: 22 }
+];
+
+// Destructure each iteration
+for (const { name, age } of users) {
+  console.log(`${name} is ${age}`);
+}
+
+// Object.entries with destructuring
+const scores = { Alice: 95, Bob: 82, Carol: 88 };
+for (const [person, score] of Object.entries(scores)) {
+  console.log(`${person}: ${score}`);
+}
+
+// Map iteration with destructuring
+const map = new Map([['a', 1], ['b', 2], ['c', 3]]);
+for (const [key, value] of map) {
+  console.log(key, '->', value);
+}</code></pre>
+          </div>
+
+          <h2 id="practical-patterns">Practical Patterns</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// 1. Unpacking API responses
+async function fetchUser(id) {
+  const response = await fetch(`/api/users/${id}`);
+  const { data: { name, email, avatar }, status } = await response.json();
+  return { name, email, avatar, status };
+}
+
+// 2. React props destructuring (common pattern)
+function UserCard({ name, avatar = '/default.png', role = 'user', onClick }) {
+  return `<div onclick="${onClick}">${avatar} ${name} (${role})</div>`;
+}
+
+// 3. Mixed array/object destructuring
+const [{ name: firstName }, { name: secondName }] = [
+  { name: 'Alice', age: 28 },
+  { name: 'Bob', age: 34 }
+];
+console.log(firstName, secondName); // Alice Bob
+
+// 4. Rename with defaults
+const { width: w = 800, height: h = 600 } = { width: 1024 };
+console.log(w, h); // 1024 600
+
+// 5. Import-style destructuring
+const { PI, sqrt, abs } = Math;
+console.log(PI, sqrt(16), abs(-5)); // 3.14159... 4 5</code></pre>
+          </div>
+
+          <h2 id="common-mistakes">Common Mistakes</h2>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Destructuring a Statement vs. Expression</strong>
+              <p>When destructuring outside of a declaration (<code>const</code>/<code>let</code>/<code>var</code>), you must wrap the statement in parentheses to avoid JavaScript parsing the opening <code>{</code> as a block: <code>({ name } = obj)</code> not <code>{ name } = obj</code>.</p>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Mistake</th><th>Problem</th><th>Fix</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>const { name } = null</code></td><td>TypeError: cannot destructure null</td><td>Guard: <code>const { name } = user ?? {}</code></td></tr>
+                <tr><td><code>const [a] = undefined</code></td><td>TypeError: undefined is not iterable</td><td>Guard: <code>const [a] = arr ?? []</code></td></tr>
+                <tr><td><code>{ a } = obj</code> as statement</td><td>SyntaxError (block parsed)</td><td>Wrap: <code>({ a } = obj)</code></td></tr>
+                <tr><td>Deeply nested without defaults</td><td>TypeError on missing intermediate</td><td>Add defaults at each nesting level</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you swap two variables using destructuring?</li>
+            <li>What is the difference between array and object destructuring?</li>
+            <li>How do you provide default values in destructuring?</li>
+            <li>How do you rename a property while destructuring an object?</li>
+            <li>What happens when you destructure a property that does not exist?</li>
+            <li>How does rest (<code>...</code>) work in destructuring vs spread?</li>
+          </ul>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Given the API response object below, use a single destructuring statement to extract: the user's full name, their city, the first tag, and the total follower count (with a default of 0 if missing).</p>
+            <pre><code class="language-javascript">const response = {
+  user: { fullName: 'Alice Chen', location: { city: 'Singapore' } },
+  tags: ['javascript', 'react', 'nodejs'],
+  stats: { posts: 42 }
+};</code></pre>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a function <code>pick(obj, keys)</code> that uses destructuring and rest parameters to return a new object containing only the listed keys from the original. Then write <code>omit(obj, keys)</code> that returns a new object with those keys removed. Do not use any library — implement both in under 5 lines each.</p>
+          </div>
+
+          <h2 id="faq">Frequently Asked Questions</h2>
+          <dl>
+            <dt>Does destructuring mutate the original object or array?</dt>
+            <dd>No. Destructuring only reads values from the source. The original object or array is untouched. The destructured variables are new bindings that hold the extracted values.</dd>
+            <dt>Can I destructure a function's return value?</dt>
+            <dd>Yes. This is one of the most common uses. Functions can return an array or object, and you destructure immediately: <code>const [min, max] = getRange(arr)</code> or <code>const { data, error } = useFetch(url)</code>.</dd>
+            <dt>What is the difference between rest in destructuring and rest parameters?</dt>
+            <dd>Rest in destructuring collects remaining elements into a variable during assignment: <code>const [a, ...b] = arr</code>. Rest parameters collect extra function arguments: <code>function f(first, ...rest) {}</code>. Both use the <code>...</code> syntax but in different contexts.</dd>
+            <dt>Can I use destructuring with a Map?</dt>
+            <dd>Not directly via the object destructuring syntax, since Map keys are not properties. However, you can use array destructuring with the iterator: <code>const [[k1, v1], [k2, v2]] = map</code>.</dd>
+            <dt>Is destructuring performance-intensive?</dt>
+            <dd>No. Destructuring is purely syntactic sugar; modern JavaScript engines optimise it to the same bytecode as manual property access. Do not avoid it for performance reasons.</dd>
+          </dl>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Array destructuring extracts by position; object destructuring extracts by key name.</li>
+              <li>Use a comma to skip elements in array destructuring: <code>const [a, , c] = arr</code>.</li>
+              <li>Rename with <code>{ key: newName }</code> and provide defaults with <code>{ key = default }</code>.</li>
+              <li>The rest operator (<code>...</code>) collects remaining elements into a new array or object.</li>
+              <li>Swap variables without a temp variable: <code>[a, b] = [b, a]</code>.</li>
+              <li>Destructure function parameters to make APIs self-documenting.</li>
+              <li>Guard against <code>null</code>/<code>undefined</code> sources with the nullish coalescing operator.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/javascript/data-structures/spread-rest.html" class="topic-tag">Spread &amp; Rest</a>
+            <a href="/javascript/data-structures/arrays.html" class="topic-tag">Arrays</a>
+            <a href="/javascript/data-structures/objects.html" class="topic-tag">Objects</a>
+            <a href="/javascript/intermediate/es6-features.html" class="topic-tag">ES6+ Features</a>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/data-structures/maps-sets.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Maps &amp; Sets</span></a>
+          <a href="/javascript/data-structures/spread-rest.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Spread &amp; Rest</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

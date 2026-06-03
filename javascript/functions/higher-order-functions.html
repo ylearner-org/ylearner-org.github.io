@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Higher-Order Functions – map, filter, reduce | ylearner</title>
+  <meta name="description" content="Master JavaScript higher-order functions: map, filter, reduce, forEach, find, some, every, custom HOFs, and the compose and pipe patterns with real-world examples.">
+  <meta name="keywords" content="javascript higher order functions, map filter reduce javascript, javascript map function, javascript filter function, javascript reduce, compose pipe pattern, forEach vs map javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/functions/higher-order-functions.html">
+  <meta property="og:title" content="JavaScript Higher-Order Functions – map, filter, reduce | ylearner">
+  <meta property="og:description" content="Master JavaScript higher-order functions: map, filter, reduce, forEach, find, some, every, custom HOFs, and the compose and pipe patterns with real-world examples.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/functions/function-basics.html">Functions</a><span class="separator">›</span>
+          <span class="current">Higher-Order Functions</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Functions</div>
+          <h1>JavaScript Higher-Order Functions – map, filter, reduce and Beyond</h1>
+          <p class="lesson-intro">Higher-order functions are functions that accept other functions as arguments or return functions as output. They are the backbone of functional JavaScript programming and power the elegant array transformations you use every day.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 24 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-a-hof">What Is a Higher-Order Function?</h2>
+          <p>A <strong>higher-order function (HOF)</strong> is a function that either:</p>
+          <ul>
+            <li>Takes one or more functions as <strong>arguments</strong> (callbacks), or</li>
+            <li><strong>Returns</strong> a function as its result, or</li>
+            <li>Both</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// HOF: takes a function as argument
+function applyToArray(arr, fn) {
+  return arr.map(fn);
+}
+
+const doubled = applyToArray([1, 2, 3, 4], n => n * 2);
+console.log(doubled); // [2, 4, 6, 8]
+
+// HOF: returns a function
+function createMultiplier(factor) {
+  return n => n * factor; // Returns a function
+}
+
+const times5 = createMultiplier(5);
+console.log(times5(6)); // 30</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>[2, 4, 6, 8]
+30</div>
+
+          <h2 id="map">Array.map()</h2>
+          <p><code>map()</code> transforms every element of an array and returns a new array of the same length. The original array is not mutated.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const prices = [10, 25, 50, 100];
+
+// Apply tax
+const pricesWithTax = prices.map(p => p * 1.2);
+console.log(pricesWithTax); // [12, 30, 60, 120]
+
+// Extract property from objects
+const users = [
+  { id: 1, name: "Alice", age: 30 },
+  { id: 2, name: "Bob",   age: 25 },
+  { id: 3, name: "Carol", age: 35 }
+];
+
+const names = users.map(u => u.name);
+console.log(names); // ["Alice", "Bob", "Carol"]
+
+// Map with index
+const indexed = users.map((u, i) => `${i + 1}. ${u.name}`);
+console.log(indexed); // ["1. Alice", "2. Bob", "3. Carol"]
+
+// Transform to a different shape
+const userCards = users.map(({ id, name }) => ({
+  key: id,
+  display: name.toUpperCase()
+}));
+console.log(userCards);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>[12, 30, 60, 120]
+[ 'Alice', 'Bob', 'Carol' ]
+[ '1. Alice', '2. Bob', '3. Carol' ]
+[ { key: 1, display: 'ALICE' }, { key: 2, display: 'BOB' }, { key: 3, display: 'CAROL' } ]</div>
+
+          <h2 id="filter">Array.filter()</h2>
+          <p><code>filter()</code> keeps only elements for which the callback returns truthy. Returns a new (potentially shorter) array.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const products = [
+  { name: "Laptop", price: 999, inStock: true },
+  { name: "Mouse",  price: 29,  inStock: false },
+  { name: "Desk",   price: 350, inStock: true },
+  { name: "Chair",  price: 150, inStock: true },
+  { name: "Monitor",price: 400, inStock: false }
+];
+
+// In-stock products under $400
+const affordable = products
+  .filter(p => p.inStock)
+  .filter(p => p.price < 400);
+
+console.log(affordable.map(p => p.name)); // ["Chair"]
+
+// Multiple conditions in one filter
+const available = products.filter(p => p.inStock && p.price <= 999);
+console.log(available.map(p => p.name));  // ["Laptop", "Desk", "Chair"]
+
+// Remove falsy values
+const mixed = [0, 1, "", "hello", null, "world", undefined, 42];
+const truthy = mixed.filter(Boolean);
+console.log(truthy); // [1, "hello", "world", 42]</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>[ 'Chair' ]
+[ 'Laptop', 'Desk', 'Chair' ]
+[ 1, 'hello', 'world', 42 ]</div>
+
+          <h2 id="reduce">Array.reduce()</h2>
+          <p><code>reduce()</code> accumulates array elements into a single value. It is the most powerful array method — map and filter can be implemented with reduce.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const orders = [
+  { product: "Book",   qty: 3, price: 15 },
+  { product: "Pen",    qty: 10, price: 2 },
+  { product: "Bag",    qty: 1,  price: 45 }
+];
+
+// Sum total
+const total = orders.reduce((acc, order) => acc + order.qty * order.price, 0);
+console.log("Total: $" + total); // Total: $110
+
+// Group by (transform array into object)
+const inventory = ["apple", "banana", "apple", "cherry", "banana", "apple"];
+const counts = inventory.reduce((acc, fruit) => {
+  acc[fruit] = (acc[fruit] || 0) + 1;
+  return acc;
+}, {});
+console.log(counts); // { apple: 3, banana: 2, cherry: 1 }
+
+// Flatten nested array
+const nested = [[1, 2], [3, 4], [5, 6]];
+const flat = nested.reduce((acc, arr) => acc.concat(arr), []);
+console.log(flat); // [1, 2, 3, 4, 5, 6]</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Total: $110
+{ apple: 3, banana: 2, cherry: 1 }
+[ 1, 2, 3, 4, 5, 6 ]</div>
+
+          <h2 id="chaining">Chaining map, filter, reduce</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const employees = [
+  { name: "Alice",  department: "Engineering", salary: 90000 },
+  { name: "Bob",    department: "Marketing",   salary: 75000 },
+  { name: "Carol",  department: "Engineering", salary: 95000 },
+  { name: "Dave",   department: "Engineering", salary: 80000 },
+  { name: "Eve",    department: "Marketing",   salary: 70000 }
+];
+
+// Total salary for Engineering department
+const engTotal = employees
+  .filter(e => e.department === "Engineering")
+  .map(e => e.salary)
+  .reduce((sum, s) => sum + s, 0);
+
+console.log("Engineering total salary: $" + engTotal); // $265,000
+
+// Average salary across all departments
+const avg = employees
+  .map(e => e.salary)
+  .reduce((sum, s, _, arr) => sum + s / arr.length, 0);
+
+console.log("Average salary: $" + avg.toFixed(0)); // $82,000</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Engineering total salary: $265000
+Average salary: $82000</div>
+
+          <h2 id="foreach-vs-map">forEach vs map</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Feature</th><th>forEach</th><th>map</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Returns</td><td><code>undefined</code></td><td>New array</td></tr>
+                <tr><td>Purpose</td><td>Side effects (logging, DOM updates)</td><td>Transforming values</td></tr>
+                <tr><td>Chainable</td><td>No</td><td>Yes</td></tr>
+                <tr><td>Mutates original</td><td>Can (you control it)</td><td>No</td></tr>
+                <tr><td>Can break/continue</td><td>No</td><td>No</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="find-findindex">find() and findIndex()</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const users = [
+  { id: 1, name: "Alice", active: true },
+  { id: 2, name: "Bob",   active: false },
+  { id: 3, name: "Carol", active: true }
+];
+
+// find — returns the first matching element (or undefined)
+const bob = users.find(u => u.id === 2);
+console.log(bob); // { id: 2, name: 'Bob', active: false }
+
+// findIndex — returns the index of the first match (-1 if not found)
+const carolIdx = users.findIndex(u => u.name === "Carol");
+console.log(carolIdx); // 2
+
+// Practical: find and update
+const idx = users.findIndex(u => u.id === 2);
+if (idx !== -1) {
+  users[idx] = { ...users[idx], active: true }; // Immutable update
+}
+console.log(users[1].active); // true</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>{ id: 2, name: 'Bob', active: false }
+2
+true</div>
+
+          <h2 id="some-every">some() and every()</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const scores = [78, 92, 55, 88, 45, 97];
+
+// some — true if at least one element passes
+const hasFailure = scores.some(s => s < 60);
+console.log("Has failure:", hasFailure); // true
+
+const hasPerfect = scores.some(s => s === 100);
+console.log("Has perfect:", hasPerfect); // false
+
+// every — true only if ALL elements pass
+const allPassed = scores.every(s => s >= 40);
+console.log("All passed (>=40):", allPassed); // true
+
+const allExcellent = scores.every(s => s >= 90);
+console.log("All excellent:", allExcellent); // false</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Has failure: true
+Has perfect: false
+All passed (>=40): true
+All excellent: false</div>
+
+          <h2 id="custom-hof">Custom Higher-Order Functions</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// repeat — run a function n times
+function repeat(n, fn) {
+  for (let i = 0; i < n; i++) fn(i);
+}
+
+repeat(3, i => console.log("Iteration " + i));
+
+// once — a function that can only be called once
+function once(fn) {
+  let called = false;
+  let result;
+  return function(...args) {
+    if (!called) {
+      called = true;
+      result = fn(...args);
+    }
+    return result;
+  };
+}
+
+const initOnce = once(() => {
+  console.log("Initialized!");
+  return 42;
+});
+
+console.log(initOnce()); // Initialized! then 42
+console.log(initOnce()); // 42 — no "Initialized!" again</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Iteration 0
+Iteration 1
+Iteration 2
+Initialized!
+42
+42</div>
+
+          <h2 id="compose-pipe">Compose and Pipe Pattern</h2>
+          <p><code>compose</code> chains functions right-to-left; <code>pipe</code> chains them left-to-right (more intuitive).</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// pipe: applies functions left to right
+const pipe = (...fns) => (value) => fns.reduce((acc, fn) => fn(acc), value);
+
+// compose: applies functions right to left
+const compose = (...fns) => (value) => fns.reduceRight((acc, fn) => fn(acc), value);
+
+// Individual transformations
+const trim       = str => str.trim();
+const toLowerCase = str => str.toLowerCase();
+const removeSpaces = str => str.replace(/\s+/g, "-");
+
+// Pipe: left to right (trim → lowercase → replace spaces)
+const slugify = pipe(trim, toLowerCase, removeSpaces);
+
+console.log(slugify("  Hello World  "));       // "hello-world"
+console.log(slugify(" Learn JavaScript! "));   // "learn-javascript!"
+
+// Numeric pipeline
+const processNumber = pipe(
+  n => n * 2,      // double
+  n => n + 10,     // add 10
+  n => n ** 2      // square
+);
+
+console.log(processNumber(3)); // (3*2 + 10)^2 = 16^2 = 256</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>hello-world
+learn-javascript!
+256</div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Given this dataset of transactions:</p>
+            <div class="code-block">
+              <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+              <pre><code class="language-javascript">const transactions = [
+  { id: 1, type: "credit", amount: 500 },
+  { id: 2, type: "debit",  amount: 120 },
+  { id: 3, type: "credit", amount: 1000 },
+  { id: 4, type: "debit",  amount: 350 },
+  { id: 5, type: "credit", amount: 200 }
+];</code></pre>
+            </div>
+            <p>Use map, filter, and reduce to find:</p>
+            <ol>
+              <li>Total credits</li>
+              <li>Total debits</li>
+              <li>Net balance (credits − debits)</li>
+              <li>List of credit transaction IDs</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Implement these higher-order functions from scratch (without using the built-in versions):</p>
+            <ol>
+              <li><code>myMap(arr, fn)</code></li>
+              <li><code>myFilter(arr, fn)</code></li>
+              <li><code>myReduce(arr, fn, initial)</code></li>
+            </ol>
+            <p>Then create a <code>groupBy(arr, keyFn)</code> function that groups array elements into an object by the result of <code>keyFn</code>. Use <code>reduce</code> internally.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Higher-order functions accept functions as arguments or return functions.</li>
+              <li><code>map()</code> transforms every element — returns same-length array.</li>
+              <li><code>filter()</code> keeps matching elements — returns shorter array.</li>
+              <li><code>reduce()</code> accumulates to one value — most powerful of the three.</li>
+              <li>Chain map/filter/reduce for readable data pipelines.</li>
+              <li><code>some()</code>/<code>every()</code> check array-level boolean conditions efficiently.</li>
+              <li><code>find()</code>/<code>findIndex()</code> locate the first matching element.</li>
+              <li>Compose and pipe let you build transformation pipelines from simple functions.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a higher-order function? Give two real examples.</li>
+            <li>Explain the difference between map() and forEach().</li>
+            <li>How does Array.reduce() work? What is the accumulator?</li>
+            <li>When would you use find() vs filter()?</li>
+            <li>What is the compose/pipe pattern and why is it useful?</li>
+          </ul>
+
+          <div class="related-topics">
+            <a href="/javascript/functions/closures.html" class="topic-tag">Closures</a>
+            <a href="/javascript/functions/arrow-functions.html" class="topic-tag">Arrow Functions</a>
+            <a href="/javascript/functions/return-values.html" class="topic-tag">Return Values</a>
+            <a href="/javascript/data-structures/arrays.html" class="topic-tag">Arrays</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does map() mutate the original array?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. <code>map()</code>, <code>filter()</code>, and <code>reduce()</code> do not mutate the original array — they return new arrays (or a new value). However, if the callback mutates objects inside the array, those objects are shared by reference and can be modified.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens if reduce() is called on an empty array with no initial value?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It throws a <code>TypeError: Reduce of empty array with no initial value</code>. Always provide an initial value (the second argument to reduce) when the array might be empty.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is reduce() really more powerful than map and filter?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — both map and filter can be implemented using reduce. <code>reduce</code> is essentially a general-purpose array-to-anything function. However, using map and filter when applicable is more readable and semantically clear.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/functions/closures.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Closures</span></a>
+          <a href="/javascript/data-structures/arrays.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Arrays</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

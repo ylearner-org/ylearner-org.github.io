@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Arrays – Methods, Iteration &amp; Manipulation | ylearner</title>
+  <meta name="description" content="Master JavaScript arrays: creating arrays, accessing elements, adding and removing items, searching, iterating with map/filter/reduce, sorting, and multidimensional arrays.">
+  <meta name="keywords" content="javascript arrays, javascript array methods, array map filter reduce, javascript push pop shift unshift, array iteration javascript, multidimensional arrays, Array.from javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/data-structures/arrays.html">
+  <meta property="og:title" content="JavaScript Arrays – Methods, Iteration &amp; Manipulation | ylearner">
+  <meta property="og:description" content="Master JavaScript arrays: creating arrays, accessing elements, adding and removing items, searching, iterating with map/filter/reduce, sorting, and multidimensional arrays.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/data-structures/arrays.html">Data Structures</a><span class="separator">›</span>
+          <span class="current">Arrays</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📦 Data Structures</div>
+          <h1>JavaScript Arrays – The Complete Guide</h1>
+          <p class="lesson-intro">Arrays are the most versatile data structure in JavaScript. They store ordered lists of values, come packed with powerful built-in methods, and are central to nearly every program you write. This guide covers everything from basic creation to advanced iteration patterns.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 28 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="creating-arrays">Creating Arrays</h2>
+          <p>JavaScript gives you two primary ways to create arrays: the array literal syntax (preferred) and the <code>Array()</code> constructor.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Array literal – the preferred way
+const fruits = ['apple', 'banana', 'cherry'];
+const numbers = [1, 2, 3, 4, 5];
+const mixed = [1, 'hello', true, null, { id: 1 }];
+const empty = [];
+
+// Array() constructor
+const zeros = new Array(3);        // [empty × 3] — sparse array
+const explicit = new Array(1, 2, 3); // [1, 2, 3]
+
+// Array.of() – always creates elements, never a sparse array
+const safe = Array.of(3);          // [3]  (not [empty × 3])
+
+// Array.from() – from iterables or array-like objects
+const fromString = Array.from('hello');      // ['h','e','l','l','o']
+const fromSet    = Array.from(new Set([1, 2, 2, 3])); // [1, 2, 3]
+const mapped     = Array.from({ length: 5 }, (_, i) => i * 2);
+// [0, 2, 4, 6, 8]
+
+console.log(fruits.length); // 3</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Prefer Array Literals</strong>
+              <p>Always use <code>[]</code> instead of <code>new Array()</code>. The constructor behaves inconsistently — <code>new Array(3)</code> creates a sparse array with 3 empty slots, not an array containing the number 3.</p>
+            </div>
+          </div>
+
+          <h2 id="accessing-elements">Accessing Elements</h2>
+          <p>Array elements are accessed by their zero-based index. ES2022 introduced <code>Array.prototype.at()</code> which supports negative indices.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const colors = ['red', 'green', 'blue', 'yellow'];
+
+// Bracket notation (zero-based index)
+console.log(colors[0]);   // 'red'
+console.log(colors[2]);   // 'blue'
+console.log(colors[10]);  // undefined (no error)
+
+// Negative indices with .at()
+console.log(colors.at(-1));  // 'yellow' (last element)
+console.log(colors.at(-2));  // 'blue'
+
+// Array length
+console.log(colors.length);  // 4
+
+// Last element (classic approach)
+console.log(colors[colors.length - 1]); // 'yellow'
+
+// Destructuring (preview)
+const [first, second] = colors;
+console.log(first, second); // 'red' 'green'</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>red
+blue
+undefined
+yellow
+blue
+4
+yellow
+red green</pre>
+          </div>
+
+          <h2 id="adding-removing">Adding and Removing Elements</h2>
+          <p>JavaScript arrays are mutable. Several methods let you add or remove elements from either end or anywhere in the middle.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const stack = ['a', 'b', 'c'];
+
+// End of array
+stack.push('d', 'e');   // adds to end → ['a','b','c','d','e']
+stack.pop();            // removes last → returns 'e' → ['a','b','c','d']
+
+// Beginning of array
+stack.unshift('z');     // adds to front → ['z','a','b','c','d']
+stack.shift();          // removes first → returns 'z' → ['a','b','c','d']
+
+// splice(startIndex, deleteCount, ...itemsToInsert)
+const arr = [1, 2, 3, 4, 5];
+const removed = arr.splice(1, 2);        // removes 2 at index 1
+console.log(removed); // [2, 3]
+console.log(arr);     // [1, 4, 5]
+
+arr.splice(1, 0, 10, 20); // insert at index 1, delete 0
+console.log(arr); // [1, 10, 20, 4, 5]
+
+// slice – returns a NEW array (does not mutate)
+const sliced = arr.slice(1, 3);  // from index 1 up to (not including) 3
+console.log(sliced); // [10, 20]
+console.log(arr);    // unchanged: [1, 10, 20, 4, 5]</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Method</th><th>Where</th><th>Mutates?</th><th>Returns</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>push(...items)</code></td><td>End</td><td>Yes</td><td>New length</td></tr>
+                <tr><td><code>pop()</code></td><td>End</td><td>Yes</td><td>Removed element</td></tr>
+                <tr><td><code>unshift(...items)</code></td><td>Start</td><td>Yes</td><td>New length</td></tr>
+                <tr><td><code>shift()</code></td><td>Start</td><td>Yes</td><td>Removed element</td></tr>
+                <tr><td><code>splice(i, n, ...)</code></td><td>Any</td><td>Yes</td><td>Removed elements</td></tr>
+                <tr><td><code>slice(s, e)</code></td><td>Any</td><td>No</td><td>New array</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="searching">Searching Arrays</h2>
+          <p>JavaScript provides several methods for finding elements. Choose based on what you need: the index, the element itself, or just a boolean.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const nums = [10, 20, 30, 20, 40];
+const users = [
+  { id: 1, name: 'Alice' },
+  { id: 2, name: 'Bob' },
+  { id: 3, name: 'Carol' }
+];
+
+// indexOf / lastIndexOf – use strict equality (===)
+console.log(nums.indexOf(20));      // 1 (first occurrence)
+console.log(nums.lastIndexOf(20));  // 3 (last occurrence)
+console.log(nums.indexOf(99));      // -1 (not found)
+
+// includes – returns boolean
+console.log(nums.includes(30));  // true
+console.log(nums.includes(99));  // false
+
+// find – returns the element (or undefined)
+const bob = users.find(u => u.name === 'Bob');
+console.log(bob); // { id: 2, name: 'Bob' }
+
+// findIndex – returns the index (or -1)
+const idx = users.findIndex(u => u.id === 3);
+console.log(idx); // 2
+
+// findLast / findLastIndex (ES2023)
+const lastEven = nums.findLast(n => n % 2 === 0);
+console.log(lastEven); // 40</code></pre>
+          </div>
+
+          <h2 id="iterating">Iterating Arrays</h2>
+          <p><code>forEach</code>, <code>map</code>, <code>filter</code>, and <code>reduce</code> are the four workhorses of array iteration. Each serves a distinct purpose.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const prices = [100, 250, 75, 320, 180];
+
+// forEach – side effects only, returns undefined
+prices.forEach((price, index) => {
+  console.log(`Item ${index}: $${price}`);
+});
+
+// map – transforms each element, returns new array
+const discounted = prices.map(p => p * 0.9);
+console.log(discounted); // [90, 225, 67.5, 288, 162]
+
+// filter – keeps elements where callback returns true
+const expensive = prices.filter(p => p > 150);
+console.log(expensive); // [250, 320, 180]
+
+// reduce – accumulates a single value
+const total = prices.reduce((sum, p) => sum + p, 0);
+console.log(total); // 925
+
+// Chaining – readable pipeline
+const totalDiscountExpensive = prices
+  .filter(p => p > 100)
+  .map(p => p * 0.9)
+  .reduce((sum, p) => sum + p, 0);
+console.log(totalDiscountExpensive.toFixed(2)); // "674.10"</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>Item 0: $100
+Item 1: $250
+...
+[90, 225, 67.5, 288, 162]
+[250, 320, 180]
+925
+"674.10"</pre>
+          </div>
+
+          <h2 id="sorting">Sorting and Reversing</h2>
+          <p><code>sort()</code> and <code>reverse()</code> mutate the original array. Always provide a comparator function to <code>sort()</code> for numeric sorting.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Default sort – converts to string, lexicographic order
+[10, 9, 2, 100].sort();     // [10, 100, 2, 9] ← WRONG for numbers!
+
+// Numeric sort with comparator
+[10, 9, 2, 100].sort((a, b) => a - b);  // [2, 9, 10, 100] ascending
+[10, 9, 2, 100].sort((a, b) => b - a);  // [100, 10, 9, 2] descending
+
+// Alphabetical sort (strings already work without comparator)
+['banana', 'apple', 'cherry'].sort(); // ['apple', 'banana', 'cherry']
+
+// Case-insensitive sort
+['Banana', 'apple', 'Cherry'].sort((a, b) =>
+  a.toLowerCase().localeCompare(b.toLowerCase())
+);
+// ['apple', 'Banana', 'Cherry']
+
+// reverse – reverses in place
+const arr = [1, 2, 3, 4, 5];
+arr.reverse();
+console.log(arr); // [5, 4, 3, 2, 1]
+
+// Non-mutating sort (ES2023: toSorted, toReversed)
+const original = [3, 1, 2];
+const sorted = original.toSorted((a, b) => a - b);
+console.log(original); // [3, 1, 2] – unchanged
+console.log(sorted);   // [1, 2, 3]</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always Use a Comparator for Numbers</strong>
+              <p>Without a comparator, <code>sort()</code> converts every element to a string first. <code>[10, 9, 100].sort()</code> gives <code>[10, 100, 9]</code> — not what you want. Always pass <code>(a, b) =&gt; a - b</code> for ascending numeric sort.</p>
+            </div>
+          </div>
+
+          <h2 id="flat-from">flat, flatMap, Array.from, Array.isArray</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// flat – flattens nested arrays
+const nested = [1, [2, 3], [4, [5, 6]]];
+console.log(nested.flat());    // [1, 2, 3, 4, [5, 6]] – one level
+console.log(nested.flat(2));   // [1, 2, 3, 4, 5, 6] – two levels
+console.log(nested.flat(Infinity)); // fully flatten any depth
+
+// flatMap – map then flat(1) in one pass (more efficient)
+const sentences = ['Hello world', 'foo bar'];
+const words = sentences.flatMap(s => s.split(' '));
+console.log(words); // ['Hello', 'world', 'foo', 'bar']
+
+// Array.from – converts iterables and array-likes
+const nodeList = document.querySelectorAll('p'); // NodeList (array-like)
+const paragraphs = Array.from(nodeList);         // real Array
+
+// Array.from with map function
+const squares = Array.from({ length: 5 }, (_, i) => (i + 1) ** 2);
+console.log(squares); // [1, 4, 9, 16, 25]
+
+// Array.isArray – reliable type check
+console.log(Array.isArray([]));          // true
+console.log(Array.isArray(new Array())); // true
+console.log(Array.isArray('hello'));     // false
+console.log(Array.isArray({ length: 3 })); // false</code></pre>
+          </div>
+
+          <h2 id="multidimensional">Multidimensional Arrays</h2>
+          <p>JavaScript does not have true 2D arrays, but you can nest arrays inside arrays to simulate matrices and grids.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// 3x3 matrix
+const matrix = [
+  [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9]
+];
+
+// Access with double indexing
+console.log(matrix[1][2]); // 6 (row 1, col 2)
+
+// Iterate with nested loops
+for (let row = 0; row < matrix.length; row++) {
+  for (let col = 0; col < matrix[row].length; col++) {
+    process.stdout.write(matrix[row][col] + ' ');
+  }
+  console.log();
+}
+
+// Create a dynamic 2D array
+function create2D(rows, cols, fill = 0) {
+  return Array.from({ length: rows }, () => new Array(cols).fill(fill));
+}
+const grid = create2D(3, 4, '.');
+console.log(grid);
+// [
+//   ['.', '.', '.', '.'],
+//   ['.', '.', '.', '.'],
+//   ['.', '.', '.', '.']
+// ]
+
+// Spread to copy a 2D array (shallow — rows are still shared)
+const copy = matrix.map(row => [...row]); // deep enough for primitives</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Copying Arrays with Spread</strong>
+              <p>Use <code>[...arr]</code> or <code>arr.slice()</code> for a shallow copy of a 1D array. For nested arrays, use <code>arr.map(row =&gt; [...row])</code> to copy each inner array too. For deeply nested structures, consider <code>structuredClone()</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between <code>slice</code> and <code>splice</code>?</li>
+            <li>Why does <code>[1, 10, 2].sort()</code> return <code>[1, 10, 2]</code> without a comparator?</li>
+            <li>How would you remove duplicates from an array?</li>
+            <li>What is the difference between <code>map</code> and <code>forEach</code>?</li>
+            <li>How do you flatten a deeply nested array in one line?</li>
+            <li>Explain <code>reduce</code> and give an example beyond summing numbers.</li>
+          </ul>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Given an array of product objects <code>[{ name, price, category }]</code>:</p>
+            <ol>
+              <li>Filter products under $50.</li>
+              <li>Map to return just the product names.</li>
+              <li>Sort names alphabetically.</li>
+              <li>Join them into a comma-separated string.</li>
+            </ol>
+            <p>Do all four steps as a single chained expression.</p>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a function <code>groupBy(arr, key)</code> that uses <code>reduce</code> to group an array of objects by a given property. For example, <code>groupBy(products, 'category')</code> should return an object where each key is a category and its value is an array of matching products. Do not use any external library.</p>
+          </div>
+
+          <h2 id="faq">Frequently Asked Questions</h2>
+          <dl>
+            <dt>Is an array an object in JavaScript?</dt>
+            <dd>Yes. <code>typeof []</code> returns <code>"object"</code>. Arrays are specialised objects with numeric keys and a <code>length</code> property. Use <code>Array.isArray()</code> to reliably distinguish them from plain objects.</dd>
+            <dt>Can arrays hold mixed types?</dt>
+            <dd>Yes. A single array can hold numbers, strings, booleans, objects, functions, or other arrays. However, mixing types can make code harder to reason about — consider typed arrays (<code>Int32Array</code>, etc.) when working with large numeric data sets.</dd>
+            <dt>Does <code>map</code> mutate the original array?</dt>
+            <dd>No. <code>map</code> always returns a new array. The original remains unchanged. Only <code>sort</code>, <code>reverse</code>, <code>push</code>, <code>pop</code>, <code>shift</code>, <code>unshift</code>, <code>splice</code>, and <code>fill</code> mutate in place.</dd>
+            <dt>What is the difference between <code>find</code> and <code>filter</code>?</dt>
+            <dd><code>find</code> returns the first matching element (or <code>undefined</code>). <code>filter</code> returns a new array of all matching elements. Use <code>find</code> when you expect a single result and performance matters.</dd>
+            <dt>How do I remove duplicates from an array?</dt>
+            <dd>The easiest way is <code>[...new Set(arr)]</code>. This converts the array to a <code>Set</code> (which only stores unique values) and spreads it back into an array.</dd>
+          </dl>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Use array literals <code>[]</code> to create arrays; <code>Array.from()</code> for iterables.</li>
+              <li>Access elements by zero-based index; use <code>.at(-1)</code> for the last element.</li>
+              <li><code>push/pop</code> work at the end; <code>unshift/shift</code> at the start; <code>splice</code> anywhere.</li>
+              <li><code>slice</code> creates a new array without mutating the original.</li>
+              <li>Use <code>indexOf/includes</code> for primitives; <code>find/findIndex</code> for objects.</li>
+              <li>Chain <code>filter → map → reduce</code> for elegant data pipelines.</li>
+              <li>Always pass a comparator to <code>sort()</code> when sorting numbers.</li>
+              <li>Use <code>flat()</code> and <code>flatMap()</code> to work with nested arrays.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/javascript/data-structures/objects.html" class="topic-tag">Objects</a>
+            <a href="/javascript/data-structures/maps-sets.html" class="topic-tag">Maps &amp; Sets</a>
+            <a href="/javascript/data-structures/array-methods.html" class="topic-tag">Array Methods Reference</a>
+            <a href="/javascript/data-structures/destructuring.html" class="topic-tag">Destructuring</a>
+            <a href="/javascript/functions/higher-order-functions.html" class="topic-tag">Higher-Order Functions</a>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/functions/higher-order-functions.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Higher-Order Functions</span></a>
+          <a href="/javascript/data-structures/objects.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Objects</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Map and Set – When to Use Over Objects &amp; Arrays | ylearner</title>
+  <meta name="description" content="Learn JavaScript Map and Set: ordered key-value pairs, unique value collections, WeakMap and WeakSet, iteration, deduplication, and when to use Map vs plain objects.">
+  <meta name="keywords" content="javascript map, javascript set, javascript map vs object, set deduplication, WeakMap WeakSet javascript, javascript map methods, map get set has delete, set add has delete">
+  <link rel="canonical" href="https://ylearner.org/javascript/data-structures/maps-sets.html">
+  <meta property="og:title" content="JavaScript Map and Set – When to Use Over Objects &amp; Arrays | ylearner">
+  <meta property="og:description" content="Learn JavaScript Map and Set: ordered key-value pairs, unique value collections, WeakMap and WeakSet, iteration, deduplication, and when to use Map vs plain objects.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/data-structures/arrays.html">Data Structures</a><span class="separator">›</span>
+          <span class="current">Maps &amp; Sets</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📦 Data Structures</div>
+          <h1>JavaScript Map and Set – Modern Data Collections</h1>
+          <p class="lesson-intro">ES6 introduced <code>Map</code> and <code>Set</code> as purpose-built alternatives to plain objects and arrays. A <code>Map</code> stores ordered key-value pairs where keys can be any type; a <code>Set</code> stores unique values with no duplicates. Knowing when to use each over the built-in alternatives is a hallmark of experienced JavaScript developers.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="map-basics">Map Basics</h2>
+          <p>A <code>Map</code> is an ordered collection of key-value pairs. Unlike a plain object, Map keys can be any value — including objects, functions, or primitives — and insertion order is preserved.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Create a Map
+const map = new Map();
+
+// set(key, value) – add or update entries
+map.set('name', 'Alice');
+map.set(42, 'the answer');
+map.set(true, 'boolean key');
+
+const objKey = { id: 1 };
+map.set(objKey, 'object as key'); // objects can be keys!
+
+// get(key) – retrieve a value
+console.log(map.get('name'));    // 'Alice'
+console.log(map.get(42));        // 'the answer'
+console.log(map.get(objKey));    // 'object as key'
+console.log(map.get('missing')); // undefined
+
+// has(key) – check existence
+console.log(map.has(true));      // true
+console.log(map.has('absent'));  // false
+
+// size – number of entries (not .length)
+console.log(map.size); // 4
+
+// delete(key) – remove one entry
+map.delete(42);
+console.log(map.size); // 3
+
+// clear() – remove all entries
+// map.clear();
+
+// Initialize from array of pairs
+const roles = new Map([
+  ['Alice', 'admin'],
+  ['Bob', 'editor'],
+  ['Carol', 'viewer']
+]);</code></pre>
+          </div>
+
+          <h2 id="map-iteration">Iterating a Map</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const scores = new Map([
+  ['Alice', 95],
+  ['Bob', 82],
+  ['Carol', 88]
+]);
+
+// for...of with destructuring (most common)
+for (const [name, score] of scores) {
+  console.log(`${name}: ${score}`);
+}
+
+// forEach
+scores.forEach((value, key) => {
+  console.log(`${key} scored ${value}`);
+});
+
+// keys(), values(), entries()
+console.log([...scores.keys()]);    // ['Alice', 'Bob', 'Carol']
+console.log([...scores.values()]);  // [95, 82, 88]
+console.log([...scores.entries()]); // [['Alice', 95], ['Bob', 82], ...]
+
+// Convert Map → Array of objects
+const arr = Array.from(scores, ([name, score]) => ({ name, score }));
+// [{ name: 'Alice', score: 95 }, ...]
+
+// Convert plain object → Map
+const obj = { x: 1, y: 2 };
+const mapFromObj = new Map(Object.entries(obj));
+console.log(mapFromObj.get('x')); // 1</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>Alice: 95
+Bob: 82
+Carol: 88
+Alice scored 95
+...
+['Alice', 'Bob', 'Carol']
+[95, 82, 88]</pre>
+          </div>
+
+          <h2 id="map-vs-object">Map vs Object Comparison</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Feature</th><th>Map</th><th>Plain Object</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Key types</td><td>Any value (objects, functions, primitives)</td><td>String or Symbol only</td></tr>
+                <tr><td>Key order</td><td>Insertion order guaranteed</td><td>Insertion order (mostly, ES2015+)</td></tr>
+                <tr><td>Size</td><td><code>map.size</code></td><td>Must compute with <code>Object.keys().length</code></td></tr>
+                <tr><td>Prototype pollution</td><td>No inherited keys</td><td>Inherits from <code>Object.prototype</code></td></tr>
+                <tr><td>Serialisation</td><td>Not directly JSON-serialisable</td><td>Works with <code>JSON.stringify</code></td></tr>
+                <tr><td>Performance</td><td>Better for frequent add/remove</td><td>Better for static structures</td></tr>
+                <tr><td>Best for</td><td>Dynamic key-value stores, any-key-type</td><td>Structured data, configs, DTOs</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="set-basics">Set Basics</h2>
+          <p>A <code>Set</code> stores a collection of <em>unique</em> values in insertion order. Adding an already-present value has no effect.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const set = new Set();
+
+// add(value)
+set.add(1);
+set.add(2);
+set.add(2); // duplicate – silently ignored
+set.add('hello');
+set.add({ id: 1 }); // different object reference → added
+
+console.log(set.size); // 4
+
+// has(value)
+console.log(set.has(2));       // true
+console.log(set.has('world')); // false
+
+// delete(value)
+set.delete(1);
+console.log(set.size); // 3
+
+// Initialize from array (automatic deduplication!)
+const unique = new Set([1, 2, 2, 3, 3, 3, 4]);
+console.log(unique.size); // 4
+
+// Set deduplication pattern (most common use case)
+const numbers = [1, 2, 2, 3, 3, 4];
+const deduped = [...new Set(numbers)];
+console.log(deduped); // [1, 2, 3, 4]
+
+// Deduplicate strings
+const tags = ['js', 'html', 'js', 'css', 'html'];
+const uniqueTags = [...new Set(tags)];
+console.log(uniqueTags); // ['js', 'html', 'css']</code></pre>
+          </div>
+
+          <h2 id="set-iteration">Iterating a Set</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const colors = new Set(['red', 'green', 'blue']);
+
+// for...of (most common)
+for (const color of colors) {
+  console.log(color);
+}
+
+// forEach
+colors.forEach(color => console.log(color));
+
+// Convert to Array
+const arr = [...colors];         // spread
+const arr2 = Array.from(colors); // Array.from
+
+// Set operations (manual implementations)
+const a = new Set([1, 2, 3, 4]);
+const b = new Set([3, 4, 5, 6]);
+
+// Union
+const union = new Set([...a, ...b]);
+console.log([...union]); // [1, 2, 3, 4, 5, 6]
+
+// Intersection
+const intersection = new Set([...a].filter(x => b.has(x)));
+console.log([...intersection]); // [3, 4]
+
+// Difference (a minus b)
+const difference = new Set([...a].filter(x => !b.has(x)));
+console.log([...difference]); // [1, 2]</code></pre>
+          </div>
+
+          <h2 id="weakmap-weakset">WeakMap and WeakSet</h2>
+          <p>The <code>WeakMap</code> and <code>WeakSet</code> variants hold <em>weak references</em>, meaning they do not prevent garbage collection of their keys/values. They are non-iterable and their primary use case is associating metadata with objects without creating memory leaks.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// WeakMap – keys must be objects; values can be anything
+const cache = new WeakMap();
+
+function process(obj) {
+  if (cache.has(obj)) {
+    return cache.get(obj); // return cached result
+  }
+  const result = /* expensive computation */ { computed: true };
+  cache.set(obj, result);
+  return result;
+}
+
+let domNode = document.getElementById('app');
+cache.set(domNode, { clicks: 0 });
+// If domNode is set to null and removed from DOM,
+// the WeakMap entry is garbage-collected automatically
+
+// WeakSet – stores objects (no primitives), weak references
+const seen = new WeakSet();
+function visitOnce(obj) {
+  if (seen.has(obj)) return 'already visited';
+  seen.add(obj);
+  return 'first visit';
+}
+
+// Key differences from Map/Set:
+// - Keys/values must be objects (WeakMap keys, WeakSet values)
+// - Not iterable (no forEach, no for...of, no .size)
+// - Automatically cleaned up when references are lost</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>When to Use WeakMap</strong>
+              <p>Use <code>WeakMap</code> when you want to attach private data or metadata to an object without interfering with garbage collection. Common patterns: caching DOM-related data, storing private instance data in class implementations, and memoisation caches keyed by object identity.</p>
+            </div>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Choose the Right Collection</strong>
+              <p>Use <code>Set</code> to deduplicate values or track membership. Use <code>Map</code> when you need non-string keys or need to frequently add/delete entries. Use a plain object for static, string-keyed structured data that needs JSON serialisation.</p>
+            </div>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between a Map and a plain object?</li>
+            <li>How would you deduplicate an array using a Set?</li>
+            <li>Why can't you iterate a WeakMap or WeakSet?</li>
+            <li>How do you convert a Map to a plain object and back?</li>
+            <li>Implement a Set intersection using the spread operator.</li>
+          </ul>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Given an array of log entries where each entry is <code>{ userId, action, timestamp }</code>:</p>
+            <ol>
+              <li>Use a <code>Map</code> to count how many actions each user performed.</li>
+              <li>Use a <code>Set</code> to find the unique actions that were performed.</li>
+              <li>Log both results in a readable format.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Implement a <code>LRUCache</code> class using a <code>Map</code> (which preserves insertion order). The cache should accept a <code>capacity</code> in the constructor and implement <code>get(key)</code> (returns -1 if not found, and moves the key to most-recently-used) and <code>put(key, value)</code> (evicts the least-recently-used item if capacity is exceeded).</p>
+          </div>
+
+          <h2 id="faq">Frequently Asked Questions</h2>
+          <dl>
+            <dt>Does a Map preserve insertion order?</dt>
+            <dd>Yes. <code>Map</code> iterates entries in the order they were inserted, which is part of the specification. Plain objects also follow insertion order for string keys in most modern engines, but this is not as strictly guaranteed for numeric-like keys.</dd>
+            <dt>Can a Set contain NaN?</dt>
+            <dd>Yes. <code>Set</code> uses the SameValueZero algorithm for equality. While <code>NaN !== NaN</code> in regular comparisons, a Set treats all <code>NaN</code> values as equal, so only one <code>NaN</code> can be stored.</dd>
+            <dt>Why use Map over an object for a dictionary?</dt>
+            <dd>A <code>Map</code> does not have prototype keys that can collide (e.g., <code>'constructor'</code>, <code>'toString'</code>), supports any key type, and has a built-in <code>size</code> property. These make it safer and more predictable for dynamic key-value storage.</dd>
+            <dt>How do I convert a Set to an array?</dt>
+            <dd>Use spread: <code>[...mySet]</code> or <code>Array.from(mySet)</code>. Both produce a regular array in insertion order.</dd>
+            <dt>Is WeakRef related to WeakMap?</dt>
+            <dd>They are related conceptually — both allow weak references. <code>WeakRef</code> (ES2021) lets you hold a weak reference to any object and check if it has been garbage-collected, while <code>WeakMap</code>/<code>WeakSet</code> automatically clean up their entries.</dd>
+          </dl>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>Map</code> stores ordered key-value pairs with any key type and a reliable <code>.size</code> property.</li>
+              <li>Prefer <code>Map</code> over objects when keys are dynamic, non-string, or frequently added/removed.</li>
+              <li><code>Set</code> stores unique values in insertion order; perfect for deduplication and membership tests.</li>
+              <li>Use <code>[...new Set(arr)]</code> as a concise one-liner to remove array duplicates.</li>
+              <li>Set operations (union, intersection, difference) are easy with spread and <code>filter/has</code>.</li>
+              <li><code>WeakMap</code> and <code>WeakSet</code> hold weak references — they do not prevent garbage collection and are not iterable.</li>
+              <li>Use <code>WeakMap</code> for attaching private metadata to objects without memory leaks.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/javascript/data-structures/arrays.html" class="topic-tag">Arrays</a>
+            <a href="/javascript/data-structures/objects.html" class="topic-tag">Objects</a>
+            <a href="/javascript/data-structures/destructuring.html" class="topic-tag">Destructuring</a>
+            <a href="/javascript/data-structures/spread-rest.html" class="topic-tag">Spread &amp; Rest</a>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/data-structures/objects.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Objects</span></a>
+          <a href="/javascript/data-structures/destructuring.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Destructuring</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

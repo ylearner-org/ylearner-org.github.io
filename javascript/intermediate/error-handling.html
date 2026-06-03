@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Error Handling – try, catch, finally &amp; Custom Errors | ylearner</title>
+  <meta name="description" content="Master JavaScript error handling: try/catch/finally, error types, custom Error classes, re-throwing, async error handling with async/await, Promise.catch(), and global error handlers.">
+  <meta name="keywords" content="javascript error handling, try catch finally javascript, custom error class javascript, javascript error types, async await error handling, promise catch javascript, window onerror, unhandledrejection javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/intermediate/error-handling.html">
+  <meta property="og:title" content="JavaScript Error Handling – try, catch, finally &amp; Custom Errors | ylearner">
+  <meta property="og:description" content="Master JavaScript error handling: try/catch/finally, error types, custom Error classes, re-throwing, async error handling with async/await, Promise.catch(), and global error handlers.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/intermediate/es6-features.html">Intermediate JS</a><span class="separator">›</span>
+          <span class="current">Error Handling</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Intermediate JS</div>
+          <h1>JavaScript Error Handling – try, catch, finally</h1>
+          <p class="lesson-intro">Errors are inevitable. How you handle them determines whether your application crashes silently or fails gracefully with a useful message. Mastering try/catch/finally, custom error types, and async error handling is essential for writing production-quality JavaScript.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 24 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="try-catch-finally">try / catch / finally</h2>
+          <p>The <code>try</code> block contains code that might throw. If an exception occurs, execution jumps to <code>catch</code>. The <code>finally</code> block always runs — even if an error was thrown or a <code>return</code> statement was hit.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function parseJSON(text) {
+  try {
+    const data = JSON.parse(text);
+    console.log('Parsed:', data);
+    return data;
+  } catch (error) {
+    console.error('Parse failed:', error.message);
+    return null;
+  } finally {
+    console.log('parseJSON completed'); // always runs
+  }
+}
+
+parseJSON('{"name":"Alice"}'); // Parsed: {name:'Alice'} → parseJSON completed
+parseJSON('not valid json');   // Parse failed: ... → parseJSON completed
+
+// Optional catch binding (ES2019) – omit the error variable if not needed
+try {
+  riskyOperation();
+} catch {
+  console.log('Something failed');
+}
+
+// You can throw anything
+try {
+  throw 'a string error'; // valid but not recommended
+  throw 42;               // also valid
+  throw { code: 500 };    // better – but use Error objects for best practice
+} catch (e) {
+  console.log(typeof e, e);
+}</code></pre>
+          </div>
+
+          <h2 id="error-object">The Error Object</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">try {
+  null.property; // throws TypeError
+} catch (error) {
+  console.log(error.name);    // 'TypeError'
+  console.log(error.message); // "Cannot read properties of null"
+  console.log(error.stack);   // Stack trace (string with file + line info)
+  console.log(error instanceof TypeError); // true
+  console.log(error instanceof Error);     // true
+}
+
+// Creating Error objects explicitly
+const err = new Error('Something went wrong');
+console.log(err.name);    // 'Error'
+console.log(err.message); // 'Something went wrong'
+console.log(err.stack);   // Error: Something went wrong\n  at ...
+
+// throw new Error is always preferred over throw 'string'
+// because it includes a stack trace</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>TypeError
+Cannot read properties of null (reading 'property')
+[stack trace...]
+true
+true</pre>
+          </div>
+
+          <h2 id="error-types">Built-in Error Types</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Type</th><th>When it occurs</th><th>Example</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>Error</code></td><td>Base class / generic</td><td><code>throw new Error('...')</code></td></tr>
+                <tr><td><code>TypeError</code></td><td>Wrong type used</td><td><code>null.property</code>, calling a non-function</td></tr>
+                <tr><td><code>ReferenceError</code></td><td>Variable not defined</td><td><code>console.log(undeclared)</code></td></tr>
+                <tr><td><code>SyntaxError</code></td><td>Invalid JavaScript syntax</td><td><code>JSON.parse('bad')</code>, parsing malformed code</td></tr>
+                <tr><td><code>RangeError</code></td><td>Value out of allowed range</td><td><code>new Array(-1)</code>, <code>n.toFixed(200)</code></td></tr>
+                <tr><td><code>URIError</code></td><td>Malformed URI</td><td><code>decodeURIComponent('%')</code></td></tr>
+                <tr><td><code>EvalError</code></td><td>Misuse of <code>eval()</code></td><td>Rarely encountered in modern code</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="custom-errors">Custom Error Classes</h2>
+          <p>Extend the built-in <code>Error</code> class to create domain-specific error types. This lets you write <code>catch</code> blocks that handle only specific error types.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Custom error class
+class ValidationError extends Error {
+  constructor(message, field) {
+    super(message);
+    this.name = 'ValidationError';
+    this.field = field;
+  }
+}
+
+class NetworkError extends Error {
+  constructor(message, statusCode) {
+    super(message);
+    this.name = 'NetworkError';
+    this.statusCode = statusCode;
+  }
+}
+
+// Using custom errors
+function validateAge(age) {
+  if (typeof age !== 'number') {
+    throw new ValidationError('Age must be a number', 'age');
+  }
+  if (age < 0 || age > 150) {
+    throw new ValidationError('Age must be between 0 and 150', 'age');
+  }
+  return age;
+}
+
+try {
+  validateAge(-5);
+} catch (error) {
+  if (error instanceof ValidationError) {
+    console.log(`Validation failed on field "${error.field}": ${error.message}`);
+  } else {
+    throw error; // re-throw unknown errors
+  }
+}
+// Validation failed on field "age": Age must be between 0 and 150</code></pre>
+          </div>
+
+          <h2 id="rethrowing">Re-throwing Errors</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Only handle errors you understand — re-throw everything else
+function processFile(data) {
+  try {
+    return JSON.parse(data);
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      // We understand this — handle it gracefully
+      console.warn('Invalid JSON, using empty object');
+      return {};
+    }
+    // Unknown error — re-throw to propagate it up
+    throw error;
+  }
+}
+
+// Wrapping and re-throwing with context
+async function loadUserProfile(userId) {
+  try {
+    const response = await fetch(`/api/users/${userId}`);
+    if (!response.ok) {
+      throw new NetworkError(`Failed to load user ${userId}`, response.status);
+    }
+    return await response.json();
+  } catch (error) {
+    if (error instanceof NetworkError) throw error; // already wrapped
+    throw new NetworkError(`Unexpected error loading user: ${error.message}`, 0);
+  }
+}</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>The Golden Rule of Error Handling</strong>
+              <p>Only catch errors you know how to handle. If you catch an error just to log it and can't recover, re-throw it. Silently swallowing unknown errors leads to mysterious bugs that are extremely hard to diagnose.</p>
+            </div>
+          </div>
+
+          <h2 id="async-errors">Error Handling in Async Code</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// async/await – use try/catch exactly like synchronous code
+async function fetchData(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new NetworkError(`HTTP ${response.status}`, response.status);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    if (error instanceof NetworkError) {
+      console.error('Network error:', error.message);
+      return null;
+    }
+    throw error;
+  }
+}
+
+// Promise chain – use .catch()
+fetch('/api/data')
+  .then(res => res.json())
+  .then(data => processData(data))
+  .catch(error => {
+    console.error('Pipeline failed:', error);
+  })
+  .finally(() => {
+    hideLoadingSpinner();
+  });
+
+// Promise.allSettled – wait for all, even if some fail
+const results = await Promise.allSettled([
+  fetch('/api/users'),
+  fetch('/api/products'),
+  fetch('/api/orders')
+]);
+
+results.forEach((result, i) => {
+  if (result.status === 'fulfilled') {
+    console.log(`Request ${i} succeeded`);
+  } else {
+    console.error(`Request ${i} failed:`, result.reason);
+  }
+});</code></pre>
+          </div>
+
+          <h2 id="global-handlers">Global Error Handlers</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Browser: catch uncaught synchronous errors
+window.onerror = function(message, source, lineno, colno, error) {
+  sendToErrorService({ message, source, lineno, error: error?.stack });
+  return true; // prevents default browser error display
+};
+
+// Browser: catch unhandled promise rejections
+window.addEventListener('unhandledrejection', event => {
+  console.error('Unhandled promise rejection:', event.reason);
+  sendToErrorService({ type: 'unhandledrejection', reason: event.reason });
+  event.preventDefault(); // prevents console output in some environments
+});
+
+// Node.js equivalent
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught exception:', error);
+  // Clean up and exit — DO NOT continue running after uncaughtException
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled rejection at:', promise, 'reason:', reason);
+});
+
+// Error logging best practice
+function reportError(error, context = {}) {
+  const report = {
+    name: error.name,
+    message: error.message,
+    stack: error.stack,
+    timestamp: new Date().toISOString(),
+    url: window.location.href,
+    ...context
+  };
+  // Send to Sentry, Datadog, etc.
+  navigator.sendBeacon('/api/errors', JSON.stringify(report));
+}</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always Handle Promise Rejections</strong>
+              <p>Every <code>async</code> function call and <code>Promise</code> chain should have error handling. In Node.js 15+, unhandled promise rejections crash the process. In browsers, they generate console warnings. Use <code>Promise.allSettled</code> when you want all promises to complete regardless of failures.</p>
+            </div>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>Does <code>finally</code> run if a <code>return</code> statement is inside <code>try</code>?</li>
+            <li>What is the difference between <code>error.name</code> and <code>instanceof</code> for type checking?</li>
+            <li>Why should you re-throw errors you cannot handle?</li>
+            <li>How do you catch errors in an async function?</li>
+            <li>What is an unhandled promise rejection?</li>
+            <li>What is the advantage of custom error classes over throwing plain strings?</li>
+          </ul>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Create a <code>safeFetch(url, options)</code> utility function that wraps <code>fetch</code> and:</p>
+            <ol>
+              <li>Throws a custom <code>NetworkError</code> with the HTTP status code for non-2xx responses.</li>
+              <li>Throws a custom <code>ParseError</code> if the response body is not valid JSON.</li>
+              <li>Automatically retries up to 3 times on network failures (but not on 4xx errors).</li>
+              <li>Returns the parsed JSON on success.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build an error boundary utility for async operations. Write a function <code>withErrorBoundary(fn, fallback, onError)</code> that wraps any async function: if it throws, calls <code>onError(error)</code> for logging and returns <code>fallback</code> instead of propagating the error. Then create a higher-order version <code>createBoundedFn(fn, options)</code> that adds retry logic, timeout, and error categorization.</p>
+          </div>
+
+          <h2 id="faq">Frequently Asked Questions</h2>
+          <dl>
+            <dt>Does <code>finally</code> always execute?</dt>
+            <dd>Yes — except when the entire JavaScript engine halts (e.g., <code>process.exit()</code>) or an infinite loop blocks execution. Even if <code>try</code> or <code>catch</code> contains a <code>return</code> statement, <code>finally</code> runs first. If <code>finally</code> itself contains a <code>return</code>, it overrides the value from <code>try</code>/<code>catch</code>.</dd>
+            <dt>Should I use <code>error instanceof TypeError</code> or <code>error.name === 'TypeError'</code>?</dt>
+            <dd><code>instanceof</code> is generally safer and more idiomatic. However, across iframes or different execution contexts, <code>instanceof</code> can give false negatives (because each frame has its own <code>Error</code> prototype). For cross-realm code, <code>error.name === 'TypeError'</code> is more reliable.</dd>
+            <dt>Can I throw any value in JavaScript?</dt>
+            <dd>Yes — you can <code>throw</code> any value (string, number, object). However, always use <code>throw new Error()</code> or a subclass. Only <code>Error</code> objects include a <code>stack</code> trace, which is essential for debugging in production.</dd>
+            <dt>What is the difference between <code>Promise.all</code> and <code>Promise.allSettled</code>?</dt>
+            <dd><code>Promise.all</code> rejects immediately if any promise rejects. <code>Promise.allSettled</code> waits for all promises to complete, regardless of success or failure, and returns an array of result objects with <code>status: 'fulfilled'</code> or <code>status: 'rejected'</code>.</dd>
+            <dt>How do error boundaries work in React?</dt>
+            <dd>React's error boundaries are class components that implement <code>componentDidCatch</code>. They catch errors thrown during rendering, lifecycle methods, and constructors of child components — but not errors in event handlers or async code. For those, use regular try/catch.</dd>
+          </dl>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>try/catch/finally</code>: try runs code, catch handles errors, finally always runs.</li>
+              <li>Always throw <code>Error</code> objects (not strings) to get a stack trace.</li>
+              <li>Use <code>error.name</code>, <code>error.message</code>, and <code>error.stack</code> for diagnostics.</li>
+              <li>Create custom error classes by extending <code>Error</code> for domain-specific error types.</li>
+              <li>Only catch errors you can handle — re-throw everything else.</li>
+              <li>Use <code>try/catch</code> inside <code>async</code> functions to handle async errors synchronously.</li>
+              <li>Every Promise chain needs a <code>.catch()</code>; every <code>await</code> should be in a <code>try/catch</code>.</li>
+              <li>Register global handlers (<code>unhandledrejection</code>) to catch any escaped errors and report them.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/javascript/intermediate/modules.html" class="topic-tag">Modules</a>
+            <a href="/javascript/intermediate/json.html" class="topic-tag">JSON</a>
+            <a href="/javascript/advanced/async-await.html" class="topic-tag">Async/Await</a>
+            <a href="/javascript/advanced/promises.html" class="topic-tag">Promises</a>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/intermediate/modules.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Modules</span></a>
+          <a href="/javascript/intermediate/json.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">JSON</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

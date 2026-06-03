@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Modules – import, export, and ES Modules | ylearner</title>
+  <meta name="description" content="Learn JavaScript ES Modules: named exports, default exports, importing, re-exporting, dynamic import(), CommonJS vs ES Modules comparison, tree shaking, and using modules in HTML.">
+  <meta name="keywords" content="javascript modules, es modules javascript, import export javascript, default export named export, dynamic import javascript, commonjs vs es modules, tree shaking javascript, javascript module bundler">
+  <link rel="canonical" href="https://ylearner.org/javascript/intermediate/modules.html">
+  <meta property="og:title" content="JavaScript Modules – import, export, and ES Modules | ylearner">
+  <meta property="og:description" content="Learn JavaScript ES Modules: named exports, default exports, importing, re-exporting, dynamic import(), CommonJS vs ES Modules comparison, tree shaking, and using modules in HTML.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/intermediate/es6-features.html">Intermediate JS</a><span class="separator">›</span>
+          <span class="current">Modules</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Intermediate JS</div>
+          <h1>JavaScript Modules – import and export</h1>
+          <p class="lesson-intro">Modules let you split JavaScript code into separate files, each with its own scope. Variables and functions inside a module are private by default — you choose exactly what to export and what to keep internal. This eliminates global namespace pollution and makes large codebases manageable.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="why-modules">Why Modules?</h2>
+          <p>Before modules, all JavaScript shared a single global scope. Every variable and function was a potential name collision waiting to happen. Modules solve this with <strong>encapsulation</strong>, <strong>reusability</strong>, and <strong>explicit dependency management</strong>.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Without modules – everything is global (old way)
+// math.js (included via &lt;script&gt;)
+var add = function(a, b) { return a + b; }; // pollutes global scope
+
+// With modules – private by default
+// math.js
+const PI = Math.PI; // private — not accessible outside this file
+
+export function add(a, b) { return a + b; }         // named export
+export function multiply(a, b) { return a * b; }    // named export
+export const VERSION = '1.0.0';                      // export a value</code></pre>
+          </div>
+
+          <h2 id="named-exports">Named Exports</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// utils.js
+export function formatDate(date) {
+  return date.toLocaleDateString('en-GB');
+}
+
+export function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export const MAX_RETRIES = 3;
+
+// Alternative: declare first, export at the end
+function debounce(fn, delay) { /* ... */ }
+function throttle(fn, limit) { /* ... */ }
+export { debounce, throttle }; // export list
+
+// Rename on export
+export { debounce as debounceFn };</code></pre>
+          </div>
+
+          <h2 id="default-exports">Default Exports</h2>
+          <p>Each module may have at most one default export. Default exports are typically used for the "main thing" the module provides — a class, a function, or a configuration object.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// logger.js – a single default export
+export default class Logger {
+  constructor(prefix) {
+    this.prefix = prefix;
+  }
+  log(msg) {
+    console.log(`[${this.prefix}] ${msg}`);
+  }
+}
+
+// api.js – export function as default
+export default async function fetchUser(id) {
+  const res = await fetch(`/api/users/${id}`);
+  return res.json();
+}
+
+// config.js – export an object as default
+export default {
+  baseURL: 'https://api.example.com',
+  timeout: 5000,
+  headers: { 'Content-Type': 'application/json' }
+};</code></pre>
+          </div>
+
+          <h2 id="importing">Importing</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Named imports – must match exported names
+import { formatDate, capitalize, MAX_RETRIES } from './utils.js';
+
+// Rename on import with 'as'
+import { formatDate as fmt, capitalize as cap } from './utils.js';
+
+// Import everything as a namespace object
+import * as Utils from './utils.js';
+Utils.formatDate(new Date());
+Utils.capitalize('hello');
+
+// Default import – name can be anything
+import Logger from './logger.js';
+import fetchUser from './api.js';
+
+// Mix default and named imports
+import Logger, { LOG_LEVELS } from './logger.js';
+
+// Import for side effects only (e.g., polyfills, initialisation)
+import './setup.js'; // runs the module code but imports nothing
+
+// Using imports
+const logger = new Logger('App');
+logger.log('Server started'); // [App] Server started
+
+const user = await fetchUser(42);
+console.log(user.name);</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Named vs Default: Which to Use?</strong>
+              <p>Prefer named exports for utility modules with multiple exports. Use a default export when a module has one primary responsibility. Avoid modules that mix many defaults — it makes tree shaking harder and imports confusing.</p>
+            </div>
+          </div>
+
+          <h2 id="re-exporting">Re-Exporting and Barrel Files</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// components/index.js – "barrel" file that re-exports
+export { Button } from './Button.js';
+export { Input } from './Input.js';
+export { Modal } from './Modal.js';
+export { default as Card } from './Card.js'; // re-export default as named
+
+// Now consumers import from one clean path:
+import { Button, Modal } from './components/index.js';
+// instead of:
+// import { Button } from './components/Button.js';
+// import { Modal }  from './components/Modal.js';
+
+// Re-export everything from a module
+export * from './utils.js';
+export * from './validators.js';
+
+// Re-export with rename
+export { formatDate as fmtDate } from './utils.js';</code></pre>
+          </div>
+
+          <h2 id="dynamic-import">Dynamic import()</h2>
+          <p>Static <code>import</code> is resolved at parse time. Dynamic <code>import()</code> loads a module at runtime and returns a Promise — perfect for code-splitting and lazy loading.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Load a module only when needed
+async function loadChart() {
+  const { default: Chart } = await import('./Chart.js');
+  return new Chart('canvas');
+}
+
+// Conditionally load based on feature detection
+if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  const { applyDarkTheme } = await import('./themes/dark.js');
+  applyDarkTheme();
+}
+
+// Lazy-load on user action
+document.getElementById('loadEditor').addEventListener('click', async () => {
+  const { Editor } = await import('./Editor.js');
+  const editor = new Editor('#container');
+  editor.init();
+});
+
+// Import with error handling
+try {
+  const module = await import('./optional-feature.js');
+  module.init();
+} catch (err) {
+  console.warn('Optional feature not available:', err.message);
+}</code></pre>
+          </div>
+
+          <h2 id="modules-in-html">Using Modules in HTML</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// In HTML: add type="module"
+// &lt;script type="module" src="./main.js"&gt;&lt;/script&gt;
+
+// Key differences with type="module":
+// 1. Deferred by default (runs after DOM is parsed)
+// 2. Strict mode is always on
+// 3. Has its own scope (no global leakage)
+// 4. Can use top-level await
+
+// main.js (type="module")
+import { initRouter } from './router.js';
+import { setupTheme } from './theme.js';
+
+// Top-level await (ES2022 — works in module scripts)
+const config = await fetch('/api/config').then(r => r.json());
+
+initRouter(config.routes);
+setupTheme(config.defaultTheme);</code></pre>
+          </div>
+
+          <h2 id="cjs-vs-esm">CommonJS vs ES Modules</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Feature</th><th>CommonJS (CJS)</th><th>ES Modules (ESM)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Syntax</td><td><code>require() / module.exports</code></td><td><code>import / export</code></td></tr>
+                <tr><td>Loading</td><td>Synchronous (runtime)</td><td>Asynchronous (parse time)</td></tr>
+                <tr><td>Static analysis</td><td>Not possible</td><td>Yes — enables tree shaking</td></tr>
+                <tr><td>Top-level await</td><td>No</td><td>Yes (ESM only)</td></tr>
+                <tr><td>Default in Node.js</td><td>Yes (legacy)</td><td>Yes with <code>.mjs</code> or <code>"type":"module"</code></td></tr>
+                <tr><td>Browser support</td><td>No (needs bundler)</td><td>Native (modern browsers)</td></tr>
+                <tr><td>Named exports</td><td>Via destructure of <code>require()</code></td><td>First-class syntax</td></tr>
+                <tr><td>Circular dependencies</td><td>Handled (with caveats)</td><td>Handled (but avoid them)</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Tree Shaking</strong>
+              <p>Because ES module imports and exports are statically analysable, bundlers (Webpack, Rollup, Vite) can determine which exports are actually used and strip unused code from the final bundle. This is called tree shaking and only works with ESM — it cannot work with CommonJS <code>require()</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between a named export and a default export?</li>
+            <li>How does dynamic <code>import()</code> differ from static <code>import</code>?</li>
+            <li>Why do ES Modules enable tree shaking while CommonJS does not?</li>
+            <li>What happens when you have circular module dependencies?</li>
+            <li>What does <code>import * as ns from './module.js'</code> do?</li>
+          </ul>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Create a mini math library across two files. In <code>arithmetic.js</code>, export named functions <code>add</code>, <code>subtract</code>, <code>multiply</code>, and <code>divide</code>. In <code>statistics.js</code>, export <code>mean</code>, <code>median</code>, and <code>mode</code> using the arithmetic helpers. Then create an <code>index.js</code> barrel file that re-exports everything from both. Write a consumer script that imports <code>{ mean, multiply }</code> from the barrel.</p>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a plugin system using dynamic <code>import()</code>. Define a <code>PluginManager</code> class that accepts plugin names, loads them lazily via <code>import()</code> from a <code>plugins/</code> directory, registers their <code>init()</code> method, and calls all registered <code>init</code> methods when <code>pluginManager.runAll()</code> is called. Handle loading errors gracefully.</p>
+          </div>
+
+          <h2 id="faq">Frequently Asked Questions</h2>
+          <dl>
+            <dt>Do I need a bundler to use ES Modules?</dt>
+            <dd>Not for modern browsers or Node.js — both support ESM natively. But for production web apps you still want a bundler (Vite, Webpack, Rollup) for code-splitting, minification, and compatibility.</dd>
+            <dt>Can a file have both a default and named exports?</dt>
+            <dd>Yes. A file can have exactly one default export and any number of named exports. Consumers can import both: <code>import Default, { named1, named2 } from './module.js'</code>.</dd>
+            <dt>Why do module imports need the <code>.js</code> extension?</dt>
+            <dd>In native ES Modules (browser and Node.js), file extensions are required because the runtime needs to know exactly what URL to fetch. Bundlers like Webpack and Vite often resolve extensions automatically, which is why you can omit them in framework code.</dd>
+            <dt>What is a circular dependency and why is it a problem?</dt>
+            <dd>A circular dependency occurs when module A imports from B, and B imports from A. JavaScript handles this by providing a partially-initialised export object, which can cause variables to be <code>undefined</code> when accessed. Avoid circular dependencies by restructuring shared code into a third module.</dd>
+            <dt>Is <code>import()</code> supported everywhere?</dt>
+            <dd>Yes, in all modern browsers and Node.js 12+. In very old environments, dynamic imports require a polyfill or bundler transformation.</dd>
+          </dl>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Modules give each file its own scope — nothing leaks to the global namespace.</li>
+              <li>Use named exports for multiple exports; default export for the module's primary value.</li>
+              <li>Import with exact names for named exports; any name for default exports.</li>
+              <li>Use <code>import * as ns</code> to import everything into a namespace object.</li>
+              <li>Barrel files (<code>index.js</code>) consolidate re-exports for cleaner import paths.</li>
+              <li>Dynamic <code>import()</code> loads modules at runtime — enables lazy loading and code-splitting.</li>
+              <li>ESM enables tree shaking because imports are statically analysable at build time.</li>
+              <li>Add <code>type="module"</code> to script tags to use ES Modules in HTML; modules run deferred and in strict mode.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/javascript/intermediate/es6-features.html" class="topic-tag">ES6+ Features</a>
+            <a href="/javascript/intermediate/error-handling.html" class="topic-tag">Error Handling</a>
+            <a href="/javascript/advanced/async-await.html" class="topic-tag">Async/Await</a>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/intermediate/es6-features.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">ES6+ Features</span></a>
+          <a href="/javascript/intermediate/error-handling.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Error Handling</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
