@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setting Up OWL JS – Three Ways to Start (CDN, npm, Dev Server) | ylearner</title>
+  <meta name="description" content="Learn three ways to set up OWL JS: simple HTML file with CDN, static server with ES modules, and a full npm/Vite project. Step-by-step setup guide for Odoo Web Library development.">
+  <meta name="keywords" content="setting up OWL JS, OWL JS setup tutorial, OWL JS CDN, OWL npm install, Odoo Web Library setup, OWL development environment, OWL JS getting started, @odoo/owl installation">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/owljs/getting-started/setup.html">
+  <meta property="og:title" content="Setting Up OWL JS – CDN, npm, and Dev Server | ylearner">
+  <meta property="og:description" content="Three approaches to set up OWL JS — from a zero-tool HTML file to a full npm project with hot reload. Choose the right setup for your learning stage.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/owljs/getting-started/setup.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Setting Up OWL JS","description":"How to set up an OWL JS development environment — CDN, static server with ES modules, and a full npm/Vite project.","educationalLevel":"Beginner","keywords":"OWL JS setup, OWL installation, @odoo/owl npm","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦉</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/getting-started/setup.html">Getting Started</a><span class="separator">›</span>
+          <span class="current">Setting Up OWL JS</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Getting Started</div>
+          <h1>Setting Up OWL JS – Three Ways to Get Started</h1>
+          <p class="lesson-intro">OWL JS is flexible — you can run it with zero tooling (a single HTML file) or with a full modern dev stack (npm + Vite + hot reload). This lesson walks you through all three approaches so you can pick the right one for your situation. <strong>Recommendation for learning:</strong> start with Approach 1 (CDN, no tools) to get OWL running in under 5 minutes, then move to Approach 2 or 3 when you are ready to build real projects.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="approach-comparison">Which Setup Should You Choose?</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Approach</th><th>Setup time</th><th>Tools needed</th><th>Best for</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>1. Single HTML file (CDN)</strong></td>
+                  <td>~2 min</td>
+                  <td>Text editor + browser</td>
+                  <td>Quick experiments, first lesson, zero-friction start</td>
+                </tr>
+                <tr>
+                  <td><strong>2. Static server (ES modules)</strong></td>
+                  <td>~10 min</td>
+                  <td>Text editor + Node.js (optional)</td>
+                  <td>Multi-file projects without a build step</td>
+                </tr>
+                <tr>
+                  <td><strong>3. npm + Vite project</strong></td>
+                  <td>~15 min</td>
+                  <td>Node.js + npm + terminal</td>
+                  <td>Real projects, hot reload, production builds, testing</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>For this course: start with Approach 1</strong>
+              <p>All examples in the early lessons of this course run with the single-file CDN setup. You do not need Node.js or npm installed to follow along. When you reach the projects section, the Approach 3 setup will be recommended.</p>
+            </div>
+          </div>
+
+          <h2 id="approach-1">Approach 1 – Single HTML File (CDN, No Tools Required)</h2>
+          <p>This is the fastest way to run OWL JS. Download the OWL bundle from the GitHub releases page and include it with a <code>&lt;script&gt;</code> tag, or use jsDelivr CDN directly. No npm, no Node.js, no terminal commands.</p>
+
+          <h3>File structure</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Directory structure</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">hello_owl/
+  index.html
+  app.js</code></pre>
+          </div>
+
+          <h3>index.html</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;Hello OWL JS&lt;/title&gt;
+  &lt;!-- Load OWL JS from CDN (IIFE build — exposes global 'owl') --&gt;
+  &lt;script src="https://cdn.jsdelivr.net/npm/@odoo/owl/dist/owl.iife.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;!-- OWL will mount into this div --&gt;
+  &lt;div id="app"&gt;&lt;/div&gt;
+
+  &lt;!-- Load your app code AFTER OWL --&gt;
+  &lt;script src="app.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          </div>
+
+          <h3>app.js</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-javascript">// 'owl' is available as a global variable (loaded by the CDN script)
+const { Component, mount, xml, useState } = owl;
+
+class App extends Component {
+  state = useState({ count: 0 });
+
+  static template = xml`
+    &lt;div style="font-family: sans-serif; padding: 2rem; text-align: center;"&gt;
+      &lt;h1&gt;Hello OWL JS! 🦉&lt;/h1&gt;
+      &lt;p style="font-size: 2rem; margin: 1rem 0;"&gt;
+        Count: &lt;strong&gt;&lt;t t-esc="state.count"/&gt;&lt;/strong&gt;
+      &lt;/p&gt;
+      &lt;button t-on-click="() =&gt; state.count++"
+              style="margin: 0.5rem; padding: 0.5rem 1.5rem; font-size: 1rem;"&gt;
+        + Increment
+      &lt;/button&gt;
+      &lt;button t-on-click="() =&gt; state.count--"
+              style="margin: 0.5rem; padding: 0.5rem 1.5rem; font-size: 1rem;"&gt;
+        - Decrement
+      &lt;/button&gt;
+      &lt;button t-on-click="() =&gt; state.count = 0"
+              style="margin: 0.5rem; padding: 0.5rem 1.5rem; font-size: 1rem;"&gt;
+        Reset
+      &lt;/button&gt;
+    &lt;/div&gt;
+  `;
+}
+
+// Mount the App component into the #app div
+mount(App, document.getElementById("app"));</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Result in browser</div>
+            Open index.html in any modern browser. A heading, counter display, and three buttons appear.
+            Clicking the buttons updates the counter in real time — no page refresh.
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Open index.html via a web server, not directly from the filesystem</strong>
+              <p>If you double-click <code>index.html</code> to open it (the URL starts with <code>file:///</code>), the CDN script loads fine because it is an external URL. However, once you split your code across multiple files and use ES modules (<code>type="module"</code>), browsers block module imports over <code>file://</code> for security. Use a local web server (see Approach 2) instead.</p>
+            </div>
+          </div>
+
+          <h2 id="approach-2">Approach 2 – Static Server with ES Modules</h2>
+          <p>This approach uses native JavaScript modules (<code>import</code>/<code>export</code>) to split your code across multiple files without a build step. You need a simple local HTTP server — browsers refuse to load ES modules over <code>file://</code>.</p>
+
+          <h3>File structure</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Directory structure</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">hello_owl/
+  index.html
+  main.js         ← entry point
+  src/
+    App.js        ← root component
+    Counter.js    ← sub-component</code></pre>
+          </div>
+
+          <h3>Starting a local server</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Option A: Python (installed by default on macOS and most Linux)
+python3 -m http.server 8080
+# Visit http://localhost:8080
+
+# Option B: Node.js (if you have npm)
+npx serve .
+# Visit the URL it prints
+
+# Option C: VS Code Live Server extension
+# Right-click index.html → "Open with Live Server"</code></pre>
+          </div>
+
+          <h3>index.html</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;OWL JS App&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div id="app"&gt;&lt;/div&gt;
+  &lt;!-- type="module" enables ES module imports --&gt;
+  &lt;script src="main.js" type="module"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          </div>
+
+          <h3>main.js (entry point)</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-javascript">// Import OWL from a local file or CDN as ES module
+// Using CDN skypack which serves OWL as an ESM
+import { mount } from "https://cdn.skypack.dev/@odoo/owl";
+import { App } from "./src/App.js";
+
+mount(App, document.getElementById("app"));</code></pre>
+          </div>
+
+          <h3>src/App.js</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-javascript">import { Component, xml, useState } from "https://cdn.skypack.dev/@odoo/owl";
+import { Counter } from "./Counter.js";
+
+export class App extends Component {
+  static components = { Counter };  // Register sub-component
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;h1&gt;OWL JS App&lt;/h1&gt;
+      &lt;Counter/&gt;
+    &lt;/div&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <h3>src/Counter.js</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-javascript">import { Component, xml, useState } from "https://cdn.skypack.dev/@odoo/owl";
+
+export class Counter extends Component {
+  state = useState({ count: 0 });
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;p&gt;Count: &lt;t t-esc="state.count"/&gt;&lt;/p&gt;
+      &lt;button t-on-click="() =&gt; state.count++"&gt;+&lt;/button&gt;
+    &lt;/div&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="approach-3">Approach 3 – npm + Vite (Recommended for Real Projects)</h2>
+          <p>For real applications — Odoo module development, standalone OWL apps, projects with tests — you want a proper build tool. <strong>Vite</strong> is the recommended choice in 2026: it starts in under a second and rebuilds instantly on save.</p>
+
+          <h3>Prerequisites</h3>
+          <p>You need <strong>Node.js 18+</strong> and <strong>npm</strong> installed. Download from <a href="https://nodejs.org" target="_blank" rel="noopener">nodejs.org</a>. Verify installation:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">node --version   # should show v18.x or higher
+npm --version    # should show 9.x or higher</code></pre>
+          </div>
+
+          <h3>Create and configure the project</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># 1. Create a new Vite project (choose "vanilla" + "JavaScript")
+npm create vite@latest my-owl-app -- --template vanilla
+cd my-owl-app
+
+# 2. Install dependencies and add OWL
+npm install
+npm install @odoo/owl
+
+# 3. Start the development server (with hot reload)
+npm run dev
+# Visit http://localhost:5173</code></pre>
+          </div>
+
+          <h3>Final file structure</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Directory structure</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">my-owl-app/
+  index.html          ← HTML entry point
+  src/
+    main.js           ← JavaScript entry point
+    App.js            ← Root component
+    components/       ← Your component files
+  package.json
+  vite.config.js</code></pre>
+          </div>
+
+          <h3>src/main.js</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-javascript">import { mount } from "@odoo/owl";
+import { App } from "./App.js";
+
+mount(App, document.getElementById("app"));</code></pre>
+          </div>
+
+          <h3>src/App.js</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-javascript">import { Component, xml, useState } from "@odoo/owl";
+
+export class App extends Component {
+  state = useState({ message: "Hello OWL JS! 🦉" });
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;h1&gt;&lt;t t-esc="state.message"/&gt;&lt;/h1&gt;
+      &lt;input
+        t-model="state.message"
+        placeholder="Type something..."
+        style="width: 300px; padding: 0.5rem; font-size: 1rem;"
+      /&gt;
+    &lt;/div&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ What you get</div>
+            A heading and a text input. Typing in the input updates the heading in real time via t-model two-way binding. File changes trigger instant hot reload — no manual refresh needed.
+          </div>
+
+          <h3>Available npm scripts</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">npm run dev      # Start dev server with hot reload at http://localhost:5173
+npm run build    # Build optimised production files into /dist
+npm run preview  # Preview the production build locally</code></pre>
+          </div>
+
+          <h2 id="recommended-editor">Recommended Editor Setup</h2>
+          <p><strong>VS Code</strong> is strongly recommended for OWL development. Useful extensions:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Extension</th><th>Purpose</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>OWL Vision</strong> (Odoo Inc.)</td><td>OWL template syntax highlighting, component navigation, autocompletion</td></tr>
+                <tr><td><strong>ESLint</strong></td><td>JavaScript linting — catch errors before running</td></tr>
+                <tr><td><strong>Prettier</strong></td><td>Auto-format JavaScript and HTML on save</td></tr>
+                <tr><td><strong>Live Server</strong></td><td>Quick static server for Approach 2 setup</td></tr>
+                <tr><td><strong>GitLens</strong></td><td>Git history and blame inline</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>OWL Devtools browser extension</strong>
+              <p>Odoo provides an OWL Devtools browser extension for Chrome and Firefox. Once installed, it adds an "OWL" panel to your browser's developer tools showing the component tree, props, and state of every mounted OWL component. Install it from the Chrome Web Store (search "OWL Devtools") — it is invaluable for debugging.</p>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Approach 1 (CDN)</strong> — Fastest start. Single HTML + JS file. OWL loaded via CDN <code>&lt;script&gt;</code> tag. No tools needed. Perfect for learning the core concepts.</li>
+              <li><strong>Approach 2 (Static server)</strong> — Multi-file ES modules. Run a local HTTP server (<code>python3 -m http.server</code> or <code>npx serve</code>). No build step.</li>
+              <li><strong>Approach 3 (npm + Vite)</strong> — Full dev setup. <code>npm install @odoo/owl</code>, Vite for hot reload and production builds. Best for real projects.</li>
+              <li>Use <strong>VS Code</strong> with the <strong>OWL Vision extension</strong> for syntax highlighting and template autocompletion.</li>
+              <li>Install the <strong>OWL Devtools browser extension</strong> for debugging component trees in the browser.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/owljs/getting-started/first-app.html" class="topic-tag owl-topic-tag">🦉 Your First OWL App</a>
+            <a href="/owljs/getting-started/project-structure.html" class="topic-tag owl-topic-tag">🦉 Project Structure</a>
+            <a href="/owljs/core/components.html" class="topic-tag owl-topic-tag">🦉 Components</a>
+            <a href="/owljs/owl-prerequisites.html" class="topic-tag owl-topic-tag">🦉 Prerequisites</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Do I need Node.js to use OWL JS? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — Approach 1 (single HTML + CDN) requires only a browser and a text editor. Node.js is only required for Approach 3 (npm + Vite). For learning the core OWL concepts in this course, you do not need Node.js at all. You will want it when you start building multi-file projects or when you reach the Odoo integration lessons.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Which version of OWL does the CDN serve? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The jsDelivr URL <code>https://cdn.jsdelivr.net/npm/@odoo/owl/dist/owl.iife.js</code> serves the latest published version. To pin to a specific version (e.g. OWL 2.x), use <code>https://cdn.jsdelivr.net/npm/@odoo/owl@2/dist/owl.iife.js</code>. For production, always pin to a specific version to avoid unexpected breaking changes.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use OWL JS with TypeScript? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — OWL is written in TypeScript and ships full type definitions. In the Vite setup, rename your files from <code>.js</code> to <code>.ts</code> and add a <code>tsconfig.json</code>. The OWL type definitions give you autocompletion for <code>Component</code>, <code>useState</code>, prop types, and lifecycle hooks. TypeScript is not required to learn OWL — this course uses JavaScript — but it is a valuable addition for larger projects.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How does OWL JS setup compare to setting up Odoo for development? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Setting up a standalone OWL project (Approaches 1–3) is much simpler than setting up a full Odoo development environment. A real Odoo dev environment requires installing PostgreSQL, Python, Odoo itself, and configuring a database. The OWL-only setups here let you learn and practice OWL components without that overhead. The Odoo Integration section of this course covers the full Odoo setup when you are ready for it.</p></div>
+            </div>
+          </section>
+
+          <div class="exercise-box">
+            <h3>🏋️ Exercise</h3>
+            <p>Set up Approach 1 (single HTML file) and get the counter example running in your browser:</p>
+            <ol>
+              <li>Create a folder named <code>owl-practice</code>.</li>
+              <li>Inside it create <code>index.html</code> and <code>app.js</code> with the code from this lesson.</li>
+              <li>Open <code>index.html</code> in your browser and verify the counter works.</li>
+              <li>Add a fourth button: "Add 10" that adds 10 to the count with a single click.</li>
+              <li>Add a <code>&lt;p&gt;</code> that shows "Even" when the count is even and "Odd" when it is odd. Use the <code>t-if</code> / <code>t-else</code> directives (covered in the Dynamic Templates section — try it now as a preview).</li>
+            </ol>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/owl-career-paths.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">OWL Career Paths</span>
+          </a>
+          <a href="/owljs/getting-started/first-app.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Your First OWL App</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
