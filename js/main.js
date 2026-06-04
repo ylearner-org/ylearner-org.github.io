@@ -750,6 +750,7 @@
     let course = null;
     if (path.includes('/python/')) course = { name: 'Python Course', icon: '🐍', color: '#3776AB' };
     else if (path.includes('/javascript/')) course = { name: 'JavaScript Course', icon: '⚡', color: '#3776AB' };
+    else if (path.includes('/owljs/')) course = { name: 'OWL JS Course', icon: '🦉', color: '#714B67' };
     else if (path.includes('/c/') && !path.includes('/cpp/')) course = { name: 'C Course', icon: '⚙️', color: '#A8B9CC' };
     else if (path.includes('/cpp/')) course = { name: 'C++ Course', icon: '🔷', color: '#00599C' };
 
