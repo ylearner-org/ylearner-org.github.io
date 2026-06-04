@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Polymorphism – Method Overriding &amp; Duck Typing | ylearner</title>
+  <meta name="description" content="Learn JavaScript polymorphism: method overriding, duck typing, toString/valueOf overrides, polymorphic arrays, Shape hierarchy, and the template method pattern.">
+  <meta name="keywords" content="javascript polymorphism, method overriding javascript, duck typing javascript, toString override javascript, valueOf javascript, javascript OOP polymorphism, Shape class javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/oop/polymorphism.html">
+  <meta property="og:title" content="JavaScript Polymorphism – Method Overriding &amp; Duck Typing | ylearner">
+  <meta property="og:description" content="Learn JavaScript polymorphism: method overriding, duck typing, toString/valueOf overrides, polymorphic arrays, Shape hierarchy, and the template method pattern.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/oop/classes.html">OOP</a><span class="separator">›</span>
+          <span class="current">Polymorphism</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🏗️ OOP</div>
+          <h1>JavaScript Polymorphism – One Interface, Many Implementations</h1>
+          <p class="lesson-intro">Polymorphism — from Greek for "many forms" — lets you write code that works on many different object types through a single consistent interface. In JavaScript this manifests as method overriding (child classes redefine parent methods), duck typing (if it has the right methods, it works), and overriding well-known methods like <code>toString()</code> and <code>valueOf()</code>. Mastering polymorphism leads to more flexible, extensible designs.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="polymorphism-definition">What Is Polymorphism?</h2>
+          <p>Polymorphism means the same interface (method name or operator) produces different behaviour depending on the type of object it is called on. JavaScript achieves this through:</p>
+          <ul>
+            <li><strong>Subtype polymorphism</strong> — child classes override parent methods.</li>
+            <li><strong>Duck typing</strong> — any object with the right method signature is accepted.</li>
+            <li><strong>Ad-hoc polymorphism</strong> — function overloading via argument inspection.</li>
+          </ul>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content"><strong>Polymorphism enables the Open/Closed Principle</strong><p>Your code is open for extension (add new subclasses) but closed for modification (existing code does not change). You can add a new shape to a drawing engine without touching any existing shape code.</p></div>
+          </div>
+
+          <h2 id="method-overriding">Method Overriding in JS Classes</h2>
+          <p>When a child class declares a method with the same name as a parent method, the child's version <em>shadows</em> the parent's. At runtime, JavaScript finds the child's method first while walking the prototype chain.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Notification {
+  constructor(message) {
+    this.message = message;
+    this.timestamp = new Date().toISOString();
+  }
+
+  send() {
+    return `[${this.timestamp.slice(11,19)}] Sending: ${this.message}`;
+  }
+
+  format() {
+    return this.message;  // base format — overridden by subclasses
+  }
+}
+
+class EmailNotification extends Notification {
+  constructor(message, to) {
+    super(message);
+    this.to = to;
+  }
+
+  format() {
+    return `To: ${this.to}\nSubject: Notification\n\n${this.message}`;
+  }
+}
+
+class SMSNotification extends Notification {
+  format() {
+    // SMS: keep it short
+    return this.message.length &gt; 160
+      ? this.message.slice(0, 157) + '...'
+      : this.message;
+  }
+}
+
+class PushNotification extends Notification {
+  constructor(message, badge = 1) {
+    super(message);
+    this.badge = badge;
+  }
+
+  format() {
+    return `🔔 (${this.badge}) ${this.message}`;
+  }
+}
+
+// Polymorphic usage — same interface, different behaviour
+const notifications = [
+  new EmailNotification('Your order shipped!', 'user@example.com'),
+  new SMSNotification('Your code: 123456'),
+  new PushNotification('New message from Alice', 3)
+];
+
+notifications.forEach(n => console.log(n.format()));
+console.log('---');
+notifications.forEach(n => console.log(n.send()));</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>To: user@example.com
+Subject: Notification
+
+Your order shipped!
+Your code: 123456
+🔔 (3) New message from Alice
+---
+[hh:mm:ss] Sending: Your order shipped!
+[hh:mm:ss] Sending: Your code: 123456
+[hh:mm:ss] Sending: New message from Alice</pre>
+          </div>
+
+          <h2 id="shape-example">Shape Hierarchy – Classic Polymorphism Example</h2>
+          <p>The canonical OOP example: a <code>Shape</code> base class defines an <code>area()</code> and <code>perimeter()</code> interface. Each concrete subclass provides its own implementation.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Shape {
+  constructor(color = 'black') {
+    if (new.target === Shape) throw new Error('Shape is abstract');
+    this.color = color;
+  }
+
+  area()      { throw new Error(`${this.constructor.name} must implement area()`); }
+  perimeter() { throw new Error(`${this.constructor.name} must implement perimeter()`); }
+
+  describe() {
+    return `${this.constructor.name} [${this.color}]: area=${this.area().toFixed(2)}, perimeter=${this.perimeter().toFixed(2)}`;
+  }
+}
+
+class Circle extends Shape {
+  constructor(radius, color) {
+    super(color);
+    this.radius = radius;
+  }
+  area()      { return Math.PI * this.radius ** 2; }
+  perimeter() { return 2 * Math.PI * this.radius; }
+}
+
+class Rectangle extends Shape {
+  constructor(width, height, color) {
+    super(color);
+    this.width  = width;
+    this.height = height;
+  }
+  area()      { return this.width * this.height; }
+  perimeter() { return 2 * (this.width + this.height); }
+}
+
+class Triangle extends Shape {
+  constructor(a, b, c, color) {
+    super(color);
+    this.a = a; this.b = b; this.c = c;
+  }
+  perimeter() { return this.a + this.b + this.c; }
+  area() {
+    const s = this.perimeter() / 2;
+    return Math.sqrt(s * (s - this.a) * (s - this.b) * (s - this.c));
+  }
+}
+
+const shapes = [
+  new Circle(5, 'red'),
+  new Rectangle(4, 6, 'blue'),
+  new Triangle(3, 4, 5, 'green')
+];
+
+shapes.forEach(s => console.log(s.describe()));
+
+// Total area — polymorphic reduce
+const total = shapes.reduce((sum, s) => sum + s.area(), 0);
+console.log(`Total area: ${total.toFixed(2)}`);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Circle [red]: area=78.54, perimeter=31.42
+Rectangle [blue]: area=24.00, perimeter=20.00
+Triangle [green]: area=6.00, perimeter=12.00
+Total area: 108.54</pre>
+          </div>
+
+          <h2 id="duck-typing">Duck Typing – "If It Quacks Like a Duck"</h2>
+          <p>JavaScript is dynamically typed, so you can write functions that work with <em>any</em> object that has the right methods — without caring about the object's class or inheritance. This is duck typing: if it walks like a duck and quacks like a duck, treat it as a duck.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Function only cares that the object has a .speak() method
+function makeNoise(animal) {
+  if (typeof animal.speak !== 'function') {
+    throw new TypeError('Object must have a speak() method');
+  }
+  return animal.speak();
+}
+
+// These are unrelated objects — no shared class hierarchy
+const dog  = { name: 'Rex',   speak() { return `${this.name}: Woof!`; } };
+const cat  = { name: 'Luna',  speak() { return `${this.name}: Meow!`; } };
+const duck = { name: 'Donald', speak() { return `${this.name}: Quack!`; } };
+const robot = { name: 'R2D2', speak() { return `${this.name}: Beep boop!`; } };
+
+[dog, cat, duck, robot].forEach(a => console.log(makeNoise(a)));
+
+// Array also works if it has speak method!
+const trumpet = {
+  name: 'Trumpet',
+  speak() { return `${this.name}: 🎺 Toot!`; }
+};
+console.log(makeNoise(trumpet));</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Rex: Woof!
+Luna: Meow!
+Donald: Quack!
+R2D2: Beep boop!
+Trumpet: 🎺 Toot!</pre>
+          </div>
+
+          <h2 id="tostring-valueof">Overriding toString() and valueOf()</h2>
+          <p>JavaScript automatically calls <code>toString()</code> when an object is used in a string context and <code>valueOf()</code> when used in a numeric context. Overriding these methods lets your custom objects participate in built-in operations polymorphically.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Vector2D {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  // Used in string contexts: template literals, console.log, String()
+  toString() {
+    return `Vector(${this.x}, ${this.y})`;
+  }
+
+  // Used in numeric contexts: +, -, *, comparisons
+  valueOf() {
+    return Math.sqrt(this.x ** 2 + this.y ** 2);  // magnitude
+  }
+
+  add(other) {
+    return new Vector2D(this.x + other.x, this.y + other.y);
+  }
+}
+
+const v1 = new Vector2D(3, 4);
+const v2 = new Vector2D(1, 2);
+
+console.log(`${v1}`);           // toString() called
+console.log(String(v1));        // toString() called
+console.log(+v1);               // valueOf() called → magnitude = 5
+console.log(v1 &gt; v2);          // valueOf() called for comparison
+console.log(v1.add(v2).toString()); // add returns new Vector</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Vector(3, 4)
+Vector(3, 4)
+5
+true
+Vector(4, 6)</pre>
+          </div>
+
+          <h2 id="template-method-pattern">Template Method Pattern</h2>
+          <p>The <strong>template method</strong> is a design pattern built on polymorphism. A base class defines the skeleton of an algorithm in a final (non-overridden) method, with steps that subclasses must fill in.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Role</th><th>Responsibility</th><th>Who defines it</th></tr></thead>
+              <tbody>
+                <tr><td>Template method</td><td>Defines algorithm skeleton; calls hook methods</td><td>Base class (do not override)</td></tr>
+                <tr><td>Hook methods</td><td>Steps that vary per subclass</td><td>Overridden by subclasses</td></tr>
+                <tr><td>Concrete method</td><td>Fixed step; same for all subclasses</td><td>Base class</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>Hollywood Principle</strong><p>"Don't call us, we'll call you." The base class calls the subclass's hook methods — subclasses don't orchestrate the algorithm, they just fill in the blanks. This keeps orchestration logic in one place.</p></div>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content"><strong>Duck typing risks</strong><p>Always validate that the expected method exists before calling it (typeof check or optional chaining). Relying on implicit duck typing without checks can produce cryptic "x is not a function" errors at runtime.</p></div>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Implement a payment processing system with polymorphism:</p>
+            <ul>
+              <li>Base class <code>PaymentMethod</code> with abstract <code>charge(amount)</code> and <code>refund(amount)</code>.</li>
+              <li>Subclasses: <code>CreditCard</code>, <code>PayPal</code>, <code>CryptoCurrency</code> — each with different fee logic and <code>toString()</code>.</li>
+              <li>Write a <code>processPayments(payments, methods)</code> function that zips payments with methods and calls the right <code>charge()</code> on each — purely duck typed, no <code>instanceof</code>.</li>
+            </ul>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Implement the Template Method pattern for a data exporter: base class <code>DataExporter</code> with a final <code>export(data)</code> method that calls <code>prepare(data)</code>, <code>transform(data)</code>, and <code>write(output)</code> in sequence. Create <code>CSVExporter</code> and <code>JSONExporter</code> subclasses that each override the three hook methods. The base <code>export</code> method also logs timing information that subclasses should not be able to remove.</p>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is polymorphism? Name the two main forms JavaScript supports.</li>
+            <li>How does method overriding work via the prototype chain?</li>
+            <li>What is duck typing and how does it relate to JavaScript's dynamic nature?</li>
+            <li>When would you override <code>toString()</code> vs <code>valueOf()</code>?</li>
+            <li>What is the template method design pattern and how does it use polymorphism?</li>
+            <li>How do you enforce that a subclass implements an abstract method in JavaScript?</li>
+          </ul>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Polymorphism lets one interface drive many different implementations.</li>
+              <li>Method overriding: child class shadows parent method; use <code>super.method()</code> to call parent.</li>
+              <li>Duck typing: any object with the right method signature works — no class hierarchy required.</li>
+              <li>Override <code>toString()</code> for string contexts; override <code>valueOf()</code> for numeric contexts.</li>
+              <li>The template method pattern uses polymorphism to define an algorithm skeleton in a base class with customisable hook steps.</li>
+            </ul>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does JavaScript support function overloading (same name, different parameters)? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not natively. Only the last function definition with a given name is kept. To simulate overloading, inspect argument types or count inside the function body: <code>if (typeof arg === 'string') { ... } else { ... }</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I make a method truly non-overridable in JavaScript? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>There is no native <code>final</code> keyword. You can simulate it by checking <code>new.target</code> or by using <code>Object.defineProperty</code> with <code>writable: false</code> on the method. In practice, documenting the intent in JSDoc (<code>@final</code>) is the most common approach.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between overriding and overloading? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><strong>Overriding</strong> is a child class redefining an inherited method (runtime polymorphism). <strong>Overloading</strong> is multiple methods with the same name but different parameter signatures (compile-time polymorphism). JavaScript supports overriding natively; overloading must be simulated manually.</p></div>
+            </div>
+          </section>
+
+          <div class="related-topics">
+            <a href="/javascript/oop/inheritance.html" class="topic-tag">Inheritance</a>
+            <a href="/javascript/oop/encapsulation.html" class="topic-tag">Encapsulation</a>
+            <a href="/javascript/oop/prototypes.html" class="topic-tag">Prototypes</a>
+            <a href="/javascript/oop/classes.html" class="topic-tag">Classes</a>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/oop/encapsulation.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Encapsulation</span></a>
+          <a href="/javascript/oop/prototypes.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Prototypes</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Encapsulation – Private Fields, Getters &amp; Setters | ylearner</title>
+  <meta name="description" content="Learn JavaScript encapsulation: private class fields (#field), private methods, getters and setters with validation, WeakMap privacy pattern, and practical BankAccount examples.">
+  <meta name="keywords" content="javascript encapsulation, private class fields javascript, getters setters javascript, #field javascript, WeakMap privacy, javascript data hiding, BankAccount javascript class, javascript OOP encapsulation">
+  <link rel="canonical" href="https://ylearner.org/javascript/oop/encapsulation.html">
+  <meta property="og:title" content="JavaScript Encapsulation – Private Fields, Getters &amp; Setters | ylearner">
+  <meta property="og:description" content="Learn JavaScript encapsulation: private class fields (#field), private methods, getters and setters with validation, WeakMap privacy pattern, and practical BankAccount examples.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/oop/classes.html">OOP</a><span class="separator">›</span>
+          <span class="current">Encapsulation</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🏗️ OOP</div>
+          <h1>JavaScript Encapsulation – Data Hiding with Private Fields</h1>
+          <p class="lesson-intro">Encapsulation is the OOP principle of bundling data and the methods that operate on it together, while restricting direct external access to internal state. JavaScript ES2022 brought true private class fields and methods (the <code>#</code> prefix), replacing older workarounds like WeakMaps and symbol keys. This lesson teaches you how to design classes that expose a clean public API while protecting their internal data from accidental mutation.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 19 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="encapsulation-concept">The Encapsulation Concept</h2>
+          <p>Think of a capsule: medicine is sealed inside a protective shell. You swallow the capsule and the medicine does its job — but you never directly touch the active ingredient. In programming, encapsulation means:</p>
+          <ul>
+            <li>Internal state is hidden behind a controlled interface.</li>
+            <li>Consumers call public methods to read or change state.</li>
+            <li>The class guarantees its invariants (e.g., balance can never be negative).</li>
+          </ul>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content"><strong>Why does encapsulation matter?</strong><p>Without it, any code that holds a reference to your object can set <code>account.balance = -99999</code> directly. With encapsulation, the class enforces validation on every write, making invalid state impossible to create by accident.</p></div>
+          </div>
+
+          <h2 id="private-fields">Private Class Fields (#field)</h2>
+          <p>Prefix a field name with <code>#</code> to make it private. Private fields must be declared at the top of the class body <em>before</em> they are used, and are completely inaccessible outside the class — the engine enforces this at runtime, not just by convention.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Temperature {
+  #celsius;   // private field declaration
+
+  constructor(celsius) {
+    this.#celsius = celsius;
+  }
+
+  // Public getters – read-only from the outside
+  get celsius()    { return this.#celsius; }
+  get fahrenheit() { return this.#celsius * 9 / 5 + 32; }
+  get kelvin()     { return this.#celsius + 273.15; }
+
+  // Public setter with validation
+  set celsius(value) {
+    if (value &lt; -273.15) {
+      throw new RangeError('Temperature cannot be below absolute zero (-273.15 °C)');
+    }
+    this.#celsius = value;
+  }
+
+  toString() {
+    return `${this.#celsius}°C / ${this.fahrenheit.toFixed(1)}°F / ${this.kelvin.toFixed(2)} K`;
+  }
+}
+
+const temp = new Temperature(100);
+console.log(temp.toString());
+console.log(temp.fahrenheit);
+
+temp.celsius = 37;
+console.log(temp.celsius);
+
+try {
+  temp.celsius = -300;   // throws RangeError
+} catch (e) {
+  console.log(e.message);
+}
+
+// Direct access throws SyntaxError at parse time:
+// console.log(temp.#celsius);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>100°C / 212.0°F / 373.15 K
+212
+37
+Temperature cannot be below absolute zero (-273.15 °C)</pre>
+          </div>
+
+          <h2 id="private-methods">Private Methods (#method)</h2>
+          <p>Private methods work the same way — prefix with <code>#</code> and they become invisible outside the class. Use them for internal helper logic that should never be part of the public API.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class PasswordManager {
+  #password;
+  #attempts = 0;
+  static #MAX_ATTEMPTS = 5;
+
+  constructor(initialPassword) {
+    this.#password = this.#hash(initialPassword);
+  }
+
+  // Private helper – not part of public API
+  #hash(plaintext) {
+    // Simplified hash for demo (use bcrypt in production!)
+    return [...plaintext].reduce((acc, ch) => acc + ch.charCodeAt(0), 0).toString(16);
+  }
+
+  #isLocked() {
+    return this.#attempts >= PasswordManager.#MAX_ATTEMPTS;
+  }
+
+  verify(plaintext) {
+    if (this.#isLocked()) {
+      throw new Error('Account locked after too many failed attempts');
+    }
+    const match = this.#hash(plaintext) === this.#password;
+    if (!match) this.#attempts++;
+    else this.#attempts = 0;
+    return match;
+  }
+
+  change(oldPassword, newPassword) {
+    if (!this.verify(oldPassword)) throw new Error('Wrong password');
+    this.#password = this.#hash(newPassword);
+    return true;
+  }
+
+  get isLocked() { return this.#isLocked(); }
+}
+
+const pm = new PasswordManager('secret123');
+console.log(pm.verify('wrong'));      // false
+console.log(pm.verify('secret123')); // true
+pm.change('secret123', 'newpass');
+console.log(pm.verify('newpass'));    // true</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>false
+true
+true</pre>
+          </div>
+
+          <h2 id="getters-setters">Getters and Setters with Validation</h2>
+          <p>Accessors (<code>get</code> / <code>set</code>) let you expose a property-like API while running logic on every read or write. Pair them with private fields to enforce invariants.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Feature</th><th>Public field</th><th>Private field + accessor</th></tr></thead>
+              <tbody>
+                <tr><td>Direct mutation</td><td>Yes – no control</td><td>No – only via setter</td></tr>
+                <tr><td>Validation on write</td><td>Manual, easily bypassed</td><td>Enforced in setter</td></tr>
+                <tr><td>Computed read</td><td>No</td><td>Yes – getter can compute</td></tr>
+                <tr><td>Read-only</td><td>With <code>Object.freeze</code> only</td><td>Yes – omit setter entirely</td></tr>
+                <tr><td>Browser support</td><td>All modern browsers</td><td>ES2022 / Node 12+</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>Naming convention for backing fields</strong><p>When a getter/setter is named <code>name</code>, name the private backing field <code>#name</code>. They can share the same identifier root because the <code>#</code> prefix makes them distinct.</p></div>
+          </div>
+
+          <h2 id="weakmap-pattern">WeakMap-Based Privacy (Legacy Pattern)</h2>
+          <p>Before private class fields, developers stored private data in a <code>WeakMap</code> keyed on <code>this</code>. The WeakMap is closed over in the module scope, invisible from outside. This pattern is still found in older codebases.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const _private = new WeakMap();
+
+class Counter {
+  constructor(start = 0) {
+    _private.set(this, { count: start });
+  }
+
+  increment() { _private.get(this).count++; }
+  decrement() { _private.get(this).count--; }
+  get value()  { return _private.get(this).count; }
+}
+
+const c = new Counter(10);
+c.increment();
+c.increment();
+c.decrement();
+console.log(c.value);       // 11
+console.log(c.count);       // undefined — truly hidden</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>11
+undefined</pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content"><strong>Prefer # over WeakMap for new code</strong><p>The WeakMap pattern works but is verbose and has higher memory overhead. Use private class fields (<code>#</code>) in all new code — they are cleaner, faster, and enforced by the engine.</p></div>
+          </div>
+
+          <h2 id="bankaccount-example">Practical BankAccount Class</h2>
+          <p>This comprehensive example brings together private fields, private methods, getters, and input validation in a realistic scenario.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class BankAccount {
+  #owner;
+  #balance;
+  #transactions = [];
+
+  constructor(owner, initialDeposit = 0) {
+    if (typeof owner !== 'string' || owner.trim() === '') {
+      throw new TypeError('Owner must be a non-empty string');
+    }
+    this.#owner   = owner.trim();
+    this.#balance = 0;
+    if (initialDeposit > 0) this.deposit(initialDeposit);
+  }
+
+  #record(type, amount) {
+    this.#transactions.push({
+      type, amount,
+      balance: this.#balance,
+      date: new Date().toISOString()
+    });
+  }
+
+  deposit(amount) {
+    if (typeof amount !== 'number' || amount &lt;= 0) {
+      throw new RangeError('Deposit amount must be a positive number');
+    }
+    this.#balance += amount;
+    this.#record('deposit', amount);
+    return this;
+  }
+
+  withdraw(amount) {
+    if (typeof amount !== 'number' || amount &lt;= 0) {
+      throw new RangeError('Withdrawal amount must be a positive number');
+    }
+    if (amount > this.#balance) {
+      throw new Error(`Insufficient funds. Balance: $${this.#balance.toFixed(2)}`);
+    }
+    this.#balance -= amount;
+    this.#record('withdrawal', amount);
+    return this;
+  }
+
+  transfer(amount, targetAccount) {
+    this.withdraw(amount);
+    targetAccount.deposit(amount);
+    return this;
+  }
+
+  get balance()       { return this.#balance; }
+  get owner()         { return this.#owner; }
+  get transactions()  { return [...this.#transactions]; }  // defensive copy
+
+  statement() {
+    const lines = this.#transactions.map(t =>
+      `${t.date.slice(0,10)} ${t.type.padEnd(12)} $${t.amount.toFixed(2).padStart(8)}  balance: $${t.balance.toFixed(2)}`
+    );
+    return [`=== ${this.#owner}'s Statement ===`, ...lines].join('\n');
+  }
+}
+
+const alice = new BankAccount('Alice', 1000);
+const bob   = new BankAccount('Bob',   500);
+
+alice.deposit(200).withdraw(50);
+alice.transfer(300, bob);
+
+console.log(alice.statement());
+console.log(`Bob's balance: $${bob.balance}`);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>=== Alice's Statement ===
+2026-06-04 deposit      $1000.00  balance: $1000.00
+2026-06-04 deposit       $200.00  balance: $1200.00
+2026-06-04 withdrawal     $50.00  balance: $1150.00
+2026-06-04 withdrawal    $300.00  balance: $850.00
+Bob's balance: $800</pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a <code>UserProfile</code> class with encapsulation:</p>
+            <ul>
+              <li>Private fields: <code>#username</code>, <code>#email</code>, <code>#age</code>.</li>
+              <li>Setters must validate: username 3–20 characters, email contains <code>@</code>, age 0–120.</li>
+              <li>Provide a public <code>update(changes)</code> method that accepts an object with optional keys and applies validated updates.</li>
+              <li>Add a private <code>#formatDate()</code> method and a public <code>toJSON()</code> that returns a plain object (no private data leaks).</li>
+            </ul>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Extend <code>BankAccount</code> with a <code>SavingsAccount</code> subclass that adds a private <code>#interestRate</code> field and a public <code>applyInterest()</code> method. Override <code>withdraw()</code> so it enforces a minimum balance of $100 (the account must keep at least $100 at all times). Test edge cases.</p>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is encapsulation and why is it important in OOP?</li>
+            <li>What is the difference between a private class field (#field) and a convention-based private property (_field)?</li>
+            <li>How do getters and setters help enforce encapsulation?</li>
+            <li>What is the WeakMap privacy pattern and when would you still use it?</li>
+            <li>Can a subclass access private fields of its parent class?</li>
+          </ul>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Encapsulation hides internal state and exposes a controlled public interface.</li>
+              <li>Private class fields (<code>#field</code>) are enforced by the JavaScript engine — not just convention.</li>
+              <li>Private methods (<code>#method()</code>) keep internal helpers invisible to consumers.</li>
+              <li>Getters and setters pair with private fields to provide validated property-like access.</li>
+              <li>WeakMap-based privacy is a legacy pattern; prefer <code>#</code> in all new code.</li>
+              <li>Subclasses cannot access parent private fields — they must use parent's public/protected accessors.</li>
+            </ul>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can a subclass access parent private fields? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Private fields (<code>#field</code>) are scoped strictly to the class body that declares them. A subclass cannot read or write a parent's private fields — it must use public or protected (getter) accessors instead. This is by design and ensures the parent's invariants are always enforced.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Does JSON.stringify leak private field values? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. <code>JSON.stringify</code> only serialises enumerable own properties. Private fields are not own properties on the object — they are stored in an internal slot. However, if your <code>toJSON()</code> method intentionally includes a value derived from a private field, that will be serialised.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Are private static fields possible? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. <code>static #field = value</code> declares a private static field that belongs to the class itself (not to instances) and is inaccessible outside the class body. Use it for class-level constants or counters that should never be exposed.</p></div>
+            </div>
+          </section>
+
+          <div class="related-topics">
+            <a href="/javascript/oop/inheritance.html" class="topic-tag">Inheritance</a>
+            <a href="/javascript/oop/constructors.html" class="topic-tag">Constructors</a>
+            <a href="/javascript/oop/polymorphism.html" class="topic-tag">Polymorphism</a>
+            <a href="/javascript/oop/classes.html" class="topic-tag">Classes</a>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/oop/inheritance.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Inheritance</span></a>
+          <a href="/javascript/oop/polymorphism.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Polymorphism</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

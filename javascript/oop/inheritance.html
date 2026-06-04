@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Inheritance – extends, super &amp; the Prototype Chain | ylearner</title>
+  <meta name="description" content="Master JavaScript inheritance: extends keyword, super() in child constructors, method overriding, multi-level inheritance, mixins, Object.create(), and prototypal vs classical inheritance.">
+  <meta name="keywords" content="javascript inheritance, extends javascript, super keyword javascript, method overriding javascript, instanceof javascript, prototype chain, mixin pattern javascript, Object.create javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/oop/inheritance.html">
+  <meta property="og:title" content="JavaScript Inheritance – extends, super &amp; the Prototype Chain | ylearner">
+  <meta property="og:description" content="Master JavaScript inheritance: extends keyword, super() in child constructors, method overriding, multi-level inheritance, mixins, Object.create(), and prototypal vs classical inheritance.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/oop/classes.html">OOP</a><span class="separator">›</span>
+          <span class="current">Inheritance</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🏗️ OOP</div>
+          <h1>JavaScript Inheritance – extends and super</h1>
+          <p class="lesson-intro">Inheritance lets one class reuse and extend the behaviour of another. With ES6's <code>extends</code> keyword, child classes gain every method of the parent and can override or augment them with <code>super</code>. This lesson covers single-level and multi-level inheritance, method overriding, the <code>instanceof</code> operator, mixins for multiple-inheritance workarounds, and the underlying prototypal mechanics that make it all work.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="extends-keyword">The extends Keyword</h2>
+          <p><code>extends</code> creates a child class that inherits all instance and static members from a parent class. The child's <code>constructor</code> must call <code>super()</code> before accessing <code>this</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Animal {
+  constructor(name, species) {
+    this.name    = name;
+    this.species = species;
+    this.energy  = 100;
+  }
+
+  eat(food) {
+    this.energy += 10;
+    return `${this.name} eats ${food}. Energy: ${this.energy}`;
+  }
+
+  toString() {
+    return `[${this.species}] ${this.name}`;
+  }
+}
+
+class Dog extends Animal {
+  constructor(name, breed) {
+    super(name, 'Canis lupus familiaris'); // required before this
+    this.breed = breed;
+  }
+
+  bark() {
+    this.energy -= 5;
+    return `${this.name} barks! Energy: ${this.energy}`;
+  }
+}
+
+const rex = new Dog('Rex', 'German Shepherd');
+console.log(rex.toString());   // inherited from Animal
+console.log(rex.eat('bone'));  // inherited method
+console.log(rex.bark());       // own method</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>[Canis lupus familiaris] Rex
+Rex eats bone. Energy: 110
+Rex barks! Energy: 105</pre>
+          </div>
+
+          <h2 id="method-overriding">Method Overriding with super.method()</h2>
+          <p>A child class can <strong>override</strong> any parent method by declaring a method with the same name. Use <code>super.methodName()</code> inside the override to call the parent's version before or after adding child-specific behaviour.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  describe() {
+    return `I am ${this.name}`;
+  }
+  sound() {
+    return '...';
+  }
+}
+
+class Cat extends Animal {
+  constructor(name, indoor) {
+    super(name);
+    this.indoor = indoor;
+  }
+
+  // Override: extends the parent version
+  describe() {
+    const base = super.describe();   // call parent
+    return `${base}, a ${this.indoor ? 'indoor' : 'outdoor'} cat`;
+  }
+
+  // Override: fully replaces parent
+  sound() {
+    return 'Meow!';
+  }
+}
+
+class Lion extends Cat {
+  constructor(name) {
+    super(name, false);  // outdoor
+  }
+
+  sound() {
+    return 'ROAR!';   // overrides Cat.sound()
+  }
+}
+
+const kitty = new Cat('Kitty', true);
+const simba = new Lion('Simba');
+
+console.log(kitty.describe());   // uses super
+console.log(kitty.sound());
+console.log(simba.describe());   // inherits Cat.describe
+console.log(simba.sound());      // Lion.sound</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>I am Kitty, a indoor cat
+Meow!
+I am Simba, a outdoor cat
+ROAR!</pre>
+          </div>
+
+          <h2 id="instanceof-prototype-chain">instanceof and the Prototype Chain</h2>
+          <p><code>instanceof</code> walks the prototype chain of an object to check whether any link equals <code>Constructor.prototype</code>. You can also inspect the chain programmatically with <code>Object.getPrototypeOf()</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class A {}
+class B extends A {}
+class C extends B {}
+
+const c = new C();
+
+console.log(c instanceof C);        // true
+console.log(c instanceof B);        // true
+console.log(c instanceof A);        // true
+console.log(c instanceof Object);   // true (everything inherits Object)
+
+// Walking the chain manually
+let proto = Object.getPrototypeOf(c);
+while (proto !== null) {
+  console.log(proto.constructor.name);
+  proto = Object.getPrototypeOf(proto);
+}
+// C → B → A → Object</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>true
+true
+true
+true
+C
+B
+A
+Object</pre>
+          </div>
+
+          <h2 id="multi-level-inheritance">Multi-Level Inheritance Chain</h2>
+          <p>Inheritance chains can go multiple levels deep: Animal → Dog → ServiceDog. Each constructor calls <code>super()</code> to chain upwards, and each level can add its own properties and methods.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Animal {
+  constructor(name) { this.name = name; }
+  eat()  { return `${this.name} is eating.`; }
+  sleep(){ return `${this.name} is sleeping.`; }
+}
+
+class Dog extends Animal {
+  constructor(name, breed) {
+    super(name);
+    this.breed = breed;
+  }
+  bark() { return `${this.name} barks: Woof!`; }
+}
+
+class ServiceDog extends Dog {
+  constructor(name, breed, role) {
+    super(name, breed);
+    this.role = role;
+    this.onDuty = false;
+  }
+
+  startDuty() {
+    this.onDuty = true;
+    return `${this.name} (${this.role}) is now on duty.`;
+  }
+
+  assist(person) {
+    if (!this.onDuty) return `${this.name} is off duty.`;
+    return `${this.name} assists ${person} as a ${this.role}.`;
+  }
+}
+
+const lassie = new ServiceDog('Lassie', 'Collie', 'Search &amp; Rescue');
+console.log(lassie.eat());           // from Animal
+console.log(lassie.bark());          // from Dog
+console.log(lassie.startDuty());     // from ServiceDog
+console.log(lassie.assist('John'));  // from ServiceDog</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Lassie is eating.
+Lassie barks: Woof!
+Lassie (Search &amp; Rescue) is now on duty.
+Lassie assists John as a Search &amp; Rescue.</pre>
+          </div>
+
+          <h2 id="mixin-pattern">Mixin Pattern – Multiple Inheritance Workaround</h2>
+          <p>JavaScript classes can only <code>extend</code> one parent. Mixins simulate multiple inheritance by composing small behaviour objects into a class using <code>Object.assign</code> or higher-order functions.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Mixin factories – return objects with methods
+const Serializable = (Base) => class extends Base {
+  serialize()   { return JSON.stringify(this); }
+  static deserialize(json) { return Object.assign(new this(), JSON.parse(json)); }
+};
+
+const Timestamped = (Base) => class extends Base {
+  constructor(...args) {
+    super(...args);
+    this.createdAt = new Date().toISOString();
+  }
+};
+
+class Entity {
+  constructor(id) { this.id = id; }
+}
+
+class User extends Timestamped(Serializable(Entity)) {
+  constructor(id, name) {
+    super(id);
+    this.name = name;
+  }
+}
+
+const u = new User(1, 'Alice');
+console.log(u.serialize());
+console.log(u.createdAt.slice(0, 10));  // today's date</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>{"id":1,"name":"Alice","createdAt":"2026-06-04T..."}
+2026-06-04</pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>Prefer composition over deep inheritance</strong><p>Inheritance chains deeper than 2–3 levels become hard to reason about. Favour mixins or simple object composition when you need to share behaviour across unrelated classes.</p></div>
+          </div>
+
+          <h2 id="classical-vs-prototypal">Classical vs Prototypal Inheritance</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Aspect</th><th>Classical (Java/C++)</th><th>Prototypal (JavaScript)</th></tr></thead>
+              <tbody>
+                <tr><td>Based on</td><td>Classes (blueprints)</td><td>Objects (live prototypes)</td></tr>
+                <tr><td>Copies behaviour?</td><td>Yes – class body copied at compile</td><td>No – delegates to prototype at runtime</td></tr>
+                <tr><td>Multiple inheritance</td><td>Some languages support it</td><td>One <code>[[Prototype]]</code> link; use mixins</td></tr>
+                <tr><td>Modify shared behaviour</td><td>Recompile class</td><td>Mutate <code>Constructor.prototype</code> at runtime</td></tr>
+                <tr><td>ES6 classes</td><td>Syntactic sugar</td><td>Still prototype-based underneath</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content"><strong>Do not mutate built-in prototypes</strong><p>Adding methods to <code>Array.prototype</code> or <code>Object.prototype</code> in production code can silently conflict with future ECMAScript features or third-party libraries. Always extend by creating a subclass instead.</p></div>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Model a vehicle hierarchy:</p>
+            <ul>
+              <li><strong>Vehicle</strong> — <code>make</code>, <code>model</code>, <code>speed=0</code>; methods <code>accelerate(n)</code> and <code>brake(n)</code>.</li>
+              <li><strong>ElectricVehicle extends Vehicle</strong> — adds <code>batteryLevel</code>; <code>charge(kWh)</code> adds to battery; <code>accelerate(n)</code> overrides to also drain battery by <code>n * 0.1</code>.</li>
+              <li><strong>Tesla extends ElectricVehicle</strong> — adds <code>autopilot()</code> method.</li>
+              <li>Verify <code>instanceof</code> returns <code>true</code> at every level of the chain.</li>
+            </ul>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Create two mixins — <code>Loggable</code> (adds <code>log(msg)</code> that prefixes the class name) and <code>Validatable</code> (adds <code>validate(rules)</code> that checks own properties against a rules object and returns an array of error strings). Compose both onto a <code>FormField</code> base class and demonstrate validation with error messages.</p>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does <code>extends</code> do to the prototype chain of a class?</li>
+            <li>Why must <code>super()</code> be called before <code>this</code> in a child constructor?</li>
+            <li>How does <code>instanceof</code> determine if an object is an instance of a class?</li>
+            <li>What is method overriding and how do you call the parent method from the override?</li>
+            <li>How do mixins simulate multiple inheritance in JavaScript?</li>
+            <li>What is the difference between classical and prototypal inheritance?</li>
+          </ul>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>class Child extends Parent</code> sets up the prototype chain and inherits all methods.</li>
+              <li><code>super()</code> in a child constructor must be called before any <code>this</code> access.</li>
+              <li><code>super.method()</code> calls the parent class's version of a method.</li>
+              <li>Method overriding lets child classes replace or extend parent behaviour.</li>
+              <li><code>instanceof</code> walks the full prototype chain — a ServiceDog is also a Dog and an Animal.</li>
+              <li>Mixins using higher-order class factories are the idiomatic way to share behaviour across unrelated classes.</li>
+            </ul>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I extend a built-in class like Array? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. You can <code>class MyArray extends Array</code> and methods like <code>map()</code> and <code>filter()</code> will return instances of <code>MyArray</code> (thanks to <code>Symbol.species</code>). However, extending built-ins has some edge cases in older transpilers — test carefully if you target legacy environments.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What if a child class has no constructor? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>JavaScript auto-generates <code>constructor(...args) { super(...args); }</code> for you, forwarding all arguments to the parent. You only need to write a constructor when you want to add child-specific initialisation.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between Object.create() and extends? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>Object.create(proto)</code> creates a plain object with its <code>[[Prototype]]</code> set to <code>proto</code> — useful for prototypal inheritance without classes. <code>extends</code> wires up both the instance prototype chain and the static/constructor chain, and enforces <code>super()</code> calls. Use <code>extends</code> with classes and <code>Object.create()</code> when working with plain objects.</p></div>
+            </div>
+          </section>
+
+          <div class="related-topics">
+            <a href="/javascript/oop/constructors.html" class="topic-tag">Constructors</a>
+            <a href="/javascript/oop/encapsulation.html" class="topic-tag">Encapsulation</a>
+            <a href="/javascript/oop/polymorphism.html" class="topic-tag">Polymorphism</a>
+            <a href="/javascript/oop/prototypes.html" class="topic-tag">Prototypes</a>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/oop/constructors.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Constructors</span></a>
+          <a href="/javascript/oop/encapsulation.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Encapsulation</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
