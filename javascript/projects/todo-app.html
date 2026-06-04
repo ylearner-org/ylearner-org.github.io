@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Todo App – Build a Complete Todo List | ylearner</title>
+  <meta name="description" content="Build a full-featured JavaScript Todo app with add, complete, delete, filter, and localStorage persistence. Complete working code with step-by-step breakdown.">
+  <meta name="keywords" content="JavaScript todo app, todo list JavaScript, JavaScript DOM project, localStorage todo, vanilla JavaScript project">
+  <link rel="canonical" href="https://ylearner.org/javascript/projects/todo-app.html">
+  <meta property="og:title" content="JavaScript Todo App – Build a Complete Todo List | ylearner">
+  <meta property="og:description" content="Build a full-featured JavaScript Todo app with add, complete, delete, filter, and localStorage persistence. Complete working code with step-by-step breakdown.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/projects/calculator.html">Projects</a><span class="separator">›</span>
+          <span class="current">Todo App</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🛠️ Projects</div>
+          <h1>JavaScript Todo App – Build a Full-Featured Todo List</h1>
+          <p class="lesson-intro">Build a complete todo list application using only vanilla JavaScript — no frameworks, no libraries. Features include add, complete, delete, filter (all/active/completed), item count, and full localStorage persistence so todos survive page refreshes.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 30 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="project-overview">Project Overview</h2>
+          <p>The Todo App is one of the most valuable beginner-to-intermediate projects because it covers nearly every core JavaScript concept: DOM manipulation, events, array methods, localStorage, and state-driven rendering. Understanding this pattern is the mental model behind React, Vue, and every other major UI framework.</p>
+
+          <table>
+            <thead><tr><th>Feature</th><th>Technique</th></tr></thead>
+            <tbody>
+              <tr><td>Add todo</td><td>Push to array, re-render</td></tr>
+              <tr><td>Mark complete</td><td>Toggle <code>done</code> boolean with <code>.map()</code></td></tr>
+              <tr><td>Delete todo</td><td>Filter out by ID with <code>.filter()</code></td></tr>
+              <tr><td>Filter view</td><td>Filter array before rendering</td></tr>
+              <tr><td>Item count</td><td>Filter for incomplete, display length</td></tr>
+              <tr><td>Persistence</td><td>JSON stringify/parse to localStorage</td></tr>
+              <tr><td>Clear completed</td><td>Filter out done todos</td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="html-structure">HTML Structure</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/* todo.html — full HTML skeleton
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Todo App&lt;/title&gt;
+  &lt;link rel="stylesheet" href="todo-style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="app"&gt;
+    &lt;header class="app-header"&gt;
+      &lt;h1&gt;My Todos&lt;/h1&gt;
+      &lt;span id="count-badge"&gt;0 left&lt;/span&gt;
+    &lt;/header&gt;
+
+    &lt;div class="input-row"&gt;
+      &lt;input id="todo-input" type="text" placeholder="What needs to be done?" autocomplete="off"&gt;
+      &lt;button id="add-btn"&gt;Add&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;nav class="filter-bar" id="filter-bar"&gt;
+      &lt;button class="active" data-filter="all"&gt;All&lt;/button&gt;
+      &lt;button data-filter="active"&gt;Active&lt;/button&gt;
+      &lt;button data-filter="completed"&gt;Completed&lt;/button&gt;
+    &lt;/nav&gt;
+
+    &lt;ul class="todo-list" id="todo-list"&gt;&lt;/ul&gt;
+
+    &lt;footer class="app-footer"&gt;
+      &lt;button id="clear-completed"&gt;Clear completed&lt;/button&gt;
+    &lt;/footer&gt;
+  &lt;/div&gt;
+  &lt;script src="todo-script.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+*/</code></pre>
+          </div>
+
+          <h2 id="state-management">State Management</h2>
+          <p>The entire application state lives in two variables: the <code>todos</code> array and the current <code>filter</code> string. Every user action updates state and then calls <code>render()</code> — a pure function that rebuilds the DOM from the current state.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// todo-script.js — State and persistence layer
+
+const STORAGE_KEY = "ylearner-todos";
+
+let todos  = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+let filter = "all"; // "all" | "active" | "completed"
+
+function persist() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+}
+
+// State mutation helpers — always call render() after
+function addTodo(text) {
+  todos.push({
+    id:        Date.now(),
+    text:      text.trim(),
+    done:      false,
+    createdAt: Date.now()
+  });
+  persist();
+}
+
+function toggleTodo(id) {
+  todos = todos.map(t => t.id === id ? { ...t, done: !t.done } : t);
+  persist();
+}
+
+function deleteTodo(id) {
+  todos = todos.filter(t => t.id !== id);
+  persist();
+}
+
+function editTodo(id, newText) {
+  todos = todos.map(t => t.id === id ? { ...t, text: newText } : t);
+  persist();
+}
+
+function clearCompleted() {
+  todos = todos.filter(t => !t.done);
+  persist();
+}</code></pre>
+          </div>
+
+          <h2 id="render-function">The Render Function</h2>
+          <p>The render function is the heart of the app. It reads from state and rebuilds the visible DOM. This "state → DOM" pattern is exactly how React's virtual DOM works.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Render — reads state, rebuilds DOM
+function render() {
+  const list  = document.getElementById("todo-list");
+  const badge = document.getElementById("count-badge");
+
+  // Apply active filter
+  const visible = todos.filter(t => {
+    if (filter === "active")    return !t.done;
+    if (filter === "completed") return t.done;
+    return true;
+  });
+
+  // Render list
+  if (visible.length === 0) {
+    list.innerHTML = `&lt;li class="empty-state"&gt;
+      ${filter === "completed" ? "No completed todos yet." : "Nothing to do — enjoy your day!"}
+    &lt;/li&gt;`;
+  } else {
+    list.innerHTML = visible.map(t => `
+      &lt;li class="todo-item ${t.done ? "done" : ""}" data-id="${t.id}"&gt;
+        &lt;button class="toggle" aria-label="Toggle complete"&gt;
+          ${t.done ? "✅" : "⬜"}
+        &lt;/button&gt;
+        &lt;span class="todo-text" contenteditable="false"&gt;${escapeHtml(t.text)}&lt;/span&gt;
+        &lt;button class="edit-btn" title="Edit"&gt;✏️&lt;/button&gt;
+        &lt;button class="delete-btn" aria-label="Delete todo"&gt;🗑️&lt;/button&gt;
+      &lt;/li&gt;
+    `).join("");
+  }
+
+  // Update item count (count only incomplete)
+  const remaining = todos.filter(t => !t.done).length;
+  badge.textContent = `${remaining} item${remaining !== 1 ? "s" : ""} left`;
+
+  // Highlight active filter button
+  document.querySelectorAll("#filter-bar button").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.filter === filter);
+  });
+}
+
+// Prevent XSS when rendering user-entered text
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}</code></pre>
+          </div>
+
+          <h2 id="event-handlers">Event Handlers</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Add todo on button click or Enter key
+const input  = document.getElementById("todo-input");
+const addBtn = document.getElementById("add-btn");
+
+function handleAdd() {
+  const text = input.value.trim();
+  if (!text) return;
+  addTodo(text);
+  input.value = "";
+  render();
+  input.focus();
+}
+
+addBtn.addEventListener("click", handleAdd);
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") handleAdd();
+});
+
+// Filter buttons
+document.getElementById("filter-bar").addEventListener("click", e => {
+  if (e.target.matches("button[data-filter]")) {
+    filter = e.target.dataset.filter;
+    render();
+  }
+});
+
+// Clear completed
+document.getElementById("clear-completed").addEventListener("click", () => {
+  clearCompleted();
+  render();
+});
+
+// Delegated events for todo list (toggle, delete, edit)
+document.getElementById("todo-list").addEventListener("click", e => {
+  const li = e.target.closest("[data-id]");
+  if (!li) return;
+  const id = Number(li.dataset.id);
+
+  if (e.target.matches(".toggle")) {
+    toggleTodo(id);
+    render();
+  }
+
+  if (e.target.matches(".delete-btn")) {
+    // Animate removal
+    li.classList.add("removing");
+    setTimeout(() => { deleteTodo(id); render(); }, 200);
+  }
+
+  if (e.target.matches(".edit-btn")) {
+    const textEl = li.querySelector(".todo-text");
+    textEl.contentEditable = "true";
+    textEl.focus();
+
+    // Place cursor at end
+    const range = document.createRange();
+    range.selectNodeContents(textEl);
+    range.collapse(false);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+
+    textEl.addEventListener("blur", () => {
+      const newText = textEl.textContent.trim();
+      if (newText) editTodo(id, newText);
+      else deleteTodo(id);
+      render();
+    }, { once: true });
+
+    textEl.addEventListener("keydown", e => {
+      if (e.key === "Enter") { e.preventDefault(); textEl.blur(); }
+      if (e.key === "Escape") { render(); } // discard changes
+    }, { once: true });
+  }
+});
+
+// Initial render
+render();</code></pre>
+          </div>
+
+          <div class="output-block"><strong>Behavior:</strong> On load, todos are read from localStorage and rendered. Adding "Buy groceries" shows it in the list with a toggle checkbox and delete button. Pressing "Active" filter hides completed items. Refreshing the page restores all todos.</div>
+
+          <div class="callout callout-warning">
+            <strong>XSS Warning:</strong> Always escape user-entered text before inserting it into innerHTML. The <code>escapeHtml()</code> function prevents an attacker from entering <code>&lt;img src=x onerror=alert(1)&gt;</code> as a todo text and executing JavaScript. Alternatively, use <code>textContent</code> property instead of HTML template literals for text nodes.
+          </div>
+
+          <div class="callout callout-tip">
+            <strong>Performance Tip:</strong> Full re-renders (wiping <code>innerHTML</code> and rebuilding) are simple and correct for small lists (&lt; 100 items). For larger lists, use a diffing strategy — compare the new virtual state to the rendered DOM and only update changed nodes. This is exactly what React's reconciliation does.
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="css-overview">CSS Highlights</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/* Key CSS patterns for the Todo App
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.todo-item.done .todo-text {
+  text-decoration: line-through;
+  color: #a0aec0;
+}
+.todo-item.removing {
+  opacity: 0;
+  transform: translateX(20px);
+}
+.filter-bar button.active {
+  border-bottom: 2px solid #3b82f6;
+  color: #3b82f6;
+  font-weight: 600;
+}
+.empty-state {
+  text-align: center;
+  color: #a0aec0;
+  padding: 40px;
+  list-style: none;
+}
+*/</code></pre>
+          </div>
+
+          <h2 id="enhancements">Enhancements</h2>
+
+          <div class="exercise-box">
+            <h3>Extend the App</h3>
+            <p>Once the base version works, add these features to build a stronger portfolio piece:</p>
+            <ol>
+              <li><strong>Drag-and-drop reordering</strong> — use the HTML Drag and Drop API to let users reorder todos</li>
+              <li><strong>Priority levels</strong> — add a low/medium/high priority badge to each todo</li>
+              <li><strong>Due dates</strong> — add a date picker and highlight overdue todos in red</li>
+              <li><strong>Search</strong> — live-filter todos by text as the user types in a search box</li>
+              <li><strong>Keyboard shortcuts</strong> — press <kbd>e</kbd> to edit the selected todo, <kbd>Delete</kbd> to remove it</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>Architecture Challenge</h3>
+            <p>Refactor the app using the module pattern to separate concerns:</p>
+            <ul>
+              <li><code>store.js</code> — state, mutations, and persistence</li>
+              <li><code>render.js</code> — all DOM rendering functions</li>
+              <li><code>events.js</code> — all event listener setup</li>
+              <li><code>main.js</code> — import all modules and initialise</li>
+            </ul>
+            <p>This introduces you to module design thinking used in production JavaScript.</p>
+          </div>
+
+          <h2 id="concepts-practiced">Concepts Practiced</h2>
+          <table>
+            <thead><tr><th>Concept</th><th>Where Used</th></tr></thead>
+            <tbody>
+              <tr><td>DOM manipulation</td><td>innerHTML rendering, querying elements</td></tr>
+              <tr><td>Event delegation</td><td>Single listener on <code>#todo-list</code></td></tr>
+              <tr><td>Array methods</td><td><code>.map()</code>, <code>.filter()</code>, <code>.push()</code></td></tr>
+              <tr><td>localStorage</td><td>JSON save/load on every state mutation</td></tr>
+              <tr><td>Closures</td><td>State variables captured by event handlers</td></tr>
+              <tr><td>contentEditable</td><td>Inline text editing without input fields</td></tr>
+              <tr><td>CSS transitions</td><td>Removal animation via class toggling</td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="faq">FAQ</h2>
+          <div class="faq-section">
+            <div class="faq-item">
+              <h3>Why rebuild the entire list on every change instead of updating individual items?</h3>
+              <p>Full re-renders are simpler to reason about — the DOM always exactly reflects the state. For small lists this is performant enough. It's also the conceptual foundation of React — understand this first before learning virtual DOM diffing.</p>
+            </div>
+            <div class="faq-item">
+              <h3>Why use <code>Date.now()</code> as the todo ID?</h3>
+              <p>It's a quick, monotonically increasing integer — guaranteed unique as long as users don't add multiple todos in the same millisecond. For multi-user or backend-synced apps, use UUIDs (<code>crypto.randomUUID()</code> in modern browsers).</p>
+            </div>
+            <div class="faq-item">
+              <h3>How does the edit feature work without an input field?</h3>
+              <p><code>contenteditable="true"</code> makes any element editable inline. The <code>blur</code> event fires when the user clicks away, and <code>textContent</code> reads the edited text. This avoids replacing the span with an input field and back.</p>
+            </div>
+            <div class="faq-item">
+              <h3>What happens if the user has 1000 todos in localStorage?</h3>
+              <p>localStorage can hold about 5MB. 1000 todos at ~200 bytes each is 200KB — well within limits. Performance-wise, rendering 1000 items at once can be slow; at that scale, implement virtual scrolling (only render visible items).</p>
+            </div>
+            <div class="faq-item">
+              <h3>How would I sync todos across devices?</h3>
+              <p>Replace <code>localStorage</code> calls with API calls to a backend (Node.js + MongoDB, Firebase, Supabase). On load, fetch todos from the server. On every change, send a PATCH/POST/DELETE request.</p>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <h3>Summary</h3>
+            <ul>
+              <li>Single source of truth: the <code>todos</code> array + <code>filter</code> string</li>
+              <li>State-driven rendering: every action updates state, then calls <code>render()</code></li>
+              <li>localStorage persistence: JSON stringify/parse on every mutation</li>
+              <li>Event delegation: one listener handles toggle, delete, and edit for all todos</li>
+              <li>Security: <code>escapeHtml()</code> prevents XSS from user-entered todo text</li>
+            </ul>
+          </div>
+
+          <ul class="interview-list">
+            <li>The state → render pattern here is identical to React's model — understanding it natively is a huge advantage</li>
+            <li>Event delegation is a must-know pattern: always preferred over attaching listeners to dynamic elements</li>
+            <li>localStorage persistence shows understanding of the browser storage API</li>
+            <li>XSS prevention (escaping user input) demonstrates security awareness interviewers value</li>
+          </ul>
+
+          <div class="related-topics">
+            <h3>Related Topics</h3>
+            <ul>
+              <li><a href="/javascript/projects/calculator.html">Calculator Project</a></li>
+              <li><a href="/javascript/projects/weather-app.html">Weather App Project</a></li>
+              <li><a href="/javascript/dom/events.html">DOM Events</a></li>
+              <li><a href="/javascript/intermediate/local-storage.html">localStorage and sessionStorage</a></li>
+            </ul>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/projects/calculator.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Calculator</span></a>
+          <a href="/javascript/projects/weather-app.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Weather App</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
