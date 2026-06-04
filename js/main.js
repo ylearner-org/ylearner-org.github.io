@@ -18,9 +18,10 @@
     parts.pop(); // remove filename
     const depth2Folders = ['beginner','control-flow','functions','data-structures',
       'intermediate','oop','advanced','real-world','frameworks','data-science','interview','projects','dom',
-      'getting-started','core','lifecycle','templates','odoo'];
+      'getting-started','core','lifecycle','templates','odoo',
+      'core-elements','forms','semantic','selectors','layout','responsive','effects'];
     const isDepth2 = depth2Folders.some(f => path.includes('/' + f + '/'));
-    const isDepth1 = !isDepth2 && ['/python/','/javascript/','/c/','/cpp/','/java/','/sql/','/owljs/'].some(s => path.includes(s));
+    const isDepth1 = !isDepth2 && ['/python/','/javascript/','/c/','/cpp/','/java/','/sql/','/owljs/','/html/','/csslessons/'].some(s => path.includes(s));
     if (isDepth2) parts.splice(-2);
     else if (isDepth1) parts.splice(-1);
     return 'file:///' + parts.join('/');
@@ -423,15 +424,187 @@
     },
   ];
 
+  // ========================
+  // HTML Navigation Data
+  // ========================
+  const HTML_NAV_DATA = [
+    {
+      title: '🌐 Introduction',
+      items: [
+        { title: 'What is HTML?', url: '/html/what-is-html.html' },
+        { title: 'History of HTML', url: '/html/history-of-html.html' },
+        { title: 'Why Learn HTML?', url: '/html/why-learn-html.html' },
+        { title: 'HTML Applications', url: '/html/html-applications.html' },
+        { title: 'HTML Career Paths', url: '/html/html-career-paths.html' },
+      ]
+    },
+    {
+      title: '🌱 Beginner',
+      items: [
+        { title: 'Setting Up HTML', url: '/html/beginner/setting-up.html' },
+        { title: 'Your First HTML Page', url: '/html/beginner/first-page.html' },
+        { title: 'HTML Syntax & Structure', url: '/html/beginner/html-syntax.html' },
+        { title: 'HTML Headings', url: '/html/beginner/headings.html' },
+        { title: 'Paragraphs & Text', url: '/html/beginner/paragraphs.html' },
+        { title: 'Links & Anchors', url: '/html/beginner/links.html' },
+        { title: 'Images', url: '/html/beginner/images.html' },
+        { title: 'HTML Comments', url: '/html/beginner/comments.html' },
+        { title: 'HTML Entities', url: '/html/beginner/entities.html' },
+      ]
+    },
+    {
+      title: '📦 Core Elements',
+      items: [
+        { title: 'Block vs Inline Elements', url: '/html/core-elements/block-inline.html' },
+        { title: 'Div & Span', url: '/html/core-elements/div-span.html' },
+        { title: 'HTML Lists', url: '/html/core-elements/lists.html' },
+        { title: 'HTML Tables', url: '/html/core-elements/tables.html' },
+        { title: 'HTML Attributes', url: '/html/core-elements/attributes.html' },
+        { title: 'HTML Classes & IDs', url: '/html/core-elements/classes-ids.html' },
+      ]
+    },
+    {
+      title: '📋 Forms',
+      items: [
+        { title: 'Form Basics', url: '/html/forms/form-basics.html' },
+        { title: 'Input Types', url: '/html/forms/input-types.html' },
+        { title: 'Form Validation', url: '/html/forms/validation.html' },
+        { title: 'Buttons', url: '/html/forms/buttons.html' },
+        { title: 'Select & Textarea', url: '/html/forms/select-textarea.html' },
+        { title: 'Fieldset & Legend', url: '/html/forms/fieldset-legend.html' },
+      ]
+    },
+    {
+      title: '🏗️ Semantic HTML',
+      items: [
+        { title: 'What is Semantic HTML?', url: '/html/semantic/what-is-semantic.html' },
+        { title: 'Header, Footer, Nav', url: '/html/semantic/header-footer-nav.html' },
+        { title: 'Main, Article, Section', url: '/html/semantic/main-article-section.html' },
+        { title: 'Aside & Figure', url: '/html/semantic/aside-figure.html' },
+        { title: 'HTML5 New Elements', url: '/html/semantic/html5-elements.html' },
+      ]
+    },
+    {
+      title: '🚀 Advanced HTML',
+      items: [
+        { title: 'Meta Tags & SEO', url: '/html/advanced/meta-seo.html' },
+        { title: 'HTML Accessibility (ARIA)', url: '/html/advanced/accessibility.html' },
+        { title: 'HTML Canvas', url: '/html/advanced/canvas.html' },
+        { title: 'HTML Video & Audio', url: '/html/advanced/video-audio.html' },
+        { title: 'Iframe', url: '/html/advanced/iframe.html' },
+      ]
+    },
+    {
+      title: '🎯 Interview Prep',
+      items: [
+        { title: 'HTML Interview Questions', url: '/html/interview/questions.html', badge: 'hot' },
+        { title: 'HTML Exercises', url: '/html/interview/exercises.html' },
+      ]
+    },
+    {
+      title: '🛠️ Projects',
+      items: [
+        { title: 'Personal Portfolio Page', url: '/html/projects/portfolio.html' },
+        { title: 'Landing Page', url: '/html/projects/landing-page.html' },
+        { title: 'Registration Form', url: '/html/projects/registration-form.html' },
+        { title: 'HTML Email Template', url: '/html/projects/email-template.html' },
+      ]
+    },
+  ];
+
+  // ========================
+  // CSS Navigation Data
+  // ========================
+  const CSS_NAV_DATA = [
+    {
+      title: '🎨 Introduction',
+      items: [
+        { title: 'What is CSS?', url: '/csslessons/what-is-css.html' },
+        { title: 'How CSS Works', url: '/csslessons/how-css-works.html' },
+        { title: 'CSS Syntax', url: '/csslessons/css-syntax.html' },
+        { title: 'Adding CSS to HTML', url: '/csslessons/adding-css.html' },
+      ]
+    },
+    {
+      title: '🌱 CSS Basics',
+      items: [
+        { title: 'CSS Selectors', url: '/csslessons/selectors/selectors-basics.html' },
+        { title: 'CSS Colors', url: '/csslessons/selectors/colors.html' },
+        { title: 'CSS Text & Fonts', url: '/csslessons/selectors/text-fonts.html' },
+        { title: 'CSS Backgrounds', url: '/csslessons/selectors/backgrounds.html' },
+        { title: 'CSS Box Model', url: '/csslessons/selectors/box-model.html' },
+        { title: 'CSS Margin & Padding', url: '/csslessons/selectors/margin-padding.html' },
+        { title: 'CSS Borders', url: '/csslessons/selectors/borders.html' },
+      ]
+    },
+    {
+      title: '📐 CSS Layout',
+      items: [
+        { title: 'CSS Display', url: '/csslessons/layout/display.html' },
+        { title: 'CSS Position', url: '/csslessons/layout/position.html' },
+        { title: 'CSS Flexbox', url: '/csslessons/layout/flexbox.html', badge: 'hot' },
+        { title: 'CSS Grid', url: '/csslessons/layout/grid.html', badge: 'hot' },
+        { title: 'CSS Float (Legacy)', url: '/csslessons/layout/float.html' },
+        { title: 'CSS Z-index', url: '/csslessons/layout/z-index.html' },
+      ]
+    },
+    {
+      title: '📱 Responsive Design',
+      items: [
+        { title: 'Media Queries', url: '/csslessons/responsive/media-queries.html' },
+        { title: 'Responsive Images', url: '/csslessons/responsive/responsive-images.html' },
+        { title: 'Mobile-First Design', url: '/csslessons/responsive/mobile-first.html' },
+        { title: 'CSS Viewport Units', url: '/csslessons/responsive/viewport-units.html' },
+      ]
+    },
+    {
+      title: '✨ CSS Effects',
+      items: [
+        { title: 'CSS Transitions', url: '/csslessons/effects/transitions.html' },
+        { title: 'CSS Animations', url: '/csslessons/effects/animations.html' },
+        { title: 'CSS Transforms', url: '/csslessons/effects/transforms.html' },
+        { title: 'CSS Filters', url: '/csslessons/effects/filters.html' },
+      ]
+    },
+    {
+      title: '🔧 Advanced CSS',
+      items: [
+        { title: 'CSS Variables', url: '/csslessons/advanced/variables.html' },
+        { title: 'CSS Pseudo-classes', url: '/csslessons/advanced/pseudo-classes.html' },
+        { title: 'CSS Pseudo-elements', url: '/csslessons/advanced/pseudo-elements.html' },
+        { title: 'CSS Specificity', url: '/csslessons/advanced/specificity.html' },
+        { title: 'CSS Best Practices', url: '/csslessons/advanced/best-practices.html' },
+      ]
+    },
+    {
+      title: '🎯 Interview Prep',
+      items: [
+        { title: 'CSS Interview Questions', url: '/csslessons/interview/questions.html', badge: 'hot' },
+        { title: 'CSS Exercises', url: '/csslessons/interview/exercises.html' },
+      ]
+    },
+    {
+      title: '🛠️ Projects',
+      items: [
+        { title: 'Button Styles Collection', url: '/csslessons/projects/buttons.html' },
+        { title: 'CSS Card Components', url: '/csslessons/projects/cards.html' },
+        { title: 'Responsive Navigation', url: '/csslessons/projects/navigation.html' },
+        { title: 'Full Landing Page Style', url: '/csslessons/projects/landing-page.html' },
+      ]
+    },
+  ];
+
   function getNavData() {
     const path = window.location.pathname;
     if (path.includes('/javascript/')) return JS_NAV_DATA;
     if (path.includes('/owljs/')) return OWL_NAV_DATA;
+    if (path.includes('/html/')) return HTML_NAV_DATA;
+    if (path.includes('/csslessons/')) return CSS_NAV_DATA;
     return NAV_DATA;
   }
 
   // Search index (with BASE-prefixed URLs for file:// searches)
-  const SEARCH_INDEX = [...NAV_DATA, ...JS_NAV_DATA, ...OWL_NAV_DATA].flatMap(section =>
+  const SEARCH_INDEX = [...NAV_DATA, ...JS_NAV_DATA, ...OWL_NAV_DATA, ...HTML_NAV_DATA, ...CSS_NAV_DATA].flatMap(section =>
     section.items.map(item => ({
       title: item.title,
       category: section.title.replace(/^.{2}\s/, ''),
@@ -751,6 +924,8 @@
     if (path.includes('/python/')) course = { name: 'Python Course', icon: '🐍', color: '#3776AB' };
     else if (path.includes('/javascript/')) course = { name: 'JavaScript Course', icon: '⚡', color: '#3776AB' };
     else if (path.includes('/owljs/')) course = { name: 'OWL JS Course', icon: '🦉', color: '#714B67' };
+    else if (path.includes('/html/')) course = { name: 'HTML Course', icon: '🌐', color: '#E44D26' };
+    else if (path.includes('/csslessons/')) course = { name: 'CSS Course', icon: '🎨', color: '#1572B6' };
     else if (path.includes('/c/') && !path.includes('/cpp/')) course = { name: 'C Course', icon: '⚙️', color: '#A8B9CC' };
     else if (path.includes('/cpp/')) course = { name: 'C++ Course', icon: '🔷', color: '#00599C' };
 
