@@ -658,7 +658,7 @@
     const path = window.location.pathname;
     let course = null;
     if (path.includes('/python/')) course = { name: 'Python Course', icon: '🐍', color: '#3776AB' };
-    else if (path.includes('/javascript/')) course = { name: 'JavaScript Course', icon: '⚡', color: '#F7DF1E' };
+    else if (path.includes('/javascript/')) course = { name: 'JavaScript Course', icon: '⚡', color: '#3776AB' };
     else if (path.includes('/c/') && !path.includes('/cpp/')) course = { name: 'C Course', icon: '⚙️', color: '#A8B9CC' };
     else if (path.includes('/cpp/')) course = { name: 'C++ Course', icon: '🔷', color: '#00599C' };
 
