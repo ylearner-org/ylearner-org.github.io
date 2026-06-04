@@ -678,6 +678,61 @@
   }
 
   // ========================
+  // Mobile Search Toggle
+  // ========================
+  function initMobileSearch() {
+    const header = document.querySelector('.site-header');
+    const searchBox = document.querySelector('.header-search');
+    if (!header || !searchBox) return;
+
+    // Create the search icon button
+    const btn = document.createElement('button');
+    btn.className = 'btn-icon mobile-search-btn';
+    btn.setAttribute('aria-label', 'Toggle search');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.innerHTML = '🔍';
+
+    // Insert it before .header-actions (or at end of header)
+    const actions = header.querySelector('.header-actions');
+    actions ? header.insertBefore(btn, actions) : header.appendChild(btn);
+
+    function openSearch() {
+      searchBox.classList.add('search-open');
+      btn.innerHTML = '✕';
+      btn.setAttribute('aria-expanded', 'true');
+      const input = searchBox.querySelector('input');
+      if (input) { input.focus(); input.select(); }
+    }
+
+    function closeSearch() {
+      searchBox.classList.remove('search-open');
+      btn.innerHTML = '🔍';
+      btn.setAttribute('aria-expanded', 'false');
+    }
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      searchBox.classList.contains('search-open') ? closeSearch() : openSearch();
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!searchBox.contains(e.target) && e.target !== btn) closeSearch();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeSearch();
+    });
+
+    // Close when a search result is selected
+    const results = document.getElementById('searchResults');
+    if (results) {
+      results.addEventListener('click', () => setTimeout(closeSearch, 150));
+    }
+  }
+
+  // ========================
   // Init All
   // ========================
   function init() {
@@ -692,6 +747,7 @@
 
     initSearch();
     initMobileNav();
+    initMobileSearch();
     buildTOC();
     initCodeCopy();
     initProgressBar();
