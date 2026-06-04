@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React JavaScript – Components, JSX, Hooks &amp; State Management | ylearner</title>
+  <meta name="description" content="Learn React: JSX syntax, functional components, props, useState, useEffect hooks, event handling, rendering lists with .map(), conditional rendering, virtual DOM, and the React ecosystem (React Router, Zustand, Redux).">
+  <meta name="keywords" content="react javascript tutorial, react useState, react useEffect, react components, JSX syntax, react props, react hooks, react virtual DOM, react router, create react app">
+  <link rel="canonical" href="https://ylearner.org/javascript/frameworks/react.html">
+  <meta property="og:title" content="React JavaScript – Components, JSX, Hooks &amp; State Management | ylearner">
+  <meta property="og:description" content="Learn React: components, JSX, hooks (useState, useEffect), event handling, list rendering, conditional rendering, and the React ecosystem.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/frameworks/react.html">Frameworks</a><span class="separator">›</span>
+          <span class="current">React</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚡ Frameworks</div>
+          <h1>React – The Most Popular JavaScript UI Framework</h1>
+          <p class="lesson-intro"><strong>React</strong> is a declarative, component-based JavaScript library for building user interfaces. Created by Facebook (Meta) in 2013, it has become the most widely used front-end library in the world. React's key innovation is the <strong>virtual DOM</strong> — an in-memory representation of the UI that makes updates fast and predictable.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-react">What Is React?</h2>
+          <p>React is <em>not</em> a full framework — it is a <strong>view library</strong>. It handles rendering the UI and reacting to state changes. For routing, data fetching, and state management you add other libraries. This composability makes it flexible but requires more architectural decisions than opinionated frameworks like Angular.</p>
+          <p>React's core ideas:</p>
+          <ul>
+            <li><strong>Declarative</strong> — describe <em>what</em> the UI should look like for a given state; React figures out <em>how</em> to update the DOM.</li>
+            <li><strong>Component-based</strong> — build encapsulated components that manage their own state, compose them into complex UIs.</li>
+            <li><strong>Learn once, write anywhere</strong> — React Native reuses the same knowledge for iOS/Android apps.</li>
+          </ul>
+
+          <h2 id="jsx-syntax">JSX Syntax</h2>
+          <p>JSX is a syntax extension that lets you write HTML-like markup inside JavaScript. Babel compiles it to <code>React.createElement()</code> calls:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// JSX — what you write
+const element = &lt;h1 className="title"&gt;Hello, React!&lt;/h1&gt;;
+
+// Compiled — what Babel produces
+const element = React.createElement('h1', { className: 'title' }, 'Hello, React!');
+
+// JSX rules:
+// 1. Return a single root element (or use &lt;Fragment&gt; / &lt;&gt;&lt;/&gt;)
+// 2. All tags must be closed: &lt;img /&gt;, &lt;br /&gt;
+// 3. Use className instead of class
+// 4. JavaScript expressions in curly braces {}
+const name = 'Alice';
+const greeting = (
+  &lt;div&gt;
+    &lt;h1&gt;Hello, {name}!&lt;/h1&gt;
+    &lt;p&gt;Today is {new Date().toDateString()}&lt;/p&gt;
+    &lt;p&gt;2 + 2 = {2 + 2}&lt;/p&gt;
+  &lt;/div&gt;
+);
+
+// Fragment — wraps multiple elements without adding a DOM node
+const items = (
+  &lt;&gt;
+    &lt;li&gt;Item 1&lt;/li&gt;
+    &lt;li&gt;Item 2&lt;/li&gt;
+  &lt;/&gt;
+);</code></pre>
+          </div>
+
+          <h2 id="functional-components">Functional Components</h2>
+          <p>A React component is a JavaScript function that returns JSX. Functions are the modern standard (class components are legacy):</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Simplest component — no state, no props
+function Hello() {
+  return &lt;h1&gt;Hello, World!&lt;/h1&gt;;
+}
+
+// Component with props (read-only data passed from parent)
+function UserCard({ name, email, avatar }) {
+  return (
+    &lt;div className="user-card"&gt;
+      &lt;img src={avatar} alt={name} /&gt;
+      &lt;h2&gt;{name}&lt;/h2&gt;
+      &lt;p&gt;{email}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}
+
+// Using the component — looks like an HTML tag
+function App() {
+  return (
+    &lt;div&gt;
+      &lt;Hello /&gt;
+      &lt;UserCard
+        name="Alice"
+        email="alice@example.com"
+        avatar="/alice.jpg"
+      /&gt;
+    &lt;/div&gt;
+  );
+}
+
+// Render to DOM (React 18+)
+import { createRoot } from 'react-dom/client';
+createRoot(document.getElementById('root')).render(&lt;App /&gt;);</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Props are read-only</strong>
+              <p>Never modify props directly — doing so violates React's data flow and causes bugs. If a child needs to update data owned by the parent, the parent passes a callback function as a prop, and the child calls it.</p>
+            </div>
+          </div>
+
+          <h2 id="usestate-hook">State with useState</h2>
+          <p>State is data that can change over time. When state updates, React re-renders the component:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { useState } from 'react';
+
+function Counter() {
+  // useState returns [currentValue, setterFunction]
+  const [count, setCount] = useState(0);  // 0 is the initial value
+
+  return (
+    &lt;div&gt;
+      &lt;p&gt;Count: {count}&lt;/p&gt;
+      &lt;button onClick={() =&gt; setCount(count + 1)}&gt;+&lt;/button&gt;
+      &lt;button onClick={() =&gt; setCount(count - 1)}&gt;-&lt;/button&gt;
+      &lt;button onClick={() =&gt; setCount(0)}&gt;Reset&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+
+// State with objects
+function UserForm() {
+  const [user, setUser] = useState({ name: '', email: '' });
+
+  const handleChange = (e) =&gt; {
+    // Always spread existing state to avoid losing other fields
+    setUser(prev =&gt; ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  return (
+    &lt;form&gt;
+      &lt;input name="name" value={user.name} onChange={handleChange} /&gt;
+      &lt;input name="email" value={user.email} onChange={handleChange} /&gt;
+      &lt;p&gt;Preview: {user.name} — {user.email}&lt;/p&gt;
+    &lt;/form&gt;
+  );
+}</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Behaviour</div>
+            <pre>Click + → Count: 1 → Count: 2 → Count: 3
+Click Reset → Count: 0</pre>
+          </div>
+
+          <h2 id="useeffect-hook">Side Effects with useEffect</h2>
+          <p><code>useEffect</code> runs code after render — for data fetching, subscriptions, DOM manipulation, and timers:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { useState, useEffect } from 'react';
+
+function UserList() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // [] dependency array → run once on mount (componentDidMount equivalent)
+  useEffect(() =&gt; {
+    fetch('https://jsonplaceholder.typicode.com/users')
+      .then(r =&gt; r.json())
+      .then(data =&gt; { setUsers(data); setLoading(false); })
+      .catch(err =&gt; { setError(err.message); setLoading(false); });
+  }, []);
+
+  // [id] dependency array → run whenever id changes
+  // No array → run after EVERY render (usually a bug)
+
+  // Cleanup — return a function to run before next effect or unmount
+  useEffect(() =&gt; {
+    const timer = setInterval(() =&gt; console.log('tick'), 1000);
+    return () =&gt; clearInterval(timer); // cleanup on unmount
+  }, []);
+
+  if (loading) return &lt;p&gt;Loading...&lt;/p&gt;;
+  if (error)   return &lt;p&gt;Error: {error}&lt;/p&gt;;
+
+  return (
+    &lt;ul&gt;
+      {users.map(user =&gt; &lt;li key={user.id}&gt;{user.name}&lt;/li&gt;)}
+    &lt;/ul&gt;
+  );
+}</code></pre>
+          </div>
+
+          <h2 id="lists-and-conditional-rendering">Lists and Conditional Rendering</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Rendering lists with .map() — key prop is required
+function TodoList({ items }) {
+  return (
+    &lt;ul&gt;
+      {items.map(item =&gt; (
+        &lt;li key={item.id} className={item.done ? 'done' : ''}&gt;
+          {item.text}
+        &lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}
+
+// Conditional rendering — && operator
+function Notification({ message }) {
+  return (
+    &lt;div&gt;
+      {message &amp;&amp; &lt;p className="notification"&gt;{message}&lt;/p&gt;}
+    &lt;/div&gt;
+  );
+}
+
+// Conditional rendering — ternary
+function AuthButton({ isLoggedIn }) {
+  return (
+    &lt;button&gt;{isLoggedIn ? 'Log Out' : 'Log In'}&lt;/button&gt;
+  );
+}
+
+// Early return pattern
+function Profile({ user }) {
+  if (!user) return &lt;p&gt;Please log in&lt;/p&gt;;
+  return &lt;h1&gt;Welcome, {user.name}!&lt;/h1&gt;;
+}</code></pre>
+          </div>
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>The key prop must be unique and stable</strong>
+              <p>React uses <code>key</code> to track list items during re-renders. Never use array index as key when items can be reordered or deleted — use a stable unique ID from your data. Unstable keys cause subtle rendering bugs and hurt performance.</p>
+            </div>
+          </div>
+
+          <h2 id="react-ecosystem">React Ecosystem Overview</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Category</th><th>Library</th><th>Purpose</th></tr></thead>
+              <tbody>
+                <tr><td>Routing</td><td>React Router v6</td><td>Client-side navigation, nested routes</td></tr>
+                <tr><td>State (global)</td><td>Zustand</td><td>Lightweight, simple global state</td></tr>
+                <tr><td>State (global)</td><td>Redux Toolkit</td><td>Predictable state container, DevTools</td></tr>
+                <tr><td>Data fetching</td><td>TanStack Query</td><td>Server state, caching, re-fetching</td></tr>
+                <tr><td>Forms</td><td>React Hook Form</td><td>Performant forms with minimal re-renders</td></tr>
+                <tr><td>Styling</td><td>Tailwind CSS / styled-components</td><td>Utility CSS or CSS-in-JS</td></tr>
+                <tr><td>Meta-framework</td><td>Next.js</td><td>SSR, SSG, API routes, file-based routing</td></tr>
+                <tr><td>Mobile</td><td>React Native</td><td>iOS + Android apps with React</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a colour-picker component in React (Vite or CodeSandbox):</p>
+            <ol>
+              <li>Create a <code>ColorPicker</code> component with a state variable for the selected colour.</li>
+              <li>Render 5 colour buttons. Clicking one updates the state.</li>
+              <li>Display a large coloured preview box below the buttons.</li>
+              <li>Show the hex value of the selected colour as text.</li>
+              <li>Pass the selected colour back to the parent via a callback prop.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a fully functional CRUD app: a "Contact Book" that lets you add, view, edit, and delete contacts. Use <code>useState</code> for the contacts array, a separate form component with controlled inputs, a contact list component, and a detail view. Persist contacts to <code>localStorage</code> using <code>useEffect</code>. Add a search filter using derived state (filter the contacts array based on an input value — no extra state needed).</p>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>React is a declarative, component-based view library powered by a virtual DOM.</li>
+              <li>JSX is compiled to <code>React.createElement()</code> — it's JavaScript, not HTML.</li>
+              <li>Functional components are plain functions that return JSX.</li>
+              <li>Props pass read-only data from parent to child; never mutate props.</li>
+              <li><code>useState</code> manages local state; calling the setter triggers a re-render.</li>
+              <li><code>useEffect</code> runs side effects after render; the dependency array controls when it runs.</li>
+              <li>Use <code>.map()</code> for lists with a stable unique <code>key</code> prop.</li>
+              <li>Use <code>&amp;&amp;</code> or ternary for conditional rendering.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the virtual DOM and why does it improve performance?</li>
+            <li>What is the difference between props and state?</li>
+            <li>When would you use <code>useEffect</code> with an empty dependency array vs a non-empty one?</li>
+            <li>Why must list items have a <code>key</code> prop? What's wrong with using array index?</li>
+            <li>What is the difference between controlled and uncontrolled components?</li>
+          </ul>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between Create React App and Vite? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Create React App (CRA) is the original scaffold tool that uses Webpack under the hood. It's slow to start and build. <strong>Vite</strong> uses native ES modules and esbuild, making dev startup near-instant. For new projects in 2026, use Vite or Next.js — CRA is no longer actively maintained.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is a controlled vs uncontrolled component? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A <strong>controlled component</strong> has its value driven by React state: <code>value={state}</code> + <code>onChange</code> handler. React owns the data. An <strong>uncontrolled component</strong> manages its own value in the DOM; you read it via a <code>ref</code>. Controlled components are preferred for validation and dynamic UIs. Use uncontrolled components for simple file inputs or when integrating with non-React code.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does React re-render and how can I prevent unnecessary re-renders? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>React re-renders a component when its state or props change. To prevent unnecessary child re-renders: wrap the component in <code>React.memo()</code> (skips render if props didn't change), use <code>useCallback</code> to memoize callback props, and <code>useMemo</code> to memoize expensive computations. Premature optimization is a trap — profile first, memoize only where there's a measurable benefit.</p></div>
+            </div>
+          </section>
+
+          <div class="related-topics">
+            <a href="/javascript/dom/web-storage.html" class="topic-tag">Web Storage</a>
+            <a href="/javascript/frameworks/vue.html" class="topic-tag">Vue.js</a>
+            <a href="/javascript/frameworks/nodejs.html" class="topic-tag">Node.js</a>
+            <a href="/javascript/advanced/async-await.html" class="topic-tag">Async/Await</a>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/dom/web-storage.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Web Storage</span></a>
+          <a href="/javascript/frameworks/vue.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Vue.js</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

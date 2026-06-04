@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Calculator Project – Build a Working Calculator | ylearner</title>
+  <meta name="description" content="Build a fully functional JavaScript calculator from scratch. Complete HTML, CSS, and JavaScript code with keyboard support, operator chaining, and decimal handling.">
+  <meta name="keywords" content="JavaScript calculator project, build calculator JavaScript, JavaScript DOM project, beginner JavaScript project, calculator HTML CSS JS">
+  <link rel="canonical" href="https://ylearner.org/javascript/projects/calculator.html">
+  <meta property="og:title" content="JavaScript Calculator Project – Build a Working Calculator | ylearner">
+  <meta property="og:description" content="Build a fully functional JavaScript calculator from scratch. Complete HTML, CSS, and JavaScript code with keyboard support, operator chaining, and decimal handling.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/projects/calculator.html">Projects</a><span class="separator">›</span>
+          <span class="current">Calculator</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🛠️ Projects</div>
+          <h1>JavaScript Calculator – Build a Functional Calculator from Scratch</h1>
+          <p class="lesson-intro">Build a fully functional calculator with number input, four arithmetic operators, decimal support, keyboard shortcuts, and a clear/backspace function. This project practices DOM manipulation, event handling, and state management in a single self-contained JavaScript file.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="project-overview">Project Overview</h2>
+          <p>The calculator supports all standard operations: addition, subtraction, multiplication, division, decimal input, chained operations, and keyboard input. The state is a single string expression that gets evaluated when the user presses <kbd>=</kbd>.</p>
+
+          <table>
+            <thead><tr><th>Feature</th><th>Implementation</th></tr></thead>
+            <tbody>
+              <tr><td>Number buttons (0–9)</td><td>Append digit to expression string</td></tr>
+              <tr><td>Operators (+, −, ×, ÷)</td><td>Append operator to expression string</td></tr>
+              <tr><td>Equals (=)</td><td>Evaluate expression with <code>Function()</code></td></tr>
+              <tr><td>Clear (C)</td><td>Reset expression to ""</td></tr>
+              <tr><td>Backspace (⌫)</td><td>Remove last character</td></tr>
+              <tr><td>Decimal (.)</td><td>Append "." (prevent double dots)</td></tr>
+              <tr><td>Keyboard support</td><td>Map keydown events to handleInput()</td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="html-structure">HTML Structure</h2>
+          <p>The calculator layout uses a CSS grid for the button pad and a display area at the top. Each button carries a <code>data-value</code> attribute that maps directly to what gets added to the expression string.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/* HTML Structure (save as calculator.html):
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Calculator&lt;/title&gt;
+  &lt;link rel="stylesheet" href="calc-style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="calculator"&gt;
+    &lt;div class="calc-display"&gt;
+      &lt;div class="expression" id="expression"&gt;&lt;/div&gt;
+      &lt;div class="result" id="result"&gt;0&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="calc-buttons" id="calc-buttons"&gt;
+      &lt;button data-value="C"  class="btn-wide btn-clear"&gt;C&lt;/button&gt;
+      &lt;button data-value="⌫" class="btn-secondary"&gt;⌫&lt;/button&gt;
+      &lt;button data-value="%"  class="btn-secondary"&gt;%&lt;/button&gt;
+      &lt;button data-value="/"  class="btn-operator"&gt;÷&lt;/button&gt;
+
+      &lt;button data-value="7"&gt;7&lt;/button&gt;
+      &lt;button data-value="8"&gt;8&lt;/button&gt;
+      &lt;button data-value="9"&gt;9&lt;/button&gt;
+      &lt;button data-value="*"  class="btn-operator"&gt;×&lt;/button&gt;
+
+      &lt;button data-value="4"&gt;4&lt;/button&gt;
+      &lt;button data-value="5"&gt;5&lt;/button&gt;
+      &lt;button data-value="6"&gt;6&lt;/button&gt;
+      &lt;button data-value="-"  class="btn-operator"&gt;−&lt;/button&gt;
+
+      &lt;button data-value="1"&gt;1&lt;/button&gt;
+      &lt;button data-value="2"&gt;2&lt;/button&gt;
+      &lt;button data-value="3"&gt;3&lt;/button&gt;
+      &lt;button data-value="+"  class="btn-operator"&gt;+&lt;/button&gt;
+
+      &lt;button data-value="+/-" class="btn-secondary"&gt;±&lt;/button&gt;
+      &lt;button data-value="0"&gt;0&lt;/button&gt;
+      &lt;button data-value="."&gt;.&lt;/button&gt;
+      &lt;button data-value="="  class="btn-equals"&gt;=&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;script src="calc-script.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+*/</code></pre>
+          </div>
+
+          <h2 id="css-styling">CSS Styling</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/* calc-style.css
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #1a1a2e;
+  font-family: 'Segoe UI', sans-serif;
+}
+.calculator {
+  background: #16213e;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  width: 320px;
+}
+.calc-display {
+  background: #0f3460;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+.expression { color: #a0aec0; font-size: 14px; min-height: 20px; }
+.result     { color: #ffffff; font-size: 36px; font-weight: 300; }
+.calc-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+button {
+  background: #1a1a2e;
+  color: #e2e8f0;
+  border: none;
+  border-radius: 12px;
+  padding: 18px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+button:hover  { background: #2d3748; }
+button:active { transform: scale(0.95); }
+.btn-operator { background: #2b6cb0; color: white; }
+.btn-operator:hover { background: #3182ce; }
+.btn-equals   { background: #e53e3e; color: white; }
+.btn-equals:hover   { background: #fc8181; }
+.btn-clear    { background: #c05621; color: white; }
+.btn-secondary { background: #2d3748; }
+*/</code></pre>
+          </div>
+
+          <h2 id="javascript-logic">JavaScript Logic</h2>
+          <p>The core logic uses a single <code>expression</code> string as state. All input appends to or modifies this string. On equals, the expression is evaluated safely using a <code>Function</code> constructor wrapped in try/catch.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// calc-script.js — Full working calculator logic
+
+let expression = "";
+let justEvaluated = false;
+
+const expressionEl = document.getElementById("expression");
+const resultEl     = document.getElementById("result");
+
+function updateDisplay() {
+  expressionEl.textContent = expression;
+  if (expression === "") resultEl.textContent = "0";
+}
+
+function safeEval(expr) {
+  try {
+    // Security: only allow numbers and operators
+    if (!/^[0-9+\-*/.%() ]+$/.test(expr)) throw new Error("Invalid");
+    const result = Function('"use strict"; return (' + expr + ')')();
+    if (!isFinite(result)) throw new Error("Math Error");
+    // Round to avoid floating point display issues
+    return parseFloat(result.toFixed(10)).toString();
+  } catch {
+    return "Error";
+  }
+}
+
+function handleInput(value) {
+  if (value === "C") {
+    expression = "";
+    resultEl.textContent = "0";
+    justEvaluated = false;
+    updateDisplay();
+    return;
+  }
+
+  if (value === "⌫") {
+    expression = expression.slice(0, -1);
+    updateDisplay();
+    return;
+  }
+
+  if (value === "=") {
+    if (!expression) return;
+    expressionEl.textContent = expression + " =";
+    const result = safeEval(expression);
+    resultEl.textContent = result;
+    expression = result === "Error" ? "" : result;
+    justEvaluated = true;
+    return;
+  }
+
+  if (value === ".") {
+    // Prevent multiple dots in the same number segment
+    const parts = expression.split(/[+\-*/]/);
+    const currentNum = parts[parts.length - 1];
+    if (currentNum.includes(".")) return;
+  }
+
+  if (value === "+/-") {
+    if (expression === "" || expression === "0") return;
+    expression = expression.startsWith("-") ? expression.slice(1) : "-" + expression;
+    updateDisplay();
+    return;
+  }
+
+  const isOperator = ["+", "-", "*", "/", "%"].includes(value);
+
+  // If just evaluated and user presses a number, start fresh
+  if (justEvaluated && !isOperator) {
+    expression = value;
+    justEvaluated = false;
+    updateDisplay();
+    return;
+  }
+  justEvaluated = false;
+
+  // Prevent double operators
+  const lastChar = expression.slice(-1);
+  if (isOperator && ["+", "-", "*", "/", "%"].includes(lastChar)) {
+    expression = expression.slice(0, -1) + value;
+  } else {
+    expression += value;
+  }
+
+  updateDisplay();
+}
+
+// Button clicks via event delegation
+document.getElementById("calc-buttons").addEventListener("click", e => {
+  if (e.target.matches("button")) {
+    handleInput(e.target.dataset.value);
+  }
+});
+
+// Keyboard support
+document.addEventListener("keydown", e => {
+  if (e.key >= "0" && e.key <= "9") handleInput(e.key);
+  if (["+", "-", "*", "/", "."].includes(e.key)) handleInput(e.key);
+  if (e.key === "Enter" || e.key === "=") handleInput("=");
+  if (e.key === "Backspace") handleInput("⌫");
+  if (e.key === "Escape")    handleInput("C");
+  if (e.key === "%")         handleInput("%");
+});</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <strong>Security Note:</strong> The <code>Function()</code> constructor can execute arbitrary JavaScript. The regex check <code>/^[0-9+\-*/.%() ]+$/</code> acts as a whitelist guard — it ensures only numbers and arithmetic operators are evaluated, blocking any injection like <code>alert(1)</code>.
+          </div>
+
+          <h2 id="enhancements">Enhancements and Extensions</h2>
+          <p>Once the basic calculator works, these enhancements increase complexity and make it more portfolio-worthy:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Enhancement 1: Calculation history (last 5 results)
+const history = [];
+
+function recordHistory(expr, result) {
+  history.unshift({ expr, result, time: new Date().toLocaleTimeString() });
+  if (history.length > 5) history.pop();
+  renderHistory();
+}
+
+function renderHistory() {
+  const el = document.getElementById("history");
+  if (!el) return;
+  el.innerHTML = history.map(h =>
+    `&lt;div class="history-item"&gt;
+      &lt;span class="history-expr"&gt;${h.expr}&lt;/span&gt;
+      &lt;span class="history-result"&gt;= ${h.result}&lt;/span&gt;
+    &lt;/div&gt;`
+  ).join("");
+}
+
+// Enhancement 2: Format large numbers with commas
+function formatNumber(numStr) {
+  const num = parseFloat(numStr);
+  if (isNaN(num)) return numStr;
+  return new Intl.NumberFormat().format(num);
+}
+
+// Enhancement 3: Percentage button logic
+function handlePercent() {
+  if (!expression) return;
+  const parts = expression.split(/([+\-*/])/);
+  const lastNum = parseFloat(parts[parts.length - 1]);
+  if (isNaN(lastNum)) return;
+  parts[parts.length - 1] = lastNum / 100;
+  expression = parts.join("");
+  updateDisplay();
+}</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <strong>Concepts Practiced:</strong> This project exercises DOM querying and manipulation, event handling and delegation, keyboard event mapping, string manipulation (the expression string), try/catch error handling, and basic security thinking (input validation before eval).
+          </div>
+
+          <h2 id="testing">Testing Your Calculator</h2>
+          <p>Run through this test checklist to verify all features work:</p>
+
+          <div class="exercise-box">
+            <h3>Test Checklist</h3>
+            <ul>
+              <li>Basic: 5 + 3 = 8</li>
+              <li>Chained: 5 + 3 * 2 = 11 (tests operator precedence)</li>
+              <li>Decimal: 1.5 + 2.5 = 4</li>
+              <li>Double decimal prevention: pressing "1.." should only give "1."</li>
+              <li>Backspace: 123⌫ should give 12</li>
+              <li>Clear: any expression then C should show 0</li>
+              <li>Division by zero: 5 / 0 should show "Infinity" or "Math Error"</li>
+              <li>Keyboard: type 7 + 8 then press Enter — should show 15</li>
+              <li>Double operator: 5 + * should replace + with *</li>
+            </ul>
+          </div>
+
+          <div class="challenge-box">
+            <h3>Challenge: Scientific Mode</h3>
+            <p>Extend the calculator with scientific functions:</p>
+            <ul>
+              <li>Square root: <code>Math.sqrt(x)</code></li>
+              <li>Power: <code>x ** y</code></li>
+              <li>Trigonometry: <code>Math.sin/cos/tan</code></li>
+              <li>Toggle between basic and scientific mode with a button</li>
+            </ul>
+          </div>
+
+          <h2 id="faq">FAQ</h2>
+          <div class="faq-section">
+            <div class="faq-item">
+              <h3>Why use a string expression instead of tracking operands separately?</h3>
+              <p>The string approach is simpler and automatically handles operator precedence (5 + 3 * 2 = 11, not 16) because <code>Function()</code> evaluates it like real JavaScript. The alternative — tracking currentValue, operator, pendingValue — requires manual precedence handling.</p>
+            </div>
+            <div class="faq-item">
+              <h3>Is eval() safe to use in a calculator?</h3>
+              <p>The raw <code>eval()</code> function is dangerous in production. Using <code>Function()</code> with a strict whitelist regex (allowing only digits and operators) makes it safe for a calculator context where input is tightly controlled.</p>
+            </div>
+            <div class="faq-item">
+              <h3>How do I prevent floating point errors like 0.1 + 0.2 = 0.30000000000000004?</h3>
+              <p>Use <code>parseFloat(result.toFixed(10))</code> to round to 10 decimal places, which eliminates most floating point artifacts while preserving legitimate decimal precision.</p>
+            </div>
+            <div class="faq-item">
+              <h3>How do I add a history panel?</h3>
+              <p>Maintain a <code>history</code> array, push <code>{ expr, result }</code> on each evaluation, and render it below the calculator. Store it in <code>localStorage</code> to persist across page loads.</p>
+            </div>
+            <div class="faq-item">
+              <h3>Can I deploy this to GitHub Pages?</h3>
+              <p>Yes. Push the HTML, CSS, and JS files to a GitHub repository, enable GitHub Pages in the repo settings, and your calculator will be live at <code>username.github.io/repo-name</code>.</p>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <h3>Summary</h3>
+            <ul>
+              <li>State: a single expression string — simple and handles operator precedence automatically</li>
+              <li>Evaluation: <code>Function()</code> constructor with whitelist regex for security</li>
+              <li>Events: delegated click handler on the button container + keyboard event listener</li>
+              <li>Edge cases: double decimal, double operator, division by zero, floating point rounding</li>
+              <li>Concepts practiced: DOM manipulation, event handling, string methods, error handling</li>
+            </ul>
+          </div>
+
+          <ul class="interview-list">
+            <li>A working, polished calculator on GitHub Pages makes an excellent portfolio piece</li>
+            <li>The <code>justEvaluated</code> flag pattern is a good example of state machine thinking</li>
+            <li>Event delegation on the button container is more efficient than 20 individual listeners</li>
+            <li>Always handle the <code>Error</code> / <code>Math Error</code> display case — interviewers note defensive coding</li>
+          </ul>
+
+          <div class="related-topics">
+            <h3>Related Topics</h3>
+            <ul>
+              <li><a href="/javascript/projects/todo-app.html">Todo App Project</a></li>
+              <li><a href="/javascript/interview/exercises.html">Practical JavaScript Exercises</a></li>
+              <li><a href="/javascript/dom/events.html">DOM Events Deep Dive</a></li>
+            </ul>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/interview/exercises.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Practical Exercises</span></a>
+          <a href="/javascript/projects/todo-app.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Todo App</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

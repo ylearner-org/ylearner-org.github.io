@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Node.js – Server-Side JavaScript, npm &amp; Express | ylearner</title>
+  <meta name="description" content="Learn Node.js: running JavaScript on the server with V8, event-driven non-blocking I/O, core modules (fs, path, http, os), npm package management, building HTTP servers, Express.js routing and middleware, and npm vs npx.">
+  <meta name="keywords" content="nodejs tutorial, node.js server, express.js nodejs, npm tutorial, nodejs http server, nodejs core modules, nodejs fs module, nodejs non-blocking io, node.js for beginners">
+  <link rel="canonical" href="https://ylearner.org/javascript/frameworks/nodejs.html">
+  <meta property="og:title" content="Node.js – Server-Side JavaScript, npm &amp; Express | ylearner">
+  <meta property="og:description" content="Learn Node.js: server-side JavaScript, core modules, npm, building HTTP servers with built-in http and Express.js.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/frameworks/react.html">Frameworks</a><span class="separator">›</span>
+          <span class="current">Node.js</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚡ Frameworks</div>
+          <h1>Node.js – Running JavaScript on the Server</h1>
+          <p class="lesson-intro"><strong>Node.js</strong> is a JavaScript runtime built on Chrome's V8 engine that lets you run JavaScript outside the browser — on servers, CLIs, scripts, and desktop apps. Its event-driven, non-blocking I/O model makes it exceptionally efficient for I/O-heavy workloads like APIs, real-time apps, and microservices.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 23 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-nodejs">What Is Node.js?</h2>
+          <p>Ryan Dahl created Node.js in 2009, embedding the V8 JavaScript engine in a C++ program that adds APIs for file system access, networking, processes, and more. Key characteristics:</p>
+          <ul>
+            <li><strong>Single-threaded event loop</strong> — one thread handles all I/O via callbacks/Promises, avoiding thread management complexity.</li>
+            <li><strong>Non-blocking I/O</strong> — operations like reading files or querying databases don't block the thread; the loop continues processing while waiting for I/O.</li>
+            <li><strong>Same language everywhere</strong> — JavaScript on client and server reduces context switching and enables code sharing.</li>
+            <li><strong>npm ecosystem</strong> — over 2 million packages available.</li>
+          </ul>
+
+          <h2 id="installing-and-running">Installing Node.js and Running Code</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Download from nodejs.org or use a version manager:
+// nvm install 20   (Node Version Manager — recommended)
+// nvm use 20
+
+// Check versions
+// $ node --version   → v20.x.x
+// $ npm --version    → 10.x.x
+
+// REPL (Read-Eval-Print Loop) — interactive shell
+// $ node
+// &gt; 2 + 2
+// 4
+// &gt; 'hello'.toUpperCase()
+// 'HELLO'
+// &gt; .exit
+
+// Run a file
+// $ node app.js
+
+// Basic Node.js script — hello.js
+console.log('Hello from Node.js!');
+console.log('Node version:', process.version);
+console.log('Platform:', process.platform);   // 'linux', 'darwin', 'win32'
+console.log('Working dir:', process.cwd());
+
+// process.argv — command-line arguments
+// $ node greet.js Alice
+const name = process.argv[2] || 'World';
+console.log(`Hello, ${name}!`);</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>Hello from Node.js!
+Node version: v20.11.0
+Platform: linux
+Working dir: /home/user/my-project</pre>
+          </div>
+
+          <h2 id="global-objects">Node.js Global Objects</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// __dirname — absolute path of current file's directory
+console.log(__dirname);  // /home/user/project/src
+
+// __filename — absolute path of current file
+console.log(__filename); // /home/user/project/src/app.js
+
+// process — information about the running Node process
+process.env.NODE_ENV = 'development';     // set env variable
+console.log(process.env.PORT || 3000);    // read env variable
+process.exit(0);                          // exit with code 0 (success)
+
+// Buffer — handle binary data
+const buf = Buffer.from('Hello');
+console.log(buf);           // &lt;Buffer 48 65 6c 6c 6f&gt;
+console.log(buf.toString()); // "Hello"
+
+// global — equivalent of window in browsers (rarely used directly)
+global.myConfig = { debug: true };
+
+// setTimeout, setInterval, clearTimeout, clearInterval — same as browser
+const timer = setTimeout(() =&gt; console.log('fired!'), 1000);
+clearTimeout(timer);</code></pre>
+          </div>
+
+          <h2 id="core-modules">Core Built-in Modules</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// No npm install needed — built into Node.js
+
+// fs — File System
+const fs = require('fs');
+// Or with ES modules: import fs from 'fs';
+
+// Read file (async with callback)
+fs.readFile('data.txt', 'utf8', (err, content) =&gt; {
+  if (err) throw err;
+  console.log(content);
+});
+
+// Read file (Promise-based — preferred)
+const fsPromises = require('fs/promises');
+const content = await fsPromises.readFile('data.txt', 'utf8');
+console.log(content);
+
+// Write file
+await fsPromises.writeFile('output.txt', 'Hello Node!');
+
+// path — cross-platform file path utilities
+const path = require('path');
+const filePath = path.join(__dirname, 'data', 'users.json');
+console.log(path.basename(filePath)); // "users.json"
+console.log(path.extname(filePath));  // ".json"
+console.log(path.dirname(filePath));  // "/home/.../data"
+
+// os — operating system info
+const os = require('os');
+console.log(os.platform());  // "linux"
+console.log(os.cpus().length); // number of CPU cores
+console.log(os.freemem());   // free memory in bytes
+console.log(os.homedir());   // "/home/user"</code></pre>
+          </div>
+
+          <h2 id="npm-basics">npm Basics</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Initialize a project — creates package.json
+// $ npm init -y
+
+// Install a package (saved to dependencies)
+// $ npm install express
+
+// Install a dev dependency (only for development/build)
+// $ npm install --save-dev nodemon
+
+// Install globally (CLI tools)
+// $ npm install -g typescript
+
+// Remove a package
+// $ npm uninstall lodash
+
+// package.json structure
+// {
+//   "name": "my-app",
+//   "version": "1.0.0",
+//   "main": "index.js",
+//   "scripts": {
+//     "start": "node index.js",
+//     "dev": "nodemon index.js",
+//     "test": "jest"
+//   },
+//   "dependencies": { "express": "^4.18.0" },
+//   "devDependencies": { "nodemon": "^3.0.0" }
+// }
+
+// Run scripts
+// $ npm run dev
+// $ npm start      (shortcut — no "run" needed)
+// $ npm test       (shortcut — no "run" needed)
+
+// npx — run a package without installing it globally
+// $ npx create-react-app my-app
+// $ npx nodemon index.js</code></pre>
+          </div>
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Commit package.json but not node_modules</strong>
+              <p>Always add <code>node_modules/</code> to your <code>.gitignore</code>. The <code>package.json</code> and <code>package-lock.json</code> files are sufficient for any developer to recreate the exact dependency tree by running <code>npm install</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="http-server">Built-in HTTP Server</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const http = require('http');
+const fs   = require('fs/promises');
+const path = require('path');
+
+const server = http.createServer(async (req, res) =&gt; {
+  const url = req.url;
+  const method = req.method;
+
+  console.log(`${method} ${url}`);
+
+  if (url === '/' &amp;&amp; method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end('&lt;h1&gt;Hello from Node.js!&lt;/h1&gt;');
+
+  } else if (url === '/api/users' &amp;&amp; method === 'GET') {
+    const users = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }];
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(users));
+
+  } else {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Not Found' }));
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () =&gt; {
+  console.log(`Server running at http://localhost:${PORT}`);
+});</code></pre>
+          </div>
+
+          <h2 id="express-intro">Express.js – The Standard Node Web Framework</h2>
+          <p>Express adds routing, middleware, and a clean request/response API on top of Node's built-in <code>http</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// npm install express
+const express = require('express');
+const app = express();
+
+// Built-in middleware — parse JSON request bodies
+app.use(express.json());
+// Serve static files from /public folder
+app.use(express.static('public'));
+
+// Routes
+app.get('/', (req, res) =&gt; {
+  res.send('&lt;h1&gt;Welcome to Express!&lt;/h1&gt;');
+});
+
+app.get('/api/users', async (req, res) =&gt; {
+  try {
+    const users = await getUsersFromDB();
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Route parameters
+app.get('/api/users/:id', (req, res) =&gt; {
+  const { id } = req.params;
+  res.json({ id, name: 'Alice' });
+});
+
+// POST with body
+app.post('/api/users', (req, res) =&gt; {
+  const { name, email } = req.body;
+  if (!name || !email) {
+    return res.status(400).json({ error: 'name and email required' });
+  }
+  const newUser = { id: Date.now(), name, email };
+  res.status(201).json(newUser);
+});
+
+// Custom middleware — runs before route handlers
+app.use((req, res, next) =&gt; {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next(); // pass to next middleware or route
+});
+
+app.listen(3000, () =&gt; console.log('Express server on port 3000'));</code></pre>
+          </div>
+
+          <h2 id="browser-vs-node">Browser JS vs Node.js</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Feature</th><th>Browser JavaScript</th><th>Node.js</th></tr></thead>
+              <tbody>
+                <tr><td>Runtime environment</td><td>Browser tab</td><td>Server / CLI / scripts</td></tr>
+                <tr><td>Global object</td><td><code>window</code></td><td><code>global</code></td></tr>
+                <tr><td>DOM API</td><td>Yes (<code>document</code>, <code>window</code>)</td><td>No (no browser)</td></tr>
+                <tr><td>File system</td><td>No (sandboxed)</td><td>Yes (<code>fs</code> module)</td></tr>
+                <tr><td>Modules</td><td>ES Modules natively</td><td>CommonJS (<code>require</code>) or ESM</td></tr>
+                <tr><td>Package manager</td><td>CDN / importmap</td><td>npm / yarn / pnpm</td></tr>
+                <tr><td>HTTP</td><td>Fetch API (client)</td><td>Built-in <code>http</code> / Express (server)</td></tr>
+                <tr><td>Use cases</td><td>UI, interactivity</td><td>APIs, CLIs, build tools, scripts</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Node.js is not great for CPU-intensive work</strong>
+              <p>Node's single-threaded model excels at I/O-bound tasks (API calls, DB queries, file reads) but struggles with CPU-heavy work (image processing, video encoding, complex math). For CPU tasks, use Worker Threads, spawn a child process, or delegate to a language better suited to computation (Python, Rust, Go).</p>
+            </div>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a simple REST API with Express:</p>
+            <ol>
+              <li><code>GET /api/notes</code> — return all notes (store in an in-memory array).</li>
+              <li><code>GET /api/notes/:id</code> — return a single note by ID (404 if not found).</li>
+              <li><code>POST /api/notes</code> — create a note from <code>{ title, content }</code> body; assign an auto-increment ID.</li>
+              <li><code>DELETE /api/notes/:id</code> — remove a note; 204 on success, 404 if missing.</li>
+              <li>Test with curl or a browser extension like Thunder Client.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a real-time chat server using Node.js built-in <code>http</code> and the <code>ws</code> npm package for WebSockets. The server: broadcasts messages from any client to all connected clients; prepends a random username to each message; stores the last 10 messages in memory and sends them to new connections. The client: a plain HTML page with a textarea and send button that connects via <code>new WebSocket('ws://localhost:3000')</code>. Open two browser tabs to test real-time updates.</p>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Node.js runs JavaScript on the server using Chrome's V8 engine.</li>
+              <li>Event-driven, non-blocking I/O makes Node efficient for API servers and real-time apps.</li>
+              <li>Global objects: <code>process</code>, <code>__dirname</code>, <code>__filename</code>, <code>Buffer</code>.</li>
+              <li>Core modules: <code>fs</code> (file I/O), <code>path</code> (path utilities), <code>http</code> (server), <code>os</code> (system info).</li>
+              <li>npm manages packages; <code>package.json</code> declares dependencies and scripts.</li>
+              <li>Express.js adds routing, middleware, and a clean API on top of Node's <code>http</code>.</li>
+              <li>Use <code>npx</code> to run CLI tools without global installation.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the event loop in Node.js and how does non-blocking I/O work?</li>
+            <li>What is the difference between <code>dependencies</code> and <code>devDependencies</code> in package.json?</li>
+            <li>What is middleware in Express? Give an example of a custom middleware.</li>
+            <li>What is the difference between <code>npm install</code> and <code>npx</code>?</li>
+            <li>When is Node.js a poor choice for a task?</li>
+          </ul>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between CommonJS and ES Modules in Node.js? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>CommonJS (<code>require()</code> / <code>module.exports</code>) is Node's original module system — synchronous, loaded at runtime. ES Modules (<code>import</code> / <code>export</code>) are the browser-standard, asynchronous module system added to Node in v12+. To use ESM in Node, add <code>"type": "module"</code> to package.json or use <code>.mjs</code> file extensions. Modern projects prefer ESM for consistency with browser code.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How does Node.js handle multiple requests on a single thread? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Node uses an <strong>event loop</strong> backed by libuv (a C library). When an I/O operation (database query, file read, HTTP request) is initiated, Node delegates it to the OS/thread pool and continues processing other events. When the I/O completes, a callback is placed in the event queue and the event loop picks it up on the next tick. This means Node can handle thousands of concurrent connections without spawning thousands of threads.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I use Express or a newer framework like Fastify or Hono? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Express has the largest ecosystem and most tutorials — ideal for learning and legacy projects. <strong>Fastify</strong> is 2–4x faster and has schema-based validation built in. <strong>Hono</strong> is ultra-lightweight and edge-runtime compatible (Cloudflare Workers, Deno Deploy). For a new production API in 2026, Fastify or Hono are excellent choices; Express remains perfectly valid for most use cases.</p></div>
+            </div>
+          </section>
+
+          <div class="related-topics">
+            <a href="/javascript/frameworks/vue.html" class="topic-tag">Vue.js</a>
+            <a href="/javascript/frameworks/react.html" class="topic-tag">React</a>
+            <a href="/javascript/dom/fetch-api.html" class="topic-tag">Fetch API</a>
+            <a href="/javascript/interview/questions.html" class="topic-tag">Interview Questions</a>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/frameworks/vue.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Vue.js</span></a>
+          <a href="/javascript/interview/questions.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Interview Questions</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
