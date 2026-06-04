@@ -17,9 +17,10 @@
     const parts = path.split('/').filter(Boolean);
     parts.pop(); // remove filename
     const depth2Folders = ['beginner','control-flow','functions','data-structures',
-      'intermediate','oop','advanced','real-world','frameworks','data-science','interview','projects','dom'];
+      'intermediate','oop','advanced','real-world','frameworks','data-science','interview','projects','dom',
+      'getting-started','core','lifecycle','templates','odoo'];
     const isDepth2 = depth2Folders.some(f => path.includes('/' + f + '/'));
-    const isDepth1 = !isDepth2 && ['/python/','/javascript/','/c/','/cpp/','/java/','/sql/'].some(s => path.includes(s));
+    const isDepth1 = !isDepth2 && ['/python/','/javascript/','/c/','/cpp/','/java/','/sql/','/owljs/'].some(s => path.includes(s));
     if (isDepth2) parts.splice(-2);
     else if (isDepth1) parts.splice(-1);
     return 'file:///' + parts.join('/');
@@ -333,14 +334,104 @@
     },
   ];
 
+  // ========================
+  // OWL JS Navigation Data
+  // ========================
+  const OWL_NAV_DATA = [
+    {
+      title: '🦉 Introduction',
+      items: [
+        { title: 'What is OWL JS?', url: '/owljs/what-is-owl.html' },
+        { title: 'Why Learn OWL JS?', url: '/owljs/why-learn-owl.html' },
+        { title: 'Prerequisites', url: '/owljs/owl-prerequisites.html' },
+        { title: 'OWL vs React vs Vue', url: '/owljs/owl-vs-frameworks.html' },
+        { title: 'OWL Career Paths', url: '/owljs/owl-career-paths.html' },
+      ]
+    },
+    {
+      title: '🚀 Getting Started',
+      items: [
+        { title: 'Setting Up OWL JS', url: '/owljs/getting-started/setup.html' },
+        { title: 'Your First OWL App', url: '/owljs/getting-started/first-app.html' },
+        { title: 'OWL Project Structure', url: '/owljs/getting-started/project-structure.html' },
+      ]
+    },
+    {
+      title: '🧩 Core Concepts',
+      items: [
+        { title: 'Components & Classes', url: '/owljs/core/components.html' },
+        { title: 'Template Syntax (QWeb)', url: '/owljs/core/templates.html' },
+        { title: 'Props', url: '/owljs/core/props.html' },
+        { title: 'State & useState', url: '/owljs/core/state.html' },
+        { title: 'Event Handling', url: '/owljs/core/events.html' },
+      ]
+    },
+    {
+      title: '🔄 Lifecycle Hooks',
+      items: [
+        { title: 'Lifecycle Overview', url: '/owljs/lifecycle/overview.html' },
+        { title: 'setup & onMounted', url: '/owljs/lifecycle/setup-mounted.html' },
+        { title: 'willStart & Async Init', url: '/owljs/lifecycle/will-start.html' },
+        { title: 'willPatch & patched', url: '/owljs/lifecycle/patch-hooks.html' },
+        { title: 'willUnmount & Cleanup', url: '/owljs/lifecycle/unmount.html' },
+      ]
+    },
+    {
+      title: '📋 Dynamic Templates',
+      items: [
+        { title: 'Conditional Rendering (t-if)', url: '/owljs/templates/conditional.html' },
+        { title: 'List Rendering (t-foreach)', url: '/owljs/templates/list-rendering.html' },
+        { title: 'Input Binding (t-model)', url: '/owljs/templates/input-binding.html' },
+        { title: 'Dynamic Attributes (t-att)', url: '/owljs/templates/dynamic-attrs.html' },
+        { title: 'Refs (t-ref)', url: '/owljs/templates/refs.html' },
+      ]
+    },
+    {
+      title: '⚙️ Advanced OWL',
+      items: [
+        { title: 'Sub-components', url: '/owljs/advanced/sub-components.html' },
+        { title: 'Slots', url: '/owljs/advanced/slots.html' },
+        { title: 'Custom Hooks', url: '/owljs/advanced/hooks.html' },
+        { title: 'Environment & Services', url: '/owljs/advanced/environment.html' },
+        { title: 'Error Handling', url: '/owljs/advanced/error-handling.html' },
+        { title: 'Concurrency Model', url: '/owljs/advanced/concurrency.html' },
+      ]
+    },
+    {
+      title: '🏢 Odoo Integration',
+      items: [
+        { title: 'OWL in Odoo Backend', url: '/owljs/odoo/owl-in-odoo.html' },
+        { title: 'Odoo Services', url: '/owljs/odoo/services.html' },
+        { title: 'RPC – Calling Python', url: '/owljs/odoo/rpc-calls.html' },
+      ]
+    },
+    {
+      title: '🎯 Interview Prep',
+      items: [
+        { title: 'OWL Interview Questions', url: '/owljs/interview/questions.html', badge: 'hot' },
+        { title: 'Practical Exercises', url: '/owljs/interview/exercises.html' },
+      ]
+    },
+    {
+      title: '🛠️ Projects',
+      items: [
+        { title: 'Todo App with OWL', url: '/owljs/projects/todo-app.html' },
+        { title: 'Counter Widget', url: '/owljs/projects/counter.html' },
+        { title: 'Form with Validation', url: '/owljs/projects/form-validation.html' },
+        { title: 'Dashboard Component', url: '/owljs/projects/dashboard.html' },
+      ]
+    },
+  ];
+
   function getNavData() {
     const path = window.location.pathname;
     if (path.includes('/javascript/')) return JS_NAV_DATA;
+    if (path.includes('/owljs/')) return OWL_NAV_DATA;
     return NAV_DATA;
   }
 
   // Search index (with BASE-prefixed URLs for file:// searches)
-  const SEARCH_INDEX = [...NAV_DATA, ...JS_NAV_DATA].flatMap(section =>
+  const SEARCH_INDEX = [...NAV_DATA, ...JS_NAV_DATA, ...OWL_NAV_DATA].flatMap(section =>
     section.items.map(item => ({
       title: item.title,
       category: section.title.replace(/^.{2}\s/, ''),
