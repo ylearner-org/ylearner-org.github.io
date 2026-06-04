@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML Iframe – Embedding Pages, YouTube, Maps with Security | ylearner</title>
+  <meta name="description" content="Learn how to use the HTML iframe element to embed YouTube videos, Google Maps, and external pages. Covers sandbox attribute, allow attribute, clickjacking, and accessibility.">
+  <meta name="keywords" content="HTML iframe, HTML embed YouTube, HTML iframe security, HTML sandbox attribute, HTML iframe allow, embedded content HTML, HTML cross-origin iframe">
+  <link rel="canonical" href="https://ylearner.org/html/advanced/iframe.html">
+  <meta property="og:title" content="HTML Iframe – Embedding Pages, YouTube, Maps with Security | ylearner">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"HTML Iframe","description":"Learn how to use HTML iframes to embed YouTube, Google Maps, and external pages securely using sandbox, allow attributes and security best practices.","educationalLevel":"Beginner","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/html/what-is-html.html">HTML</a><span class="separator">›</span>
+          <a href="/html/advanced/meta-seo.html">Advanced HTML</a><span class="separator">›</span>
+          <span class="current">HTML Iframe</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 Advanced HTML</div>
+          <h1>HTML Iframe – Embedding Pages, YouTube, Maps with Security</h1>
+          <p class="lesson-intro">The <code>&lt;iframe&gt;</code> element embeds another HTML document inside your page — a YouTube video, a Google Map, a payment form, or any external web page. Understanding its security model is just as important as knowing its attributes, because iframes are a common attack vector if misconfigured.</p>
+          <div class="lesson-meta"><span>⏱️ 17 min read</span><span>🎯 Beginner</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="iframe-basics">The iframe Element – Core Attributes</h2>
+          <p>At its simplest, an iframe requires <code>src</code>, <code>width</code>, <code>height</code>, and <code>title</code>. The <code>title</code> attribute is required for accessibility — screen readers announce it so users know what the embedded content is.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- Basic iframe --&gt;
+&lt;iframe
+  src="https://example.com"
+  width="800"
+  height="500"
+  title="Example website"&gt;
+  &lt;!-- Fallback content if iframes are disabled --&gt;
+  Your browser does not support iframes.
+  &lt;a href="https://example.com"&gt;Visit Example.com&lt;/a&gt;
+&lt;/iframe&gt;
+
+&lt;!-- Responsive iframe using padding-bottom trick in a wrapper --&gt;
+&lt;div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden;"&gt;
+  &lt;iframe
+    src="https://example.com"
+    title="Example website"
+    style="position:absolute; top:0; left:0; width:100%; height:100%;"
+    loading="lazy"&gt;
+  &lt;/iframe&gt;
+&lt;/div&gt;</code></pre>
+          </div>
+          <div class="callout callout-warning">
+            <strong>Always include title:</strong> An iframe without a <code>title</code> attribute is a WCAG 2.1 Level A failure. Screen readers will announce something unhelpful like "frame" with no context. Describe the content: <code>title="Product demo video"</code>.
+          </div>
+
+          <h2 id="embed-youtube">Embedding YouTube Videos</h2>
+          <p>YouTube's shareable URL (<code>youtube.com/watch?v=ID</code>) cannot be embedded directly. Use the <code>/embed/VIDEO_ID</code> format instead. You can find the embed code from YouTube's Share → Embed menu.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- Correct: use the /embed/ URL --&gt;
+&lt;iframe
+  width="560"
+  height="315"
+  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+  title="Introduction to HTML – ylearner tutorial video"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  allowfullscreen
+  loading="lazy"&gt;
+&lt;/iframe&gt;
+
+&lt;!-- Wrong: watch URL does not work in iframes --&gt;
+&lt;!-- &lt;iframe src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"&gt;&lt;/iframe&gt; --&gt;
+
+&lt;!-- Useful YouTube embed parameters --&gt;
+&lt;!-- ?start=30        — start at 30 seconds --&gt;
+&lt;!-- ?end=120         — stop at 120 seconds --&gt;
+&lt;!-- ?autoplay=1      — autoplay (requires muted) --&gt;
+&lt;!-- ?mute=1          — mute audio --&gt;
+&lt;!-- ?controls=0      — hide player controls --&gt;
+&lt;!-- ?rel=0           — don't show related videos from other channels --&gt;
+&lt;!-- ?cc_load_policy=1 — force captions on --&gt;
+&lt;!-- Combine with &amp; separator: ?start=30&amp;rel=0&amp;cc_load_policy=1 --&gt;
+&lt;iframe
+  src="https://www.youtube.com/embed/dQw4w9WgXcQ?start=30&amp;rel=0"
+  title="HTML tutorial starting at 0:30"
+  width="560" height="315" allowfullscreen loading="lazy"&gt;
+&lt;/iframe&gt;</code></pre>
+          </div>
+
+          <h2 id="embed-google-maps">Embedding Google Maps</h2>
+          <p>Use the Google Maps Embed API or copy the embed code from Google Maps (Share → Embed a map). You need a Maps Embed API key for custom maps; the simple "Share" embed does not require one.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- Google Maps embed (from Maps → Share → Embed a map) --&gt;
+&lt;iframe
+  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2483.3456!2d-0.1276!3d51.5074!..."
+  width="600"
+  height="450"
+  title="London, UK map"
+  style="border:0;"
+  allowfullscreen
+  loading="lazy"
+  referrerpolicy="no-referrer-when-downgrade"&gt;
+&lt;/iframe&gt;
+
+&lt;!-- Google Maps Embed API (requires API key) --&gt;
+&lt;iframe
+  src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&amp;q=London,UK"
+  width="600"
+  height="450"
+  title="London, UK map"
+  allowfullscreen
+  loading="lazy"&gt;
+&lt;/iframe&gt;</code></pre>
+          </div>
+
+          <h2 id="embed-html-documents">Embedding Other HTML Documents</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- Embed another page from your own site --&gt;
+&lt;iframe
+  src="/components/widget.html"
+  title="Interactive widget"
+  width="400"
+  height="300"&gt;
+&lt;/iframe&gt;
+
+&lt;!-- Embed a PDF (browser PDF viewer) --&gt;
+&lt;iframe
+  src="/docs/report.pdf"
+  title="Annual Report 2026"
+  width="800"
+  height="600"&gt;
+&lt;/iframe&gt;</code></pre>
+          </div>
+
+          <h2 id="sandbox-attribute">The sandbox Attribute – Restricting Iframe Capabilities</h2>
+          <p>Adding <code>sandbox</code> to an iframe applies a strict security policy. A bare <code>sandbox</code> with no value enables all restrictions — scripts cannot run, forms cannot submit, the page cannot navigate the parent, and so on. You then selectively re-enable only what you need.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- Maximum restriction: bare sandbox disables everything --&gt;
+&lt;iframe src="untrusted.html" sandbox title="Sandboxed content"&gt;&lt;/iframe&gt;
+
+&lt;!-- Allow JavaScript but nothing else --&gt;
+&lt;iframe src="widget.html" sandbox="allow-scripts" title="Widget"&gt;&lt;/iframe&gt;
+
+&lt;!-- Allow scripts and forms (e.g. a third-party survey embed) --&gt;
+&lt;iframe src="survey.html" sandbox="allow-scripts allow-forms" title="Survey"&gt;&lt;/iframe&gt;
+
+&lt;!-- Allow same-origin content to act as if not sandboxed --&gt;
+&lt;iframe src="/internal.html" sandbox="allow-scripts allow-same-origin" title="Internal"&gt;&lt;/iframe&gt;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Token</th><th>What it re-enables</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>allow-scripts</code></td><td>JavaScript execution</td></tr>
+                <tr><td><code>allow-forms</code></td><td>Form submission</td></tr>
+                <tr><td><code>allow-same-origin</code></td><td>Treats content as same-origin (access cookies, storage)</td></tr>
+                <tr><td><code>allow-popups</code></td><td>Opening new windows/tabs with window.open()</td></tr>
+                <tr><td><code>allow-top-navigation</code></td><td>Navigating the parent page's URL</td></tr>
+                <tr><td><code>allow-downloads</code></td><td>Downloading files</td></tr>
+                <tr><td><code>allow-modals</code></td><td>alert(), confirm(), prompt() dialogs</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout callout-warning">
+            <strong>Never combine</strong> <code>allow-scripts</code> and <code>allow-same-origin</code> for untrusted content — together they allow the iframe to remove its own sandbox restrictions.
+          </div>
+
+          <h2 id="allow-attribute">The allow Attribute – Feature Permissions</h2>
+          <p>The <code>allow</code> attribute controls which browser APIs the embedded page can access — camera, microphone, fullscreen, payment, and more. It follows the Permissions Policy (formerly Feature Policy) syntax.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- YouTube requires accelerometer, autoplay, clipboard-write, etc. --&gt;
+&lt;iframe
+  src="https://www.youtube.com/embed/VIDEO_ID"
+  title="Tutorial video"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen&gt;
+&lt;/iframe&gt;
+
+&lt;!-- Payment request API --&gt;
+&lt;iframe src="checkout.html" title="Checkout" allow="payment"&gt;&lt;/iframe&gt;
+
+&lt;!-- Camera access for a video-call widget --&gt;
+&lt;iframe src="videocall.html" title="Video call" allow="camera; microphone"&gt;&lt;/iframe&gt;
+
+&lt;!-- Geolocation for a map widget --&gt;
+&lt;iframe src="nearby.html" title="Nearby stores" allow="geolocation"&gt;&lt;/iframe&gt;</code></pre>
+          </div>
+
+          <h2 id="security-risks">Security Risks – Clickjacking and X-Frame-Options</h2>
+          <p><strong>Clickjacking</strong> is an attack where a malicious page embeds your site in a transparent iframe and overlays it with invisible buttons. When users think they are clicking on the attacker's UI, they are actually clicking on your site's buttons — confirming purchases, changing settings, or performing account actions.</p>
+          <p>Defence against clickjacking is controlled server-side, not in HTML:</p>
+          <ul>
+            <li><strong>X-Frame-Options</strong> HTTP header — older, widely supported. <code>DENY</code> prevents all embedding; <code>SAMEORIGIN</code> allows only same-origin embedding.</li>
+            <li><strong>Content-Security-Policy: frame-ancestors</strong> HTTP header — newer, more flexible. Supersedes X-Frame-Options.</li>
+          </ul>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- These are HTTP response headers, not HTML tags.
+     Set them in your web server config or server-side code. --&gt;
+
+&lt;!-- Nginx config example --&gt;
+&lt;!-- add_header X-Frame-Options "SAMEORIGIN"; --&gt;
+&lt;!-- add_header Content-Security-Policy "frame-ancestors 'self' https://trusted.com"; --&gt;
+
+&lt;!-- Apache config example --&gt;
+&lt;!-- Header always set X-Frame-Options "DENY" --&gt;
+
+&lt;!-- For your own page to check if it's been framed (JavaScript defence): --&gt;
+&lt;script&gt;
+  if (window.top !== window.self) {
+    // This page is inside an iframe
+    window.top.location = window.self.location; // break out of frame
+  }
+&lt;/script&gt;</code></pre>
+          </div>
+
+          <h2 id="when-not-to-use">When Not to Use Iframes</h2>
+          <p>Iframes have real drawbacks that make them the wrong choice in certain situations:</p>
+          <ul>
+            <li><strong>Performance:</strong> Each iframe creates a completely separate browsing context — its own HTML parser, JavaScript engine, CSS engine. Loading several iframes on one page is expensive.</li>
+            <li><strong>SEO:</strong> Search engines do not reliably index the content inside iframes. Do not use iframes for content you want indexed.</li>
+            <li><strong>Accessibility:</strong> Some screen reader and keyboard navigation flows break when they encounter iframes, especially if keyboard focus traps are not handled. Always test with screen readers.</li>
+            <li><strong>Cross-origin limitations:</strong> JavaScript in your page cannot read or write to the content of a cross-origin iframe (same-origin policy).</li>
+            <li><strong>Mobile layout:</strong> Fixed-size iframes are difficult to make responsive and can cause horizontal scrolling.</li>
+          </ul>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Every <code>&lt;iframe&gt;</code> must have a descriptive <code>title</code> attribute for screen reader accessibility.</li>
+              <li>To embed YouTube, use the <code>/embed/VIDEO_ID</code> URL — the watch URL does not work in iframes.</li>
+              <li>Add <code>loading="lazy"</code> to defer loading off-screen iframes and improve page load performance.</li>
+              <li>Use <code>sandbox</code> to restrict untrusted embedded content — start with the strictest policy and only add tokens you need.</li>
+              <li>Never combine <code>allow-scripts</code> and <code>allow-same-origin</code> on untrusted content.</li>
+              <li>The <code>allow</code> attribute controls access to browser APIs (camera, microphone, fullscreen, payment, geolocation).</li>
+              <li>Protect your own pages from clickjacking with the <code>X-Frame-Options</code> or <code>Content-Security-Policy: frame-ancestors</code> HTTP headers.</li>
+              <li>Avoid iframes for SEO-critical content, performance-sensitive pages, and anywhere mobile layout is a concern.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/html/advanced/video-audio.html" class="html-topic-tag">Video &amp; Audio</a>
+            <a href="/html/advanced/accessibility.html" class="html-topic-tag">Accessibility</a>
+            <a href="/html/advanced/meta-seo.html" class="html-topic-tag">Meta Tags &amp; SEO</a>
+            <a href="/html/interview/questions.html" class="html-topic-tag">Interview Questions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <h3>Why does my YouTube embed show "Video unavailable"?</h3>
+              <p>The most common reason is that you used the watch URL (<code>youtube.com/watch?v=ID</code>) instead of the embed URL (<code>youtube.com/embed/ID</code>). Other reasons include: the video owner has disabled embedding for their video (set in YouTube Studio settings), the video is private or age-restricted, or the video is geo-blocked in the viewer's country. Check the video's YouTube Studio "Embed" settings if you control the video.</p>
+            </div>
+            <div class="faq-item">
+              <h3>Can I communicate between an iframe and the parent page?</h3>
+              <p>For same-origin iframes you can access the iframe's content directly via <code>iframe.contentDocument</code> or <code>iframe.contentWindow</code>. For cross-origin iframes, direct access is blocked by the Same-Origin Policy. Use the <code>window.postMessage()</code> API instead — both sides listen for the <code>message</code> event and validate the <code>event.origin</code> before trusting the data.</p>
+            </div>
+            <div class="faq-item">
+              <h3>How do I make an iframe responsive?</h3>
+              <p>The classic approach is a wrapper div with <code>position: relative; padding-bottom: 56.25%; height: 0;</code> (56.25% = 9/16 for a 16:9 ratio) and the iframe set to <code>position: absolute; top: 0; left: 0; width: 100%; height: 100%;</code>. Modern browsers also support the <code>aspect-ratio</code> CSS property: set <code>width: 100%; aspect-ratio: 16/9;</code> directly on the iframe — cleaner and requires no wrapper.</p>
+            </div>
+          </section>
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/html/advanced/video-audio.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Video &amp; Audio</span></a>
+          <a href="/html/interview/questions.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Interview Questions</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar"><div class="toc-title">On This Page</div><div id="toc"></div><div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div></aside>
+  </div>
+  <footer class="site-footer"><div class="footer-bottom" style="max-width:1200px;margin:0 auto;"><span>© 2026 ylearner. All rights reserved.</span><span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span></div></footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

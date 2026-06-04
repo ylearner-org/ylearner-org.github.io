@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML Form Validation – required, pattern, min, max, minlength | ylearner</title>
+  <meta name="description" content="Learn HTML form validation: required, minlength, maxlength, min, max, pattern with regex examples, type validation, novalidate, setCustomValidity, and client vs server-side validation.">
+  <meta name="keywords" content="HTML form validation, HTML required attribute, HTML pattern attribute, HTML minlength maxlength, HTML min max validation, HTML form novalidate, setCustomValidity, client-side validation HTML, HTML5 form validation">
+  <link rel="canonical" href="https://ylearner.org/html/forms/validation.html">
+  <meta property="og:title" content="HTML Form Validation – required, pattern, min, max, minlength | ylearner">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"HTML Form Validation","description":"Learn HTML form validation attributes including required, minlength, maxlength, min, max, pattern with regex, novalidate, setCustomValidity, and when to use client vs server-side validation.","educationalLevel":"Beginner","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/html/what-is-html.html">HTML</a><span class="separator">›</span>
+          <a href="/html/forms/form-basics.html">Forms</a><span class="separator">›</span>
+          <span class="current">Form Validation</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 Forms</div>
+          <h1>HTML Form Validation – required, pattern, min, max, minlength</h1>
+          <p class="lesson-intro">HTML5 built-in form validation lets browsers check user input before the form is submitted — without any JavaScript. Using attributes like <code>required</code>, <code>pattern</code>, <code>minlength</code>, and <code>min</code>/<code>max</code>, you can catch common errors instantly and guide users to submit correct data.</p>
+          <div class="lesson-meta"><span>⏱️ 15 min read</span><span>🎯 Beginner</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="why-validation">Why Validation Matters</h2>
+          <p>Validation serves two purposes:</p>
+          <ul>
+            <li><strong>User experience</strong> — giving immediate feedback prevents frustration from submitting a form only to find out the email was missing the @ symbol.</li>
+            <li><strong>Data quality</strong> — ensuring data arrives in the format your server or database expects, reducing errors and security risks.</li>
+          </ul>
+          <p>HTML5 provides basic validation for free. For complex rules or security-critical checks, you supplement it with JavaScript and always repeat validation server-side.</p>
+
+          <h2 id="required">The required Attribute</h2>
+          <p>Adding <code>required</code> to a field means the browser will refuse to submit the form if that field is empty. It works on <code>input</code>, <code>textarea</code>, and <code>select</code>.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;form action="/subscribe" method="POST"&gt;
+
+  &lt;label for="sub-email"&gt;Email address *&lt;/label&gt;
+  &lt;input type="email" id="sub-email" name="email" required&gt;
+
+  &lt;label for="sub-name"&gt;Full name *&lt;/label&gt;
+  &lt;input type="text" id="sub-name" name="name" required&gt;
+
+  &lt;!-- Optional field – no required attribute --&gt;
+  &lt;label for="sub-company"&gt;Company (optional)&lt;/label&gt;
+  &lt;input type="text" id="sub-company" name="company"&gt;
+
+  &lt;button type="submit"&gt;Subscribe&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+          </div>
+
+          <h2 id="minlength-maxlength">minlength and maxlength</h2>
+          <p>These attributes constrain the <strong>number of characters</strong> in a text-based input or textarea.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- Password: at least 8, no more than 64 characters --&gt;
+&lt;label for="pw"&gt;Password&lt;/label&gt;
+&lt;input type="password" id="pw" name="password"
+       minlength="8" maxlength="64" required&gt;
+
+&lt;!-- Username: 3–20 characters --&gt;
+&lt;label for="uname"&gt;Username&lt;/label&gt;
+&lt;input type="text" id="uname" name="username"
+       minlength="3" maxlength="20" required&gt;
+
+&lt;!-- Textarea: bio up to 500 characters --&gt;
+&lt;label for="bio"&gt;Bio (max 500 characters)&lt;/label&gt;
+&lt;textarea id="bio" name="bio" rows="4" maxlength="500"&gt;&lt;/textarea&gt;</code></pre>
+          </div>
+          <div class="callout callout-info">
+            <strong>maxlength silently truncates input</strong> as the user types — the browser prevents entering more characters. <strong>minlength</strong> is only checked on submit; the browser does not prevent typing fewer characters than the minimum.
+          </div>
+
+          <h2 id="min-max-step">min, max, step for Numbers and Dates</h2>
+          <p>For <code>type="number"</code>, <code>type="range"</code>, and date/time inputs, use <code>min</code>, <code>max</code>, and <code>step</code> to constrain the allowed range.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- Age: integer between 16 and 120 --&gt;
+&lt;label for="age"&gt;Age&lt;/label&gt;
+&lt;input type="number" id="age" name="age" min="16" max="120" step="1" required&gt;
+
+&lt;!-- Price: dollars and cents, 0.00 to 9999.99 --&gt;
+&lt;label for="price"&gt;Price (USD)&lt;/label&gt;
+&lt;input type="number" id="price" name="price" min="0" max="9999.99" step="0.01"&gt;
+
+&lt;!-- Event date: must be in 2026 --&gt;
+&lt;label for="event-date"&gt;Event date&lt;/label&gt;
+&lt;input type="date" id="event-date" name="event_date"
+       min="2026-01-01" max="2026-12-31" required&gt;
+
+&lt;!-- Working hours: 9am to 5pm, in 30-min slots --&gt;
+&lt;label for="appt-time"&gt;Appointment time&lt;/label&gt;
+&lt;input type="time" id="appt-time" name="time"
+       min="09:00" max="17:00" step="1800"&gt;</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="pattern">The pattern Attribute with Regex</h2>
+          <p>The <code>pattern</code> attribute accepts a JavaScript-compatible regular expression. The entire input value must match the pattern for the form to submit. This is essential for <code>type="tel"</code> (which has no built-in format validation) and for custom text formats.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- UK phone number: starts with 07 or +447, then 9 digits --&gt;
+&lt;label for="uk-phone"&gt;UK mobile number&lt;/label&gt;
+&lt;input type="tel" id="uk-phone" name="phone"
+       pattern="(07\d{9}|\+447\d{9})"
+       placeholder="07700 900000"
+       title="Enter a UK mobile number: 07xxxxxxxxx or +447xxxxxxxxx"
+       required&gt;
+
+&lt;!-- UK postcode: letter(s) + digit(s) + space + digit + two letters --&gt;
+&lt;label for="postcode"&gt;Postcode&lt;/label&gt;
+&lt;input type="text" id="postcode" name="postcode"
+       pattern="[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}"
+       placeholder="SW1A 1AA"
+       title="Enter a valid UK postcode in uppercase"
+       required&gt;
+
+&lt;!-- Hex colour code: # followed by exactly 6 hex digits --&gt;
+&lt;label for="hex-color"&gt;Hex colour&lt;/label&gt;
+&lt;input type="text" id="hex-color" name="color"
+       pattern="#[0-9A-Fa-f]{6}"
+       placeholder="#ff5733"
+       title="Enter a hex colour code like #ff5733"&gt;
+
+&lt;!-- Username: letters, numbers, underscores, 3-20 chars --&gt;
+&lt;label for="handle"&gt;Username&lt;/label&gt;
+&lt;input type="text" id="handle" name="username"
+       pattern="[a-zA-Z0-9_]{3,20}"
+       title="3 to 20 characters: letters, numbers, and underscores only"
+       required&gt;</code></pre>
+          </div>
+          <div class="callout callout-warning">
+            <strong>Always include a <code>title</code> attribute</strong> alongside <code>pattern</code>. The browser shows this text in the validation tooltip, telling users what format is expected. Without it, the error message is generic and unhelpful.
+          </div>
+
+          <h2 id="type-validation">Type Validation</h2>
+          <p>Input types <code>email</code> and <code>url</code> have built-in format validation — no <code>pattern</code> needed for basic checking.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- Browser validates: must contain @ and a domain part --&gt;
+&lt;input type="email" name="email" required&gt;
+
+&lt;!-- Browser validates: must start with http:// or https:// --&gt;
+&lt;input type="url" name="website"&gt;
+
+&lt;!-- Number type rejects non-numeric characters --&gt;
+&lt;input type="number" name="quantity" min="1"&gt;</code></pre>
+          </div>
+
+          <h2 id="novalidate">The novalidate Attribute</h2>
+          <p>Adding <code>novalidate</code> to the <code>&lt;form&gt;</code> element disables all browser-native validation for that form. This is useful when you want to handle validation entirely with JavaScript and display your own custom error messages.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- Browser validation disabled – JavaScript takes over --&gt;
+&lt;form action="/register" method="POST" novalidate id="register-form"&gt;
+  &lt;label for="reg-email"&gt;Email&lt;/label&gt;
+  &lt;input type="email" id="reg-email" name="email" required&gt;
+  &lt;div class="error-message" id="email-error" role="alert"&gt;&lt;/div&gt;
+
+  &lt;button type="submit"&gt;Create account&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">document.getElementById('register-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const emailInput = document.getElementById('reg-email');
+  const errorDiv   = document.getElementById('email-error');
+
+  if (!emailInput.validity.valid) {
+    errorDiv.textContent = 'Please enter a valid email address.';
+    emailInput.focus();
+    return;
+  }
+  errorDiv.textContent = '';
+  // proceed with form submission
+  this.submit();
+});</code></pre>
+          </div>
+
+          <h2 id="set-custom-validity">Customising Validation Messages with setCustomValidity()</h2>
+          <p>The Constraint Validation API lets you set a custom error message that the browser displays in its native tooltip. Call <code>setCustomValidity('')</code> to clear the error (mark the field valid again).</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;label for="confirm-pw"&gt;Confirm password&lt;/label&gt;
+&lt;input type="password" id="confirm-pw" name="confirm_password" required&gt;</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const pw        = document.getElementById('pw');
+const confirmPw = document.getElementById('confirm-pw');
+
+confirmPw.addEventListener('input', function() {
+  if (this.value !== pw.value) {
+    this.setCustomValidity('Passwords do not match.');
+  } else {
+    this.setCustomValidity(''); // clear error → field is valid
+  }
+});</code></pre>
+          </div>
+
+          <h2 id="client-vs-server">Client-Side vs Server-Side Validation</h2>
+          <p>Browser validation is a convenience — it is never a security measure on its own.</p>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th></th><th>Client-side (HTML/JS)</th><th>Server-side</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Speed</td><td>Instant, no round-trip</td><td>Requires network request</td></tr>
+                <tr><td>Can be bypassed?</td><td>Yes — easily disabled in DevTools or via API calls</td><td>No — server always runs the check</td></tr>
+                <tr><td>Can access database?</td><td>No</td><td>Yes — can check uniqueness, existing records</td></tr>
+                <tr><td>Security</td><td>Never trust alone</td><td>Required for all security-sensitive rules</td></tr>
+                <tr><td>Use for</td><td>Immediate UX feedback (empty fields, format hints)</td><td>All business logic, unique email, passwords, authorisation</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout callout-warning">
+            <strong>Always validate server-side as well.</strong> A malicious user can disable JavaScript, edit HTML in DevTools, or send HTTP requests directly with tools like curl — bypassing all browser validation. Treat every incoming form submission as untrusted data.
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>required</code> — prevents submission if the field is empty.</li>
+              <li><code>minlength</code> / <code>maxlength</code> — constrains the character count for text inputs and textareas.</li>
+              <li><code>min</code> / <code>max</code> / <code>step</code> — constrains numeric and date input values.</li>
+              <li><code>pattern</code> — validates input against a regex; always add a descriptive <code>title</code>.</li>
+              <li><code>type="email"</code> and <code>type="url"</code> perform automatic format validation.</li>
+              <li><code>novalidate</code> on the form disables native browser validation — use when writing custom JS validation.</li>
+              <li><code>setCustomValidity()</code> customises the browser's native validation error message.</li>
+              <li>Client-side validation is for UX; server-side validation is for security — you need both.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/html/forms/form-basics.html" class="topic-tag html-topic-tag">🌐 Form Basics</a>
+            <a href="/html/forms/input-types.html" class="topic-tag html-topic-tag">🌐 Input Types</a>
+            <a href="/html/forms/buttons.html" class="topic-tag html-topic-tag">🌐 Buttons</a>
+            <a href="/html/forms/fieldset-legend.html" class="topic-tag html-topic-tag">🌐 Fieldset &amp; Legend</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+
+            <h3>Does the required attribute work on checkboxes?</h3>
+            <p>Yes. On a checkbox, <code>required</code> means the box must be checked before the form submits. This is commonly used for "I agree to the terms" checkboxes. For a group of checkboxes where at least one must be selected, you need JavaScript — HTML cannot express that constraint natively.</p>
+
+            <h3>Why does my pattern validation fail even though the value looks correct?</h3>
+            <p>The <code>pattern</code> attribute implicitly anchors the regex to match the <em>entire</em> value (like wrapping your pattern in <code>^...$</code>). So a pattern of <code>[0-9]{5}</code> requires the entire field to be exactly 5 digits — not just contain 5 digits somewhere. If your value has extra characters, the match fails. Also check that you haven't used regex delimiters (<code>/pattern/</code>) — the <code>pattern</code> attribute only takes the pattern string, no slashes.</p>
+
+            <h3>Can I show custom styled error messages instead of the browser tooltip?</h3>
+            <p>Yes. Add <code>novalidate</code> to the form, prevent default submission in a JavaScript event listener, check <code>element.validity</code> properties, and display your own error elements. The <code>validity</code> object exposes booleans like <code>valueMissing</code>, <code>typeMismatch</code>, <code>patternMismatch</code>, <code>tooShort</code>, and <code>rangeUnderflow</code> so you can tailor each message.</p>
+
+            <h3>What is the maxlength limit on a textarea?</h3>
+            <p>There is no browser-imposed upper limit on the <code>maxlength</code> value itself — you choose the number. A practical guideline: match it to your database column size to prevent truncation errors. For a VARCHAR(255) column, set <code>maxlength="255"</code>. For long-form content stored in a TEXT column, you might set 5000 or omit maxlength entirely and rely on server-side trimming.</p>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/html/forms/input-types.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Input Types</span></a>
+          <a href="/html/forms/buttons.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Buttons</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar"><div class="toc-title">On This Page</div><div id="toc"></div><div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div></aside>
+  </div>
+  <footer class="site-footer"><div class="footer-bottom" style="max-width:1200px;margin:0 auto;"><span>© 2026 ylearner. All rights reserved.</span><span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span></div></footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

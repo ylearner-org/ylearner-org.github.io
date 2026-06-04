@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML Canvas – Drawing Shapes, Text, and Images with JavaScript | ylearner</title>
+  <meta name="description" content="Learn HTML Canvas from scratch. Draw rectangles, paths, circles, text, and images with the 2D context API. Includes a requestAnimationFrame bouncing ball animation example.">
+  <meta name="keywords" content="HTML canvas tutorial, HTML canvas JavaScript, canvas 2D context, canvas drawRect, canvas beginPath, HTML5 canvas drawing, canvas animation HTML">
+  <link rel="canonical" href="https://ylearner.org/html/advanced/canvas.html">
+  <meta property="og:title" content="HTML Canvas – Drawing Shapes, Text, and Images with JavaScript | ylearner">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"HTML Canvas","description":"Learn HTML Canvas from scratch. Draw rectangles, paths, circles, text, and images with the 2D context API, plus a requestAnimationFrame animation example.","educationalLevel":"Beginner","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/html/what-is-html.html">HTML</a><span class="separator">›</span>
+          <a href="/html/advanced/meta-seo.html">Advanced HTML</a><span class="separator">›</span>
+          <span class="current">HTML Canvas</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 Advanced HTML</div>
+          <h1>HTML Canvas – Drawing Shapes, Text, and Images with JavaScript</h1>
+          <p class="lesson-intro">The <code>&lt;canvas&gt;</code> element gives you a blank pixel-based drawing surface that you control entirely with JavaScript. It powers games, data visualisations, image editors, and interactive graphics. This lesson covers every core 2D drawing API you need to get started.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Beginner</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="canvas-element">The canvas Element</h2>
+          <p>The <code>&lt;canvas&gt;</code> element creates a rectangular drawing area on the page. By itself it displays nothing — you draw on it with JavaScript.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- width and height are the actual pixel dimensions of the drawing surface --&gt;
+&lt;canvas id="myCanvas" width="600" height="400"&gt;
+  &lt;!-- Fallback content for browsers that don't support canvas (very rare today) --&gt;
+  Your browser does not support the HTML canvas element.
+&lt;/canvas&gt;</code></pre>
+          </div>
+          <div class="callout callout-warning">
+            <strong>Important:</strong> Always set <code>width</code> and <code>height</code> as HTML attributes, not CSS. CSS can scale the canvas element visually, but the drawing buffer size is controlled by the HTML attributes. If you size the canvas only with CSS, drawings will appear blurry because the buffer stays at the default 300×150 pixels.
+          </div>
+
+          <h2 id="2d-context">Getting the 2D Context</h2>
+          <p>Before drawing anything, you must get the <code>CanvasRenderingContext2D</code> object by calling <code>getContext('2d')</code>. All drawing methods live on this context object.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;canvas id="myCanvas" width="600" height="400"&gt;&lt;/canvas&gt;
+
+&lt;script&gt;
+  const canvas = document.getElementById('myCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // ctx is now the 2D drawing context — all drawing methods are called on ctx
+  // canvas refers to the DOM element (width, height properties, etc.)
+&lt;/script&gt;</code></pre>
+          </div>
+
+          <h2 id="drawing-rectangles">Drawing Rectangles</h2>
+          <p>Rectangles are the only shape with dedicated shorthand methods. All three use the same coordinate system: <code>(x, y, width, height)</code> where <code>(0,0)</code> is the top-left corner.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;canvas id="rectCanvas" width="400" height="200"&gt;&lt;/canvas&gt;
+&lt;script&gt;
+  const ctx = document.getElementById('rectCanvas').getContext('2d');
+
+  // fillRect(x, y, width, height) — filled rectangle
+  ctx.fillStyle = '#e67e22';
+  ctx.fillRect(20, 20, 150, 100);
+
+  // strokeRect(x, y, width, height) — outlined rectangle (no fill)
+  ctx.strokeStyle = '#2c3e50';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(200, 20, 150, 100);
+
+  // clearRect(x, y, width, height) — erases pixels (makes them transparent)
+  ctx.fillStyle = '#3498db';
+  ctx.fillRect(180, 60, 100, 100);
+  ctx.clearRect(200, 80, 60, 60); // cuts a hole in the blue rect
+&lt;/script&gt;</code></pre>
+          </div>
+
+          <h2 id="drawing-paths">Drawing Paths – Lines, Arcs, Circles</h2>
+          <p>For any shape that is not a rectangle, you use paths. A path is a sequence of points connected by lines and curves. The workflow is always: <code>beginPath()</code> → define the path → <code>stroke()</code> or <code>fill()</code>.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;canvas id="pathCanvas" width="400" height="300"&gt;&lt;/canvas&gt;
+&lt;script&gt;
+  const ctx = document.getElementById('pathCanvas').getContext('2d');
+
+  // --- Triangle using lines ---
+  ctx.beginPath();
+  ctx.moveTo(200, 20);    // lift pen and move to starting point
+  ctx.lineTo(350, 180);   // draw line to this point
+  ctx.lineTo(50, 180);    // draw line to this point
+  ctx.closePath();        // draws a line back to the starting point
+  ctx.fillStyle = '#9b59b6';
+  ctx.fill();
+  ctx.strokeStyle = '#2c3e50';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // --- Circle using arc() ---
+  // arc(x, y, radius, startAngle, endAngle, anticlockwise)
+  // Angles in radians: full circle = 2 * Math.PI
+  ctx.beginPath();
+  ctx.arc(200, 240, 40, 0, 2 * Math.PI);
+  ctx.fillStyle = '#e74c3c';
+  ctx.fill();
+
+  // --- Semicircle ---
+  ctx.beginPath();
+  ctx.arc(80, 240, 30, 0, Math.PI); // 0 to PI = bottom semicircle
+  ctx.fillStyle = '#27ae60';
+  ctx.fill();
+
+  // --- Pie slice (arc + lines to center) ---
+  ctx.beginPath();
+  ctx.moveTo(330, 240);
+  ctx.arc(330, 240, 40, 0, Math.PI * 0.75);
+  ctx.closePath();
+  ctx.fillStyle = '#f39c12';
+  ctx.fill();
+&lt;/script&gt;</code></pre>
+          </div>
+
+          <h2 id="drawing-text">Drawing Text</h2>
+          <p>Canvas provides <code>fillText()</code> for solid text and <code>strokeText()</code> for outlined text. The <code>font</code> property uses the same syntax as CSS <code>font</code>.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;canvas id="textCanvas" width="400" height="200"&gt;&lt;/canvas&gt;
+&lt;script&gt;
+  const ctx = document.getElementById('textCanvas').getContext('2d');
+
+  // Font syntax: "style weight size family"
+  ctx.font = 'bold 48px sans-serif';
+  ctx.fillStyle = '#2c3e50';
+  ctx.fillText('Hello Canvas!', 20, 70);
+
+  // Outlined text
+  ctx.font = '36px Georgia, serif';
+  ctx.strokeStyle = '#e74c3c';
+  ctx.lineWidth = 1;
+  ctx.strokeText('Outlined', 20, 130);
+
+  // Text alignment
+  ctx.font = '20px Arial';
+  ctx.textAlign = 'center';   // 'left' | 'center' | 'right'
+  ctx.textBaseline = 'middle'; // 'top' | 'middle' | 'alphabetic' | 'bottom'
+  ctx.fillStyle = '#27ae60';
+  ctx.fillText('Centered text', 200, 170);
+
+  // Measure text width before drawing
+  const metrics = ctx.measureText('Hello Canvas!');
+  console.log('Text width:', metrics.width); // useful for layout
+&lt;/script&gt;</code></pre>
+          </div>
+
+          <h2 id="drawing-images">Drawing Images</h2>
+          <p>Use <code>drawImage()</code> to render <code>&lt;img&gt;</code> elements, other canvases, or video frames onto the canvas.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;canvas id="imgCanvas" width="400" height="300"&gt;&lt;/canvas&gt;
+&lt;script&gt;
+  const canvas = document.getElementById('imgCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const img = new Image();
+  img.src = '/assets/sample.jpg';
+
+  // Must wait for image to load before drawing
+  img.onload = function() {
+    // drawImage(image, dx, dy) — draw at position
+    ctx.drawImage(img, 0, 0);
+
+    // drawImage(image, dx, dy, dWidth, dHeight) — draw scaled
+    ctx.drawImage(img, 200, 0, 200, 150);
+
+    // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+    // sx/sy/sWidth/sHeight = crop from source
+    // dx/dy/dWidth/dHeight = destination on canvas
+    ctx.drawImage(img, 50, 50, 100, 100, 0, 150, 200, 150);
+  };
+&lt;/script&gt;</code></pre>
+          </div>
+
+          <h2 id="colors-styles">Colors and Styles</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;canvas id="styleCanvas" width="400" height="200"&gt;&lt;/canvas&gt;
+&lt;script&gt;
+  const ctx = document.getElementById('styleCanvas').getContext('2d');
+
+  // fillStyle and strokeStyle accept any CSS color value
+  ctx.fillStyle = '#e74c3c';         // hex
+  ctx.fillStyle = 'rgb(231,76,60)';  // rgb
+  ctx.fillStyle = 'rgba(231,76,60,0.5)'; // rgba (semi-transparent)
+  ctx.fillStyle = 'hsl(6, 78%, 57%)';    // hsl
+
+  // Linear gradient
+  const linearGrad = ctx.createLinearGradient(0, 0, 400, 0); // x0,y0 → x1,y1
+  linearGrad.addColorStop(0, '#3498db');
+  linearGrad.addColorStop(1, '#9b59b6');
+  ctx.fillStyle = linearGrad;
+  ctx.fillRect(0, 0, 400, 80);
+
+  // Radial gradient
+  const radialGrad = ctx.createRadialGradient(200, 150, 10, 200, 150, 70);
+  radialGrad.addColorStop(0, '#f1c40f');
+  radialGrad.addColorStop(1, '#e67e22');
+  ctx.fillStyle = radialGrad;
+  ctx.beginPath();
+  ctx.arc(200, 150, 70, 0, 2 * Math.PI);
+  ctx.fill();
+
+  // Line styles
+  ctx.strokeStyle = '#2c3e50';
+  ctx.lineWidth = 5;
+  ctx.lineCap = 'round';   // 'butt' | 'round' | 'square'
+  ctx.lineJoin = 'round';  // 'miter' | 'round' | 'bevel'
+  ctx.setLineDash([10, 5]); // dashed line: 10px dash, 5px gap
+&lt;/script&gt;</code></pre>
+          </div>
+
+          <h2 id="animation">Simple Animation with requestAnimationFrame</h2>
+          <p><code>requestAnimationFrame()</code> tells the browser to call your drawing function before the next screen repaint — typically 60 times per second. The pattern is: clear the canvas, update positions, draw, then schedule the next frame.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;canvas id="animCanvas" width="500" height="300"&gt;&lt;/canvas&gt;
+&lt;script&gt;
+  const canvas = document.getElementById('animCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Ball state
+  let x = 250, y = 150;
+  let dx = 3, dy = 2;   // velocity (pixels per frame)
+  const radius = 20;
+
+  function draw() {
+    // 1. Clear the entire canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 2. Draw background
+    ctx.fillStyle = '#ecf0f1';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 3. Draw the ball
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    ctx.fillStyle = '#e74c3c';
+    ctx.fill();
+    ctx.strokeStyle = '#c0392b';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // 4. Update position
+    x += dx;
+    y += dy;
+
+    // 5. Bounce off walls
+    if (x + radius &gt; canvas.width || x - radius &lt; 0) dx = -dx;
+    if (y + radius &gt; canvas.height || y - radius &lt; 0) dy = -dy;
+
+    // 6. Request next frame
+    requestAnimationFrame(draw);
+  }
+
+  // Start the animation loop
+  requestAnimationFrame(draw);
+&lt;/script&gt;</code></pre>
+          </div>
+
+          <h2 id="canvas-vs-svg">When to Use Canvas vs SVG</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Factor</th><th>Canvas</th><th>SVG</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Rendering model</td><td>Immediate (pixel bitmap)</td><td>Retained (DOM tree of shapes)</td></tr>
+                <tr><td>Performance at scale</td><td>Better for thousands of objects</td><td>Slows with many DOM nodes</td></tr>
+                <tr><td>Resolution</td><td>Fixed pixel size (blurry when scaled)</td><td>Infinitely scalable (vector)</td></tr>
+                <tr><td>Interactivity</td><td>Manual hit-testing required</td><td>CSS/JS events work naturally</td></tr>
+                <tr><td>Accessibility</td><td>Needs ARIA fallback or alt text</td><td>Text inside SVG is readable</td></tr>
+                <tr><td>Animation</td><td>Excellent (60fps games, physics)</td><td>Good for simple transitions</td></tr>
+                <tr><td>Best for</td><td>Games, image manipulation, charts with many data points</td><td>Icons, logos, charts, maps, UI graphics</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Set canvas <code>width</code> and <code>height</code> as HTML attributes — CSS sizing scales visually but does not change the pixel buffer.</li>
+              <li>Get the 2D context with <code>canvas.getContext('2d')</code> — all drawing methods are on the returned <code>ctx</code> object.</li>
+              <li>Rectangle shortcuts: <code>fillRect</code>, <code>strokeRect</code>, <code>clearRect</code>.</li>
+              <li>For all other shapes use the path API: <code>beginPath()</code> → <code>moveTo()</code>, <code>lineTo()</code>, <code>arc()</code> → <code>fill()</code> / <code>stroke()</code>.</li>
+              <li>Draw text with <code>fillText()</code> / <code>strokeText()</code>; set <code>ctx.font</code> before drawing.</li>
+              <li>Draw images with <code>drawImage()</code> inside the image's <code>onload</code> handler.</li>
+              <li>Animate with <code>requestAnimationFrame()</code>: clear, update, draw, repeat.</li>
+              <li>Choose Canvas for pixel-heavy animations and games; choose SVG for scalable graphics and interactive diagrams.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/html/advanced/accessibility.html" class="html-topic-tag">Accessibility</a>
+            <a href="/html/advanced/video-audio.html" class="html-topic-tag">Video &amp; Audio</a>
+            <a href="/html/advanced/iframe.html" class="html-topic-tag">HTML Iframe</a>
+            <a href="/html/advanced/meta-seo.html" class="html-topic-tag">Meta Tags &amp; SEO</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <h3>Why does my canvas drawing look blurry on Retina/HiDPI screens?</h3>
+              <p>On HiDPI screens, the device pixel ratio (DPR) is typically 2 or 3. The canvas buffer is drawn at its HTML attribute size but displayed at double the physical pixels, causing blurriness. Fix: multiply the canvas width/height by <code>window.devicePixelRatio</code>, set CSS width/height to the original size, and scale the context with <code>ctx.scale(dpr, dpr)</code> before drawing.</p>
+            </div>
+            <div class="faq-item">
+              <h3>How do I stop a requestAnimationFrame animation?</h3>
+              <p>Store the ID returned by <code>requestAnimationFrame(draw)</code> in a variable, then call <code>cancelAnimationFrame(id)</code> when you want to stop. Example: <code>let animId = requestAnimationFrame(draw);</code> then later <code>cancelAnimationFrame(animId);</code>. A common pattern is to set a boolean flag like <code>running = false</code> that the draw function checks before scheduling the next frame.</p>
+            </div>
+            <div class="faq-item">
+              <h3>Can I add text that is selectable and accessible inside a canvas?</h3>
+              <p>No. Canvas text is rasterised as pixels — it cannot be selected, copied, translated, or read by screen readers. For accessible interactive graphics, consider SVG instead. If you must use canvas, provide an equivalent text description in the surrounding HTML or as a <code>aria-label</code> on the canvas element itself: <code>&lt;canvas aria-label="Bar chart: sales increased 40% in Q2 2026"&gt;&lt;/canvas&gt;</code>.</p>
+            </div>
+          </section>
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/html/advanced/accessibility.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Accessibility</span></a>
+          <a href="/html/advanced/video-audio.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Video &amp; Audio</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar"><div class="toc-title">On This Page</div><div id="toc"></div><div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div></aside>
+  </div>
+  <footer class="site-footer"><div class="footer-bottom" style="max-width:1200px;margin:0 auto;"><span>© 2026 ylearner. All rights reserved.</span><span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span></div></footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

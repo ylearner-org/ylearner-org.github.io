@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML Accessibility – ARIA, alt Text, Keyboard Navigation | ylearner</title>
+  <meta name="description" content="Learn HTML accessibility with ARIA attributes, descriptive alt text, keyboard navigation, skip links, tabindex, color contrast, and WCAG guidelines with practical code examples.">
+  <meta name="keywords" content="HTML accessibility, ARIA HTML, HTML alt text, web accessibility, WCAG HTML, HTML keyboard navigation, screen reader HTML, HTML tabindex, aria-label HTML, HTML skip link">
+  <link rel="canonical" href="https://ylearner.org/html/advanced/accessibility.html">
+  <meta property="og:title" content="HTML Accessibility – ARIA, alt Text, Keyboard Navigation | ylearner">
+  <meta property="og:type" content="article">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"HTML Accessibility","description":"Learn HTML accessibility with ARIA attributes, descriptive alt text, keyboard navigation, skip links, tabindex, color contrast, and WCAG guidelines.","educationalLevel":"Beginner","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌐</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/html/what-is-html.html">HTML</a><span class="separator">›</span>
+          <a href="/html/advanced/meta-seo.html">Advanced HTML</a><span class="separator">›</span>
+          <span class="current">Accessibility</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 Advanced HTML</div>
+          <h1>HTML Accessibility – ARIA, alt Text, Keyboard Navigation</h1>
+          <p class="lesson-intro">Web accessibility means building pages that everyone can use — including the 1.3 billion people worldwide who have a disability. It is also a legal requirement in many countries (ADA, EN 301 549, EAA) and a direct SEO signal. The good news: semantic HTML gets you 80% of the way there for free.</p>
+          <div class="lesson-meta"><span>⏱️ 22 min read</span><span>🎯 Beginner</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="why-accessibility">Why Accessibility Matters</h2>
+          <p>The Web Content Accessibility Guidelines (WCAG) define four principles for accessible content, summarised as <strong>POUR</strong>:</p>
+          <ul>
+            <li><strong>Perceivable</strong> — information must be presentable in ways all users can perceive (e.g., alt text for images).</li>
+            <li><strong>Operable</strong> — interface components must be operable by keyboard, not just mouse.</li>
+            <li><strong>Understandable</strong> — content and UI must be understandable.</li>
+            <li><strong>Robust</strong> — content must be interpreted reliably by assistive technologies.</li>
+          </ul>
+          <p>WCAG 2.1 has three conformance levels: A (minimum), AA (standard legal target), and AAA (enhanced). Most accessibility legislation requires AA compliance.</p>
+          <div class="callout callout-info">
+            <strong>Legal note:</strong> The US ADA, UK Equality Act, and EU European Accessibility Act all require accessible websites. Lawsuits for inaccessible websites cost US companies over $3.5 billion in 2023 alone.
+          </div>
+
+          <h2 id="semantic-html-foundation">Semantic HTML is the Foundation</h2>
+          <p>The single most impactful accessibility action is to use the right HTML element for the right job. Semantic elements carry built-in accessibility information that browsers expose to screen readers automatically — no extra work required.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- Bad: div soup — screen readers have no context --&gt;
+&lt;div class="header"&gt;
+  &lt;div class="nav"&gt;
+    &lt;div class="nav-item" onclick="go('/')"&gt;Home&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Good: semantic HTML is accessible by default --&gt;
+&lt;header&gt;
+  &lt;nav aria-label="Main navigation"&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href="/"&gt;Home&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/nav&gt;
+&lt;/header&gt;</code></pre>
+          </div>
+          <p>A screen reader announces a <code>&lt;button&gt;</code> as "button, activatable". A plain <code>&lt;div&gt;</code> with an <code>onclick</code> handler announces nothing useful. Use native elements whenever possible — <code>&lt;button&gt;</code>, <code>&lt;a&gt;</code>, <code>&lt;input&gt;</code>, <code>&lt;select&gt;</code> are all keyboard-focusable and announced correctly out of the box.</p>
+
+          <h2 id="alt-text">Images: Descriptive alt Text</h2>
+          <p>Every <code>&lt;img&gt;</code> element must have an <code>alt</code> attribute. Screen readers read the alt text aloud. Search engines also use it for image indexing.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- Informative image: describe what the image shows and why it matters --&gt;
+&lt;img src="html-structure.png" alt="Diagram showing the HTML document tree with html, head, and body elements"&gt;
+
+&lt;!-- Functional image (linked image): describe the destination/action, not the image --&gt;
+&lt;a href="/"&gt;
+  &lt;img src="logo.png" alt="ylearner – Go to homepage"&gt;
+&lt;/a&gt;
+
+&lt;!-- Decorative image: empty alt (screen readers skip it entirely) --&gt;
+&lt;img src="decorative-wave.svg" alt=""&gt;
+
+&lt;!-- Bad: filename as alt (useless to screen reader users) --&gt;
+&lt;img src="img_001.jpg" alt="img_001.jpg"&gt;
+
+&lt;!-- Bad: "image of" / "photo of" prefix (redundant — screen readers announce it is an image) --&gt;
+&lt;img src="chart.png" alt="Image of a bar chart"&gt;
+
+&lt;!-- Good: describe content meaningfully --&gt;
+&lt;img src="chart.png" alt="Bar chart showing 40% increase in web traffic from January to June 2026"&gt;</code></pre>
+          </div>
+          <div class="callout callout-warning">
+            <strong>Missing alt attribute vs empty alt:</strong> A missing <code>alt</code> attribute is a WCAG failure. An empty <code>alt=""</code> is intentional — it tells screen readers "skip this image." Never omit the attribute entirely.
+          </div>
+
+          <h2 id="forms-accessibility">Forms: Labels, Fieldsets, and Error Messages</h2>
+          <p>Forms are the area where accessibility failures are most common. Every form control must have a visible, programmatically associated label.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- Method 1: label with for + matching input id (preferred) --&gt;
+&lt;label for="email"&gt;Email address&lt;/label&gt;
+&lt;input type="email" id="email" name="email" required autocomplete="email"&gt;
+
+&lt;!-- Method 2: wrapping label --&gt;
+&lt;label&gt;
+  Username
+  &lt;input type="text" name="username" required&gt;
+&lt;/label&gt;
+
+&lt;!-- Bad: placeholder is NOT a label --&gt;
+&lt;input type="email" placeholder="Email address"&gt;
+
+&lt;!-- Grouping related inputs with fieldset and legend --&gt;
+&lt;fieldset&gt;
+  &lt;legend&gt;Preferred contact method&lt;/legend&gt;
+  &lt;label&gt;&lt;input type="radio" name="contact" value="email"&gt; Email&lt;/label&gt;
+  &lt;label&gt;&lt;input type="radio" name="contact" value="phone"&gt; Phone&lt;/label&gt;
+&lt;/fieldset&gt;
+
+&lt;!-- Accessible error message linked to input --&gt;
+&lt;label for="password"&gt;Password&lt;/label&gt;
+&lt;input type="password" id="password" name="password"
+       aria-describedby="password-error" aria-invalid="true"&gt;
+&lt;span id="password-error" class="error" role="alert"&gt;
+  Password must be at least 8 characters.
+&lt;/span&gt;</code></pre>
+          </div>
+
+          <h2 id="keyboard-navigation">Keyboard Navigation: tabindex, Focus Styles, Skip Links</h2>
+          <p>Many users — including those with motor disabilities and power users — navigate entirely by keyboard. Tab moves forward through focusable elements; Shift+Tab moves backward; Enter/Space activates buttons and links.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- Skip link: allows keyboard users to jump past repeated navigation --&gt;
+&lt;!-- Place as the very first element in body --&gt;
+&lt;a href="#main-content" class="skip-link"&gt;Skip to main content&lt;/a&gt;
+
+&lt;!-- tabindex="0": adds a non-interactive element to the tab order --&gt;
+&lt;div role="button" tabindex="0" onclick="doAction()"
+     onkeydown="if(event.key==='Enter'||event.key===' ')doAction()"&gt;
+  Click me
+&lt;/div&gt;
+&lt;!-- Note: use a real &lt;button&gt; instead when possible! --&gt;
+
+&lt;!-- tabindex="-1": removes element from tab order but allows programmatic focus --&gt;
+&lt;div id="modal" tabindex="-1"&gt;…modal content…&lt;/div&gt;
+&lt;!-- document.getElementById('modal').focus() works, Tab key skips it --&gt;
+
+&lt;!-- tabindex values greater than 0 create unpredictable tab order — AVOID --&gt;
+&lt;!-- Bad: --&gt;
+&lt;input tabindex="3"&gt;
+&lt;input tabindex="1"&gt;
+&lt;input tabindex="2"&gt;</code></pre>
+          </div>
+          <div class="callout callout-warning">
+            <strong>Never remove focus styles:</strong> <code>outline: none</code> or <code>outline: 0</code> without a replacement focus style is a WCAG 2.1 Level AA failure (Success Criterion 2.4.7). Always provide a visible focus indicator.
+          </div>
+
+          <h2 id="aria-attributes">ARIA Attributes</h2>
+          <p>ARIA (Accessible Rich Internet Applications) is a set of HTML attributes that supplement the accessibility information of elements when native semantics are insufficient. The first rule of ARIA: <strong>don't use ARIA if a native HTML element provides the semantics you need.</strong></p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- aria-label: provides an accessible name when no visible text label exists --&gt;
+&lt;button aria-label="Close dialog"&gt;✕&lt;/button&gt;
+&lt;input type="search" aria-label="Search tutorials"&gt;
+
+&lt;!-- aria-describedby: links to text that provides additional description --&gt;
+&lt;input type="text" id="zip" aria-describedby="zip-hint"&gt;
+&lt;p id="zip-hint"&gt;Enter your 5-digit US ZIP code.&lt;/p&gt;
+
+&lt;!-- aria-hidden: hides element from accessibility tree (e.g. decorative icons) --&gt;
+&lt;span aria-hidden="true"&gt;🏠&lt;/span&gt;
+&lt;span&gt;Home&lt;/span&gt;
+
+&lt;!-- aria-expanded: communicates open/closed state of collapsible content --&gt;
+&lt;button aria-expanded="false" aria-controls="menu"&gt;Menu&lt;/button&gt;
+&lt;ul id="menu" hidden&gt;&lt;li&gt;&lt;a href="/"&gt;Home&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
+
+&lt;!-- aria-live: announces dynamic content changes to screen readers --&gt;
+&lt;div aria-live="polite" aria-atomic="true"&gt;
+  &lt;!-- Updated content will be announced when changed --&gt;
+  Form submitted successfully.
+&lt;/div&gt;
+
+&lt;!-- aria-current: marks the current item in a set (e.g. current nav link) --&gt;
+&lt;nav&gt;
+  &lt;a href="/" aria-current="page"&gt;Home&lt;/a&gt;
+  &lt;a href="/about"&gt;About&lt;/a&gt;
+&lt;/nav&gt;</code></pre>
+          </div>
+
+          <h2 id="aria-landmarks">ARIA Landmark Roles</h2>
+          <p>Landmark roles allow screen reader users to jump directly to major page regions. HTML5 semantic elements map to landmark roles automatically — use the native elements and you get the landmarks for free.</p>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Landmark Role</th><th>Native HTML Element</th><th>Purpose</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>banner</code></td><td><code>&lt;header&gt;</code> (top-level)</td><td>Site header with logo and primary navigation</td></tr>
+                <tr><td><code>navigation</code></td><td><code>&lt;nav&gt;</code></td><td>Group of navigational links</td></tr>
+                <tr><td><code>main</code></td><td><code>&lt;main&gt;</code></td><td>Primary page content (one per page)</td></tr>
+                <tr><td><code>complementary</code></td><td><code>&lt;aside&gt;</code></td><td>Content that supports but is not essential to main</td></tr>
+                <tr><td><code>contentinfo</code></td><td><code>&lt;footer&gt;</code> (top-level)</td><td>Footer with copyright, legal links</td></tr>
+                <tr><td><code>search</code></td><td><code>&lt;search&gt;</code> or <code>role="search"</code></td><td>Search functionality</td></tr>
+                <tr><td><code>form</code></td><td><code>&lt;form&gt;</code> with <code>aria-label</code></td><td>Labelled form region</td></tr>
+                <tr><td><code>region</code></td><td><code>&lt;section&gt;</code> with <code>aria-label</code></td><td>Labelled section of significant content</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- When you have multiple nav elements, label them for distinction --&gt;
+&lt;nav aria-label="Main navigation"&gt;…&lt;/nav&gt;
+&lt;nav aria-label="Breadcrumb"&gt;…&lt;/nav&gt;
+&lt;nav aria-label="Pagination"&gt;…&lt;/nav&gt;
+
+&lt;!-- Explicit landmark role when element cannot be semantic --&gt;
+&lt;div role="main"&gt;…&lt;/div&gt;  &lt;!-- Only if &lt;main&gt; is not usable --&gt;</code></pre>
+          </div>
+
+          <h2 id="color-contrast">Color Contrast</h2>
+          <p>Approximately 8% of men and 0.5% of women have some form of color vision deficiency. WCAG 2.1 defines minimum contrast ratios for text against its background:</p>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Text Type</th><th>Level AA (minimum)</th><th>Level AAA (enhanced)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Normal text (under 18pt / 14pt bold)</td><td>4.5:1</td><td>7:1</td></tr>
+                <tr><td>Large text (18pt+ / 14pt+ bold)</td><td>3:1</td><td>4.5:1</td></tr>
+                <tr><td>UI components and graphics</td><td>3:1</td><td>—</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Use the <a href="https://webaim.org/resources/contrastchecker/" rel="noopener noreferrer">WebAIM Contrast Checker</a> or browser DevTools' accessibility panel to verify contrast. Never convey information using color alone — also use shape, pattern, or text labels.</p>
+
+          <h2 id="testing-accessibility">Testing Accessibility</h2>
+          <p>Automated tools catch about 30–40% of accessibility issues. Manual testing is essential:</p>
+          <ul>
+            <li><strong>Browser DevTools Accessibility panel</strong> — Chrome and Firefox both have built-in accessibility trees showing element roles, names, and states.</li>
+            <li><strong>axe DevTools</strong> (free browser extension) — scans the page and reports WCAG violations with links to how-to-fix guides.</li>
+            <li><strong>Lighthouse</strong> — built into Chrome DevTools, produces an accessibility score with actionable items.</li>
+            <li><strong>Keyboard-only testing</strong> — unplug your mouse and navigate your entire page using only Tab, Shift+Tab, Enter, Space, and arrow keys.</li>
+            <li><strong>Screen reader testing</strong> — NVDA (Windows, free), JAWS (Windows, paid), VoiceOver (macOS/iOS, built in), TalkBack (Android, built in).</li>
+          </ul>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Semantic HTML (<code>&lt;button&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, etc.) provides accessibility for free — use it instead of div soup.</li>
+              <li>Every <code>&lt;img&gt;</code> needs an <code>alt</code> attribute: descriptive for informative images, empty (<code>alt=""</code>) for decorative ones.</li>
+              <li>Every form control needs a programmatically associated <code>&lt;label&gt;</code>; use <code>&lt;fieldset&gt;</code> and <code>&lt;legend&gt;</code> for groups of related inputs.</li>
+              <li>Add a skip link as the first element in <code>&lt;body&gt;</code> so keyboard users can bypass repeated navigation.</li>
+              <li>Never remove focus styles without providing a visible replacement.</li>
+              <li>ARIA attributes supplement native semantics — do not use ARIA where a native element already provides the role.</li>
+              <li>Aim for WCAG 2.1 Level AA compliance: 4.5:1 contrast for normal text, 3:1 for large text and UI components.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/html/advanced/meta-seo.html" class="html-topic-tag">Meta Tags &amp; SEO</a>
+            <a href="/html/advanced/canvas.html" class="html-topic-tag">HTML Canvas</a>
+            <a href="/html/forms/form-basics.html" class="html-topic-tag">HTML Forms</a>
+            <a href="/html/semantic/what-is-semantic.html" class="html-topic-tag">Semantic HTML</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <h3>Is ARIA necessary if I use semantic HTML?</h3>
+              <p>Often not. Semantic HTML elements carry their own ARIA roles implicitly. For example, <code>&lt;button&gt;</code> has an implicit <code>role="button"</code>, <code>&lt;nav&gt;</code> has <code>role="navigation"</code>. You only need explicit ARIA when you are building a custom interactive widget (like a combobox, date picker, or carousel) that has no semantic HTML equivalent, or when you need to communicate dynamic state changes (like <code>aria-expanded</code> or <code>aria-live</code>).</p>
+            </div>
+            <div class="faq-item">
+              <h3>What is the difference between aria-label and aria-labelledby?</h3>
+              <p><code>aria-label</code> provides an accessible name as a direct string value: <code>aria-label="Close"</code>. <code>aria-labelledby</code> references the ID of an existing element whose text content becomes the accessible name: <code>aria-labelledby="dialog-title"</code>. Use <code>aria-labelledby</code> when the label text is already visible on screen (avoiding duplication), and <code>aria-label</code> when there is no visible text to reference (icon-only buttons, etc.).</p>
+            </div>
+            <div class="faq-item">
+              <h3>Do placeholder attributes count as labels?</h3>
+              <p>No. Placeholder text fails as a label for several reasons: it disappears when the user starts typing (making it impossible to check what was required), it often has insufficient color contrast, and older screen readers do not consistently announce placeholders as labels. Always use a visible <code>&lt;label&gt;</code> element. Placeholder text can supplement a label but must never replace it.</p>
+            </div>
+          </section>
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/html/advanced/meta-seo.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Meta Tags &amp; SEO</span></a>
+          <a href="/html/advanced/canvas.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">HTML Canvas</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar"><div class="toc-title">On This Page</div><div id="toc"></div><div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div></aside>
+  </div>
+  <footer class="site-footer"><div class="footer-bottom" style="max-width:1200px;margin:0 auto;"><span>© 2026 ylearner. All rights reserved.</span><span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span></div></footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
