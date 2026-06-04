@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS Project Structure – Standalone & Odoo Module Layout | ylearner</title>
+  <meta name="description" content="Learn how to structure an OWL JS project: file organisation for standalone apps, naming conventions, and the anatomy of an Odoo module with OWL JS front-end code. Understand where each piece of OWL code lives.">
+  <meta name="keywords" content="OWL JS project structure, OWL JS file organisation, Odoo module OWL structure, OWL JS folder layout, OWL component naming, Odoo frontend module structure, OWL JS app architecture">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/owljs/getting-started/project-structure.html">
+  <meta property="og:title" content="OWL JS Project Structure – Standalone & Odoo Module | ylearner">
+  <meta property="og:description" content="How to structure an OWL JS project — standalone app file layout, naming conventions, and the anatomy of an Odoo module with OWL front-end code.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/owljs/getting-started/project-structure.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"OWL JS Project Structure","description":"How to organise an OWL JS project — file layout for standalone apps and Odoo modules, naming conventions, and architecture patterns.","educationalLevel":"Beginner","keywords":"OWL JS structure, Odoo module OWL files, OWL project layout","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦉</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/getting-started/setup.html">Getting Started</a><span class="separator">›</span>
+          <span class="current">Project Structure</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Getting Started</div>
+          <h1>OWL JS Project Structure – How to Organise Your Code</h1>
+          <p class="lesson-intro">As your OWL JS application grows from a single file into dozens of components, having a clear file structure becomes essential. This lesson covers two project structures: a <strong>standalone OWL JS app</strong> (when you are building outside of Odoo) and an <strong>Odoo module with OWL JS front-end code</strong> (the real-world structure you will use in production Odoo work). You will also learn naming conventions, what each file type does, and how Odoo's asset bundling system loads your OWL components.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 16 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="standalone-structure">Standalone OWL JS Project Structure</h2>
+          <p>For a standalone OWL JS app built with <strong>Vite + npm</strong> (Approach 3 from the Setup lesson), the recommended structure is:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Directory structure – Standalone OWL + Vite</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">my-owl-app/
+├── index.html                  ← HTML entry point, contains &lt;div id="app"&gt;
+├── package.json                ← npm config: @odoo/owl dependency, scripts
+├── vite.config.js              ← Vite build config
+│
+├── src/
+│   ├── main.js                 ← App entry: imports App, calls mount()
+│   │
+│   ├── App.js                  ← Root component — composes everything else
+│   │
+│   ├── components/             ← Reusable UI components
+│   │   ├── Button.js
+│   │   ├── Modal.js
+│   │   └── DataTable.js
+│   │
+│   ├── views/                  ← Page-level components (routed views)
+│   │   ├── HomeView.js
+│   │   ├── UserListView.js
+│   │   └── SettingsView.js
+│   │
+│   ├── hooks/                  ← Custom OWL hooks (reusable logic)
+│   │   ├── useLocalStorage.js
+│   │   └── useFetch.js
+│   │
+│   ├── services/               ← App-wide services (injectable via env)
+│   │   ├── ApiService.js
+│   │   └── NotificationService.js
+│   │
+│   └── utils/                  ← Helper functions (not components)
+│       ├── formatDate.js
+│       └── validators.js
+│
+└── tests/                      ← Unit tests for components and hooks
+    ├── App.test.js
+    └── components/
+        └── Button.test.js</code></pre>
+          </div>
+
+          <h3>Key files explained</h3>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>File</th><th>Purpose</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>index.html</code></td><td>The HTML shell. Only contains <code>&lt;div id="app"&gt;</code> and a <code>&lt;script type="module"&gt;</code> pointing to <code>src/main.js</code></td></tr>
+                <tr><td><code>src/main.js</code></td><td>Imports the root App component and calls <code>mount(App, document.getElementById("app"))</code>. May also configure the OWL app environment here.</td></tr>
+                <tr><td><code>src/App.js</code></td><td>The root component. Defines the top-level layout and registers all top-level sub-components.</td></tr>
+                <tr><td><code>src/components/</code></td><td>Reusable, stateless-or-self-contained UI pieces: buttons, inputs, modals, cards. Components here should work in any context.</td></tr>
+                <tr><td><code>src/views/</code></td><td>Page-level components associated with routes or major app screens. They compose <code>components/</code> pieces together.</td></tr>
+                <tr><td><code>src/hooks/</code></td><td>Custom OWL hooks — functions that call <code>useState</code>, <code>onMounted</code>, etc. to encapsulate reusable stateful logic.</td></tr>
+                <tr><td><code>src/services/</code></td><td>Services shared across the app via OWL's environment system. Examples: API client, notification manager, auth service.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="odoo-module-structure">Odoo Module Structure with OWL JS</h2>
+          <p>When building a real Odoo module, your OWL JS code lives inside a Python module directory. Odoo has a specific convention for where front-end assets (JavaScript, CSS, templates) go. Here is the anatomy of a custom Odoo module named <code>my_custom_module</code>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Directory structure – Odoo Module with OWL JS</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">my_custom_module/
+├── __init__.py                 ← Python: makes this a Python package
+├── __manifest__.py             ← Odoo: module name, version, depends, data files
+│
+├── models/                     ← Python: Odoo ORM models (database)
+│   ├── __init__.py
+│   └── sale_order_custom.py
+│
+├── views/                      ← XML: Odoo form/tree/kanban view definitions
+│   └── sale_order_views.xml
+│
+├── security/                   ← CSV/XML: access rights and record rules
+│   └── ir.model.access.csv
+│
+└── static/                     ← ALL front-end assets (served to browser)
+    ├── description/
+    │   └── icon.png            ← Module icon shown in Odoo App Store
+    │
+    └── src/                    ← OWL JS source code
+        ├── js/
+        │   ├── components/     ← OWL components
+        │   │   ├── MyWidget.js
+        │   │   └── CustomKanban.js
+        │   ├── views/          ← OWL view overrides (extends Odoo views)
+        │   │   └── sale_form_view.js
+        │   └── main.js         ← Entry point: registers components
+        │
+        ├── xml/                ← OWL templates (alternative to xml`` helper)
+        │   └── my_templates.xml
+        │
+        └── css/                ← Custom CSS for your components
+            └── my_module.css</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>The <code>static/</code> directory is special in Odoo</strong>
+              <p>Odoo serves files inside <code>static/</code> directly to the browser without any Python processing. This is where all your JavaScript, CSS, and image assets live. Odoo's asset bundling system (defined in <code>__manifest__.py</code> or <code>ir.asset</code> records) tells Odoo which JS and CSS files to include in the browser bundle.</p>
+            </div>
+          </div>
+
+          <h2 id="manifest">The __manifest__.py File</h2>
+          <p>The manifest tells Odoo about your module and declares your front-end assets:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python – __manifest__.py</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">{
+    "name": "My Custom Module",
+    "version": "17.0.1.0.0",
+    "category": "Sales",
+    "summary": "Custom OWL widgets for Sales",
+    "author": "Your Company",
+    "depends": ["sale", "web"],      # Odoo modules this depends on
+    "license": "LGPL-3",
+
+    # Declare your JavaScript and CSS assets
+    "assets": {
+        # web.assets_backend = the main Odoo backend bundle
+        "web.assets_backend": [
+            "my_custom_module/static/src/js/components/MyWidget.js",
+            "my_custom_module/static/src/js/views/sale_form_view.js",
+            "my_custom_module/static/src/css/my_module.css",
+        ],
+    },
+
+    # XML views, security files, and data
+    "data": [
+        "security/ir.model.access.csv",
+        "views/sale_order_views.xml",
+    ],
+
+    "installable": True,
+    "application": False,
+}</code></pre>
+          </div>
+
+          <h2 id="registering-owl-components">Registering OWL Components in Odoo</h2>
+          <p>In a standalone app you call <code>mount(App, el)</code> to start OWL. In Odoo, you do not call <code>mount()</code> directly — instead you <strong>extend</strong> or <strong>patch</strong> existing Odoo views and components using Odoo's registry system:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript – Registering a custom field widget in Odoo</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-javascript">/** @odoo-module */
+// The @odoo-module comment tells Odoo's bundler this is an ES module
+
+import { Component, xml, useState } from "@web/owl";
+// In Odoo, OWL is imported from "@web/owl" (Odoo's internal alias)
+
+// Import Odoo's registry to register your component as a field widget
+import { registry } from "@web/core/registry";
+
+// Your custom OWL component
+class ColorPickerWidget extends Component {
+  static template = xml`
+    &lt;div class="color-picker-widget"&gt;
+      &lt;div t-foreach="colors" t-as="color" t-key="color"
+           t-att-style="'background:' + color"
+           t-att-class="{ selected: props.value === color }"
+           t-on-click="() =&gt; props.update(color)"&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  `;
+
+  get colors() {
+    return ["#e74c3c", "#3498db", "#2ecc71", "#f39c12", "#9b59b6"];
+  }
+}
+
+// Register as a field widget — Odoo will use this for fields
+// where widget="color_picker" is specified in a view XML
+registry.category("fields").add("color_picker", ColorPickerWidget);</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>In Odoo: import from <code>"@web/owl"</code>, not <code>"@odoo/owl"</code></strong>
+              <p>Inside an Odoo module, OWL is available as <code>@web/owl</code> — Odoo provides it through its own asset system. Do not try to install <code>@odoo/owl</code> via npm inside an Odoo module. Odoo also provides its own <code>useState</code>, <code>Component</code>, etc. through this alias. When learning OWL standalone (this course), use <code>@odoo/owl</code> or the CDN. When writing real Odoo modules, use <code>@web/owl</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="naming-conventions">Naming Conventions</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Item</th><th>Convention</th><th>Example</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Component file</td><td>PascalCase, matches class name</td><td><code>UserCard.js</code>, <code>SalesKanban.js</code></td></tr>
+                <tr><td>Component class</td><td>PascalCase</td><td><code>class UserCard extends Component</code></td></tr>
+                <tr><td>Hook file</td><td>camelCase, prefixed <code>use</code></td><td><code>useSearch.js</code>, <code>useNotification.js</code></td></tr>
+                <tr><td>Service file</td><td>camelCase + "Service"</td><td><code>notificationService.js</code></td></tr>
+                <tr><td>CSS file</td><td>snake_case (Odoo convention)</td><td><code>my_module.css</code></td></tr>
+                <tr><td>Template IDs</td><td>ModuleName.ComponentName</td><td><code>MyModule.UserCard</code></td></tr>
+                <tr><td>Odoo module dir</td><td>snake_case</td><td><code>my_custom_module/</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="component-file-anatomy">Anatomy of a Single Component File</h2>
+          <p>Here is what a well-structured OWL JS component file looks like:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript – UserCard.js (anatomy)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-javascript">// 1. OWL imports
+import { Component, xml, useState, onMounted } from "@odoo/owl";
+
+// 2. Sub-component imports (if any)
+import { Avatar } from "./Avatar.js";
+import { Badge } from "./Badge.js";
+
+// 3. Component class
+export class UserCard extends Component {
+
+  // 4. Static props declaration — documents and validates incoming props
+  static props = {
+    userId: Number,
+    name: String,
+    role: { type: String, optional: true },
+    onDelete: { type: Function, optional: true },
+  };
+
+  // 5. Default props (optional)
+  static defaultProps = {
+    role: "Member",
+  };
+
+  // 6. Sub-component registry
+  static components = { Avatar, Badge };
+
+  // 7. Reactive state
+  state = useState({ expanded: false });
+
+  // 8. Lifecycle hooks — called in setup()
+  setup() {
+    onMounted(() => {
+      console.log(`UserCard for user ${this.props.userId} mounted`);
+    });
+  }
+
+  // 9. Computed getters
+  get initials() {
+    return this.props.name
+      .split(" ")
+      .map(n => n[0])
+      .join("")
+      .toUpperCase();
+  }
+
+  // 10. Event handlers
+  toggleExpanded() {
+    this.state.expanded = !this.state.expanded;
+  }
+
+  handleDelete() {
+    if (this.props.onDelete) {
+      this.props.onDelete(this.props.userId);
+    }
+  }
+
+  // 11. Template — defined last so methods are visible above it
+  static template = xml`
+    &lt;div class="user-card" t-att-class="{ expanded: state.expanded }"&gt;
+      &lt;Avatar initials="initials"/&gt;
+      &lt;div class="user-info"&gt;
+        &lt;h3 t-esc="props.name"/&gt;
+        &lt;Badge label="props.role"/&gt;
+      &lt;/div&gt;
+      &lt;button t-on-click="toggleExpanded"&gt;
+        &lt;t t-if="state.expanded"&gt;▲ Less&lt;/t&gt;
+        &lt;t t-else=""&gt;▼ More&lt;/t&gt;
+      &lt;/button&gt;
+      &lt;div t-if="state.expanded" class="user-details"&gt;
+        &lt;p&gt;ID: &lt;t t-esc="props.userId"/&gt;&lt;/p&gt;
+        &lt;button t-if="props.onDelete" t-on-click="handleDelete"&gt;Delete&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Standalone OWL projects: organise into <code>components/</code>, <code>views/</code>, <code>hooks/</code>, <code>services/</code>, <code>utils/</code>.</li>
+              <li>Odoo modules: all front-end assets live in <code>static/src/</code>. Assets are declared in <code>__manifest__.py</code> under the <code>assets</code> key.</li>
+              <li>In Odoo, OWL components are registered in Odoo's <strong>registry system</strong> (not mounted directly).</li>
+              <li>In Odoo modules, import OWL from <code>"@web/owl"</code> — NOT <code>"@odoo/owl"</code>.</li>
+              <li>Naming: <strong>PascalCase</strong> for component files and classes; <strong>camelCase</strong> for hooks and utilities; <strong>snake_case</strong> for Odoo module directories.</li>
+              <li>A well-structured component file: imports → class → static props → static components → state → setup() → getters → event handlers → template.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/owljs/core/components.html" class="topic-tag owl-topic-tag">🦉 Components Deep Dive</a>
+            <a href="/owljs/core/props.html" class="topic-tag owl-topic-tag">🦉 Props</a>
+            <a href="/owljs/advanced/environment.html" class="topic-tag owl-topic-tag">🦉 Environment & Services</a>
+            <a href="/owljs/odoo/owl-in-odoo.html" class="topic-tag owl-topic-tag">🦉 OWL in Odoo Backend</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I put multiple OWL components in a single file? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — you can export multiple classes from one file. For small, tightly related components (like a parent and a private child it exclusively uses), a single file is fine. For components that are reused in many places, give each one its own file. The general rule: one public component per file, with small private helpers in the same file if they are not reused elsewhere.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the @odoo-module comment in Odoo module files? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The <code>/** @odoo-module */</code> comment at the top of a JavaScript file tells Odoo's asset bundler to treat the file as an ES module with <code>import</code>/<code>export</code> syntax. Without it, Odoo assumes the file is a legacy script. In modern Odoo 16/17 development you should always include it at the top of every JavaScript file in your module.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Where do OWL templates defined in separate XML files go? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In Odoo, you can define OWL templates in separate <code>.xml</code> files inside <code>static/src/xml/</code>. These XML files use the same <code>t-*</code> directive syntax as inline <code>xml``</code> templates. You reference them by template ID (e.g. <code>MyModule.MyComponent</code>). Separate XML templates are useful for very long templates that would clutter your JS file. In standalone OWL apps, the inline <code>xml``</code> helper is simpler and is the modern preferred approach.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/getting-started/first-app.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Your First OWL App</span>
+          </a>
+          <a href="/owljs/core/components.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Components & Classes</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
