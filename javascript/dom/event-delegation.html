@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Event Delegation – Dynamic Elements &amp; Performance | ylearner</title>
+  <meta name="description" content="Learn JavaScript event delegation: attach one listener to a parent to handle events from many child elements. Covers event.target, .matches(), .closest(), dynamic elements, performance benefits, and when not to use delegation.">
+  <meta name="keywords" content="javascript event delegation, event.target.matches, event.target.closest, dynamic elements javascript, performance event listener, bubbling javascript, event delegation pattern">
+  <link rel="canonical" href="https://ylearner.org/javascript/dom/event-delegation.html">
+  <meta property="og:title" content="JavaScript Event Delegation – Dynamic Elements &amp; Performance | ylearner">
+  <meta property="og:description" content="Learn event delegation in JavaScript: one parent listener to handle many child elements efficiently, including dynamically added ones.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/dom/dom-manipulation.html">DOM &amp; Browser</a><span class="separator">›</span>
+          <span class="current">Event Delegation</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 DOM &amp; Browser</div>
+          <h1>JavaScript Event Delegation – One Listener for Many Elements</h1>
+          <p class="lesson-intro"><strong>Event delegation</strong> is a pattern where instead of attaching a listener to each child element, you attach <em>one</em> listener to a common ancestor and use <code>event.target</code> to determine which child was interacted with. It relies on event bubbling and dramatically improves performance when working with many or dynamically generated elements.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 16 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="the-problem">The Problem Without Delegation</h2>
+          <p>Imagine a list with 1 000 items. Attaching a click listener to each one wastes memory and is fragile — dynamically added items get no listener at all:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// ❌ Anti-pattern: listener per child
+const items = document.querySelectorAll('.list-item');
+items.forEach(item =&gt; {
+  item.addEventListener('click', (e) =&gt; {
+    console.log('Clicked:', e.target.textContent);
+  });
+});
+
+// Problem 1: 1000 listener objects in memory
+// Problem 2: items added later get NO listener
+const newItem = document.createElement('li');
+newItem.className = 'list-item';
+newItem.textContent = 'New item';
+document.querySelector('ul').appendChild(newItem);
+// Clicking newItem → nothing happens!</code></pre>
+          </div>
+
+          <h2 id="how-delegation-works">How Event Delegation Works</h2>
+          <p>Because events bubble up the DOM tree, a click on any <code>&lt;li&gt;</code> also fires on the parent <code>&lt;ul&gt;</code>. We attach <em>one</em> listener to the parent and inspect <code>event.target</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// ✅ Delegation: one listener on parent
+const ul = document.querySelector('ul');
+
+ul.addEventListener('click', (e) =&gt; {
+  // e.target = the element that was actually clicked
+  if (e.target.tagName === 'LI') {
+    console.log('Clicked item:', e.target.textContent);
+  }
+});
+
+// Works for dynamically added items too!
+const newItem = document.createElement('li');
+newItem.textContent = 'Dynamically added';
+ul.appendChild(newItem);
+// Clicking newItem → "Clicked item: Dynamically added" ✓</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>Clicked item: Dynamically added</pre>
+          </div>
+
+          <h2 id="matches-and-closest">Using .matches() and .closest()</h2>
+          <p>Tag name checks are brittle. Use <code>element.matches(selector)</code> for CSS-selector matching and <code>element.closest(selector)</code> for nested element scenarios:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const list = document.getElementById('todo-list');
+
+list.addEventListener('click', (e) =&gt; {
+  // matches() – CSS selector check on the exact clicked element
+  if (e.target.matches('.delete-btn')) {
+    e.target.closest('li').remove();
+    return;
+  }
+
+  if (e.target.matches('.complete-btn')) {
+    e.target.closest('li').classList.toggle('done');
+    return;
+  }
+});
+
+// closest() traverses UP the tree to find the matching ancestor
+// Useful when the clicked element is a child of the intended target
+// Example: &lt;li&gt;&lt;span class="icon"&gt;✓&lt;/span&gt; Task text&lt;/li&gt;
+list.addEventListener('click', (e) =&gt; {
+  const li = e.target.closest('li'); // works even if user clicks &lt;span&gt;
+  if (li) {
+    li.classList.toggle('selected');
+  }
+});</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always use .closest() for nested structures</strong>
+              <p>When a list item contains child elements (icons, badges, buttons), <code>e.target</code> may be the icon, not the <code>&lt;li&gt;</code>. <code>e.target.closest('li')</code> safely walks up the tree to the intended element, regardless of which child was clicked.</p>
+            </div>
+          </div>
+
+          <h2 id="todo-list-example">Practical Example: Todo List with Delegation</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// HTML assumed:
+// &lt;input id="todo-input" placeholder="Add task…"&gt;
+// &lt;button id="add-btn"&gt;Add&lt;/button&gt;
+// &lt;ul id="todo-list"&gt;&lt;/ul&gt;
+
+const input   = document.getElementById('todo-input');
+const addBtn  = document.getElementById('add-btn');
+const todoList = document.getElementById('todo-list');
+
+function addItem(text) {
+  if (!text.trim()) return;
+  const li = document.createElement('li');
+  li.innerHTML = `
+    &lt;span class="task-text"&gt;${text}&lt;/span&gt;
+    &lt;button class="complete-btn"&gt;✓&lt;/button&gt;
+    &lt;button class="delete-btn"&gt;✕&lt;/button&gt;
+  `;
+  todoList.appendChild(li);
+  input.value = '';
+}
+
+addBtn.addEventListener('click', () =&gt; addItem(input.value));
+input.addEventListener('keydown', (e) =&gt; {
+  if (e.key === 'Enter') addItem(input.value);
+});
+
+// ONE delegated listener handles all current and future items
+todoList.addEventListener('click', (e) =&gt; {
+  const li = e.target.closest('li');
+  if (!li) return;
+
+  if (e.target.matches('.delete-btn')) {
+    li.remove();
+  } else if (e.target.matches('.complete-btn')) {
+    li.classList.toggle('done');
+  }
+});</code></pre>
+          </div>
+
+          <h2 id="dynamic-table-example">Practical Example: Dynamic Table Actions</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const tableBody = document.querySelector('#data-table tbody');
+
+// Delegate on the tbody — handles Edit and Delete for any row
+tableBody.addEventListener('click', (e) =&gt; {
+  const btn = e.target.closest('button[data-action]');
+  if (!btn) return;
+
+  const row = btn.closest('tr');
+  const id  = row.dataset.id;
+
+  switch (btn.dataset.action) {
+    case 'edit':
+      openEditModal(id);
+      break;
+    case 'delete':
+      if (confirm(`Delete record ${id}?`)) row.remove();
+      break;
+    case 'view':
+      openDetailPanel(id);
+      break;
+  }
+});
+
+// Adding rows dynamically — no new listeners needed
+function addRow(id, name, email) {
+  tableBody.insertAdjacentHTML('beforeend', `
+    &lt;tr data-id="${id}"&gt;
+      &lt;td&gt;${id}&lt;/td&gt;
+      &lt;td&gt;${name}&lt;/td&gt;
+      &lt;td&gt;${email}&lt;/td&gt;
+      &lt;td&gt;
+        &lt;button data-action="edit"&gt;Edit&lt;/button&gt;
+        &lt;button data-action="delete"&gt;Delete&lt;/button&gt;
+        &lt;button data-action="view"&gt;View&lt;/button&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+  `);
+}</code></pre>
+          </div>
+
+          <h2 id="direct-vs-delegation">Direct vs Delegation – Comparison</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Aspect</th><th>Direct Listeners</th><th>Event Delegation</th></tr></thead>
+              <tbody>
+                <tr><td>Memory</td><td>N listeners for N elements</td><td>1 listener regardless of count</td></tr>
+                <tr><td>Dynamic elements</td><td>Must re-attach after DOM update</td><td>Works automatically</td></tr>
+                <tr><td>Setup complexity</td><td>Simple loop</td><td>Needs <code>target</code> check</td></tr>
+                <tr><td>stopPropagation risk</td><td>None</td><td>Child's stopPropagation breaks delegation</td></tr>
+                <tr><td>Best for</td><td>Few, static, complex elements</td><td>Many or dynamic child elements</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="when-not-to-use">When NOT to Use Delegation</h2>
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Delegation breaks if children call stopPropagation</strong>
+              <p>If a child element's listener calls <code>e.stopPropagation()</code>, the event never reaches your delegate listener on the parent. This is a common source of bugs in third-party widget integration. In those cases, attach a direct listener to the child.</p>
+            </div>
+          </div>
+          <p>Avoid delegation when: events don't bubble (e.g. <code>focus</code>, <code>blur</code> — use <code>focusin</code>/<code>focusout</code> instead); the parent and child are far apart in the tree (performance overhead of bubbling through many nodes); or the child widgets call <code>stopPropagation</code>.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build an accordion FAQ list using delegation:</p>
+            <ol>
+              <li>Create a <code>&lt;div id="faq"&gt;</code> containing several <code>&lt;div class="faq-item"&gt;</code> elements, each with an <code>&lt;h3 class="question"&gt;</code> and a <code>&lt;p class="answer"&gt;</code> (initially hidden with CSS).</li>
+              <li>Attach a single click listener to <code>#faq</code>.</li>
+              <li>When a <code>.question</code> is clicked, toggle a CSS class <code>open</code> on its parent <code>.faq-item</code> to show/hide the answer.</li>
+              <li>Close all other items when one is opened (accordion behaviour).</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a Kanban-style board with three columns (To Do, In Progress, Done). Use a single delegated listener on the board container. Cards should have "Move Right" and "Move Left" buttons that move them between columns. Cards can be dynamically added via an input in each column. The entire interaction should use fewer than 3 event listeners total.</p>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Delegation attaches one listener to an ancestor instead of many to children.</li>
+              <li>It relies on event bubbling — the event from a child travels up to the parent.</li>
+              <li><code>e.target</code> identifies which child was clicked; use <code>.matches()</code> for CSS-selector checks.</li>
+              <li><code>e.target.closest(selector)</code> handles clicks on nested child elements inside the target.</li>
+              <li>Delegated listeners automatically handle dynamically added children.</li>
+              <li>Delegation fails if a child calls <code>e.stopPropagation()</code>.</li>
+              <li>Use <code>focusin</code>/<code>focusout</code> instead of <code>focus</code>/<code>blur</code> when delegating focus events.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is event delegation and why is it useful?</li>
+            <li>How does event delegation work with dynamically added elements?</li>
+            <li>What is the difference between <code>e.target</code> and <code>e.currentTarget</code> in a delegated handler?</li>
+            <li>When would you choose a direct listener over delegation?</li>
+            <li>Why might delegation fail on a page that uses third-party widgets?</li>
+          </ul>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I delegate events that don't bubble? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not directly. <code>focus</code> and <code>blur</code> do not bubble, so attaching them to a parent won't catch child focus events. Use <code>focusin</code> and <code>focusout</code> instead — they are the bubbling equivalents. Alternatively, you can use the capture phase (<code>addEventListener('focus', handler, true)</code>) which runs top-down before bubbling.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is event delegation always faster than direct listeners? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For large or dynamic lists, yes — delegation uses far less memory and avoids the overhead of attaching/removing listeners. For a small fixed set of elements (say, 3 buttons), direct listeners are simpler and the performance difference is negligible. Choose based on readability and the dynamic nature of your elements.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I handle multiple action types in one delegated listener? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>data-action</code> attributes on the child elements and check <code>e.target.dataset.action</code> (or <code>e.target.closest('[data-action]').dataset.action</code> for nested elements) inside a <code>switch</code> or <code>if/else</code> chain. This cleanly separates logic per action without cluttering the selector checks.</p></div>
+            </div>
+          </section>
+
+          <div class="related-topics">
+            <a href="/javascript/dom/events.html" class="topic-tag">JS Events</a>
+            <a href="/javascript/dom/dom-manipulation.html" class="topic-tag">DOM Manipulation</a>
+            <a href="/javascript/dom/forms.html" class="topic-tag">Forms &amp; Validation</a>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/dom/events.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Events</span></a>
+          <a href="/javascript/dom/forms.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Forms &amp; Validation</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

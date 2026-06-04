@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Generators – function*, yield &amp; Iterators | ylearner</title>
+  <meta name="description" content="Master JavaScript generators: function* syntax, yield keyword, generator .next(), infinite sequences, passing values via next(value), Symbol.iterator, custom iterables, for...of, yield* delegation, and practical use cases.">
+  <meta name="keywords" content="javascript generators, function* javascript, yield javascript, iterator protocol javascript, Symbol.iterator javascript, infinite generator javascript, yield* delegation, custom iterable javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/advanced/generators.html">
+  <meta property="og:title" content="JavaScript Generators – function*, yield &amp; Iterators | ylearner">
+  <meta property="og:description" content="Master JavaScript generators and the iterator protocol: function*, yield, infinite sequences, Symbol.iterator, and practical use cases.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/advanced/callbacks.html">Advanced JS</a><span class="separator">›</span>
+          <span class="current">Generators &amp; Iterators</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Advanced JS</div>
+          <h1>JavaScript Generators and Iterators – Lazy Evaluation</h1>
+          <p class="lesson-intro">Generator functions (<code>function*</code>) are special functions that can pause execution mid-body, yield a value to the caller, and resume from where they left off when the caller asks for the next value. This "lazy evaluation" pattern is perfect for infinite sequences, data streaming, custom iteration, and cooperative concurrency. This lesson covers everything from basic <code>yield</code> to the iterator protocol, <code>yield*</code> delegation, and practical real-world use cases.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="generator-function">Generator Function Syntax</h2>
+          <p>A generator function is declared with <code>function*</code> (asterisk). Calling it does <em>not</em> execute the body — it returns a <strong>generator object</strong>. The body only runs when you call <code>.next()</code> on the generator object.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function* simpleGenerator() {
+  console.log('Body: before first yield');
+  yield 1;
+  console.log('Body: after first yield');
+  yield 2;
+  console.log('Body: after second yield');
+  yield 3;
+  console.log('Body: done');
+}
+
+const gen = simpleGenerator();
+console.log('Generator created — body not running yet');
+
+let result;
+
+result = gen.next();
+console.log('next() returned:', result);    // { value: 1, done: false }
+
+result = gen.next();
+console.log('next() returned:', result);    // { value: 2, done: false }
+
+result = gen.next();
+console.log('next() returned:', result);    // { value: 3, done: false }
+
+result = gen.next();
+console.log('next() returned:', result);    // { value: undefined, done: true }</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Generator created — body not running yet
+Body: before first yield
+next() returned: { value: 1, done: false }
+Body: after first yield
+next() returned: { value: 2, done: false }
+Body: after second yield
+next() returned: { value: 3, done: false }
+Body: done
+next() returned: { value: undefined, done: true }</pre>
+          </div>
+
+          <h2 id="infinite-generator">Infinite Sequence Generator</h2>
+          <p>Generators can represent infinite sequences because values are computed lazily — only when requested. A <code>while(true)</code> loop that yields is perfectly safe inside a generator.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Infinite integer counter
+function* counter(start = 0, step = 1) {
+  let current = start;
+  while (true) {
+    yield current;
+    current += step;
+  }
+}
+
+// Fibonacci sequence (infinite)
+function* fibonacci() {
+  let [a, b] = [0, 1];
+  while (true) {
+    yield a;
+    [a, b] = [b, a + b];
+  }
+}
+
+// Helper: take first N values from any generator
+function take(gen, n) {
+  const result = [];
+  for (const value of gen) {
+    result.push(value);
+    if (result.length >= n) break;
+  }
+  return result;
+}
+
+console.log(take(counter(1, 2), 6));    // [1, 3, 5, 7, 9, 11]
+console.log(take(fibonacci(), 10));     // [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+console.log(take(counter(100, -10), 5)); // [100, 90, 80, 70, 60]</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>[1, 3, 5, 7, 9, 11]
+[0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+[100, 90, 80, 70, 60]</pre>
+          </div>
+
+          <h2 id="passing-values">Passing Values Into Generators via next(value)</h2>
+          <p>You can pass a value into a running generator via <code>gen.next(value)</code>. The passed value becomes the result of the <code>yield</code> expression inside the generator. This enables two-way communication.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function* dialog() {
+  const name    = yield 'What is your name?';
+  const hobbies = yield `Nice to meet you, ${name}! What are your hobbies?`;
+  yield `Cool, ${name} — I enjoy ${hobbies} too!`;
+}
+
+const conv = dialog();
+
+let q = conv.next();         // start: value = first question
+console.log(q.value);        // 'What is your name?'
+
+q = conv.next('Alice');      // send 'Alice' as the result of first yield
+console.log(q.value);        // 'Nice to meet you, Alice! What are your hobbies?'
+
+q = conv.next('coding');     // send 'coding' as result of second yield
+console.log(q.value);        // 'Cool, Alice — I enjoy coding too!'</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>What is your name?
+Nice to meet you, Alice! What are your hobbies?
+Cool, Alice — I enjoy coding too!</pre>
+          </div>
+
+          <h2 id="symbol-iterator">The Symbol.iterator Protocol</h2>
+          <p>An object is <strong>iterable</strong> if it has a <code>[Symbol.iterator]()</code> method that returns an iterator. An <strong>iterator</strong> is an object with a <code>.next()</code> method that returns <code>{ value, done }</code>. Generators automatically implement both protocols.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Custom iterable class using a generator
+class Range {
+  constructor(start, end, step = 1) {
+    this.start = start;
+    this.end   = end;
+    this.step  = step;
+  }
+
+  // The Symbol.iterator method makes instances iterable
+  *[Symbol.iterator]() {
+    for (let i = this.start; i &lt;= this.end; i += this.step) {
+      yield i;
+    }
+  }
+
+  // Convenience: collect to array
+  toArray() { return [...this]; }
+}
+
+const r = new Range(1, 10, 2);
+
+// Works with for...of
+for (const n of r) {
+  process.stdout.write(n + ' ');
+}
+console.log();
+
+// Works with spread
+console.log([...new Range(0, 6, 3)]);
+
+// Works with destructuring
+const [a, b, c] = new Range(10, 50, 15);
+console.log(a, b, c);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>1 3 5 7 9
+[0, 3, 6]
+10 25 40</pre>
+          </div>
+
+          <h2 id="yield-star">yield* Delegation</h2>
+          <p><code>yield*</code> delegates to another iterable (another generator, array, string, etc.). It's like yielding every item from the inner iterable one by one.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function* inner() {
+  yield 'a';
+  yield 'b';
+}
+
+function* outer() {
+  yield 1;
+  yield* inner();          // delegate to inner generator
+  yield* [10, 20, 30];    // delegate to array
+  yield* 'hi';            // delegate to string (character by character)
+  yield 2;
+}
+
+console.log([...outer()]);
+// [1, 'a', 'b', 10, 20, 30, 'h', 'i', 2]</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>[1, 'a', 'b', 10, 20, 30, 'h', 'i', 2]</pre>
+          </div>
+
+          <h2 id="practical-uses">Practical Use Cases</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Use-case 1: Unique ID factory
+function* idFactory(prefix = 'id') {
+  let n = 1;
+  while (true) {
+    yield `${prefix}-${String(n++).padStart(4, '0')}`;
+  }
+}
+
+const userIds = idFactory('usr');
+console.log(userIds.next().value);  // usr-0001
+console.log(userIds.next().value);  // usr-0002
+
+// Use-case 2: Paginated API fetching
+async function* paginatedFetch(baseUrl) {
+  let page = 1;
+  while (true) {
+    const res  = await fetch(`${baseUrl}?page=${page}&limit=10`);
+    const data = await res.json();
+    if (data.length === 0) break;
+    yield data;           // yield entire page at once
+    page++;
+  }
+}
+
+// Consumer
+async function fetchAllUsers() {
+  const allUsers = [];
+  for await (const page of paginatedFetch('/api/users')) {
+    allUsers.push(...page);
+    console.log(`Fetched ${allUsers.length} users so far`);
+  }
+  return allUsers;
+}
+
+// Use-case 3: Tree traversal
+function* flattenTree(node) {
+  yield node.value;
+  if (node.children) {
+    for (const child of node.children) {
+      yield* flattenTree(child);  // recursive delegation
+    }
+  }
+}
+
+const tree = { value: 1, children: [
+  { value: 2, children: [{ value: 4 }, { value: 5 }] },
+  { value: 3, children: [{ value: 6 }] }
+]};
+
+console.log([...flattenTree(tree)]);  // [1, 2, 4, 5, 3, 6]</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>usr-0001
+usr-0002
+[1, 2, 4, 5, 3, 6]</pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Use Case</th><th>Why Generators Help</th><th>Alternative</th></tr></thead>
+              <tbody>
+                <tr><td>Infinite sequences</td><td>Lazy — compute only when asked</td><td>Cannot do with plain arrays</td></tr>
+                <tr><td>ID factories</td><td>Stateful counter, trivially simple</td><td>Closure variable</td></tr>
+                <tr><td>Pagination</td><td>Async generators hide fetching logic</td><td>Recursive async functions</td></tr>
+                <tr><td>Tree traversal</td><td>yield* enables elegant recursion</td><td>Manual stack with array</td></tr>
+                <tr><td>Custom iteration</td><td>Symbol.iterator + generator = minimal code</td><td>Manual iterator object</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>Async generators (for await...of)</strong><p>Prefix a generator function with both <code>async</code> and <code>*</code>: <code>async function*</code>. It can both <code>await</code> Promises and <code>yield</code> values. Consume it with <code>for await...of</code>. This is the standard pattern for streaming data sources like paginated APIs, file line readers, and WebSocket streams.</p></div>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content"><strong>Generator objects are not reusable</strong><p>Once a generator is exhausted (<code>done: true</code>), calling <code>.next()</code> will always return <code>{ value: undefined, done: true }</code>. To restart, create a new generator by calling the generator function again.</p></div>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Implement these generator utilities:</p>
+            <ul>
+              <li><code>map*(gen, fn)</code> — transforms each yielded value.</li>
+              <li><code>filter*(gen, predicate)</code> — yields only values that pass the predicate.</li>
+              <li><code>zip*(gen1, gen2)</code> — yields pairs <code>[a, b]</code> until either generator is done.</li>
+              <li>Chain them: filter even numbers from an infinite counter, map to squares, take first 5.</li>
+            </ul>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Implement a generic <code>pipeline(...generators)</code> function that composes generator transformers left-to-right over an initial iterable. Then create a data processing pipeline that: reads a list of raw user objects → filters active users → maps to display names → takes the first 10 → collects to an array. All steps must be lazy generator functions.</p>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a generator function and how is it different from a regular function?</li>
+            <li>What does <code>yield</code> do? What does <code>.next(value)</code> do?</li>
+            <li>What is the iterator protocol (<code>{ value, done }</code>)?</li>
+            <li>How do you make a custom class iterable with Symbol.iterator?</li>
+            <li>What is <code>yield*</code> and when would you use it?</li>
+            <li>What is the difference between a generator and an async generator?</li>
+          </ul>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Generator functions (<code>function*</code>) return a generator object; body runs only on <code>.next()</code>.</li>
+              <li><code>yield expr</code> pauses execution and sends <code>expr</code> as <code>value</code> to the caller.</li>
+              <li><code>.next(value)</code> resumes the generator; <code>value</code> becomes the result of the <code>yield</code> expression.</li>
+              <li>Generators automatically implement the iterator protocol and are usable with <code>for...of</code> and spread.</li>
+              <li>Add <code>[Symbol.iterator]*()</code> to a class to make it iterable.</li>
+              <li><code>yield*</code> delegates to another iterable/generator.</li>
+              <li>Async generators (<code>async function*</code>) combine await and yield for streaming async data.</li>
+            </ul>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between an iterator and an iterable? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>An <strong>iterable</strong> is any object with a <code>[Symbol.iterator]()</code> method that returns an iterator. An <strong>iterator</strong> is an object with a <code>.next()</code> method that returns <code>{ value, done }</code>. Generator objects are both — they have <code>[Symbol.iterator]()</code> (returns <code>this</code>) and <code>.next()</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use return inside a generator? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. <code>return value</code> inside a generator causes the generator to finish with <code>{ value: value, done: true }</code>. Note that <code>for...of</code> ignores the done-true value — it only sees yielded values. The final return value is only visible if you call <code>.next()</code> manually after all yields are exhausted.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I throw an error into a generator? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Call <code>gen.throw(new Error('msg'))</code>. This resumes the generator as if the current <code>yield</code> threw the error. If the generator has a <code>try/catch</code> around the yield, it can handle the error and continue yielding. If not, the error propagates to the caller of <code>.throw()</code>.</p></div>
+            </div>
+          </section>
+
+          <div class="related-topics">
+            <a href="/javascript/advanced/event-loop.html" class="topic-tag">Event Loop</a>
+            <a href="/javascript/advanced/proxy-reflect.html" class="topic-tag">Proxy &amp; Reflect</a>
+            <a href="/javascript/advanced/symbols.html" class="topic-tag">Symbols</a>
+            <a href="/javascript/advanced/async-await.html" class="topic-tag">Async/Await</a>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/advanced/event-loop.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Event Loop</span></a>
+          <a href="/javascript/advanced/proxy-reflect.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Proxy &amp; Reflect</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Proxy and Reflect – Metaprogramming | ylearner</title>
+  <meta name="description" content="Master JavaScript Proxy and Reflect: get/set/has/deleteProperty/apply traps, validation schemas, logging proxies, default values, read-only objects, Proxy.revocable(), and Vue 3 reactivity.">
+  <meta name="keywords" content="javascript proxy, javascript reflect, Proxy handler traps, get trap javascript, set trap validation, Proxy.revocable javascript, Vue 3 reactivity proxy, metaprogramming javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/advanced/proxy-reflect.html">
+  <meta property="og:title" content="JavaScript Proxy and Reflect – Metaprogramming | ylearner">
+  <meta property="og:description" content="Master JavaScript Proxy and Reflect: traps, validation, logging, read-only objects, revocable proxies, and the Vue 3 reactivity system.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/advanced/callbacks.html">Advanced JS</a><span class="separator">›</span>
+          <span class="current">Proxy &amp; Reflect</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Advanced JS</div>
+          <h1>JavaScript Proxy and Reflect – Intercepting Object Operations</h1>
+          <p class="lesson-intro">A <code>Proxy</code> wraps a target object and lets you intercept and customise fundamental operations — property reads, writes, deletions, function calls — via <em>trap</em> functions. The <code>Reflect</code> API provides corresponding methods for performing the default behaviour, making it easy to intercept an operation, do some work, then forward to the default. Together they enable powerful metaprogramming patterns used by reactive UI frameworks like Vue 3.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 21 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="proxy-basics">Proxy Basics</h2>
+          <p><code>new Proxy(target, handler)</code> creates a proxy for <code>target</code>. The <code>handler</code> object contains <em>traps</em> — methods named after the operations they intercept. If a trap is absent, the operation falls through to the target unmodified.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const target = { name: 'Alice', age: 30 };
+
+const handler = {
+  get(target, prop, receiver) {
+    console.log(`GET ${String(prop)}`);
+    return Reflect.get(target, prop, receiver);  // default behaviour
+  },
+
+  set(target, prop, value, receiver) {
+    console.log(`SET ${String(prop)} = ${value}`);
+    return Reflect.set(target, prop, value, receiver);
+  }
+};
+
+const proxy = new Proxy(target, handler);
+
+console.log(proxy.name);       // triggers get trap
+proxy.age = 31;                // triggers set trap
+console.log(proxy.age);        // triggers get trap
+
+// The target is also mutated
+console.log(target.age);       // 31</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>GET name
+Alice
+SET age = 31
+GET age
+31
+31</pre>
+          </div>
+
+          <h2 id="validation-proxy">Proxy for Validation</h2>
+          <p>The <code>set</code> trap can enforce type and value constraints on every property write, turning any plain object into a validated schema.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function createValidated(schema) {
+  return new Proxy({}, {
+    set(target, prop, value) {
+      const rule = schema[prop];
+      if (!rule) throw new TypeError(`Unknown property: ${String(prop)}`);
+
+      if (rule.type &amp;&amp; typeof value !== rule.type) {
+        throw new TypeError(`${String(prop)} must be ${rule.type}, got ${typeof value}`);
+      }
+      if (rule.min !== undefined &amp;&amp; value &lt; rule.min) {
+        throw new RangeError(`${String(prop)} must be >= ${rule.min}`);
+      }
+      if (rule.max !== undefined &amp;&amp; value &gt; rule.max) {
+        throw new RangeError(`${String(prop)} must be <= ${rule.max}`);
+      }
+      if (rule.pattern &amp;&amp; !rule.pattern.test(value)) {
+        throw new Error(`${String(prop)} does not match pattern`);
+      }
+
+      return Reflect.set(target, prop, value);
+    }
+  });
+}
+
+const user = createValidated({
+  name:  { type: 'string', pattern: /^[A-Za-z ]{2,50}$/ },
+  age:   { type: 'number', min: 0, max: 150 },
+  email: { type: 'string', pattern: /^.+@.+\..+$/ }
+});
+
+user.name  = 'Bob Smith';
+user.age   = 25;
+user.email = 'bob@example.com';
+console.log(user.name, user.age, user.email);
+
+try { user.age = -5; } catch (e) { console.error(e.message); }
+try { user.name = 123; } catch (e) { console.error(e.message); }
+try { user.phone = '555'; } catch (e) { console.error(e.message); }</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Bob Smith 25 bob@example.com
+age must be >= 0
+name must be string, got number
+Unknown property: phone</pre>
+          </div>
+
+          <h2 id="other-traps">Other Useful Traps</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const sensitiveData = {
+  password: 'secret',
+  apiKey:   'abc123',
+  name:     'Alice'
+};
+
+const secureProxy = new Proxy(sensitiveData, {
+  // Intercept property read
+  get(target, prop) {
+    if (prop === 'password' || prop === 'apiKey') {
+      return '***REDACTED***';
+    }
+    return Reflect.get(target, prop);
+  },
+
+  // Intercept `in` operator
+  has(target, prop) {
+    console.log(`Checking: ${String(prop)} in proxy`);
+    return Reflect.has(target, prop);
+  },
+
+  // Intercept delete operator
+  deleteProperty(target, prop) {
+    if (prop === 'password') {
+      throw new Error('Cannot delete password field');
+    }
+    return Reflect.deleteProperty(target, prop);
+  },
+
+  // Intercept Object.keys / for...in
+  ownKeys(target) {
+    return Reflect.ownKeys(target).filter(k => k !== 'apiKey');
+  }
+});
+
+console.log(secureProxy.password);        // ***REDACTED***
+console.log(secureProxy.name);            // Alice
+console.log('password' in secureProxy);   // true (but value is hidden)
+console.log(Object.keys(secureProxy));    // ['password', 'name'] (no apiKey)
+try { delete secureProxy.password; } catch (e) { console.error(e.message); }</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>***REDACTED***
+Alice
+Checking: password in proxy
+true
+['password', 'name']
+Cannot delete password field</pre>
+          </div>
+
+          <h2 id="reflect-api">The Reflect API</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Reflect method</th><th>Equivalent operation</th><th>Used in trap</th></tr></thead>
+              <tbody>
+                <tr><td><code>Reflect.get(t, p, r)</code></td><td><code>t[p]</code></td><td><code>get</code></td></tr>
+                <tr><td><code>Reflect.set(t, p, v, r)</code></td><td><code>t[p] = v</code></td><td><code>set</code></td></tr>
+                <tr><td><code>Reflect.has(t, p)</code></td><td><code>p in t</code></td><td><code>has</code></td></tr>
+                <tr><td><code>Reflect.deleteProperty(t, p)</code></td><td><code>delete t[p]</code></td><td><code>deleteProperty</code></td></tr>
+                <tr><td><code>Reflect.apply(t, th, a)</code></td><td><code>t.apply(th, a)</code></td><td><code>apply</code></td></tr>
+                <tr><td><code>Reflect.construct(t, a, nt)</code></td><td><code>new t(...a)</code></td><td><code>construct</code></td></tr>
+                <tr><td><code>Reflect.ownKeys(t)</code></td><td><code>Object.getOwnPropertyNames + Symbols</code></td><td><code>ownKeys</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>Always use Reflect inside traps</strong><p>Inside a proxy trap, always forward to the corresponding <code>Reflect</code> method to perform the default behaviour. Doing the equivalent operation on <code>target</code> directly (<code>target[prop]</code>) bypasses getter/setter semantics and can break object invariants. <code>Reflect</code> methods also return the correct boolean for traps like <code>set</code> and <code>deleteProperty</code>.</p></div>
+          </div>
+
+          <h2 id="default-values-apply">Default Values and Function Call Trapping</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Default value proxy (like Python's defaultdict)
+function withDefaults(target, defaultValue) {
+  return new Proxy(target, {
+    get(obj, prop) {
+      return prop in obj ? obj[prop] : defaultValue;
+    }
+  });
+}
+
+const scores = withDefaults({}, 0);
+scores.Alice = 10;
+scores.Bob   = 20;
+console.log(scores.Alice);    // 10
+console.log(scores.Charlie);  // 0 (default — not set)
+
+// Function call trap
+function multiply(a, b) { return a * b; }
+
+const trackedMultiply = new Proxy(multiply, {
+  apply(target, thisArg, args) {
+    console.log(`Called with args: ${args}`);
+    const result = Reflect.apply(target, thisArg, args);
+    console.log(`Result: ${result}`);
+    return result;
+  }
+});
+
+trackedMultiply(3, 4);
+trackedMultiply(7, 8);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>10
+0
+Called with args: 3,4
+Result: 12
+Called with args: 7,8
+Result: 56</pre>
+          </div>
+
+          <h2 id="revocable-proxy">Proxy.revocable()</h2>
+          <p><code>Proxy.revocable(target, handler)</code> returns <code>{ proxy, revoke }</code>. After calling <code>revoke()</code>, any operation on the proxy throws a <code>TypeError</code>. Useful for temporary access tokens or capability objects.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function createTemporaryAccess(data, ttlMs) {
+  const { proxy, revoke } = Proxy.revocable(data, {});
+  setTimeout(revoke, ttlMs);    // auto-revoke after TTL
+  return proxy;
+}
+
+const tempAccess = createTemporaryAccess({ secret: 'TOKEN_XYZ' }, 500);
+
+console.log(tempAccess.secret);  // 'TOKEN_XYZ'
+
+setTimeout(() => {
+  try {
+    console.log(tempAccess.secret);  // throws after 500ms
+  } catch (e) {
+    console.error('Access revoked:', e.message);
+  }
+}, 600);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>TOKEN_XYZ
+Access revoked: Cannot perform 'get' on a proxy that has been revoked</pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content"><strong>Vue 3 Reactivity Uses Proxy</strong><p>Vue 3's reactivity system (<code>reactive()</code>, <code>ref()</code>) wraps your state objects in Proxies with <code>get</code> and <code>set</code> traps. The <code>get</code> trap tracks which component is reading the value; the <code>set</code> trap triggers re-renders when the value changes. This is fundamentally more capable than Vue 2's <code>Object.defineProperty</code> approach, which couldn't detect property additions or deletions.</p></div>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a <code>createObservable(obj)</code> function that:</p>
+            <ul>
+              <li>Returns a proxied version of <code>obj</code>.</li>
+              <li>Accepts subscriber callbacks via <code>observable.on(prop, callback)</code>.</li>
+              <li>Calls <code>callback(newValue, oldValue)</code> whenever <code>prop</code> changes.</li>
+              <li>Supports nested objects (deep proxy).</li>
+              <li>Test: observe a user object and log changes to <code>name</code> and <code>email</code>.</li>
+            </ul>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Implement a lightweight <code>reactive(obj)</code> system inspired by Vue 3: when a property changes, automatically re-run any "effect" functions that previously read that property. Use a global <code>activeEffect</code> variable to track the currently-running effect, a <code>get</code> trap to subscribe it, and a <code>set</code> trap to trigger subscribers. Demonstrate with a computed display name that auto-updates when <code>firstName</code> or <code>lastName</code> changes.</p>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a Proxy in JavaScript and what problem does it solve?</li>
+            <li>Name five proxy traps and describe what operation each intercepts.</li>
+            <li>Why should you use Reflect methods inside proxy traps instead of operating on the target directly?</li>
+            <li>What is Proxy.revocable() and when would you use it?</li>
+            <li>How does Vue 3 use Proxy for its reactivity system?</li>
+          </ul>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>new Proxy(target, handler)</code> intercepts operations on the target via trap methods.</li>
+              <li>Common traps: <code>get</code>, <code>set</code>, <code>has</code>, <code>deleteProperty</code>, <code>apply</code>, <code>ownKeys</code>.</li>
+              <li>Always forward to <code>Reflect</code> inside traps to maintain correct semantics.</li>
+              <li>Use Proxy for validation, logging, default values, read-only access, and observability.</li>
+              <li><code>Proxy.revocable()</code> creates proxies that can be disabled, enabling time-limited access tokens.</li>
+              <li>Vue 3's reactivity system is built on Proxy — a real-world example of production metaprogramming.</li>
+            </ul>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can Proxy intercept operations on private class fields? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Private class fields (<code>#field</code>) are stored in an internal slot, not as regular object properties. Proxy traps only intercept regular property access. A <code>get</code> trap on a proxy of a class instance will not see reads to private fields — those bypass the proxy entirely.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between Proxy get trap and Object.defineProperty getter? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>Object.defineProperty</code> getters are tied to a specific named property on a specific object — you must define one per property. A Proxy <code>get</code> trap intercepts <em>all</em> property reads on the target, including dynamic and unknown property names. This makes Proxy much more flexible for generic patterns like default values or logging all accesses.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Are Proxy and Reflect performance overhead? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — proxy traps add overhead to every intercepted operation. Modern JS engines have optimised this considerably, but Proxies are still slower than direct property access. In hot code paths, profile before proxying. For UI reactivity (Vue, MobX), the overhead is negligible compared to rendering costs.</p></div>
+            </div>
+          </section>
+
+          <div class="related-topics">
+            <a href="/javascript/advanced/generators.html" class="topic-tag">Generators</a>
+            <a href="/javascript/advanced/symbols.html" class="topic-tag">Symbols</a>
+            <a href="/javascript/advanced/event-loop.html" class="topic-tag">Event Loop</a>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/advanced/generators.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Generators &amp; Iterators</span></a>
+          <a href="/javascript/advanced/symbols.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Symbols</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

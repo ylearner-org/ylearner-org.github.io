@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript DOM Manipulation – Select, Create &amp; Modify Elements | ylearner</title>
+  <meta name="description" content="Learn JavaScript DOM manipulation: selecting elements with querySelector, traversing the DOM tree, modifying content and attributes, changing styles with classList, and creating or removing elements dynamically.">
+  <meta name="keywords" content="javascript dom manipulation, querySelector javascript, getElementById, createElement javascript, classList javascript, innerHTML vs textContent, dom traversal javascript, appendChild javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/dom/dom-manipulation.html">
+  <meta property="og:title" content="JavaScript DOM Manipulation – Select, Create &amp; Modify Elements | ylearner">
+  <meta property="og:description" content="Learn JavaScript DOM manipulation: selecting elements, traversing the DOM tree, modifying content and attributes, and creating or removing elements dynamically.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/dom/dom-manipulation.html">DOM &amp; Browser</a><span class="separator">›</span>
+          <span class="current">DOM Manipulation</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 DOM &amp; Browser</div>
+          <h1>JavaScript DOM Manipulation – Working with the Document Object Model</h1>
+          <p class="lesson-intro">The <strong>Document Object Model (DOM)</strong> is the live, in-memory tree representation of an HTML page. JavaScript can read and rewrite every node in that tree — changing text, attributes, styles, and structure — without a page reload. Mastering DOM manipulation is the gateway from static HTML to interactive web applications.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-the-dom">What Is the DOM?</h2>
+          <p>When a browser loads an HTML file it parses the markup and builds a tree of <em>nodes</em>. Each HTML element becomes an <strong>Element node</strong>, text content becomes a <strong>Text node</strong>, and comments become <strong>Comment nodes</strong>. The root of the tree is <code>document</code>.</p>
+          <p>The DOM is <em>live</em> — changes made via JavaScript are instantly reflected in the browser viewport and vice-versa. It is also language-agnostic; the DOM specification is maintained by the W3C/WHATWG independently of JavaScript, but JavaScript is its most common interface.</p>
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>DOM vs HTML source</strong>
+              <p>The DOM and the raw HTML source are not the same thing. The browser auto-corrects invalid HTML, JavaScript can modify the DOM after load, and browser extensions inject extra nodes — so the DOM you inspect in DevTools may differ from the original file.</p>
+            </div>
+          </div>
+
+          <h2 id="selecting-elements">Selecting Elements</h2>
+          <p>Before you can manipulate an element you must obtain a reference to it. JavaScript provides multiple selection APIs:</p>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Method</th><th>Returns</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td><code>getElementById(id)</code></td><td>Element | null</td><td>Fastest for single ID lookup</td></tr>
+                <tr><td><code>getElementsByClassName(cls)</code></td><td>HTMLCollection (live)</td><td>Updates automatically when DOM changes</td></tr>
+                <tr><td><code>getElementsByTagName(tag)</code></td><td>HTMLCollection (live)</td><td>Pass <code>"*"</code> for all elements</td></tr>
+                <tr><td><code>querySelector(selector)</code></td><td>Element | null</td><td>CSS selector, first match only</td></tr>
+                <tr><td><code>querySelectorAll(selector)</code></td><td>NodeList (static)</td><td>All matches; not live</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// By ID (returns one element or null)
+const title = document.getElementById('main-title');
+
+// By class name (live HTMLCollection)
+const cards = document.getElementsByClassName('card');
+
+// CSS selector – first match
+const firstBtn = document.querySelector('.btn-primary');
+
+// CSS selector – all matches (static NodeList)
+const allLinks = document.querySelectorAll('nav a');
+allLinks.forEach(link =&gt; console.log(link.href));
+
+// Scoped query – search inside an element
+const nav = document.getElementById('main-nav');
+const activeItem = nav.querySelector('.active');</code></pre>
+          </div>
+
+          <h2 id="traversing-the-dom">Traversing the DOM</h2>
+          <p>Once you have a reference you can navigate to related nodes using traversal properties:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const list = document.querySelector('ul');
+
+// Parent
+console.log(list.parentNode);        // immediate parent node
+console.log(list.parentElement);     // same but always an Element
+
+// Children (element-only, preferred)
+console.log(list.children);          // HTMLCollection of child Elements
+console.log(list.firstElementChild); // first &lt;li&gt;
+console.log(list.lastElementChild);  // last &lt;li&gt;
+
+// Siblings
+const item = list.firstElementChild;
+console.log(item.nextElementSibling);     // second &lt;li&gt;
+console.log(item.previousElementSibling); // null (it's first)
+
+// All nodes including Text/Comment
+console.log(list.childNodes);   // NodeList including whitespace text nodes
+console.log(list.firstChild);   // often a text node (whitespace)</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Use Element properties, not Node properties</strong>
+              <p>Prefer <code>children</code>, <code>firstElementChild</code>, <code>nextElementSibling</code> over <code>childNodes</code>, <code>firstChild</code>, <code>nextSibling</code>. The Node versions include whitespace text nodes and are rarely what you want.</p>
+            </div>
+          </div>
+
+          <h2 id="modifying-content">Modifying Content</h2>
+          <p>Three properties let you read and write element content. Each has different behaviour — choose deliberately:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const div = document.querySelector('#demo');
+
+// innerHTML: parses HTML tags – powerful but XSS risk with user data
+div.innerHTML = '&lt;strong&gt;Hello&lt;/strong&gt; World';
+
+// textContent: raw text, ignores tags – safe for user-supplied strings
+div.textContent = '&lt;script&gt;alert(1)&lt;/script&gt;'; // displays as text, not executed
+
+// innerText: visible text only (respects CSS display:none, triggers reflow)
+console.log(div.innerText); // reflects what user sees
+
+// Differences at a glance:
+// innerHTML  – fastest for bulk HTML, dangerous with untrusted input
+// textContent– safe, no rendering cost for hidden elements
+// innerText  – CSS-aware, slower (triggers layout)</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>div.innerHTML → renders bold "Hello" + " World"
+div.textContent → displays literal &lt;script&gt; tag as text (safe)</pre>
+          </div>
+
+          <h2 id="attributes-and-dataset">Attributes and Dataset</h2>
+          <p>HTML attributes are accessible through dedicated methods or the convenient <code>dataset</code> property for <code>data-*</code> attributes:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const img = document.querySelector('img');
+
+// Standard attribute methods
+console.log(img.getAttribute('src'));       // current src value
+img.setAttribute('alt', 'A scenic view');   // set or create
+img.removeAttribute('loading');             // remove attribute
+
+// Property shortcut (for reflected properties)
+img.src = 'photo.jpg';   // same as setAttribute for src
+img.alt = 'Photo';
+
+// data-* attributes via dataset (camelCase conversion)
+// HTML: &lt;div data-user-id="42" data-role="admin"&gt;
+const card = document.querySelector('[data-user-id]');
+console.log(card.dataset.userId);   // "42"  (data-user-id → userId)
+console.log(card.dataset.role);     // "admin"
+card.dataset.role = 'editor';       // updates attribute in DOM</code></pre>
+          </div>
+
+          <h2 id="modifying-styles-and-classes">Modifying Styles and Classes</h2>
+          <p>Inline styles are set via the <code>style</code> property; class-based styling is managed with <code>classList</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const box = document.querySelector('.box');
+
+// Inline style (camelCase property names)
+box.style.backgroundColor = '#3498db';
+box.style.fontSize = '18px';
+box.style.transform = 'translateX(20px)';
+
+// Read computed style (includes stylesheet rules)
+const computed = getComputedStyle(box);
+console.log(computed.display); // "flex" (even if set by CSS file)
+
+// classList API — preferred over className string manipulation
+box.classList.add('highlight');          // add class
+box.classList.remove('hidden');          // remove class
+box.classList.toggle('active');          // add if absent, remove if present
+box.classList.toggle('active', true);    // force-add (2nd arg = boolean)
+console.log(box.classList.contains('highlight')); // true
+box.classList.replace('highlight', 'selected');   // swap classes</code></pre>
+          </div>
+
+          <h2 id="creating-and-inserting-elements">Creating and Inserting Elements</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// createElement + appendChild (classic)
+const li = document.createElement('li');
+li.textContent = 'New item';
+li.classList.add('list-item');
+document.querySelector('ul').appendChild(li);
+
+// prepend – insert as first child
+const ul = document.querySelector('ul');
+const firstItem = document.createElement('li');
+firstItem.textContent = 'First!';
+ul.prepend(firstItem);
+
+// insertBefore(newNode, referenceNode)
+const ref = ul.children[1];
+const inserted = document.createElement('li');
+inserted.textContent = 'Inserted before index 1';
+ul.insertBefore(inserted, ref);
+
+// insertAdjacentHTML – fastest for raw HTML strings
+// positions: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend'
+ul.insertAdjacentHTML('beforeend', '&lt;li class="list-item"&gt;Last via HTML&lt;/li&gt;');
+
+// cloneNode(deep) – duplicate an element
+const clone = li.cloneNode(true); // true = deep clone (includes children)
+ul.appendChild(clone);</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>Resulting list:
+• First!
+• New item (original)
+• Inserted before index 1
+• (original index 1 item)
+• ...
+• Last via HTML</pre>
+          </div>
+
+          <h2 id="removing-elements">Removing Elements</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Modern: element.remove() — supported in all modern browsers
+const obsolete = document.getElementById('old-banner');
+obsolete.remove();
+
+// Legacy: parentNode.removeChild(child)
+const item = document.querySelector('.to-delete');
+item.parentNode.removeChild(item);
+
+// Remove all children efficiently
+const container = document.querySelector('#results');
+container.innerHTML = '';         // fast but may leak event listeners
+// Alternative (preserves listeners on children if any):
+while (container.firstChild) {
+  container.removeChild(container.firstChild);
+}</code></pre>
+          </div>
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>XSS Warning with innerHTML</strong>
+              <p>Never insert raw user-supplied strings using <code>innerHTML</code>. An attacker can inject <code>&lt;script&gt;</code> tags or event handlers. Always use <code>textContent</code> for user data, or sanitize with a library like DOMPurify.</p>
+            </div>
+          </div>
+
+          <h2 id="practical-exercise">Practical Exercise</h2>
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a dynamic to-do list using only DOM APIs:</p>
+            <ol>
+              <li>Create an <code>&lt;input&gt;</code> and an <code>&lt;ul&gt;</code> in your HTML.</li>
+              <li>When the user presses Enter in the input, create a new <code>&lt;li&gt;</code> with the input's text and append it to the list.</li>
+              <li>Each <code>&lt;li&gt;</code> should have a "Delete" <code>&lt;button&gt;</code>; clicking it calls <code>.remove()</code> on the parent <code>&lt;li&gt;</code>.</li>
+              <li>Clicking the <code>&lt;li&gt;</code> text toggles a <code>done</code> CSS class that applies <code>text-decoration: line-through</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Extend the to-do list with drag-and-drop reordering using only the <code>draggable</code> attribute and <code>dragstart</code> / <code>dragover</code> / <code>drop</code> events. Store the dragged element reference and use <code>insertBefore</code> to reorder items on drop.</p>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>The DOM is a live tree of nodes representing the parsed HTML page.</li>
+              <li>Use <code>querySelector</code> / <code>querySelectorAll</code> for flexible CSS-selector-based selection.</li>
+              <li>Traverse with <code>children</code>, <code>firstElementChild</code>, <code>nextElementSibling</code> (element-only variants).</li>
+              <li>Modify content with <code>textContent</code> (safe) or <code>innerHTML</code> (powerful, XSS risk).</li>
+              <li>Manage attributes via <code>getAttribute</code>/<code>setAttribute</code> and <code>data-*</code> via <code>dataset</code>.</li>
+              <li>Prefer <code>classList</code> over manipulating <code>className</code> strings directly.</li>
+              <li>Create nodes with <code>createElement</code>, insert with <code>append</code>/<code>prepend</code>/<code>insertAdjacentHTML</code>.</li>
+              <li>Remove nodes with <code>element.remove()</code> (modern) or <code>parent.removeChild()</code> (legacy).</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between <code>innerHTML</code>, <code>textContent</code>, and <code>innerText</code>?</li>
+            <li>What does "the DOM is live" mean? How does a live HTMLCollection differ from a static NodeList?</li>
+            <li>How would you efficiently remove all child elements from a container?</li>
+            <li>What is the difference between an HTML attribute and a DOM property?</li>
+            <li>Why is inserting user-supplied strings with <code>innerHTML</code> dangerous?</li>
+          </ul>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>querySelector</code> and <code>getElementById</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>getElementById</code> is slightly faster because it uses the browser's internal ID index. <code>querySelector</code> accepts any CSS selector so it is far more flexible. For a single ID lookup either works; for anything more complex use <code>querySelector</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I call DOM methods before the page fully loads? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>If your <code>&lt;script&gt;</code> is in <code>&lt;head&gt;</code> without <code>defer</code> or <code>async</code>, the DOM is not yet built and <code>querySelector</code> will return <code>null</code>. Place scripts at the bottom of <code>&lt;body&gt;</code>, use the <code>defer</code> attribute, or wrap code in a <code>DOMContentLoaded</code> event listener.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is <code>insertAdjacentHTML</code> and when should I use it? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>insertAdjacentHTML</code> parses an HTML string and inserts nodes at a specified position relative to an element without replacing existing content. It is faster than setting <code>innerHTML</code> because it does not re-parse the entire element — ideal for appending rows to a table or items to a list.</p></div>
+            </div>
+          </section>
+
+          <div class="related-topics">
+            <a href="/javascript/dom/events.html" class="topic-tag">JS Events</a>
+            <a href="/javascript/dom/event-delegation.html" class="topic-tag">Event Delegation</a>
+            <a href="/javascript/dom/forms.html" class="topic-tag">Forms &amp; Validation</a>
+            <a href="/javascript/dom/fetch-api.html" class="topic-tag">Fetch API</a>
+            <a href="/javascript/advanced/promises.html" class="topic-tag">Promises</a>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/advanced/symbols.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Symbols</span></a>
+          <a href="/javascript/dom/events.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Events</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

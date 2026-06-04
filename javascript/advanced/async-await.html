@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Async/Await – Clean Asynchronous Code | ylearner</title>
+  <meta name="description" content="Master JavaScript async/await: async functions, await expressions, try/catch error handling, parallel execution with Promise.all, top-level await, async class methods, and real fetch() examples.">
+  <meta name="keywords" content="javascript async await, async function javascript, await javascript, try catch async javascript, top-level await, async class methods, fetch async await, Promise.all async await">
+  <link rel="canonical" href="https://ylearner.org/javascript/advanced/async-await.html">
+  <meta property="og:title" content="JavaScript Async/Await – Clean Asynchronous Code | ylearner">
+  <meta property="og:description" content="Master JavaScript async/await: async functions, await, try/catch error handling, parallel vs sequential, top-level await, and real fetch() examples.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><div class="logo-icon"></div><span class="logo-text">y<span>learner</span></span></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/advanced/callbacks.html">Advanced JS</a><span class="separator">›</span>
+          <span class="current">Async/Await</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Advanced JS</div>
+          <h1>JavaScript Async/Await – Write Async Code Like Sync Code</h1>
+          <p class="lesson-intro">The <code>async</code>/<code>await</code> syntax, introduced in ES2017, is built entirely on Promises but gives asynchronous code the look and feel of synchronous code. An <code>async</code> function always returns a Promise; <code>await</code> pauses execution inside that function until the awaited Promise settles. The result is code that is dramatically easier to read, debug, and reason about compared to raw <code>.then()</code> chains.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="async-function">The async Function</h2>
+          <p>Prefix any function declaration, expression, or arrow function with <code>async</code> to make it asynchronous. An async function <strong>always returns a Promise</strong> — if you return a plain value, it is automatically wrapped in <code>Promise.resolve()</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// All three are equivalent
+async function greet(name) {
+  return `Hello, ${name}!`;
+}
+
+const greetArrow = async (name) => `Hello, ${name}!`;
+
+const obj = {
+  async greet(name) { return `Hello, ${name}!`; }
+};
+
+// All return Promises
+const result = greet('Alice');
+console.log(result instanceof Promise);   // true
+result.then(msg => console.log(msg));     // Hello, Alice!
+
+// Return value is auto-wrapped
+async function add(a, b) {
+  return a + b;    // returns Promise.resolve(a + b)
+}
+
+add(3, 4).then(sum => console.log(sum));  // 7</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>true
+Hello, Alice!
+7</pre>
+          </div>
+
+          <h2 id="await-expression">The await Expression</h2>
+          <p><code>await</code> can only be used inside an <code>async</code> function. It pauses the function's execution until the awaited Promise resolves, then returns the resolved value. Other code outside the async function continues to run while it is paused.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function makeBreakfast() {
+  console.log('Starting breakfast...');
+
+  console.log('Boiling water...');
+  await delay(500);              // pause 500ms
+  console.log('Water boiled!');
+
+  console.log('Toasting bread...');
+  await delay(300);
+  console.log('Toast ready!');
+
+  console.log('Brewing coffee...');
+  await delay(400);
+  console.log('Coffee ready!');
+
+  return 'Breakfast is served!';
+}
+
+makeBreakfast().then(msg => console.log(msg));
+console.log('(Outside async function — runs immediately)');</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Starting breakfast...
+Boiling water...
+(Outside async function — runs immediately)
+Water boiled!
+Toasting bread...
+Toast ready!
+Brewing coffee...
+Coffee ready!
+Breakfast is served!</pre>
+          </div>
+
+          <h2 id="error-handling">Error Handling with try/catch/finally</h2>
+          <p>Use standard <code>try/catch</code> with async/await — the syntax works exactly as with synchronous code. A rejected Promise becomes a thrown error that the <code>catch</code> block receives.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">async function fetchUser(id) {
+  if (id &lt;= 0) throw new RangeError('ID must be positive');
+  const response = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
+  if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+  return response.json();
+}
+
+async function displayUser(id) {
+  let spinner;
+  try {
+    spinner = '⏳ Loading...';
+    console.log(spinner);
+
+    const user = await fetchUser(id);
+    console.log(`Name: ${user.name}`);
+    console.log(`Email: ${user.email}`);
+    return user;
+  } catch (err) {
+    // Handles BOTH thrown errors and rejected Promises
+    console.error(`Error: ${err.message}`);
+    return null;
+  } finally {
+    spinner = null;       // cleanup always runs
+    console.log('Loading complete (success or failure)');
+  }
+}
+
+displayUser(1);   // success path
+displayUser(-1);  // error path (throws RangeError)</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>⏳ Loading...
+⏳ Loading...
+Error: ID must be positive
+Loading complete (success or failure)
+Name: Leanne Graham
+Email: Sincere@april.biz
+Loading complete (success or failure)</pre>
+          </div>
+
+          <h2 id="sequential-vs-parallel">Sequential vs Parallel await</h2>
+          <p>A common mistake is awaiting Promises sequentially when they are independent — this wastes time. Use <code>Promise.all()</code> to run independent async operations in parallel.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function fetchData(label, ms) {
+  return new Promise(resolve =>
+    setTimeout(() => resolve(`${label} data`), ms)
+  );
+}
+
+// ❌ Sequential: total ~900ms (each waits for the previous)
+async function sequential() {
+  const start = Date.now();
+  const a = await fetchData('User',    300);
+  const b = await fetchData('Posts',   400);
+  const c = await fetchData('Friends', 200);
+  console.log(`Sequential: ${Date.now() - start}ms`, [a, b, c]);
+}
+
+// ✅ Parallel: total ~400ms (the longest one)
+async function parallel() {
+  const start = Date.now();
+  const [a, b, c] = await Promise.all([
+    fetchData('User',    300),
+    fetchData('Posts',   400),
+    fetchData('Friends', 200)
+  ]);
+  console.log(`Parallel:   ${Date.now() - start}ms`, [a, b, c]);
+}
+
+sequential();
+parallel();</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Parallel:   ~400ms  ['User data', 'Posts data', 'Friends data']
+Sequential: ~900ms  ['User data', 'Posts data', 'Friends data']</pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content"><strong>Sequential await is not always wrong</strong><p>Only parallelise operations that are truly independent. If step B requires the result of step A (e.g., get userId then fetch user data), sequential awaits are correct. Forcing parallel execution on dependent operations will cause errors.</p></div>
+          </div>
+
+          <h2 id="async-vs-then">async/await vs .then() – Same Power, Better Syntax</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Aspect</th><th>.then() chains</th><th>async/await</th></tr></thead>
+              <tbody>
+                <tr><td>Readability</td><td>Can become nested/long</td><td>Reads like synchronous code</td></tr>
+                <tr><td>Error handling</td><td>.catch() at end of chain</td><td>try/catch (familiar)</td></tr>
+                <tr><td>Debugging</td><td>Stack traces can be confusing</td><td>Clear stack traces</td></tr>
+                <tr><td>Conditional logic</td><td>Awkward with if/else</td><td>Natural if/else, loops</td></tr>
+                <tr><td>Return values</td><td>Explicit return in each .then()</td><td>Use return normally</td></tr>
+                <tr><td>Under the hood</td><td>Promises</td><td>Promises (syntactic sugar)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="top-level-await">Top-Level await (ES2022 Modules)</h2>
+          <p>In ES modules (<code>type="module"</code> in browsers or <code>.mjs</code> files in Node.js), you can use <code>await</code> at the top level of a file — without wrapping in an async function.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// In an ES module (type="module" or .mjs file)
+// Top-level await — valid without async wrapper
+
+const response = await fetch('https://jsonplaceholder.typicode.com/todos/1');
+const todo = await response.json();
+console.log(todo.title);  // "delectus aut autem"
+
+// Useful for dynamic imports
+const { default: lodash } = await import('lodash');
+
+// Useful for conditional configuration
+const config = process.env.NODE_ENV === 'test'
+  ? await import('./config.test.mjs')
+  : await import('./config.prod.mjs');</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>Async IIFE for non-module environments</strong><p>When top-level await is unavailable (CommonJS, older environments), wrap your code in an immediately-invoked async function: <code>(async () => { ... })()</code>. This is a common pattern in Node.js scripts.</p></div>
+          </div>
+
+          <h2 id="async-class-methods">Async Class Methods</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class UserService {
+  #baseUrl = 'https://jsonplaceholder.typicode.com';
+
+  async getUser(id) {
+    const res = await fetch(`${this.#baseUrl}/users/${id}`);
+    if (!res.ok) throw new Error(`User ${id} not found`);
+    return res.json();
+  }
+
+  async getPosts(userId) {
+    const res = await fetch(`${this.#baseUrl}/posts?userId=${userId}`);
+    return res.json();
+  }
+
+  async getUserWithPosts(userId) {
+    // Parallel fetch — both requests fire at the same time
+    const [user, posts] = await Promise.all([
+      this.getUser(userId),
+      this.getPosts(userId)
+    ]);
+    return { ...user, posts };
+  }
+}
+
+const svc = new UserService();
+svc.getUserWithPosts(1)
+  .then(data => {
+    console.log(`${data.name} has ${data.posts.length} posts`);
+  })
+  .catch(console.error);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Leanne Graham has 10 posts</pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a <code>DataLoader</code> class that:</p>
+            <ul>
+              <li>Has an async <code>load(urls)</code> method that fetches multiple URLs in parallel with <code>Promise.all</code>.</li>
+              <li>Has an async <code>loadSequential(urls)</code> method using a <code>for...of</code> loop.</li>
+              <li>Both methods return an array of parsed JSON objects.</li>
+              <li>Wrap each fetch in try/catch so a single failure doesn't abort the whole batch — return <code>null</code> for failed items.</li>
+              <li>Add a private <code>#cache</code> Map to avoid re-fetching the same URL.</li>
+            </ul>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Implement an <code>asyncQueue</code> function that processes an array of items through an async worker function with a configurable concurrency limit, collects all results in order (even if faster tasks finish first), and reports progress as tasks complete. No external libraries allowed — only async/await and Promises.</p>
+          </div>
+
+          <h2 id="interview-questions">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does an async function always return?</li>
+            <li>Can you use await outside an async function? (What about top-level await?)</li>
+            <li>How does try/catch work with async/await?</li>
+            <li>What is the performance problem with sequential awaits on independent Promises?</li>
+            <li>How does async/await differ from .then() at the engine level?</li>
+            <li>What is an async IIFE and when would you use one?</li>
+          </ul>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>async</code> functions always return Promises; plain return values are auto-wrapped.</li>
+              <li><code>await</code> pauses the async function until the Promise resolves, returning its value.</li>
+              <li>Use <code>try/catch/finally</code> for error handling — rejected Promises become throw errors.</li>
+              <li>Use <code>Promise.all()</code> to run independent async operations in parallel, not sequential awaits.</li>
+              <li>Top-level await is available in ES modules (ES2022).</li>
+              <li>async/await is syntactic sugar over Promises — same power, much more readable.</li>
+            </ul>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does await block the entire JavaScript thread? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. <code>await</code> only pauses the <em>async function</em> that contains it. The JavaScript event loop is free to run other code while the awaited Promise is pending. This is fundamentally different from blocking synchronous code.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use async/await with forEach? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Technically yes — you can pass an async function to <code>forEach</code> — but <code>forEach</code> does not await the returned Promise, so all iterations run concurrently and errors are silently ignored. Use a <code>for...of</code> loop for sequential async iteration, or <code>Promise.all(arr.map(async ...))</code> for parallel.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I handle errors per-await vs globally? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For global handling, wrap the entire function body in one <code>try/catch</code>. For per-operation handling, either wrap each <code>await</code> in its own <code>try/catch</code>, or use the pattern <code>const [err, data] = await somePromise.then(d => [null, d]).catch(e => [e, null])</code> — a Go-style error-first return.</p></div>
+            </div>
+          </section>
+
+          <div class="related-topics">
+            <a href="/javascript/advanced/promises.html" class="topic-tag">Promises</a>
+            <a href="/javascript/advanced/callbacks.html" class="topic-tag">Callbacks</a>
+            <a href="/javascript/advanced/event-loop.html" class="topic-tag">Event Loop</a>
+          </div>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/advanced/promises.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Promises</span></a>
+          <a href="/javascript/advanced/event-loop.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Event Loop</span></a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
