@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS Props – Passing Data to Components | ylearner</title>
+  <meta name="description" content="Complete guide to OWL JS props: static props declaration, type checking, required vs optional, defaultProps, one-way data flow, callback props, and prop drilling with real examples.">
+  <meta name="keywords" content="OWL JS props, OWL component props, OWL static props, OWL defaultProps, OWL prop types, passing data components OWL, OWL one-way data flow, Odoo Web Library props, OWL JS tutorial">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/owljs/core/props.html">
+  <meta property="og:title" content="OWL JS Props – Passing Data Between Components | ylearner">
+  <meta property="og:description" content="How to pass, declare, type-check, and provide defaults for props in OWL JS. One-way data flow, callback props, and prop drilling explained.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/owljs/core/props.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS Props Complete Guide | ylearner">
+  <meta name="twitter:description" content="Static props declaration, type checking, required/optional, defaultProps, callback props — full OWL JS props reference.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS Props",
+    "description": "Complete guide to OWL JS props: declaration, type checking, required and optional props, defaultProps, callback props, and one-way data flow.",
+    "educationalLevel": "Beginner",
+    "keywords": "OWL JS props, static props, OWL defaultProps, OWL prop types, one-way data flow",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/core/components.html">Core Concepts</a><span class="separator">›</span>
+          <span class="current">Props</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Core Concepts</div>
+          <h1>OWL JS Props – Passing Data Down the Component Tree</h1>
+          <p class="lesson-intro">Props are how parent components send data to child components in OWL JS. They are read-only from the child's perspective — a child should never mutate its props directly. Instead it communicates back to the parent through <strong>callback props</strong> (functions passed down as props). This one-way data flow makes component interactions predictable and easy to trace. This lesson covers everything about props: how to pass them, how to declare and validate them with <code>static props</code>, how to set defaults with <code>static defaultProps</code>, and the patterns you will use in every real OWL application.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 3 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="what-are-props">What Are Props?</h2>
+          <p>Props (short for "properties") are values that a parent component passes to a child component in the template. The child receives them as a frozen <code>this.props</code> object and can read them in its template and methods. Think of props as function arguments — they configure what the child renders without the child knowing who its caller is.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – basic props example</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml } from "@odoo/owl";
+
+// Child — receives name and role as props
+class UserBadge extends Component {
+  static template = xml`
+    &lt;div class="user-badge"&gt;
+      &lt;strong t-esc="props.name"/&gt;
+      &lt;span class="role" t-esc="props.role"/&gt;
+    &lt;/div&gt;
+  `;
+}
+
+// Parent — passes props in the template
+class App extends Component {
+  static components = { UserBadge };
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;UserBadge name="'Alice'" role="'Admin'"/&gt;
+      &lt;UserBadge name="'Bob'" role="'Editor'"/&gt;
+    &lt;/div&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <h2 id="passing-props">Passing Props – Syntax Rules</h2>
+          <p>Props are passed as attributes on the child component tag. The attribute value is always a JavaScript expression:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – prop passing syntax</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- String literals: wrap in extra single quotes --&gt;
+&lt;UserCard name="'Alice'"/&gt;
+
+&lt;!-- Numbers and booleans: no extra quotes needed --&gt;
+&lt;UserCard age="30" isAdmin="true"/&gt;
+
+&lt;!-- Variables and expressions from the parent --&gt;
+&lt;UserCard name="state.selectedUser.name" age="state.selectedUser.age"/&gt;
+
+&lt;!-- Boolean true shorthand (attribute with no value) --&gt;
+&lt;UserCard isActive/&gt;
+
+&lt;!-- Passing an object --&gt;
+&lt;UserCard config="{ theme: 'dark', size: 'large' }"/&gt;
+
+&lt;!-- Passing an array --&gt;
+&lt;TagList tags="['js', 'owl', 'odoo']"/&gt;
+
+&lt;!-- Bound method as callback prop (preserves 'this') --&gt;
+&lt;UserCard onSave.bind="handleSave"/&gt;
+
+&lt;!-- Inline arrow function --&gt;
+&lt;UserCard onSave="(data) =&gt; handleSave(data)"/&gt;</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>The string literal trap</strong>
+              <p><code>name="Alice"</code> evaluates the JavaScript variable <code>Alice</code> — likely undefined. <code>name="'Alice'"</code> is a string literal. This is the single most common OWL beginner mistake. When passing a string constant, always wrap it in inner single quotes: <code>"'my string'"</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="static-props">Declaring Props with static props</h2>
+          <p>The <code>static props</code> property is an optional but strongly recommended way to declare the props a component expects, their types, and whether they are required. OWL validates against this definition in dev mode and throws a clear error if a prop is missing or the wrong type.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – static props declaration</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class UserCard extends Component {
+  static props = {
+    // Simple type declaration
+    name:    { type: String },
+    age:     { type: Number },
+    isAdmin: { type: Boolean },
+
+    // Optional prop (will not throw if absent)
+    bio:     { type: String, optional: true },
+
+    // Multiple allowed types
+    id:      { type: [Number, String] },
+
+    // Array of objects with shape
+    tags: {
+      type: Array,
+      element: { type: Object },
+    },
+
+    // Object with specific shape
+    address: {
+      type: Object,
+      shape: {
+        street: { type: String },
+        city:   { type: String },
+        zip:    { type: String, optional: true },
+      },
+    },
+
+    // Callback / function prop
+    onSave:   { type: Function },
+    onCancel: { type: Function, optional: true },
+
+    // Any type (turns off type checking for this prop)
+    data:     true,
+
+    // Wildcard — accept any extra props (no validation)
+    "*":      true,
+  };
+}</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Prop validation only runs in dev mode</strong>
+              <p>OWL's prop validation is a development-time safeguard — it is disabled in production builds for performance. When calling <code>mount(App, el, { dev: true })</code>, validation is active. In your Odoo module, Odoo enables dev mode automatically when the browser is in debug mode.</p>
+            </div>
+          </div>
+
+          <h2 id="default-props">Default Props with static defaultProps</h2>
+          <p><code>static defaultProps</code> provides fallback values for optional props. These are merged with the incoming props before the component renders, so a prop with a default will always have a value.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – defaultProps</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Button extends Component {
+  static template = xml`
+    &lt;button t-att-class="'btn btn--' + props.variant" t-esc="props.label"/&gt;
+  `;
+
+  static props = {
+    label:    { type: String },
+    variant:  { type: String, optional: true },  // "primary" | "secondary" | "danger"
+    disabled: { type: Boolean, optional: true },
+    onClick:  { type: Function, optional: true },
+  };
+
+  // Default values for optional props
+  static defaultProps = {
+    variant:  "primary",
+    disabled: false,
+    onClick:  () => {},  // no-op so you can always call props.onClick() safely
+  };
+}</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="one-way-flow">One-Way Data Flow</h2>
+          <p>OWL enforces one-way data flow: data goes <strong>down</strong> (parent → child via props) and events go <strong>up</strong> (child → parent via callbacks or custom events). A child must never directly mutate its props — doing so would make the data flow unpredictable.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – correct: callback prop to communicate up</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// ── Child (Counter) ───────────────────────────────────────────────
+class Counter extends Component {
+  static template = xml`
+    &lt;div&gt;
+      &lt;p&gt;Count: &lt;t t-esc="props.count"/&gt;&lt;/p&gt;
+      &lt;button t-on-click="() =&gt; props.onIncrement()"&gt;+1&lt;/button&gt;
+      &lt;button t-on-click="() =&gt; props.onReset()"&gt;Reset&lt;/button&gt;
+    &lt;/div&gt;
+  `;
+
+  static props = {
+    count:       { type: Number },
+    onIncrement: { type: Function },
+    onReset:     { type: Function },
+  };
+}
+
+// ── Parent ─────────────────────────────────────────────────────────
+class App extends Component {
+  static components = { Counter };
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;Counter
+        count="state.count"
+        onIncrement.bind="increment"
+        onReset.bind="reset"
+      /&gt;
+    &lt;/div&gt;
+  `;
+
+  state = useState({ count: 0 });
+
+  increment() { this.state.count++; }
+  reset()     { this.state.count = 0; }
+}</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Why .bind in the template?</strong>
+              <p><code>onIncrement.bind="increment"</code> passes the method with its <code>this</code> context already bound to the parent component. Without <code>.bind</code>, passing <code>onIncrement="increment"</code> would pass the unbound method, and <code>this</code> inside it would be <code>undefined</code> when the child calls it. Always use <code>.bind</code> when passing methods as callback props.</p>
+            </div>
+          </div>
+
+          <h2 id="accessing-props">Accessing Props in the Component</h2>
+          <p>Props are available as <code>this.props</code> in methods and getters, and as <code>props</code> (no <code>this</code>) in the template.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – this.props in methods</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class ProductCard extends Component {
+  static template = xml`
+    &lt;div&gt;
+      &lt;h3 t-esc="props.name"/&gt;
+      &lt;p t-esc="formattedPrice"/&gt;    &lt;!-- uses a getter --&gt;
+      &lt;span t-if="isOnSale" class="sale-badge"&gt;SALE&lt;/span&gt;
+    &lt;/div&gt;
+  `;
+
+  static props = {
+    name:         { type: String },
+    price:        { type: Number },
+    originalPrice: { type: Number, optional: true },
+  };
+
+  // Getters use this.props
+  get formattedPrice() {
+    return `$${this.props.price.toFixed(2)}`;
+  }
+
+  get isOnSale() {
+    return this.props.originalPrice !== undefined
+      &amp;&amp; this.props.price &lt; this.props.originalPrice;
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="prop-drilling">Prop Drilling and When to Avoid It</h2>
+          <p>Prop drilling means passing a prop through multiple intermediate components just to get it to a deeply nested child. For one or two levels, this is fine. For three or more levels, it signals that you should use OWL's <a href="/owljs/advanced/environment.html">Environment / Services</a> feature to share data globally, similar to React's Context API.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – when drilling becomes a problem</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// ❌ Three levels deep — drilling starts to hurt
+// App → Layout → Sidebar → UserMenu → Avatar → all need 'currentUser'
+
+// ✅ Better: put currentUser in OWL environment/service
+// App provides it once, any component at any depth can get it
+// via useService or useEnv (covered in Advanced OWL → Environment)</code></pre>
+          </div>
+
+          <h2 id="props-reference">Props Type Reference</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Type declaration</th><th>Accepts</th><th>Example</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>{ type: String }</code></td><td>Any string</td><td><code>name="'Alice'"</code></td></tr>
+                <tr><td><code>{ type: Number }</code></td><td>Any number</td><td><code>age="30"</code></td></tr>
+                <tr><td><code>{ type: Boolean }</code></td><td><code>true</code> or <code>false</code></td><td><code>isActive="true"</code></td></tr>
+                <tr><td><code>{ type: Object }</code></td><td>Any plain object</td><td><code>user="state.user"</code></td></tr>
+                <tr><td><code>{ type: Array }</code></td><td>Any array</td><td><code>items="state.items"</code></td></tr>
+                <tr><td><code>{ type: Function }</code></td><td>Any function</td><td><code>onSave.bind="save"</code></td></tr>
+                <tr><td><code>{ type: [Number, String] }</code></td><td>Number or string</td><td><code>id="42"</code> or <code>id="'ABC'"</code></td></tr>
+                <tr><td><code>true</code></td><td>Any value, no check</td><td><code>data="anything"</code></td></tr>
+                <tr><td><code>{ type: X, optional: true }</code></td><td>X or undefined</td><td>Prop may be absent</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Props flow <strong>one way</strong>: parent → child. Children read props; they never mutate them.</li>
+              <li>Pass string literals as <code>"'value'"</code> (extra inner quotes). Passing <code>"value"</code> evaluates the variable <code>value</code>.</li>
+              <li><code>static props</code> declares and type-validates incoming props in dev mode — use it for every component.</li>
+              <li><code>static defaultProps</code> provides fallback values for optional props — always safe to read without an undefined check.</li>
+              <li>Pass callback functions down as props for child-to-parent communication. Always use <code>.bind</code> suffix to preserve <code>this</code>.</li>
+              <li>In templates, access <code>props.x</code>. In methods and getters, access <code>this.props.x</code>.</li>
+              <li>For deeply shared data (3+ levels), use OWL's Environment / Services instead of prop drilling.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/owljs/core/components.html" class="topic-tag owl-topic-tag">🦉 Components</a>
+            <a href="/owljs/core/state.html" class="topic-tag owl-topic-tag">🦉 State &amp; useState</a>
+            <a href="/owljs/core/events.html" class="topic-tag owl-topic-tag">🦉 Event Handling</a>
+            <a href="/owljs/advanced/sub-components.html" class="topic-tag owl-topic-tag">🦉 Sub-components</a>
+            <a href="/owljs/advanced/environment.html" class="topic-tag owl-topic-tag">🦉 Environment &amp; Services</a>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Exercise</h3>
+            <p>Build a <code>RatingWidget</code> component with full prop handling:</p>
+            <ol>
+              <li><code>RatingWidget</code> accepts: <code>value</code> (Number, 1–5), <code>label</code> (String, optional, default "Rating"), <code>readonly</code> (Boolean, optional, default false), <code>onChange</code> (Function, optional).</li>
+              <li>Render 5 star buttons (★). Stars up to <code>value</code> are filled, the rest are empty.</li>
+              <li>When <code>readonly</code> is false and a star is clicked, call <code>props.onChange(newValue)</code> if provided.</li>
+              <li>In a parent <code>App</code> component, place two <code>RatingWidget</code>s: one with <code>readonly</code> true (static display) and one connected to state (interactive).</li>
+              <li>Declare all props with correct types in <code>static props</code>.</li>
+            </ol>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I mutate props directly in the child? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Technically you can (JavaScript does not prevent it), but you must never do so. Props are owned by the parent, and mutating them in the child causes desynchronization — the parent's state does not reflect the mutation, so the next render from the parent will overwrite your change. If the child needs to modify something, it should call a callback prop to notify the parent, which updates its state and re-passes the correct prop value. OWL freezes <code>this.props</code> in dev mode to catch accidental mutations early.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens if a required prop is not passed? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In dev mode, OWL throws an error: "Missing props '…' for component '…'". In production mode (dev not enabled), no error is thrown, but <code>props.missingProp</code> is <code>undefined</code>. This is why declaring <code>static props</code> and testing in dev mode is important — it surfaces these bugs before they reach production.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I declare static props for every component? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For components that other developers will use (shared components, library components), always declare <code>static props</code> — it is self-documenting and catches mistakes early. For purely internal leaf components used in only one place, you may skip it as a pragmatic trade-off. As a rule: the more reusable the component, the more important the prop declaration.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I spread all parent props onto a child? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>OWL does not have a spread-props syntax like React's <code>&lt;Child {...props}/&gt;</code>. You must pass each prop explicitly. If you find yourself wanting to spread many props through multiple levels, that is a signal to reconsider the component structure — possibly by passing the whole parent object as a single prop, or by using the environment for globally shared data.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/core/templates.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Template Syntax (QWeb)</span>
+          </a>
+          <a href="/owljs/core/state.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">State &amp; useState</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
