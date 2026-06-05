@@ -603,13 +603,26 @@
     return NAV_DATA;
   }
 
+  function courseFromUrl(url) {
+    if (url.includes('/python/'))     return 'Python';
+    if (url.includes('/javascript/')) return 'JavaScript';
+    if (url.includes('/owljs/'))      return 'OWL JS';
+    if (url.includes('/html/'))       return 'HTML';
+    if (url.includes('/csslessons/')) return 'CSS';
+    return '';
+  }
+
   // Search index (with BASE-prefixed URLs for file:// searches)
   const SEARCH_INDEX = [...NAV_DATA, ...JS_NAV_DATA, ...OWL_NAV_DATA, ...HTML_NAV_DATA, ...CSS_NAV_DATA].flatMap(section =>
-    section.items.map(item => ({
-      title: item.title,
-      category: section.title.replace(/^.{2}\s/, ''),
-      url: BASE + item.url,
-    }))
+    section.items.map(item => {
+      const course = courseFromUrl(item.url);
+      const sectionName = section.title.replace(/^.{2}\s/, '');
+      return {
+        title: item.title,
+        category: course ? `${sectionName} (${course})` : sectionName,
+        url: BASE + item.url,
+      };
+    })
   );
 
   // ========================
