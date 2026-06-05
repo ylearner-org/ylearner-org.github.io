@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Box Model – Complete Guide with Visual Examples | ylearner</title>
+  <meta name="description" content="Understand the CSS box model: content, padding, border, and margin. Learn box-sizing, how width and height are calculated, and why box-sizing: border-box changes everything.">
+  <meta name="keywords" content="CSS box model, CSS padding, CSS margin, CSS border, box-sizing border-box, CSS width height, CSS box model explained, CSS layout basics">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/csslessons/selectors/box-model.html">
+  <meta property="og:title" content="CSS Box Model – Complete Visual Guide | ylearner">
+  <meta property="og:description" content="Content, padding, border, margin — the CSS box model explained with diagrams, examples, and the all-important box-sizing property.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/csslessons/selectors/box-model.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CSS Box Model Explained | ylearner">
+  <meta name="twitter:description" content="Content, padding, border, margin, box-sizing — the CSS box model fully explained with examples.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "CSS Box Model",
+    "description": "Complete guide to the CSS box model — content box, padding, border, margin, box-sizing, and how browsers calculate element dimensions.",
+    "educationalLevel": "Beginner",
+    "keywords": "CSS box model, padding CSS, margin CSS, border CSS, box-sizing",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+  <style>
+    .box-model-diagram {
+      background: #e8f4fd;
+      border: 3px solid #1572B6;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      max-width: 480px;
+      font-family: monospace;
+      font-size: .85rem;
+    }
+    .bmd-margin { background: rgba(255,193,7,.25); border: 2px dashed #ffc107; padding: 1rem; border-radius: 6px; }
+    .bmd-border { background: rgba(21,114,182,.15); border: 4px solid #1572B6; padding: .75rem; border-radius: 4px; }
+    .bmd-padding { background: rgba(76,175,80,.2); border: 2px dashed #4caf50; padding: .75rem; border-radius: 3px; }
+    .bmd-content { background: #fff3e0; border: 2px solid #ff9800; padding: .75rem; border-radius: 2px; text-align:center; font-weight:700; color:#e65100; }
+    .bmd-label { font-size:.7rem; color: var(--text-muted); margin-bottom:.25rem; font-family:sans-serif; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">
+          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1755924855244642" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/csslessons/what-is-css.html">CSS</a><span class="separator">›</span>
+          <a href="/csslessons/selectors/selectors-basics.html">CSS Basics</a><span class="separator">›</span>
+          <span class="current">CSS Box Model</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🌱 CSS Basics</div>
+          <h1>CSS Box Model – How Every Element is Sized</h1>
+          <p class="lesson-intro">Every single HTML element — a heading, a button, a div, a link — is rendered by the browser as a rectangular box. The <strong>CSS Box Model</strong> describes how that box is built: four concentric layers that determine the element's total size and its spacing from surrounding elements. Understanding the box model is the single most important conceptual foundation in CSS layout. Without it, sizing and spacing will always feel like guesswork.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 5 of 7</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="four-layers">The Four Layers of the Box Model</h2>
+          <p>Every element is surrounded by four layers, from inside to outside:</p>
+          <ol>
+            <li><strong>Content</strong> — the actual text, image, or child elements</li>
+            <li><strong>Padding</strong> — transparent space between content and border</li>
+            <li><strong>Border</strong> — a line (visible or invisible) around the padding</li>
+            <li><strong>Margin</strong> — transparent space outside the border, separating from other elements</li>
+          </ol>
+
+          <div class="box-model-diagram" aria-label="Box model diagram">
+            <div class="bmd-margin">
+              <div class="bmd-label">MARGIN (orange dashed)</div>
+              <div class="bmd-border">
+                <div class="bmd-label">BORDER (blue)</div>
+                <div class="bmd-padding">
+                  <div class="bmd-label">PADDING (green dashed)</div>
+                  <div class="bmd-content">CONTENT</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h2 id="content-box">Content Box – width and height</h2>
+          <p><code>width</code> and <code>height</code> set the size of the <strong>content area</strong> by default (in <code>content-box</code> mode).</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">.card {
+  width: 300px;
+  height: 200px;
+}
+
+/* Min and max constraints */
+.container {
+  width: 100%;
+  max-width: 1200px;   /* won't grow wider than 1200px */
+  min-width: 320px;    /* won't shrink below 320px */
+}
+
+.hero {
+  height: 100vh;       /* full viewport height */
+  min-height: 400px;   /* minimum on small screens */
+}
+
+/* Intrinsic sizing keywords */
+.inline { width: fit-content; }   /* shrinks to content */
+.full   { width: stretch; }       /* fills available space */</code></pre>
+          </div>
+
+          <h2 id="padding">Padding – Inner Breathing Room</h2>
+          <p>Padding is the space between the content and the border. Background color and background images extend into the padding area.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Padding</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Longhand — individual sides */
+padding-top:    16px;
+padding-right:  24px;
+padding-bottom: 16px;
+padding-left:   24px;
+
+/* Shorthand: top | right | bottom | left (clockwise) */
+padding: 16px 24px 16px 24px;
+
+/* Shorthand: top/bottom | left/right */
+padding: 16px 24px;
+
+/* Shorthand: all four equal */
+padding: 16px;
+
+/* Shorthand: top | left/right | bottom */
+padding: 8px 16px 24px;
+
+/* Percentage — relative to the element's WIDTH (both axes!) */
+padding: 5%;     /* 5% of the element's own width */
+
+/* Common patterns */
+.btn    { padding: 10px 24px; }    /* horizontal buttons */
+.card   { padding: 24px; }         /* even card padding */
+.section { padding: 80px 0; }      /* top/bottom sections, no horizontal */</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Padding adds to background, not margin</strong>
+              <p>Background color fills the content box <em>and</em> the padding. Margin is always transparent — it only creates space between elements. If you want a colored gap between content and border, use padding. If you want invisible space between elements, use margin.</p>
+            </div>
+          </div>
+
+          <h2 id="border">Border – The Line Around the Box</h2>
+          <p>Border sits between padding and margin. A border of 0 width still exists in the box model — it just has no visible thickness.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Border</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Shorthand: width style color */
+border: 1px solid #ccc;
+border: 2px solid #1572B6;
+border: 3px dashed #e63946;
+border: 4px double navy;
+border: none;
+
+/* Individual sides */
+border-top:    2px solid #1572B6;
+border-right:  none;
+border-bottom: 1px solid #eee;
+border-left:   4px solid #1572B6;   /* left accent border */
+
+/* Longhand properties */
+border-width: 2px;
+border-style: solid;   /* solid | dashed | dotted | double | groove | none */
+border-color: #1572B6;
+
+/* Rounded corners */
+border-radius: 4px;         /* same for all corners */
+border-radius: 50%;         /* circle (on equal width/height) */
+border-radius: 12px 4px;    /* top-left/bottom-right | top-right/bottom-left */
+border-radius: 8px 8px 0 0; /* top-left | top-right | bottom-right | bottom-left */
+
+/* Pill shape */
+.badge { border-radius: 9999px; }  /* always fully rounded */</code></pre>
+          </div>
+
+          <div class="ad-container ad-inline">
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1755924855244642" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+          </div>
+
+          <h2 id="margin">Margin – Outer Spacing</h2>
+          <p>Margin creates transparent space <em>outside</em> the border, between this element and its neighbors.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Margin</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Same shorthand as padding */
+margin: 16px;
+margin: 16px 24px;
+margin: 16px 24px 32px 24px;
+
+/* Auto — center a block element horizontally */
+.container {
+  width: 800px;
+  margin: 0 auto;   /* top/bottom = 0, left/right = auto (equal) */
+}
+
+/* Negative margins — pull element closer or overlap */
+.pull-up { margin-top: -20px; }
+
+/* Remove default browser margins */
+h1, h2, p, ul { margin: 0; }
+
+/* Stack spacing — bottom margin on everything */
+.content > * + * { margin-top: 1rem; }  /* lobotomized owl — gap between children */</code></pre>
+          </div>
+
+          <h3 id="margin-collapse">Margin Collapse</h3>
+          <p>This is one of CSS's most surprising behaviors. Vertical margins between adjacent block elements <strong>collapse</strong> — they merge into a single margin equal to the larger of the two:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS + HTML – Margin collapse</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">h2 { margin-bottom: 32px; }
+p  { margin-top: 16px; }
+/* Gap between h2 and p = 32px (larger wins), NOT 32+16=48px */</code></pre>
+          </div>
+          <p>Margin collapse only happens with <strong>vertical margins</strong> (top/bottom). Horizontal margins (left/right) never collapse. It also doesn't happen with flexbox or grid children.</p>
+
+          <h2 id="box-sizing">box-sizing – The Most Important Reset</h2>
+          <p>By default (<code>box-sizing: content-box</code>), when you set <code>width: 300px</code>, that is the width of the <em>content only</em>. Adding <code>padding: 20px</code> and <code>border: 2px</code> makes the total rendered width <code>300 + 40 + 4 = 344px</code>.</p>
+
+          <p><code>box-sizing: border-box</code> changes this: the <code>width</code> you set becomes the total rendered width — padding and border are subtracted from the inside.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – content-box vs border-box</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Default: content-box */
+.box {
+  width: 300px;
+  padding: 20px;
+  border: 2px solid black;
+  /* Rendered width = 300 + 40 + 4 = 344px — WIDER THAN EXPECTED */
+}
+
+/* border-box: width INCLUDES padding and border */
+.box {
+  box-sizing: border-box;
+  width: 300px;
+  padding: 20px;
+  border: 2px solid black;
+  /* Rendered width = 300px — as expected */
+  /* Content area = 300 - 40 - 4 = 256px */
+}
+
+/* Apply to everything — the standard CSS reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+}</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Always use box-sizing: border-box</strong>
+              <p>Put <code>*, *::before, *::after { box-sizing: border-box; }</code> at the top of every stylesheet. It prevents almost all sizing arithmetic bugs and is the standard approach used by Bootstrap, Tailwind, and virtually every modern CSS framework. Without it, any <code>width: 100%</code> element with padding will overflow its container.</p>
+            </div>
+          </div>
+
+          <h2 id="devtools">Inspecting the Box Model in DevTools</h2>
+          <p>Every browser's DevTools shows the box model visually:</p>
+          <ol>
+            <li>Right-click any element → Inspect</li>
+            <li>In the Elements panel, look for the "Computed" tab</li>
+            <li>You will see an interactive box model diagram showing the exact pixel values for content, padding, border, and margin</li>
+            <li>Hover each layer in the diagram to highlight it on the page</li>
+          </ol>
+          <p>This is invaluable for debugging spacing issues — always check DevTools first before guessing at values.</p>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Every element = rectangular box with four layers: <strong>content → padding → border → margin</strong></li>
+              <li><strong>Padding</strong> — space inside the border. Background color fills padding. Use for inner breathing room.</li>
+              <li><strong>Border</strong> — line between padding and margin. Shorthand: <code>width style color</code>. <code>border-radius</code> for rounded corners.</li>
+              <li><strong>Margin</strong> — space outside the border. Always transparent. <code>margin: 0 auto</code> centers blocks.</li>
+              <li><strong>Margin collapse</strong> — adjacent vertical margins merge into the larger value. Horizontal margins never collapse.</li>
+              <li><strong>box-sizing: border-box</strong> — width/height include padding and border. Use this always via universal reset.</li>
+              <li>Inspect box model live in browser DevTools → Elements → Computed tab.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/csslessons/selectors/margin-padding.html" class="topic-tag css-topic-tag">🎨 Margin &amp; Padding Deep Dive</a>
+            <a href="/csslessons/selectors/borders.html" class="topic-tag css-topic-tag">🎨 CSS Borders</a>
+            <a href="/csslessons/layout/display.html" class="topic-tag css-topic-tag">🎨 CSS Display</a>
+            <a href="/csslessons/layout/flexbox.html" class="topic-tag css-topic-tag">🎨 CSS Flexbox</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between padding and margin? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><strong>Padding</strong> is the space inside an element — between the content and the border. It's part of the element's clickable/touchable area and its background fills the padding. <strong>Margin</strong> is space outside the element — between its border and adjacent elements. Margin is always transparent and doesn't take a background. Rule of thumb: padding for inner breathing room (around content), margin for outer gap (between elements).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why is my 100% width element overflowing? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>You're using <code>box-sizing: content-box</code> (the default). When you set <code>width: 100%</code> and add <code>padding: 20px</code>, the total rendered width becomes 100% + 40px — wider than the container, causing overflow. Fix: add <code>*, *::before, *::after { box-sizing: border-box; }</code> to your stylesheet. With <code>border-box</code>, padding and border are included in the 100%, not added on top.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is margin collapse and how do I stop it? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Margin collapse is when the bottom margin of one element and the top margin of the next merge into a single margin equal to the larger value. To prevent it: (1) use <code>display: flex</code> or <code>display: grid</code> on the parent — flex/grid children don't collapse. (2) Add <code>padding: 1px</code> or <code>border: 1px solid transparent</code> to the parent. (3) Use the <code>gap</code> property in flex/grid instead of margins. In most modern CSS, flexbox/grid is used for layout and margin collapse becomes a non-issue.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Does box-sizing: border-box affect all elements automatically? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not automatically — you must declare it. The universal reset (<code>*, *::before, *::after { box-sizing: border-box; }</code>) applies it to all elements and is the industry standard. It's included in Bootstrap, Tailwind, and most CSS resets. Setting it on a parent does NOT inherit it to children because <code>box-sizing</code> is a non-inheriting property — that's why the universal <code>*</code> selector is necessary rather than just setting it on <code>html</code>.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/csslessons/selectors/backgrounds.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">CSS Backgrounds</span>
+          </a>
+          <a href="/csslessons/selectors/margin-padding.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">CSS Margin &amp; Padding</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer">
+          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1755924855244642" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1755924855244642" data-ad-slot="auto" data-ad-format="rectangle" data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
