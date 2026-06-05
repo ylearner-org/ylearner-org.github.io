@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS setup() & onMounted – Initialization and DOM Ready | ylearner</title>
+  <meta name="description" content="Deep dive into OWL JS setup() and onMounted: how setup replaces the constructor, registering hooks and services, and using onMounted for DOM manipulation, focus management, scroll positioning, and third-party library initialization.">
+  <meta name="keywords" content="OWL JS setup, OWL onMounted, OWL setup function, OWL component initialization, OWL JS DOM ready, OWL useService, OWL JS lifecycle tutorial, Odoo Web Library setup, OWL onMounted example">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/owljs/lifecycle/setup-mounted.html">
+  <meta property="og:title" content="OWL JS setup() &amp; onMounted – Initialization | ylearner">
+  <meta property="og:description" content="How setup() works as a constructor replacement, registering lifecycle hooks and services, and using onMounted for DOM-ready work in OWL JS.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/owljs/lifecycle/setup-mounted.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS setup() and onMounted Complete Guide | ylearner">
+  <meta name="twitter:description" content="setup() for initialization, useService injection, onMounted for DOM manipulation — complete OWL JS tutorial.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS setup() and onMounted",
+    "description": "Deep dive into OWL JS setup() lifecycle method and onMounted hook: component initialization, service injection, DOM manipulation, focus management, and third-party library integration.",
+    "educationalLevel": "Intermediate",
+    "keywords": "OWL JS setup, onMounted, component initialization, service injection, DOM ready, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/lifecycle/overview.html">Lifecycle</a><span class="separator">›</span>
+          <span class="current">setup &amp; onMounted</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Lifecycle</div>
+          <h1>OWL JS setup() &amp; onMounted – Initialization and DOM Ready</h1>
+          <p class="lesson-intro"><code>setup()</code> is the first method OWL calls on every component instance — it is where you register lifecycle hooks, inject services, and initialize reactive state. <code>onMounted</code> is the hook that fires after the component's DOM has been inserted into the document — the earliest moment you can safely interact with the real DOM. Together, these two are the most commonly used parts of the OWL lifecycle. This lesson covers both in depth with real patterns from production Odoo modules.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 2 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="setup-purpose">What setup() Does</h2>
+          <p><code>setup()</code> is a special class method that OWL calls synchronously during component construction, before any render. It is the designated place for all initialization logic. This includes:</p>
+
+          <ul>
+            <li>Calling lifecycle hook functions (<code>onWillStart</code>, <code>onMounted</code>, etc.)</li>
+            <li>Injecting services via <code>useService()</code></li>
+            <li>Calling built-in hooks like <code>useRef()</code>, <code>useEnv()</code>, <code>useStore()</code></li>
+            <li>Calling custom hooks</li>
+            <li>Initializing <code>useState</code> when you prefer <code>setup()</code> over class fields</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – setup() anatomy</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import {
+  Component, xml, useState,
+  onWillStart, onMounted, onWillUnmount,
+  useRef, useEnv
+} from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
+
+class DataTable extends Component {
+  setup() {
+    // 1. Get services (Odoo context)
+    this.orm     = useService("orm");
+    this.action  = useService("action");
+    this.notification = useService("notification");
+
+    // 2. Initialize reactive state
+    this.state = useState({
+      records:    [],
+      isLoading:  true,
+      sortField:  "name",
+      sortAsc:    true,
+      page:       1,
+    });
+
+    // 3. Get DOM refs
+    this.tableRef = useRef("table");
+
+    // 4. Register lifecycle hooks
+    onWillStart(() =&gt; this.loadData());
+
+    onMounted(() =&gt; {
+      this.initResizeObserver();
+    });
+
+    onWillUnmount(() =&gt; {
+      this.resizeObserver?.disconnect();
+    });
+  }
+
+  async loadData() { /* ... */ }
+  initResizeObserver() { /* ... */ }
+}</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Hooks must be called in setup() — not elsewhere</strong>
+              <p>OWL hook functions (<code>onMounted</code>, <code>useService</code>, <code>useRef</code>, etc.) track which component they belong to using a global "current component" reference that is only set during <code>setup()</code>. Calling them in an event handler, a regular method, or an async callback will throw: "No component is being set up." Always call hooks synchronously inside <code>setup()</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="class-fields-vs-setup">Class Fields vs setup()</h2>
+          <p>Class fields that call hook functions are syntactic sugar — they run before <code>setup()</code> but inside the same "current component" context. Both patterns are valid:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – class field vs setup() equivalents</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// ── Class field style ───────────────────────────────────────────────
+class ComponentA extends Component {
+  state = useState({ count: 0 });     // class field
+  inputRef = useRef("myInput");        // class field
+
+  setup() {
+    this.orm = useService("orm");      // services still need setup()
+    onMounted(() =&gt; { ... });
+  }
+}
+
+// ── Full setup() style ──────────────────────────────────────────────
+class ComponentB extends Component {
+  setup() {
+    this.state    = useState({ count: 0 });
+    this.inputRef = useRef("myInput");
+    this.orm      = useService("orm");
+    onMounted(() =&gt; { ... });
+  }
+}
+// Both are equivalent. Mix and match — use class fields for state,
+// setup() for services and lifecycle hooks.</code></pre>
+          </div>
+
+          <h2 id="onmounted">onMounted – The DOM-Ready Hook</h2>
+          <p><code>onMounted</code> fires once, immediately after the component's first render is inserted into the document. At this point, <code>this.el</code> is a real DOM element you can query, measure, and manipulate.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – onMounted patterns</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml, useState, onMounted, useRef } from "@odoo/owl";
+
+class AutoFocusInput extends Component {
+  static template = xml`
+    &lt;div&gt;
+      &lt;input t-ref="input" type="text" placeholder="I auto-focus on mount"/&gt;
+    &lt;/div&gt;
+  `;
+
+  inputRef = useRef("input");
+
+  setup() {
+    onMounted(() =&gt; {
+      // this.inputRef.el is the real &lt;input&gt; DOM element
+      this.inputRef.el?.focus();
+    });
+  }
+}</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="common-onmounted-patterns">Common onMounted Patterns</h2>
+
+          <h3 id="dom-measurement">DOM Measurement</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – measure after mount</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class ResponsiveChart extends Component {
+  state = useState({ width: 0, height: 0 });
+
+  setup() {
+    onMounted(() =&gt; {
+      // getBoundingClientRect() requires the element to be in the DOM
+      const rect = this.el.getBoundingClientRect();
+      this.state.width  = rect.width;
+      this.state.height = rect.height;
+    });
+  }
+}</code></pre>
+          </div>
+
+          <h3 id="scroll-position">Scroll Management</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – scroll to element on mount</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class ChatWindow extends Component {
+  static template = xml`
+    &lt;div class="chat-window" t-ref="window"&gt;
+      &lt;div t-foreach="props.messages" t-as="msg" t-key="msg.id"
+           class="message" t-esc="msg.text"/&gt;
+    &lt;/div&gt;
+  `;
+
+  windowRef = useRef("window");
+
+  setup() {
+    onMounted(() =&gt; {
+      // Scroll to the bottom after first render
+      this.scrollToBottom();
+    });
+  }
+
+  scrollToBottom() {
+    const el = this.windowRef.el;
+    if (el) el.scrollTop = el.scrollHeight;
+  }
+}</code></pre>
+          </div>
+
+          <h3 id="third-party-libraries">Third-Party Library Initialization</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – initialize a chart library</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class SalesChart extends Component {
+  static template = xml`
+    &lt;div&gt;
+      &lt;canvas t-ref="canvas" width="600" height="300"&gt;&lt;/canvas&gt;
+    &lt;/div&gt;
+  `;
+
+  canvasRef = useRef("canvas");
+  chart     = null;
+
+  setup() {
+    onMounted(() =&gt; {
+      // Chart.js (or any lib) needs the real DOM canvas element
+      this.chart = new Chart(this.canvasRef.el, {
+        type: "line",
+        data: { labels: props.labels, datasets: [{ data: props.data }] },
+      });
+    });
+
+    onWillUnmount(() =&gt; {
+      this.chart?.destroy();   // ← always clean up third-party libraries
+    });
+  }
+}</code></pre>
+          </div>
+
+          <h3 id="event-listeners">Global Event Listeners</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – window event listener setup/teardown</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class KeyboardShortcuts extends Component {
+  setup() {
+    // Store the bound reference so we can remove the exact same function
+    this._onKeyDown = this.handleGlobalKey.bind(this);
+
+    onMounted(() =&gt; {
+      window.addEventListener("keydown", this._onKeyDown);
+    });
+
+    onWillUnmount(() =&gt; {
+      // Remove the exact same reference
+      window.removeEventListener("keydown", this._onKeyDown);
+    });
+  }
+
+  handleGlobalKey(ev) {
+    if ((ev.ctrlKey || ev.metaKey) &amp;&amp; ev.key === "s") {
+      ev.preventDefault();
+      this.save();
+    }
+  }
+}</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always pair onMounted with onWillUnmount for side effects</strong>
+              <p>Every global event listener, timer, ResizeObserver, IntersectionObserver, WebSocket connection, or third-party library instance you create in <code>onMounted</code> must be destroyed in <code>onWillUnmount</code>. If you do not clean up, these keep running after the component is removed, causing memory leaks and subtle bugs. This pairing is one of the most important patterns in OWL development.</p>
+            </div>
+          </div>
+
+          <h2 id="useref">useRef() – Accessing DOM Elements</h2>
+          <p><code>useRef(name)</code> creates a ref that OWL fills with the DOM element that has <code>t-ref="name"</code> in the template. The element is set when the component mounts and cleared when it unmounts.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – useRef pattern</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml, onMounted, useRef } from "@odoo/owl";
+
+class VideoPlayer extends Component {
+  static template = xml`
+    &lt;div&gt;
+      &lt;video t-ref="video" src="/assets/intro.mp4" controls&gt;&lt;/video&gt;
+      &lt;button t-on-click="play"&gt;▶ Play&lt;/button&gt;
+      &lt;button t-on-click="pause"&gt;⏸ Pause&lt;/button&gt;
+    &lt;/div&gt;
+  `;
+
+  videoRef = useRef("video");
+
+  play()  { this.videoRef.el?.play();  }
+  pause() { this.videoRef.el?.pause(); }
+
+  setup() {
+    onMounted(() =&gt; {
+      // Safe to access videoRef.el here
+      console.log("Video duration:", this.videoRef.el?.duration);
+    });
+  }
+}</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Context</th><th>this.myRef.el value</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>During setup()</td><td><code>null</code> — DOM not yet created</td></tr>
+                <tr><td>During onWillStart()</td><td><code>null</code> — still before first render</td></tr>
+                <tr><td>During onMounted()</td><td>✅ The real DOM element</td></tr>
+                <tr><td>During event handlers (after mount)</td><td>✅ The real DOM element</td></tr>
+                <tr><td>During onWillUnmount()</td><td>✅ Still the real DOM element</td></tr>
+                <tr><td>After onWillUnmount()</td><td><code>null</code> — element removed</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>setup()</code> runs synchronously during construction — before any render. Use it for all hook registration, service injection, and initialization.</li>
+              <li>Hook functions (<code>onMounted</code>, <code>useService</code>, <code>useRef</code>) must be called inside <code>setup()</code> — calling them elsewhere throws.</li>
+              <li>Class fields that call hook functions (like <code>state = useState({})</code>) are equivalent to calling them in <code>setup()</code>.</li>
+              <li><code>onMounted</code> fires once after the first render inserts the DOM. <code>this.el</code> is available here.</li>
+              <li>Use <code>onMounted</code> for: DOM measurement, focus, scroll, global listeners, third-party library init.</li>
+              <li><code>useRef("name")</code> gives you a reactive reference to a DOM element marked with <code>t-ref="name"</code> in the template. Access via <code>this.myRef.el</code> after mount.</li>
+              <li>Always pair <code>onMounted</code> side effects with cleanup in <code>onWillUnmount</code>.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/owljs/lifecycle/overview.html" class="topic-tag owl-topic-tag">🦉 Lifecycle Overview</a>
+            <a href="/owljs/lifecycle/will-start.html" class="topic-tag owl-topic-tag">🦉 willStart &amp; Async Init</a>
+            <a href="/owljs/lifecycle/unmount.html" class="topic-tag owl-topic-tag">🦉 willUnmount &amp; Cleanup</a>
+            <a href="/owljs/templates/refs.html" class="topic-tag owl-topic-tag">🦉 Refs (t-ref)</a>
+            <a href="/owljs/advanced/hooks.html" class="topic-tag owl-topic-tag">🦉 Custom Hooks</a>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Exercise</h3>
+            <p>Build a <code>ResizablePanel</code> component that demonstrates <code>onMounted</code> and <code>useRef</code>:</p>
+            <ol>
+              <li>Render a <code>&lt;div t-ref="panel"&gt;</code> with some content and a fixed min-height.</li>
+              <li>In <code>onMounted</code>, use a <code>ResizeObserver</code> to watch the panel's size. When it resizes, update <code>state.width</code> and <code>state.height</code>.</li>
+              <li>Display the current dimensions in the panel header.</li>
+              <li>In <code>onWillUnmount</code>, call <code>resizeObserver.disconnect()</code>.</li>
+              <li>Add a "Expand" button that increases the panel's <code>min-height</code> via a state variable, triggering a size change that the ResizeObserver detects.</li>
+            </ol>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I call super.setup() in a subclass? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — if you subclass a component and both parent and child define <code>setup()</code>, the child should call <code>super.setup()</code> to ensure the parent's setup logic (hook registrations, service injections) runs. OWL does not call <code>super.setup()</code> automatically, so forgetting it will silently skip the parent's initialization.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why can't I just use the constructor instead of setup()? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>OWL's hook system relies on a global "current component" context that is set <em>during</em> <code>setup()</code> — not the constructor. If you call <code>useService()</code> or <code>onMounted()</code> in the constructor, the context is not set and they throw. Additionally, <code>setup()</code> enables custom hooks — reusable functions that call other hooks internally. This composability is not possible with constructors because you cannot inject into an arbitrary constructor call stack in the same way.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is this.el available in setup()? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — <code>this.el</code> is <code>null</code> during <code>setup()</code> because the component has not rendered yet. The DOM does not exist until after the first render and insertion. <code>this.el</code> becomes available in <code>onMounted</code> and stays available until after <code>onWillUnmount</code>. If you try to access <code>this.el</code> in <code>setup()</code>, you get <code>null</code> — no error, just no element.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I call onMounted multiple times in setup()? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — each call to <code>onMounted(callback)</code> registers an additional callback. All registered callbacks fire when the component mounts, in the order they were registered. This is intentional — it allows custom hooks to independently register <code>onMounted</code> callbacks without knowing what else is registered. All callbacks run before the parent's <code>onMounted</code> fires.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/lifecycle/overview.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Lifecycle Overview</span>
+          </a>
+          <a href="/owljs/lifecycle/will-start.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">willStart &amp; Async Init</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

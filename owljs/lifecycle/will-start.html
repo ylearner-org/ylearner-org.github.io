@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS onWillStart & Async Initialization – Pre-Render Data Fetching | ylearner</title>
+  <meta name="description" content="Master OWL JS onWillStart and onWillUpdateProps: how to fetch data before the first render, handle loading states, react to prop changes with async logic, and avoid common pitfalls in pre-render initialization.">
+  <meta name="keywords" content="OWL JS onWillStart, OWL async initialization, OWL pre-render data fetching, OWL onWillUpdateProps, OWL JS lifecycle async, OWL loading state, Odoo Web Library onWillStart, OWL JS tutorial async">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/owljs/lifecycle/will-start.html">
+  <meta property="og:title" content="OWL JS onWillStart – Async Pre-Render Initialization | ylearner">
+  <meta property="og:description" content="How onWillStart and onWillUpdateProps work in OWL JS: async data fetching before render, loading states, error handling, and prop-change reactions.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/owljs/lifecycle/will-start.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS onWillStart Async Init Guide | ylearner">
+  <meta name="twitter:description" content="onWillStart for pre-render data fetching, onWillUpdateProps for prop changes — OWL JS async lifecycle tutorial.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS onWillStart and Async Initialization",
+    "description": "Complete guide to OWL JS onWillStart and onWillUpdateProps: async data fetching before render, loading state patterns, error handling, and reacting to prop changes.",
+    "educationalLevel": "Intermediate",
+    "keywords": "OWL JS onWillStart, async initialization, pre-render data fetching, onWillUpdateProps, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/lifecycle/overview.html">Lifecycle</a><span class="separator">›</span>
+          <span class="current">willStart &amp; Async Init</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Lifecycle</div>
+          <h1>OWL JS onWillStart &amp; Async Initialization</h1>
+          <p class="lesson-intro"><code>onWillStart</code> is OWL's only async pre-render hook — it fires before the component's first render and OWL waits for it to complete before showing anything. This makes it the correct place to fetch initial data, load resources, or perform any async work that the template depends on. Similarly, <code>onWillUpdateProps</code> lets you perform async work when the parent sends new props — before the re-render triggered by those new props. This lesson covers both hooks in depth, with loading state patterns, error handling, and common real-world examples.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 3 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="onwillstart-basics">onWillStart – Before the First Render</h2>
+          <p><code>onWillStart</code> is called once, after <code>setup()</code> completes and before the first render. OWL awaits its Promise — the component does not render until the hook resolves. Use it to fetch data that the template needs to display on first paint.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – basic onWillStart</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml, useState, onWillStart } from "@odoo/owl";
+
+class UserProfile extends Component {
+  static template = xml`
+    &lt;div&gt;
+      &lt;t t-if="state.isLoading"&gt;Loading…&lt;/t&gt;
+      &lt;t t-else=""&gt;
+        &lt;h2 t-esc="state.user.name"/&gt;
+        &lt;p t-esc="state.user.email"/&gt;
+      &lt;/t&gt;
+    &lt;/div&gt;
+  `;
+
+  static props = { userId: { type: Number } };
+
+  state = useState({ user: null, isLoading: true });
+
+  setup() {
+    onWillStart(async () =&gt; {
+      // OWL awaits this — component does not render until it resolves
+      this.state.user      = await fetchUser(this.props.userId);
+      this.state.isLoading = false;
+    });
+  }
+}</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Why not fetch in the constructor or setup() directly?</strong>
+              <p><code>setup()</code> is synchronous — you cannot <code>await</code> inside it. If you start a fetch in <code>setup()</code> without awaiting, the component renders immediately with empty data, then the fetch completes and a second render happens — causing a flash. <code>onWillStart</code> lets you <code>await</code> the fetch so the first render already has data. The component appears only after the data is ready.</p>
+            </div>
+          </div>
+
+          <h2 id="loading-patterns">Loading State Patterns</h2>
+          <p>There are two main approaches to loading states with <code>onWillStart</code>:</p>
+
+          <h3 id="loading-flag">Pattern 1: Explicit loading flag</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – explicit loading flag</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class InvoiceList extends Component {
+  static template = xml`
+    &lt;div&gt;
+      &lt;div t-if="state.isLoading" class="loading-spinner"&gt;Loading invoices…&lt;/div&gt;
+      &lt;div t-elif="state.error" class="error-box"&gt;
+        &lt;p t-esc="state.error"/&gt;
+        &lt;button t-on-click="retry"&gt;Retry&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;t t-else=""&gt;
+        &lt;p t-if="state.invoices.length === 0"&gt;No invoices found.&lt;/p&gt;
+        &lt;table t-if="state.invoices.length &gt; 0"&gt;
+          &lt;tr t-foreach="state.invoices" t-as="inv" t-key="inv.id"&gt;
+            &lt;td t-esc="inv.name"/&gt;
+            &lt;td t-esc="inv.amount"/&gt;
+          &lt;/tr&gt;
+        &lt;/table&gt;
+      &lt;/t&gt;
+    &lt;/div&gt;
+  `;
+
+  state = useState({ invoices: [], isLoading: true, error: null });
+
+  setup() {
+    onWillStart(() =&gt; this.loadInvoices());
+  }
+
+  async loadInvoices() {
+    try {
+      this.state.isLoading = true;
+      this.state.error     = null;
+      this.state.invoices  = await fetchInvoices();
+    } catch (err) {
+      this.state.error = "Failed to load invoices: " + err.message;
+    } finally {
+      this.state.isLoading = false;
+    }
+  }
+
+  retry() {
+    this.loadInvoices();  // re-fetch on demand
+  }
+}</code></pre>
+          </div>
+
+          <h3 id="loading-no-render">Pattern 2: Show nothing until data is ready</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – no render until data ready</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Dashboard extends Component {
+  // Data starts as null — template guards against it
+  state = useState({ metrics: null });
+
+  setup() {
+    onWillStart(async () =&gt; {
+      // OWL waits here — nothing renders yet
+      this.state.metrics = await fetchDashboardMetrics();
+      // After this resolves, the component renders once with all data
+    });
+  }
+
+  static template = xml`
+    &lt;div t-if="state.metrics"&gt;
+      &lt;p&gt;Revenue: &lt;t t-esc="state.metrics.revenue"/&gt;&lt;/p&gt;
+      &lt;p&gt;Orders: &lt;t t-esc="state.metrics.orders"/&gt;&lt;/p&gt;
+    &lt;/div&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="on-will-update-props">onWillUpdateProps – React to New Props</h2>
+          <p><code>onWillUpdateProps</code> fires when the parent component passes new props. OWL awaits it before re-rendering. Use it when changing a prop (like an ID) requires fetching new data that the new render depends on.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – onWillUpdateProps</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml, useState, onWillStart, onWillUpdateProps } from "@odoo/owl";
+
+class ProductDetail extends Component {
+  static template = xml`
+    &lt;div&gt;
+      &lt;div t-if="state.isLoading"&gt;Loading…&lt;/div&gt;
+      &lt;div t-else=""&gt;
+        &lt;h2 t-esc="state.product.name"/&gt;
+        &lt;p t-esc="state.product.description"/&gt;
+        &lt;p&gt;Price: $&lt;t t-esc="state.product.price"/&gt;&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  `;
+
+  static props = { productId: { type: Number } };
+
+  state = useState({ product: null, isLoading: true });
+
+  setup() {
+    // Load data before first render
+    onWillStart(() =&gt; this.loadProduct(this.props.productId));
+
+    // When parent passes a different productId, load new data before re-render
+    onWillUpdateProps(async (nextProps) =&gt; {
+      if (nextProps.productId !== this.props.productId) {
+        await this.loadProduct(nextProps.productId);
+      }
+    });
+  }
+
+  async loadProduct(id) {
+    this.state.isLoading = true;
+    try {
+      this.state.product   = await fetchProduct(id);
+    } finally {
+      this.state.isLoading = false;
+    }
+  }
+}</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>nextProps vs this.props in onWillUpdateProps</strong>
+              <p>Inside <code>onWillUpdateProps(nextProps =&gt; ...)</code>, <code>nextProps</code> is the incoming new props object. <code>this.props</code> still has the current (old) props. This lets you compare old vs new: <code>if (nextProps.id !== this.props.id)</code>. After the hook resolves, <code>this.props</code> is updated to <code>nextProps</code> and the re-render happens.</p>
+            </div>
+          </div>
+
+          <h2 id="odoo-example">Real Odoo Example: ORM Data Loading</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – Odoo ORM in onWillStart</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { Component, xml, useState, onWillStart, onWillUpdateProps } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
+
+class PartnerCard extends Component {
+  static template = xml`
+    &lt;div class="partner-card"&gt;
+      &lt;t t-if="state.isLoading"&gt;
+        &lt;div class="o_loading"/&gt;
+      &lt;/t&gt;
+      &lt;t t-else=""&gt;
+        &lt;h3 t-esc="state.partner.name"/&gt;
+        &lt;span t-esc="state.partner.email"/&gt;
+        &lt;span t-esc="state.partner.phone"/&gt;
+      &lt;/t&gt;
+    &lt;/div&gt;
+  `;
+
+  static props = { partnerId: { type: Number } };
+
+  state = useState({ partner: null, isLoading: true });
+
+  setup() {
+    this.orm = useService("orm");
+
+    onWillStart(() =&gt; this.fetchPartner(this.props.partnerId));
+
+    onWillUpdateProps(async (nextProps) =&gt; {
+      if (nextProps.partnerId !== this.props.partnerId) {
+        await this.fetchPartner(nextProps.partnerId);
+      }
+    });
+  }
+
+  async fetchPartner(id) {
+    this.state.isLoading = true;
+    const records = await this.orm.read("res.partner", [id], ["name", "email", "phone"]);
+    this.state.partner   = records[0] || null;
+    this.state.isLoading = false;
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="comparison-table">onWillStart vs onWillUpdateProps vs onMounted</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Hook</th><th>Fires when</th><th>Async?</th><th>Use case</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>onWillStart</code></td>
+                  <td>Once, before first render</td>
+                  <td>✅ Awaited</td>
+                  <td>Initial data fetch, auth check, resource loading</td>
+                </tr>
+                <tr>
+                  <td><code>onWillUpdateProps</code></td>
+                  <td>Every time parent passes new props</td>
+                  <td>✅ Awaited</td>
+                  <td>Re-fetch data when a key prop (like ID) changes</td>
+                </tr>
+                <tr>
+                  <td><code>onMounted</code></td>
+                  <td>Once, after first render + DOM insert</td>
+                  <td>❌ Not awaited</td>
+                  <td>DOM work, third-party init, listeners</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>onWillStart</code> fires before the first render and OWL awaits it — use it for async initialization that the template depends on.</li>
+              <li><code>onWillUpdateProps(nextProps =&gt; ...)</code> fires before a re-render caused by new parent props — use it to fetch data based on incoming prop values.</li>
+              <li>Both hooks are async-safe — pass an <code>async</code> function or return a Promise and OWL will wait.</li>
+              <li>Inside <code>onWillUpdateProps</code>, compare <code>nextProps.x</code> to <code>this.props.x</code> to avoid unnecessary fetches when the relevant prop did not change.</li>
+              <li>Use a loading flag in state to show a spinner while async hooks are running — the component does render a loading state if <code>onWillStart</code> sets state before awaiting.</li>
+              <li>For Odoo modules, use <code>useService("orm")</code> and ORM methods in these hooks to load server data.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/owljs/lifecycle/overview.html" class="topic-tag owl-topic-tag">🦉 Lifecycle Overview</a>
+            <a href="/owljs/lifecycle/setup-mounted.html" class="topic-tag owl-topic-tag">🦉 setup &amp; onMounted</a>
+            <a href="/owljs/lifecycle/patch-hooks.html" class="topic-tag owl-topic-tag">🦉 willPatch &amp; patched</a>
+            <a href="/owljs/odoo/rpc-calls.html" class="topic-tag owl-topic-tag">🦉 RPC – Calling Python</a>
+            <a href="/owljs/advanced/concurrency.html" class="topic-tag owl-topic-tag">🦉 Concurrency Model</a>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Exercise</h3>
+            <p>Build a <code>SearchResults</code> component that uses both <code>onWillStart</code> and <code>onWillUpdateProps</code>:</p>
+            <ol>
+              <li>Props: <code>query</code> (String) — the search term.</li>
+              <li>In <code>onWillStart</code>, simulate an API call with <code>await delay(500)</code> (a helper that returns <code>new Promise(r =&gt; setTimeout(r, 500))</code>). Set fake results based on the query.</li>
+              <li>In <code>onWillUpdateProps</code>, check if <code>nextProps.query !== this.props.query</code>. If so, set <code>state.isLoading = true</code>, simulate the fetch, and update results.</li>
+              <li>Show a loading indicator while loading. Show "No results" when the results array is empty.</li>
+              <li>In a parent <code>App</code>, add an input bound to <code>state.query</code> via <code>t-model</code>. Pass <code>state.query</code> to <code>SearchResults</code>. Observe: every time you type and the query changes, <code>SearchResults</code> shows a loading state then updates.</li>
+            </ol>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does the component show anything while onWillStart is running? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — OWL does not render the component at all until <code>onWillStart</code> resolves. The parent component renders but the child appears only after its <code>onWillStart</code> completes. If you want to show a loading spinner immediately, the loading state must be in the <em>parent</em>, not the child — or you can render a lightweight placeholder via <code>t-if="state.data"</code> only (hide the real content while loading, but still render a skeleton).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens if onWillStart throws or rejects? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The error propagates up to the nearest ancestor with an <code>onError</code> hook registered. If no ancestor handles it, OWL treats it as an unhandled Promise rejection. The component that threw never renders. This is the right place to implement error boundaries — the parent catches the child's init failure and shows a fallback UI. Always wrap async calls in try/catch inside <code>onWillStart</code> if you want the component itself to handle the error and show an error state.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I re-trigger onWillStart? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — <code>onWillStart</code> fires exactly once per component instance. To re-fetch data after mounting (e.g., a "Refresh" button), call your fetch method directly from an event handler. For data that changes when props change, use <code>onWillUpdateProps</code>. If you need to fully reset a component with fresh initial data, unmount and remount it (change its <code>t-key</code> in the parent — OWL treats a different key as a new component instance).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I use onWillStart or onMounted for data fetching? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>onWillStart</code> when the template depends on the data for its first meaningful render — fetching in <code>onWillStart</code> means one render with complete data. Use <code>onMounted</code> only if the fetch can be done after the DOM is shown (e.g., lazy loading below-the-fold content) and you are comfortable showing a loading placeholder. For most data-driven components, <code>onWillStart</code> gives a cleaner user experience.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/lifecycle/setup-mounted.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">setup &amp; onMounted</span>
+          </a>
+          <a href="/owljs/lifecycle/patch-hooks.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">willPatch &amp; patched</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

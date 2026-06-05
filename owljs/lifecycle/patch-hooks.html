@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS onWillPatch & onPatched – Before and After Re-render | ylearner</title>
+  <meta name="description" content="Complete guide to OWL JS onWillPatch and onPatched lifecycle hooks: when they fire, how to read DOM state before re-render, restore scroll position after updates, and avoid common performance pitfalls.">
+  <meta name="keywords" content="OWL JS onWillPatch, OWL onPatched, OWL JS re-render hooks, OWL DOM update lifecycle, OWL JS patch lifecycle, OWL scroll position, Odoo Web Library patch hooks, OWL component update lifecycle">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/owljs/lifecycle/patch-hooks.html">
+  <meta property="og:title" content="OWL JS onWillPatch &amp; onPatched – Re-render Hooks | ylearner">
+  <meta property="og:description" content="onWillPatch fires before every re-render to snapshot DOM state; onPatched fires after. Learn scroll preservation, DOM measurement, and side-effect patterns.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/owljs/lifecycle/patch-hooks.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS onWillPatch and onPatched Guide | ylearner">
+  <meta name="twitter:description" content="onWillPatch and onPatched in OWL JS — pre-patch DOM snapshot, post-patch DOM work, scroll preservation, and side effects.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS onWillPatch and onPatched",
+    "description": "Complete guide to OWL JS re-render lifecycle hooks: onWillPatch fires before every DOM patch to snapshot state; onPatched fires after to restore or react to the updated DOM.",
+    "educationalLevel": "Intermediate",
+    "keywords": "OWL JS onWillPatch, onPatched, re-render hooks, DOM update, scroll position, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/lifecycle/overview.html">Lifecycle</a><span class="separator">›</span>
+          <span class="current">willPatch &amp; patched</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Lifecycle</div>
+          <h1>OWL JS onWillPatch &amp; onPatched – Before and After Re-render</h1>
+          <p class="lesson-intro"><code>onWillPatch</code> and <code>onPatched</code> are the update-phase lifecycle hooks — they fire around every DOM patch (re-render) after the initial mount. <code>onWillPatch</code> lets you read the current DOM state <em>before</em> it changes. <code>onPatched</code> lets you react to the new DOM state <em>after</em> it has been updated. These two hooks are less frequently needed than <code>onMounted</code> or <code>onWillStart</code>, but they are essential for specific patterns like scroll position preservation, DOM diffing side effects, and syncing with third-party libraries on update.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 16 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 4 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="when-they-fire">When onWillPatch and onPatched Fire</h2>
+          <p>These hooks fire on every re-render — whether caused by state change, new props from the parent, or a forced re-render. They do <em>not</em> fire on the initial mount (that is <code>onMounted</code>'s territory).</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Text – update phase timeline</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-text">Trigger: state mutation or new props
+  │
+  ├─ onWillUpdateProps(nextProps)   ← only when props change (async, awaited)
+  │
+  ├─ onWillPatch()                  ← sync, fires before virtual DOM diff
+  │      read current DOM here: scroll position, focus, measurements
+  │
+  ├─ [virtual DOM diff + DOM patch] ← OWL applies minimal DOM changes
+  │
+  └─ onPatched()                    ← sync, fires after DOM is updated
+         react to new DOM: restore scroll, update external lib, measure</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>These hooks fire on EVERY update — keep them fast</strong>
+              <p><code>onWillPatch</code> and <code>onPatched</code> run synchronously every time the component re-renders. Any expensive DOM query or computation here runs on every keystroke if your component updates frequently. Keep logic minimal — read one value, store it, restore it. Never make network calls in these hooks.</p>
+            </div>
+          </div>
+
+          <h2 id="onwillpatch">onWillPatch – Snapshot Before Update</h2>
+          <p>The primary use case for <code>onWillPatch</code> is to <strong>capture DOM state that would be lost</strong> during the patch. The most common example is scroll position.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – scroll preservation with willPatch + patched</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml, useState, onWillPatch, onPatched, useRef } from "@odoo/owl";
+
+class MessageList extends Component {
+  static template = xml`
+    &lt;div class="message-list" t-ref="list"&gt;
+      &lt;div t-foreach="props.messages" t-as="msg" t-key="msg.id"
+           class="message" t-esc="msg.text"/&gt;
+    &lt;/div&gt;
+  `;
+
+  static props = {
+    messages: { type: Array },
+  };
+
+  listRef = useRef("list");
+
+  // Store scroll state between renders
+  _scrollTop    = 0;
+  _scrollHeight = 0;
+
+  setup() {
+    onWillPatch(() =&gt; {
+      // Capture scroll position before the DOM is patched
+      const el = this.listRef.el;
+      if (el) {
+        this._scrollTop    = el.scrollTop;
+        this._scrollHeight = el.scrollHeight;
+      }
+    });
+
+    onPatched(() =&gt; {
+      const el = this.listRef.el;
+      if (!el) return;
+
+      const newScrollHeight = el.scrollHeight;
+      const isAtBottom      = this._scrollTop + el.clientHeight &gt;= this._scrollHeight - 5;
+
+      if (isAtBottom) {
+        // User was at the bottom — keep them at the bottom after new messages added
+        el.scrollTop = newScrollHeight;
+      } else {
+        // User scrolled up — preserve their position
+        el.scrollTop = this._scrollTop + (newScrollHeight - this._scrollHeight);
+      }
+    });
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="onpatched">onPatched – React to Updated DOM</h2>
+          <p><code>onPatched</code> fires after every re-render. At this point the DOM fully reflects the new component state. Use it to:</p>
+
+          <ul>
+            <li>Restore scroll position (paired with <code>onWillPatch</code> snapshot)</li>
+            <li>Notify a third-party library that the DOM changed</li>
+            <li>Measure new DOM dimensions after a layout change</li>
+            <li>Trigger animations when specific state changes</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – update a third-party chart on patch</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class LiveChart extends Component {
+  static template = xml`
+    &lt;div&gt;
+      &lt;canvas t-ref="canvas"&gt;&lt;/canvas&gt;
+      &lt;button t-on-click="addDataPoint"&gt;Add point&lt;/button&gt;
+    &lt;/div&gt;
+  `;
+
+  canvasRef = useRef("canvas");
+  chart     = null;
+
+  state = useState({
+    data: [10, 25, 18, 40, 32],
+  });
+
+  setup() {
+    onMounted(() =&gt; {
+      // Initialize chart after first render
+      this.chart = new Chart(this.canvasRef.el, {
+        type:    "line",
+        data:    { datasets: [{ data: this.state.data }] },
+      });
+    });
+
+    onPatched(() =&gt; {
+      // After every state update, sync the chart with new data
+      if (this.chart) {
+        this.chart.data.datasets[0].data = [...this.state.data];
+        this.chart.update();           // Chart.js re-draws
+      }
+    });
+
+    onWillUnmount(() =&gt; {
+      this.chart?.destroy();
+    });
+  }
+
+  addDataPoint() {
+    this.state.data.push(Math.floor(Math.random() * 60));
+    // ↑ triggers re-render → onPatched fires → chart.update() called
+  }
+}</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="animate-on-change">Triggering Animations on State Change</h2>
+          <p>A common pattern: add a CSS class to an element in <code>onPatched</code> to trigger an animation, then remove it after the animation ends.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – CSS flash animation on value change</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class PriceDisplay extends Component {
+  static template = xml`
+    &lt;span t-ref="price" t-esc="props.price"/&gt;
+  `;
+
+  static props = { price: { type: Number } };
+
+  priceRef  = useRef("price");
+  _prevPrice = null;
+
+  setup() {
+    onWillPatch(() =&gt; {
+      this._prevPrice = this.props.price;  // save current before update
+    });
+
+    onPatched(() =&gt; {
+      const el = this.priceRef.el;
+      if (!el || this.props.price === this._prevPrice) return;
+
+      // Price changed — trigger flash animation
+      const cls = this.props.price &gt; this._prevPrice ? "flash-green" : "flash-red";
+      el.classList.add(cls);
+      el.addEventListener("animationend", () =&gt; el.classList.remove(cls), { once: true });
+    });
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="comparison">onWillPatch vs onPatched – Summary Table</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Feature</th><th><code>onWillPatch</code></th><th><code>onPatched</code></th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Fires when</td><td>Before DOM patch (after state/prop change)</td><td>After DOM patch (DOM fully updated)</td></tr>
+                <tr><td>DOM reflects</td><td>Old state — last render's DOM</td><td>New state — current render's DOM</td></tr>
+                <tr><td>Async?</td><td>❌ Synchronous only</td><td>❌ Synchronous only</td></tr>
+                <tr><td>Fires on initial mount?</td><td>❌ No</td><td>❌ No (use onMounted)</td></tr>
+                <tr><td>Primary use</td><td>Snapshot DOM state before it changes</td><td>Restore or react after DOM update</td></tr>
+                <tr><td>Common pattern</td><td>Read scroll position, element dimensions</td><td>Restore scroll, update chart, trigger animation</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>onPatched vs onMounted for DOM work</strong>
+              <p>Use <code>onMounted</code> for work that should happen once when the component first appears. Use <code>onPatched</code> for work that should repeat after every update. If you need both (initial setup + updates), register both hooks — the logic will naturally duplicate if they share code, so extract it into a shared method.</p>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>onWillPatch</code> fires synchronously before every DOM patch (re-render after initial mount). DOM still reflects the previous render.</li>
+              <li><code>onPatched</code> fires synchronously after every DOM patch. DOM fully reflects the new state.</li>
+              <li>Neither hook fires on the initial mount — use <code>onMounted</code> for that.</li>
+              <li>Both are synchronous — no async work, no network calls. Keep them fast.</li>
+              <li>Classic pattern: <code>onWillPatch</code> captures scroll position → <code>onPatched</code> restores it based on whether the user was at the bottom.</li>
+              <li>Use <code>onPatched</code> to sync third-party libraries (charts, datepickers) after OWL updates the DOM.</li>
+              <li>Use plain instance properties (not <code>useState</code>) to store snapshot values between <code>onWillPatch</code> and <code>onPatched</code> — they must not trigger a re-render.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/owljs/lifecycle/overview.html" class="topic-tag owl-topic-tag">🦉 Lifecycle Overview</a>
+            <a href="/owljs/lifecycle/setup-mounted.html" class="topic-tag owl-topic-tag">🦉 setup &amp; onMounted</a>
+            <a href="/owljs/lifecycle/will-start.html" class="topic-tag owl-topic-tag">🦉 willStart &amp; Async Init</a>
+            <a href="/owljs/lifecycle/unmount.html" class="topic-tag owl-topic-tag">🦉 willUnmount &amp; Cleanup</a>
+            <a href="/owljs/templates/refs.html" class="topic-tag owl-topic-tag">🦉 Refs (t-ref)</a>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Exercise</h3>
+            <p>Build an <code>InfiniteScrollList</code> component using the patch hooks:</p>
+            <ol>
+              <li>State: array of items (start with 10), a <code>loadingMore</code> flag.</li>
+              <li>In <code>onWillPatch</code>: record <code>this._scrollTop</code> and <code>this._scrollHeight</code> from the scroll container.</li>
+              <li>In <code>onPatched</code>: when <code>loadingMore</code> just became <code>false</code> (compare with a previous flag), restore scroll so the user does not jump — use the formula <code>scrollTop = newScrollHeight - oldScrollHeight + oldScrollTop</code>.</li>
+              <li>Add a "Load More" button that sets <code>state.loadingMore = true</code>, waits 300ms, pushes 10 more items, and sets <code>state.loadingMore = false</code>.</li>
+              <li>Add a scroll event listener to automatically trigger load-more when the user scrolls near the bottom (within 50px).</li>
+            </ol>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I update state in onPatched? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Technically yes, but be very careful — mutating <code>useState</code> state in <code>onPatched</code> schedules another re-render, which fires <code>onWillPatch</code> and <code>onPatched</code> again. If your condition is not strict enough, this creates an infinite update loop. If you must update state in <code>onPatched</code>, use a guard flag that prevents repeated updates: only mutate when a specific condition changes, and ensure the mutation resolves that condition so it does not trigger again.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between onPatched and a watcher/computed on state? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>OWL does not have explicit watchers or computed properties in the Vue sense. <code>onPatched</code> is the closest equivalent for DOM side effects after state changes. For purely derived data (not DOM-related), use JavaScript getters instead — they are re-evaluated every render and are simpler. Use <code>onPatched</code> only when you need to interact with the DOM after an update.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Do onWillPatch and onPatched fire if only a child component's state changes? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — lifecycle hooks fire on the component whose state or props changed, not on ancestors. If only a child component updates, the child's <code>onWillPatch</code> and <code>onPatched</code> fire but the parent's do not. OWL's component isolation means each component's lifecycle is independent. This is also why OWL is efficient — updating one deep component does not re-render or trigger hooks on all ancestors.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/lifecycle/will-start.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">willStart &amp; Async Init</span>
+          </a>
+          <a href="/owljs/lifecycle/unmount.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">willUnmount &amp; Cleanup</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

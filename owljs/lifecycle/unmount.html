@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS onWillUnmount & Cleanup – Memory Leak Prevention | ylearner</title>
+  <meta name="description" content="Complete guide to OWL JS onWillUnmount: how to clean up timers, event listeners, observers, WebSocket connections, and subscriptions to prevent memory leaks. Also covers the onError hook for error boundaries.">
+  <meta name="keywords" content="OWL JS onWillUnmount, OWL cleanup, OWL memory leak prevention, OWL JS destroy component, OWL onError, OWL error boundary, Odoo Web Library cleanup, OWL JS lifecycle cleanup, OWL remove event listener">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/owljs/lifecycle/unmount.html">
+  <meta property="og:title" content="OWL JS onWillUnmount &amp; Cleanup – Memory Leak Prevention | ylearner">
+  <meta property="og:description" content="How to use onWillUnmount to clean up timers, event listeners, observers, and subscriptions in OWL JS. Plus onError for error boundaries.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/owljs/lifecycle/unmount.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS onWillUnmount Cleanup Guide | ylearner">
+  <meta name="twitter:description" content="onWillUnmount cleanup patterns: timers, event listeners, observers, subscriptions, and onError for error boundaries.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS onWillUnmount and Cleanup",
+    "description": "Complete guide to OWL JS onWillUnmount hook: cleanup patterns for timers, event listeners, ResizeObservers, WebSocket connections, and subscriptions to prevent memory leaks. Includes onError for error boundaries.",
+    "educationalLevel": "Intermediate",
+    "keywords": "OWL JS onWillUnmount, cleanup, memory leaks, event listeners, timers, onError, error boundary",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></link>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/lifecycle/overview.html">Lifecycle</a><span class="separator">›</span>
+          <span class="current">willUnmount &amp; Cleanup</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Lifecycle</div>
+          <h1>OWL JS onWillUnmount &amp; Cleanup – Memory Leak Prevention</h1>
+          <p class="lesson-intro">When OWL removes a component from the DOM, it calls <code>onWillUnmount</code> — the last chance to clean up everything the component created during its lifetime. Without proper cleanup, resources like timers, event listeners, observers, and subscriptions keep running indefinitely after the component is gone, causing <strong>memory leaks</strong> and ghost callbacks that produce subtle bugs. This lesson covers every cleanup pattern you need, plus the <code>onError</code> hook for building error boundaries that catch child component failures.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 5 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="onwillunmount-basics">onWillUnmount Basics</h2>
+          <p><code>onWillUnmount</code> fires synchronously before the component is removed from the DOM. The element <code>this.el</code> is still accessible here — it is removed from the document after the hook completes.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – basic onWillUnmount</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml, onMounted, onWillUnmount } from "@odoo/owl";
+
+class MyComponent extends Component {
+  setup() {
+    onMounted(() =&gt; {
+      // Create something that needs cleanup
+      this._timerId = setInterval(() =&gt; {
+        console.log("tick");
+      }, 1000);
+    });
+
+    onWillUnmount(() =&gt; {
+      // Clean it up before the component is destroyed
+      clearInterval(this._timerId);
+    });
+  }
+}</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Every setup has a corresponding teardown</strong>
+              <p>The golden rule: if you create it in <code>onMounted</code>, destroy it in <code>onWillUnmount</code>. This applies to: timers (<code>setInterval</code>, <code>setTimeout</code>), global event listeners (<code>window.addEventListener</code>), DOM observers (<code>ResizeObserver</code>, <code>IntersectionObserver</code>, <code>MutationObserver</code>), WebSocket connections, third-party library instances, and pub/sub subscriptions.</p>
+            </div>
+          </div>
+
+          <h2 id="cleanup-patterns">Complete Cleanup Patterns</h2>
+
+          <h3 id="timers">Timers: setInterval and setTimeout</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – timer cleanup</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class AutoRefresh extends Component {
+  state = useState({ data: null, lastUpdated: null });
+
+  setup() {
+    onMounted(() =&gt; {
+      // Start polling every 30 seconds
+      this._pollInterval = setInterval(() =&gt; {
+        this.refresh();
+      }, 30_000);
+
+      // Also set a one-shot timeout
+      this._introTimeout = setTimeout(() =&gt; {
+        this.state.showIntro = false;
+      }, 5_000);
+    });
+
+    onWillUnmount(() =&gt; {
+      clearInterval(this._pollInterval);  // stop polling
+      clearTimeout(this._introTimeout);   // cancel pending timeout
+    });
+  }
+
+  async refresh() {
+    this.state.data        = await fetchData();
+    this.state.lastUpdated = new Date();
+  }
+}</code></pre>
+          </div>
+
+          <h3 id="event-listeners">Global Event Listeners</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – event listener cleanup</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class ModalWithEscape extends Component {
+  setup() {
+    // Store the bound reference — needed for removeEventListener
+    this._onKeyDown = (ev) =&gt; {
+      if (ev.key === "Escape") {
+        this.props.onClose();
+      }
+    };
+
+    onMounted(() =&gt; {
+      // Listen globally for Escape key
+      window.addEventListener("keydown", this._onKeyDown);
+      // Prevent body scroll while modal is open
+      document.body.style.overflow = "hidden";
+    });
+
+    onWillUnmount(() =&gt; {
+      // Must pass the exact same function reference to remove it
+      window.removeEventListener("keydown", this._onKeyDown);
+      // Restore body scroll
+      document.body.style.overflow = "";
+    });
+  }
+}</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Store the bound reference, not the original method</strong>
+              <p><code>removeEventListener</code> requires the exact same function reference that was passed to <code>addEventListener</code>. If you bind in <code>onMounted</code> (<code>this.method.bind(this)</code>), that creates a new function — you cannot remove it unless you stored the result. The cleanest pattern: create the bound reference in <code>setup()</code> as a property, then use it in both <code>onMounted</code> and <code>onWillUnmount</code>.</p>
+            </div>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h3 id="observers">DOM Observers</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – ResizeObserver and IntersectionObserver cleanup</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class LazyImage extends Component {
+  static template = xml`
+    &lt;div t-ref="container"&gt;
+      &lt;img t-if="state.isVisible" t-att-src="props.src" t-att-alt="props.alt"/&gt;
+      &lt;div t-else="" class="placeholder"&gt;Loading…&lt;/div&gt;
+    &lt;/div&gt;
+  `;
+
+  containerRef = useRef("container");
+  state = useState({ isVisible: false });
+
+  setup() {
+    onMounted(() =&gt; {
+      // IntersectionObserver: load image only when it scrolls into view
+      this._observer = new IntersectionObserver(
+        ([entry]) =&gt; {
+          if (entry.isIntersecting) {
+            this.state.isVisible = true;
+            this._observer.disconnect();  // stop watching after first intersection
+          }
+        },
+        { threshold: 0.1 }
+      );
+      this._observer.observe(this.containerRef.el);
+    });
+
+    onWillUnmount(() =&gt; {
+      // Stop observing — prevents callback firing after component is gone
+      this._observer?.disconnect();
+    });
+  }
+}
+
+class ResizableWidget extends Component {
+  state = useState({ width: 0 });
+
+  setup() {
+    onMounted(() =&gt; {
+      this._resizeObserver = new ResizeObserver(([entry]) =&gt; {
+        this.state.width = entry.contentRect.width;
+      });
+      this._resizeObserver.observe(this.el);
+    });
+
+    onWillUnmount(() =&gt; {
+      this._resizeObserver?.disconnect();
+    });
+  }
+}</code></pre>
+          </div>
+
+          <h3 id="subscriptions">Pub/Sub Subscriptions</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – subscription cleanup pattern</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { Component, xml, useState, onWillStart, onWillUnmount } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
+
+class NotificationBell extends Component {
+  state = useState({ count: 0 });
+
+  setup() {
+    this.bus = useService("bus_service");
+
+    onWillStart(() =&gt; {
+      // Subscribe to the Odoo bus
+      this.bus.subscribe("notification_count", this._onNotification.bind(this));
+    });
+
+    onWillUnmount(() =&gt; {
+      // Unsubscribe to prevent ghost callbacks
+      this.bus.unsubscribe("notification_count", this._onNotification.bind(this));
+      // Better: store the bound ref
+    });
+  }
+
+  _onNotification({ count }) {
+    this.state.count = count;
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="async-after-unmount">The Stale Component Problem</h2>
+          <p>A subtle but important bug: an async operation started while the component was alive completes after the component is unmounted. Setting state on an unmounted component causes errors and wasted work.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – guard against stale component updates</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class SearchPanel extends Component {
+  state = useState({ results: [], isLoading: false });
+  _isMounted = false;
+
+  setup() {
+    onMounted(() =&gt; {
+      this._isMounted = true;
+    });
+
+    onWillUnmount(() =&gt; {
+      this._isMounted = false;
+      // Also cancel pending requests if using AbortController
+      this._abortController?.abort();
+    });
+  }
+
+  async search(query) {
+    this._abortController = new AbortController();
+    this.state.isLoading  = true;
+
+    try {
+      const results = await fetchSearch(query, {
+        signal: this._abortController.signal,  // cancel on unmount
+      });
+
+      if (!this._isMounted) return;  // component gone — do nothing
+      this.state.results   = results;
+      this.state.isLoading = false;
+    } catch (err) {
+      if (err.name === "AbortError") return;  // expected — not an error
+      if (!this._isMounted) return;
+      this.state.isLoading = false;
+    }
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="onerror">onError – Error Boundaries</h2>
+          <p><code>onError</code> makes a component an <strong>error boundary</strong> — it catches errors thrown by any descendant component and lets the parent decide how to recover.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – onError error boundary</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml, useState, onError } from "@odoo/owl";
+
+class ErrorBoundary extends Component {
+  static template = xml`
+    &lt;div&gt;
+      &lt;t t-if="state.hasError"&gt;
+        &lt;div class="error-fallback"&gt;
+          &lt;h3&gt;Something went wrong&lt;/h3&gt;
+          &lt;p t-esc="state.errorMessage"/&gt;
+          &lt;button t-on-click="retry"&gt;Try Again&lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/t&gt;
+      &lt;t t-else=""&gt;
+        &lt;t t-slot="default"/&gt;  &lt;!-- normal children render here --&gt;
+      &lt;/t&gt;
+    &lt;/div&gt;
+  `;
+
+  state = useState({ hasError: false, errorMessage: "" });
+
+  setup() {
+    onError((error) =&gt; {
+      console.error("Caught by ErrorBoundary:", error);
+      this.state.hasError    = true;
+      this.state.errorMessage = error.message || "An unexpected error occurred.";
+    });
+  }
+
+  retry() {
+    this.state.hasError    = false;
+    this.state.errorMessage = "";
+    // Re-mounting the children requires remounting the whole boundary —
+    // change a key prop or use a state-driven re-render
+  }
+}
+
+// Parent — wraps risky components
+class App extends Component {
+  static components = { ErrorBoundary, RiskyWidget };
+
+  static template = xml`
+    &lt;ErrorBoundary&gt;
+      &lt;RiskyWidget/&gt;
+    &lt;/ErrorBoundary&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>onWillUnmount</code> fires synchronously before the component is removed. Use it to destroy everything created in <code>onMounted</code>.</li>
+              <li><strong>Must clean up:</strong> <code>setInterval</code>/<code>setTimeout</code>, <code>window.addEventListener</code>, <code>ResizeObserver</code>/<code>IntersectionObserver</code>/<code>MutationObserver</code>, WebSocket connections, third-party library instances, pub/sub subscriptions.</li>
+              <li>Store bound function references as instance properties so <code>removeEventListener</code> can find the exact same reference.</li>
+              <li>For async operations that outlive the component, use an <code>AbortController</code> to cancel them and an <code>_isMounted</code> flag to guard state updates.</li>
+              <li><code>onError</code> turns a component into an error boundary — it catches errors from all descendant components and can show a fallback UI instead of crashing the whole app.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/owljs/lifecycle/overview.html" class="topic-tag owl-topic-tag">🦉 Lifecycle Overview</a>
+            <a href="/owljs/lifecycle/setup-mounted.html" class="topic-tag owl-topic-tag">🦉 setup &amp; onMounted</a>
+            <a href="/owljs/advanced/hooks.html" class="topic-tag owl-topic-tag">🦉 Custom Hooks</a>
+            <a href="/owljs/advanced/error-handling.html" class="topic-tag owl-topic-tag">🦉 Error Handling</a>
+            <a href="/owljs/advanced/concurrency.html" class="topic-tag owl-topic-tag">🦉 Concurrency Model</a>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Exercise</h3>
+            <p>Build a <code>WebSocketMonitor</code> component to practice all unmount cleanup patterns:</p>
+            <ol>
+              <li>In <code>onMounted</code>, open a WebSocket connection (use <code>new WebSocket("wss://echo.websocket.org")</code> or simulate with a mock). Store the connection on <code>this._ws</code>.</li>
+              <li>On message, push the message text into <code>state.messages</code>. Guard against updates after unmount.</li>
+              <li>In <code>onMounted</code> also start a <code>setInterval</code> that sends a "ping" every 5 seconds.</li>
+              <li>In <code>onWillUnmount</code>: close the WebSocket (<code>this._ws?.close()</code>) and clear the interval.</li>
+              <li>Wrap the component in a parent with a "Connect / Disconnect" toggle that mounts/unmounts <code>WebSocketMonitor</code> via <code>t-if</code>. Open browser DevTools → Network to confirm the WebSocket closes cleanly on unmount.</li>
+            </ol>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does OWL automatically clean up event listeners added with t-on-*? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — event listeners added declaratively with <code>t-on-*</code> in the template are managed by OWL. They are added when the element is rendered and removed when the component unmounts or the element is removed from the template (e.g., via <code>t-if</code>). You only need to manually clean up listeners added with <code>addEventListener</code> in your code — typically in <code>onMounted</code> for <code>window</code> or <code>document</code> listeners.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens if I forget to clean up? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Several problems: (1) <strong>Memory leaks</strong> — the component's closure keeps all referenced objects alive in memory even after unmount. In long-running Odoo sessions where views are opened and closed repeatedly, this adds up. (2) <strong>Ghost callbacks</strong> — a <code>setInterval</code> or <code>WebSocket</code> message handler fires after unmount and tries to mutate <code>useState</code> on a destroyed component, causing warnings or errors. (3) <strong>Duplicate listeners</strong> — if the component re-mounts (toggle with <code>t-if</code>), <code>onMounted</code> adds another listener without removing the previous one.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can onWillUnmount be async? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>OWL does not await <code>onWillUnmount</code>. If you pass an async function, OWL calls it but does not wait for the Promise to resolve before removing the component from the DOM. Cleanup must complete synchronously. For async cleanup (like flushing a pending analytics batch), start the async operation but do not block unmounting on it. The DOM removal happens regardless.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How is onError different from try/catch in onWillStart? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>try/catch</code> in <code>onWillStart</code> catches errors from that specific async hook in that specific component. <code>onError</code> is an error boundary — it catches errors thrown by any descendant component's lifecycle hooks, renders, or unhandled Promises during OWL's rendering. Use <code>try/catch</code> for expected errors in a specific operation. Use <code>onError</code> when you want a parent to act as a safety net for an entire subtree — hiding failure from the user and showing a fallback.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/lifecycle/patch-hooks.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">willPatch &amp; patched</span>
+          </a>
+          <a href="/owljs/templates/conditional.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Conditional Rendering (t-if)</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
