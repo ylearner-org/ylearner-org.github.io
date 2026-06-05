@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Transitions – Smooth State Changes Explained | ylearner</title>
+  <meta name="description" content="Master CSS transitions: transition-property, duration, timing-function, delay, shorthand, which properties are animatable, and performance best practices. Free tutorial.">
+  <meta name="keywords" content="CSS transitions, CSS transition property, CSS ease, CSS timing function, CSS hover transition, CSS transition duration, animatable CSS properties">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/csslessons/effects/transitions.html">
+  <meta property="og:title" content="CSS Transitions – Smooth State Changes | ylearner">
+  <meta property="og:description" content="Complete CSS transitions guide — property, duration, timing-function, delay, and which properties animate smoothly.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/csslessons/effects/transitions.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CSS Transitions Complete Guide | ylearner">
+  <meta name="twitter:description" content="transition-property, duration, timing-function, delay — complete CSS transitions tutorial.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "CSS Transitions",
+    "description": "Complete guide to CSS transitions — transition-property, duration, timing-function, delay, animatable properties, and performance best practices.",
+    "educationalLevel": "Beginner",
+    "keywords": "CSS transitions, transition-property, timing-function, CSS hover effect",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+  <style>
+    .demo-btn {
+      display: inline-block; padding: 10px 24px; background: #1572B6; color: white;
+      border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer;
+      margin: 4px; text-decoration: none;
+    }
+    .t-color   { transition: background-color 0.3s ease; }
+    .t-color:hover { background-color: #e63946; }
+    .t-scale   { transition: transform 0.25s ease; }
+    .t-scale:hover { transform: scale(1.08); }
+    .t-shadow  { transition: box-shadow 0.3s ease; }
+    .t-shadow:hover { box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+    .t-all     { transition: background-color 0.3s ease, transform 0.25s ease, box-shadow 0.3s ease; }
+    .t-all:hover { background-color: #2e7d32; transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+    .demo-row  { display: flex; flex-wrap: wrap; gap: 12px; margin: 1rem 0 1.5rem; align-items: center; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/csslessons/what-is-css.html">CSS</a><span class="separator">›</span>
+          <a href="/csslessons/effects/transitions.html">CSS Effects</a><span class="separator">›</span>
+          <span class="current">CSS Transitions</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">✨ CSS Effects</div>
+          <h1>CSS Transitions – Adding Smooth State Changes</h1>
+          <p class="lesson-intro">Without transitions, CSS state changes are instant — hover a button and the color snaps immediately. With transitions, changes animate smoothly over time, making interfaces feel polished and alive. CSS transitions are the easiest way to add motion to a web page — no JavaScript, no libraries, just a single CSS property. In this lesson you will learn every transition property, how to choose timing functions, which properties are safe to animate for performance, and the most common real-world patterns.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 1 of 4</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="how-transitions-work">How Transitions Work</h2>
+          <p>A transition watches for a CSS property to change (usually triggered by <code>:hover</code>, <code>:focus</code>, a class being added/removed via JavaScript) and animates that change over a specified duration instead of applying it instantly.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Basic transition</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Apply transition on the ELEMENT, not on the :hover state */
+.btn {
+  background-color: #1572B6;
+  transition: background-color 0.3s ease;
+}
+
+/* When this changes, it will animate over 0.3s */
+.btn:hover {
+  background-color: #0d5fa0;
+}</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Hover these buttons to see transitions</div>
+            <div class="demo-row">
+              <button class="demo-btn t-color">Color change</button>
+              <button class="demo-btn t-scale">Scale up</button>
+              <button class="demo-btn t-shadow">Shadow grow</button>
+              <button class="demo-btn t-all">All three</button>
+            </div>
+          </div>
+
+          <h2 id="four-properties">The Four Transition Properties</h2>
+
+          <h3 id="transition-property">transition-property</h3>
+          <p>Which CSS properties to animate. Only changes to listed properties will transition.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">transition-property: all;                    /* all animatable properties */
+transition-property: background-color;       /* only bg color */
+transition-property: transform, opacity;     /* specific list */
+transition-property: none;                   /* disable all transitions */</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Avoid transition: all in production</strong>
+              <p><code>transition: all</code> watches every property for changes and tries to animate them. This can animate properties you don't intend (like <code>width</code> during a layout change) and causes performance issues. Always list specific properties.</p>
+            </div>
+          </div>
+
+          <h3 id="transition-duration">transition-duration</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">transition-duration: 0.3s;    /* 300ms — good for color/opacity */
+transition-duration: 200ms;   /* same as 0.2s */
+transition-duration: 0.5s;    /* slower — for larger movements */
+transition-duration: 0s;      /* instant (override to disable) */
+
+/* Rule of thumb for UI transitions:
+   100–200ms: micro-interactions (hover, focus ring)
+   200–400ms: element appearing/disappearing, size changes
+   400–600ms: page sections sliding in
+   600ms+: usually too slow — feels sluggish */</code></pre>
+          </div>
+
+          <h3 id="timing-function">transition-timing-function</h3>
+          <p>Controls the acceleration curve — how fast the transition moves at each point.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Timing functions</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Named keywords */
+transition-timing-function: ease;         /* slow start, fast middle, slow end (default) */
+transition-timing-function: linear;       /* constant speed — use for spinners */
+transition-timing-function: ease-in;      /* slow start, fast end — things leaving */
+transition-timing-function: ease-out;     /* fast start, slow end — things arriving */
+transition-timing-function: ease-in-out; /* slow start and end — balanced */
+
+/* cubic-bezier() — full control over the curve */
+/* cubic-bezier(x1, y1, x2, y2) — values 0–1 for x, any for y */
+transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);   /* Material Design standard */
+transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); /* spring overshoot */
+
+/* steps() — discrete jumps (sprite animation) */
+transition-timing-function: steps(4, end);   /* 4 equal frames */
+transition-timing-function: step-start;      /* jump immediately */
+transition-timing-function: step-end;        /* jump at end */</code></pre>
+          </div>
+
+          <h3 id="transition-delay">transition-delay</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">transition-delay: 0s;      /* no delay (default) */
+transition-delay: 0.1s;    /* wait 100ms before starting */
+transition-delay: -0.2s;   /* negative: starts 0.2s INTO the transition */
+
+/* Stagger effect on multiple elements */
+.item:nth-child(1) { transition-delay: 0s;    }
+.item:nth-child(2) { transition-delay: 0.05s; }
+.item:nth-child(3) { transition-delay: 0.1s;  }
+.item:nth-child(4) { transition-delay: 0.15s; }</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="shorthand">transition Shorthand</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – shorthand</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* transition: property duration timing-function delay */
+transition: background-color 0.3s ease 0s;
+
+/* Multiple transitions — comma separated */
+.card {
+  transition:
+    background-color 0.3s ease,
+    transform        0.25s ease-out,
+    box-shadow       0.3s ease,
+    opacity          0.2s ease;
+}
+
+/* Common real-world patterns */
+.btn     { transition: background-color 0.2s ease, transform 0.15s ease; }
+.link    { transition: color 0.2s ease; }
+.overlay { transition: opacity 0.3s ease; }
+.drawer  { transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); }</code></pre>
+          </div>
+
+          <h2 id="animatable-properties">Animatable Properties – Performance Matters</h2>
+          <p>Not all CSS properties are equal to animate. The browser's rendering pipeline determines performance:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Animation performance tiers</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* ✅ BEST: Compositor-only — GPU, no layout or paint */
+transition: transform 0.3s ease;    /* translateX, scale, rotate, etc. */
+transition: opacity  0.3s ease;     /* fade in/out */
+
+/* ⚠️ OK: Paint-only — triggers repaint, not reflow */
+transition: color            0.2s ease;
+transition: background-color 0.3s ease;
+transition: border-color     0.2s ease;
+transition: box-shadow       0.3s ease;
+transition: outline          0.15s ease;
+
+/* ❌ AVOID for frequent animation: triggers reflow */
+/* These force the browser to recalculate layout every frame */
+transition: width    0.3s ease;   /* reflow */
+transition: height   0.3s ease;   /* reflow */
+transition: margin   0.3s ease;   /* reflow */
+transition: padding  0.3s ease;   /* reflow */
+transition: top      0.3s ease;   /* reflow — use transform: translateY() instead */
+transition: left     0.3s ease;   /* reflow — use transform: translateX() instead */
+transition: font-size 0.3s ease;  /* reflow */
+
+/* Rule: use transform instead of position/size for movement */
+/* SLOW: */  .modal { left: -100%; } .modal.open { left: 0; }
+/* FAST: */  .modal { transform: translateX(-100%); } .modal.open { transform: translateX(0); }</code></pre>
+          </div>
+
+          <h2 id="real-patterns">Real-World Patterns</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Common transition patterns</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* 1. Button hover */
+.btn {
+  background-color: #1572B6;
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+.btn:hover {
+  background-color: #0d5fa0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.2);
+}
+.btn:active { transform: translateY(0); }
+
+/* 2. Fade in/out */
+.tooltip { opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+.tooltip.visible { opacity: 1; pointer-events: auto; }
+
+/* 3. Slide drawer */
+.drawer {
+  transform: translateX(-100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.drawer.open { transform: translateX(0); }
+
+/* 4. Card lift on hover */
+.card {
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+  transform: translateY(0);
+  transition: box-shadow 0.3s ease, transform 0.25s ease;
+}
+.card:hover {
+  box-shadow: 0 12px 32px rgba(0,0,0,.18);
+  transform: translateY(-4px);
+}
+
+/* 5. Smooth focus ring */
+.input {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color 0.15s ease;
+}
+.input:focus { outline-color: #1572B6; }
+
+/* 6. Expand/collapse height (needs known max-height) */
+.panel { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.panel.open { max-height: 500px; }
+
+/* 7. Accessibility: respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0.01ms !important; }
+}</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Put <code>transition</code> on the element, not the trigger state (<code>:hover</code>).</li>
+              <li><strong>transition: property duration timing delay</strong> — all four parts.</li>
+              <li>Multiple transitions: comma-separate them.</li>
+              <li><strong>Avoid <code>transition: all</code></strong> — list specific properties.</li>
+              <li><strong>Best performers:</strong> <code>transform</code> and <code>opacity</code> — compositor only, 60fps.</li>
+              <li><strong>Good:</strong> <code>color</code>, <code>background-color</code>, <code>box-shadow</code> — repaint only.</li>
+              <li><strong>Avoid for animation:</strong> <code>width</code>, <code>height</code>, <code>top</code>, <code>left</code>, <code>margin</code> — trigger reflow.</li>
+              <li>UI durations: 100–200ms micro, 200–400ms element changes, 400–600ms section transitions.</li>
+              <li>Always add <code>@media (prefers-reduced-motion: reduce)</code> override.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/csslessons/effects/animations.html" class="topic-tag css-topic-tag">🎨 CSS Animations</a>
+            <a href="/csslessons/effects/transforms.html" class="topic-tag css-topic-tag">🎨 CSS Transforms</a>
+            <a href="/csslessons/effects/filters.html" class="topic-tag css-topic-tag">🎨 CSS Filters</a>
+            <a href="/csslessons/layout/position.html" class="topic-tag css-topic-tag">🎨 CSS Position</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why does my transition not work? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Most common causes: (1) <code>transition</code> is on the <code>:hover</code> state instead of the element itself — the transition must be on the base element. (2) The property is not animatable — <code>display</code>, <code>visibility</code>, and <code>content</code> cannot transition. (3) <code>display: none</code> to <code>display: block</code> cannot be transitioned — use <code>opacity</code> + <code>visibility</code> or <code>max-height</code> instead. (4) The starting and ending values are the same. Check all four in DevTools.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I transition display: none? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>display</code> is not animatable — it switches instantly. Use this pattern instead: <code>opacity: 0; visibility: hidden; pointer-events: none;</code> → <code>opacity: 1; visibility: visible; pointer-events: auto;</code> with <code>transition: opacity 0.3s ease, visibility 0.3s ease</code>. The <code>visibility</code> transition keeps the element in layout but invisible, while <code>pointer-events: none</code> prevents clicks. Modern CSS also supports <code>@starting-style</code> for transitioning <em>from</em> <code>display: none</code> in Chrome 116+.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between transitions and animations? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><strong>Transitions</strong> require a trigger — a state change (hover, focus, class toggle). They go from A to B once. <strong>Animations</strong> (<code>@keyframes</code>) run independently — they can loop, run automatically on load, go through multiple steps (A→B→C→D), and play in reverse. Use transitions for interactive state changes (hover effects, UI feedback). Use animations for autonomous motion (loading spinners, entrance effects, looping decorative elements).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does ease-out feel better than ease-in for most UI animations? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Objects in the physical world decelerate as they arrive — they don't slam into their final position. <code>ease-out</code> (fast start, slow end) mimics this natural deceleration, which feels more physical and comfortable. <code>ease-in</code> (slow start, fast end) feels like something flying out of frame — better for elements <em>leaving</em> the screen. For most UI elements entering the viewport or revealing themselves: use <code>ease-out</code>. For elements departing: use <code>ease-in</code>.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/csslessons/responsive/viewport-units.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">CSS Viewport Units</span>
+          </a>
+          <a href="/csslessons/effects/animations.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">CSS Animations</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
