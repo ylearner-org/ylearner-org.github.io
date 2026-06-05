@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile-First CSS Design – Strategy, Patterns & Best Practices | ylearner</title>
+  <meta name="description" content="Learn the mobile-first CSS design strategy: why it matters, how to implement it, viewport meta tag, touch targets, performance, and converting desktop-first to mobile-first.">
+  <meta name="keywords" content="mobile first CSS, mobile first design, responsive design strategy, CSS mobile first, viewport meta tag, touch targets CSS, mobile first vs desktop first">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/csslessons/responsive/mobile-first.html">
+  <meta property="og:title" content="Mobile-First CSS Design – Strategy &amp; Patterns | ylearner">
+  <meta property="og:description" content="The mobile-first approach explained — why it works, how to implement it, and patterns for building responsive sites that start small.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/csslessons/responsive/mobile-first.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Mobile-First CSS Design | ylearner">
+  <meta name="twitter:description" content="Strategy, viewport meta, touch targets, and patterns for building mobile-first responsive websites.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Mobile-First CSS Design",
+    "description": "Complete guide to mobile-first CSS design — strategy, viewport meta tag, touch targets, performance benefits, and converting desktop-first code.",
+    "educationalLevel": "Beginner",
+    "keywords": "mobile first CSS, mobile first design, responsive CSS strategy, viewport meta tag",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/csslessons/what-is-css.html">CSS</a><span class="separator">›</span>
+          <a href="/csslessons/responsive/media-queries.html">Responsive Design</a><span class="separator">›</span>
+          <span class="current">Mobile-First Design</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">📱 Responsive Design</div>
+          <h1>Mobile-First CSS Design – Building for the Smallest Screen First</h1>
+          <p class="lesson-intro">Mobile-first is not just a technique — it is a design philosophy. It says: start with the most constrained environment (a small screen, a slow connection, a touch interface) and progressively enhance the experience for larger screens and faster connections. This approach produces leaner CSS, better performance on mobile, and forces better content prioritization. In this lesson you will learn the complete mobile-first methodology and how to apply it in every project.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 3 of 4</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="viewport-meta">Step 1: The Viewport Meta Tag</h2>
+          <p>Without this tag, mobile browsers render pages at desktop width and then scale them down — making text tiny. This is the first thing in every responsive project:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML – viewport meta tag</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+
+&lt;!-- Breakdown:
+  width=device-width       — viewport width = actual device screen width
+  initial-scale=1.0        — no zoom on load
+
+  Avoid adding these (they disable accessibility):
+  user-scalable=no         — prevents pinch-to-zoom (BAD for accessibility)
+  maximum-scale=1          — same problem — never use this
+--&gt;</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Never disable user scaling</strong>
+              <p><code>user-scalable=no</code> and <code>maximum-scale=1</code> prevent users from pinching to zoom. This is an accessibility violation — many users with low vision rely on zoom to read content. WCAG 1.4.4 requires that text can be resized up to 200% without loss of content or functionality. Google also penalizes sites that disable zoom in mobile search ranking.</p>
+            </div>
+          </div>
+
+          <h2 id="the-approach">Mobile-First in CSS: Base + Enhancement</h2>
+          <p>Write CSS in two layers:</p>
+          <ol>
+            <li><strong>Base styles</strong> — work for all screens, optimized for mobile</li>
+            <li><strong>Enhanced styles</strong> — progressively added via <code>min-width</code> media queries for larger screens</li>
+          </ol>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Mobile-first structure</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* ====== BASE: mobile (no media query) ====== */
+
+.nav {
+  display: flex;
+  flex-direction: column;  /* stack vertically on mobile */
+  gap: 8px;
+}
+
+.hero { padding: 48px 16px; }
+.hero h1 { font-size: 2rem; }
+
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr;  /* single column on mobile */
+  gap: 16px;
+}
+
+.sidebar { display: none; }  /* hidden on mobile */
+
+/* ====== TABLET: 768px and up ====== */
+
+@media (min-width: 768px) {
+  .nav {
+    flex-direction: row;   /* horizontal nav on tablet */
+    gap: 24px;
+  }
+
+  .hero { padding: 80px 32px; }
+  .hero h1 { font-size: 3rem; }
+
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);  /* 2 columns */
+  }
+}
+
+/* ====== DESKTOP: 1024px and up ====== */
+
+@media (min-width: 1024px) {
+  .sidebar { display: block; }   /* show sidebar */
+
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);  /* 3 columns */
+  }
+}
+
+/* ====== LARGE: 1280px and up ====== */
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="touch-targets">Touch Targets – Designing for Fingers</h2>
+          <p>Mouse pointers are precise. Fingers are not. Any clickable element on mobile must be large enough to tap reliably:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Touch target sizing</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Google recommends: minimum 48×48px touch targets */
+/* Apple HIG: minimum 44×44pt */
+/* WCAG 2.5.5 (AAA): minimum 44×44px */
+
+/* Apply to all interactive elements */
+a, button, input, select, textarea, [role="button"] {
+  min-height: 44px;
+}
+
+/* Nav links — add padding so the tap area is large even if text is small */
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 16px;  /* creates 44px+ height with normal font */
+  text-decoration: none;
+}
+
+/* Icons with small visual size but large tap area */
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Space between touch targets */
+.nav-links {
+  display: flex;
+  gap: 4px;   /* minimum gap between tappable elements */
+}
+
+/* On desktop, targets can be smaller */
+@media (min-width: 1024px) and (hover: hover) {
+  .nav-link { padding: 8px 12px; }
+}</code></pre>
+          </div>
+
+          <h2 id="typography">Mobile Typography</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Responsive typography</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Base (mobile) font sizes */
+:root {
+  font-size: 16px;  /* never go below this on mobile */
+}
+
+body {
+  font-size: 1rem;      /* 16px */
+  line-height: 1.6;
+}
+
+h1 { font-size: clamp(1.8rem, 6vw, 3rem); }   /* fluid: 28.8px → 48px */
+h2 { font-size: clamp(1.4rem, 4vw, 2rem); }   /* fluid: 22.4px → 32px */
+h3 { font-size: clamp(1.1rem, 3vw, 1.5rem); } /* fluid: 17.6px → 24px */
+
+/* clamp(min, preferred, max) scales with viewport without media queries */
+
+/* Explicit steps for headings */
+h1 { font-size: 2rem; }        /* mobile */
+@media (min-width: 768px)  { h1 { font-size: 2.5rem; } }
+@media (min-width: 1024px) { h1 { font-size: 3rem; } }</code></pre>
+          </div>
+
+          <h2 id="mobile-patterns">Common Mobile-First Patterns</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Mobile-first patterns</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* 1. Hamburger nav: hidden on desktop, toggle on mobile */
+.mobile-nav { display: none; }
+.mobile-nav.open { display: block; }
+@media (min-width: 768px) {
+  .mobile-nav { display: none !important; }  /* always hide on desktop */
+  .desktop-nav { display: flex; }
+}
+
+/* 2. Full-width buttons on mobile, auto-width on desktop */
+.btn { display: block; width: 100%; }
+@media (min-width: 768px) {
+  .btn { display: inline-block; width: auto; }
+}
+
+/* 3. Stacked form fields on mobile, side-by-side on desktop */
+.form-row { display: flex; flex-direction: column; gap: 12px; }
+@media (min-width: 768px) {
+  .form-row { flex-direction: row; }
+  .form-row .field { flex: 1; }
+}
+
+/* 4. Full-screen modal on mobile, dialog on desktop */
+.modal {
+  position: fixed;
+  inset: 0;              /* full screen on mobile */
+  border-radius: 0;
+}
+@media (min-width: 768px) {
+  .modal {
+    inset: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 560px;
+    max-height: 80vh;
+    border-radius: 12px;
+  }
+}
+
+/* 5. Scroll instead of paginate on mobile */
+.tabs {
+  display: flex;
+  overflow-x: auto;      /* horizontal scroll on mobile */
+  -webkit-overflow-scrolling: touch;
+  gap: 8px;
+  scrollbar-width: none; /* hide scrollbar visually */
+}
+@media (min-width: 768px) {
+  .tabs { overflow-x: visible; }
+}</code></pre>
+          </div>
+
+          <h2 id="performance">Performance – Mobile-First Wins</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Performance practices</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Load heavy styles only when needed */
+/* Inline critical CSS in &lt;style&gt; for fastest first paint */
+/* Defer non-critical CSS */
+
+/* Animations — disable on slow connections or user preference */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* Use transform/opacity for animations (GPU, no reflow) */
+.slide-in {
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+.slide-in.open { transform: translateX(0); }
+
+/* Avoid expensive properties on mobile (scroll performance) */
+.sticky-el {
+  position: sticky;
+  top: 0;
+  will-change: transform;  /* promote to own compositor layer */
+}
+
+/* Critical rendering path: only load fonts needed */
+&lt;link rel="preload" as="font" href="font.woff2" crossorigin&gt;</code></pre>
+          </div>
+
+          <h2 id="convert-desktop-to-mobile">Converting Desktop-First to Mobile-First</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Conversion pattern</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* BEFORE: desktop-first */
+.grid { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 1023px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 767px)  { .grid { grid-template-columns: 1fr; } }
+
+/* AFTER: mobile-first (same result, less override) */
+.grid { grid-template-columns: 1fr; }
+@media (min-width: 768px)  { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+
+/* Strategy for conversion:
+   1. Identify the mobile layout (usually the simplest)
+   2. Make that the base (no media query)
+   3. Replace max-width queries with min-width queries
+   4. Build up from simple to complex */</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Viewport meta:</strong> <code>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</code> — required on every page. Never disable user-scalable.</li>
+              <li><strong>Mobile-first:</strong> base styles for mobile, <code>min-width</code> media queries for larger screens.</li>
+              <li><strong>Touch targets:</strong> minimum 44×44px for all interactive elements.</li>
+              <li><strong>Typography:</strong> minimum 16px body text. Use <code>clamp()</code> for fluid headings.</li>
+              <li><strong>Full-width buttons, stacked forms</strong> on mobile. Auto-width, horizontal on desktop.</li>
+              <li><strong>Performance:</strong> respect <code>prefers-reduced-motion</code>. Use <code>transform</code> for animations.</li>
+              <li><strong>Conversion:</strong> take the simplest state (mobile) as base, build up with <code>min-width</code>.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/csslessons/responsive/media-queries.html" class="topic-tag css-topic-tag">🎨 Media Queries</a>
+            <a href="/csslessons/responsive/responsive-images.html" class="topic-tag css-topic-tag">🎨 Responsive Images</a>
+            <a href="/csslessons/responsive/viewport-units.html" class="topic-tag css-topic-tag">🎨 Viewport Units</a>
+            <a href="/csslessons/layout/flexbox.html" class="topic-tag css-topic-tag">🎨 CSS Flexbox</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Is mobile-first always better than desktop-first? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For most projects: yes. Mobile-first produces smaller CSS payloads for mobile devices, forces better content prioritization, and produces cleaner code with fewer overrides. The exception: if you're building a tool primarily used on desktops (a complex data dashboard, a code editor, an admin panel), desktop-first may be more natural for the design process. For public-facing websites with mixed audiences, always start mobile-first.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why is the minimum touch target 44px? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Apple's Human Interface Guidelines originally defined 44pt as the minimum based on research into average fingertip width and tap accuracy. Google's Material Design uses 48dp. WCAG 2.5.5 specifies 44×44 CSS pixels. Elements smaller than this have high miss rates — users tap adjacent elements accidentally. The 44px rule significantly reduces user frustration on touch interfaces, especially for users with motor impairments.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between mobile-first CSS and responsive design? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><strong>Responsive design</strong> is the broad goal — making a layout adapt to different screen sizes. <strong>Mobile-first</strong> is one approach to achieving it — write mobile styles as the base, then enhance for larger screens. The alternative is desktop-first (write desktop styles, override for mobile). Responsive design can be achieved with either approach; mobile-first just tends to produce better results and is the industry standard.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/csslessons/responsive/responsive-images.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Responsive Images</span>
+          </a>
+          <a href="/csslessons/responsive/viewport-units.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Viewport Units</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

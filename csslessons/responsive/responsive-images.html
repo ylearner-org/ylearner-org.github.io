@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Images in CSS – srcset, picture, object-fit | ylearner</title>
+  <meta name="description" content="Master responsive images: CSS object-fit, object-position, srcset, sizes, the picture element, aspect-ratio, lazy loading, and modern image formats for the web.">
+  <meta name="keywords" content="responsive images CSS, CSS object-fit, srcset, picture element, CSS aspect-ratio, lazy loading images, WebP images, responsive web design images">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/csslessons/responsive/responsive-images.html">
+  <meta property="og:title" content="Responsive Images in CSS – Complete Guide | ylearner">
+  <meta property="og:description" content="object-fit, srcset, picture, aspect-ratio, lazy loading — the complete responsive images guide for CSS developers.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/csslessons/responsive/responsive-images.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Responsive Images Complete Guide | ylearner">
+  <meta name="twitter:description" content="object-fit, srcset, picture, aspect-ratio — making images work on every screen size.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Responsive Images in CSS",
+    "description": "Complete guide to responsive images — CSS object-fit, object-position, srcset, sizes, picture element, aspect-ratio, lazy loading, and modern image formats.",
+    "educationalLevel": "Beginner",
+    "keywords": "responsive images, CSS object-fit, srcset, picture element, CSS aspect-ratio",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/csslessons/what-is-css.html">CSS</a><span class="separator">›</span>
+          <a href="/csslessons/responsive/media-queries.html">Responsive Design</a><span class="separator">›</span>
+          <span class="current">Responsive Images</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">📱 Responsive Design</div>
+          <h1>Responsive Images – CSS and HTML Techniques</h1>
+          <p class="lesson-intro">Images are the biggest performance bottleneck on most websites. Serving a 2000px image to a 375px phone screen wastes bandwidth and slows down the page. Responsive images solve this — serving the right image size to the right device, maintaining correct proportions, and loading only when needed. This lesson covers both the CSS properties (<code>object-fit</code>, <code>aspect-ratio</code>) and the HTML attributes (<code>srcset</code>, <code>sizes</code>, <code>picture</code>) that make images truly responsive.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 2 of 4</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="fluid-images">The Fluid Image Baseline</h2>
+          <p>The single most important CSS rule for responsive images — include it in every project:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Fluid image reset</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">img, video, canvas, svg {
+  max-width: 100%;  /* never wider than container */
+  height: auto;     /* maintain aspect ratio */
+  display: block;   /* remove inline gap below image */
+}</code></pre>
+          </div>
+          <p><code>max-width: 100%</code> lets images shrink below their natural size but never grow beyond it. <code>height: auto</code> maintains the original aspect ratio as width changes.</p>
+
+          <h2 id="object-fit">object-fit – Controlling Image Display in a Box</h2>
+          <p><code>object-fit</code> controls how a replaced element (<code>&lt;img&gt;</code>, <code>&lt;video&gt;</code>) fills its container — the same way <code>background-size</code> works for background images.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – object-fit</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* fill — stretches to fill (default, may distort) */
+img { object-fit: fill; }
+
+/* cover — fills while maintaining ratio, may crop */
+img { object-fit: cover; }
+
+/* contain — fits entirely inside, may have empty space */
+img { object-fit: contain; }
+
+/* none — original size, clipped if overflows */
+img { object-fit: none; }
+
+/* scale-down — whichever of none/contain is smaller */
+img { object-fit: scale-down; }
+
+/* Most common pattern: fixed-size image thumbnail */
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;    /* crop to circle, no distortion */
+}
+
+/* Card image with fixed height */
+.card-image {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;    /* always fills the height, crops sides */
+}</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ object-fit: cover on a fixed-size container</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+              <div style="width:120px;height:80px;background:linear-gradient(135deg,#1572B6,#FFD43B);border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:white;font-weight:700;">cover: fills box</div>
+              <div style="width:120px;height:80px;border:2px dashed #ccc;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--text-muted);">contain: fits inside</div>
+            </div>
+          </div>
+
+          <h2 id="object-position">object-position – Focal Point Control</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – object-position</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Default: center center */
+img { object-fit: cover; object-position: center; }
+
+/* Position the image within its box */
+img { object-position: top; }           /* show top of image */
+img { object-position: bottom right; }  /* show bottom-right of image */
+img { object-position: 20% 30%; }       /* 20% from left, 30% from top */
+
+/* Person portrait — keep face visible when cropping */
+.person-photo {
+  object-fit: cover;
+  object-position: top center;  /* prioritize the face at the top */
+}</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="aspect-ratio">aspect-ratio – Prevent Layout Shift</h2>
+          <p>Setting a fixed aspect ratio reserves space for an image before it loads — preventing Cumulative Layout Shift (CLS), a Core Web Vital metric.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – aspect-ratio</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* aspect-ratio: width / height */
+.hero-image { aspect-ratio: 16 / 9; }
+.thumbnail  { aspect-ratio: 4 / 3; }
+.avatar     { aspect-ratio: 1 / 1; }   /* square */
+.banner     { aspect-ratio: 3 / 1; }   /* wide banner */
+
+/* Combined with object-fit for responsive images */
+.card-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+/* Reserve space before image loads (prevents CLS) */
+img {
+  width: 100%;
+  aspect-ratio: attr(width) / attr(height);  /* uses HTML width/height attrs */
+}</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always set width and height on &lt;img&gt; tags</strong>
+              <p>Add <code>width</code> and <code>height</code> attributes to every <code>&lt;img&gt;</code> tag matching the image's natural dimensions. The browser uses these to reserve the correct space before the image loads, eliminating layout shift. With <code>height: auto</code> in CSS, the image still scales responsively — the attributes are just hints for the browser.</p>
+            </div>
+          </div>
+
+          <h2 id="srcset">srcset – Serving Different Resolutions</h2>
+          <p>The HTML <code>srcset</code> attribute lets you provide multiple image files for different screen sizes or resolutions. The browser picks the most appropriate one.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML – srcset for resolution switching</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- Width descriptors — browser chooses based on display width and DPR --&gt;
+&lt;img
+  src="hero-800.jpg"
+  srcset="
+    hero-400.jpg  400w,
+    hero-800.jpg  800w,
+    hero-1200.jpg 1200w,
+    hero-1600.jpg 1600w
+  "
+  sizes="
+    (max-width: 600px) 100vw,
+    (max-width: 1200px) 80vw,
+    1200px
+  "
+  alt="Hero image"
+  width="1200"
+  height="675"
+  loading="lazy"
+&gt;
+
+&lt;!-- DPR (device pixel ratio) descriptors — for retina screens --&gt;
+&lt;img
+  src="logo.png"
+  srcset="logo.png 1x, logo@2x.png 2x, logo@3x.png 3x"
+  alt="ylearner"
+  width="160"
+  height="40"
+&gt;</code></pre>
+          </div>
+
+          <h2 id="picture">The &lt;picture&gt; Element – Art Direction</h2>
+          <p>Use <code>&lt;picture&gt;</code> when you want to show a different image crop or composition at different screen sizes — not just different resolutions of the same image.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML – picture element</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;picture&gt;
+  &lt;!-- WebP for modern browsers (smaller file size) --&gt;
+  &lt;source
+    type="image/webp"
+    srcset="hero-mobile.webp 400w, hero-desktop.webp 1200w"
+    sizes="(max-width: 768px) 100vw, 1200px"
+  &gt;
+
+  &lt;!-- JPEG fallback --&gt;
+  &lt;source
+    type="image/jpeg"
+    srcset="hero-mobile.jpg 400w, hero-desktop.jpg 1200w"
+    sizes="(max-width: 768px) 100vw, 1200px"
+  &gt;
+
+  &lt;!-- Fallback img (always required) --&gt;
+  &lt;img src="hero-desktop.jpg" alt="Hero" width="1200" height="600" loading="lazy"&gt;
+&lt;/picture&gt;
+
+&lt;!-- Art direction: different crop on mobile --&gt;
+&lt;picture&gt;
+  &lt;source media="(max-width: 767px)" srcset="team-portrait.jpg"&gt;
+  &lt;source media="(min-width: 768px)" srcset="team-landscape.jpg"&gt;
+  &lt;img src="team-landscape.jpg" alt="The team" width="1200" height="630"&gt;
+&lt;/picture&gt;</code></pre>
+          </div>
+
+          <h2 id="lazy-loading">Lazy Loading</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML – Lazy loading</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;!-- Native lazy loading — supported in all modern browsers --&gt;
+&lt;img src="image.jpg" alt="..." loading="lazy"&gt;
+
+&lt;!-- eager — load immediately (use for above-the-fold images) --&gt;
+&lt;img src="hero.jpg" alt="..." loading="eager"&gt;
+
+&lt;!-- fetchpriority — hint for above-fold images (LCP) --&gt;
+&lt;img src="hero.jpg" alt="..." fetchpriority="high" loading="eager"&gt;</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Never lazy-load the LCP image</strong>
+              <p>The Largest Contentful Paint (LCP) image — usually the hero or first visible image — should have <code>loading="eager"</code> and <code>fetchpriority="high"</code>. Lazy-loading it delays the page's most important visual element and hurts your Core Web Vitals score. Only use <code>loading="lazy"</code> on images below the fold.</p>
+            </div>
+          </div>
+
+          <h2 id="modern-formats">Modern Image Formats</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Format comparison</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-text">FORMAT     COMPRESSION  TRANSPARENCY  ANIMATION  BROWSER SUPPORT
+JPEG       Lossy        No            No         Universal
+PNG        Lossless     Yes           No         Universal
+GIF        Lossless     1-bit         Yes        Universal (avoid — use WebP/AVIF)
+WebP       Lossy/Loss.  Yes           Yes        All modern browsers (2020+)
+AVIF       Lossy/Loss.  Yes           Yes        Chrome/Firefox/Safari (2022+)
+SVG        Vector       Yes           Yes        Universal
+
+RECOMMENDATION:
+- Photos:     WebP (primary) + JPEG (fallback via &lt;picture&gt;)
+- Icons/UI:   SVG (scalable, tiny file size)
+- Screenshots: WebP or PNG
+- Animations: WebP or CSS animations (not GIF)
+- Cutting edge: AVIF (50% smaller than WebP for photos)</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Fluid baseline:</strong> <code>img { max-width: 100%; height: auto; display: block; }</code></li>
+              <li><strong>object-fit: cover</strong> — fills fixed-size container without distortion, crops if needed.</li>
+              <li><strong>object-position</strong> — controls crop focal point (default: center).</li>
+              <li><strong>aspect-ratio</strong> — reserves space before image loads, prevents layout shift.</li>
+              <li><strong>srcset + sizes</strong> — serve different resolutions; browser picks the best one.</li>
+              <li><strong>&lt;picture&gt;</strong> — serve different crops (art direction) or different formats (WebP/JPEG).</li>
+              <li><strong>loading="lazy"</strong> — defer off-screen images. Use <code>eager</code> for above-fold.</li>
+              <li><strong>fetchpriority="high"</strong> — prioritize the LCP image.</li>
+              <li><strong>WebP</strong> — use as primary format for photos. Smaller than JPEG, transparent like PNG.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/csslessons/responsive/media-queries.html" class="topic-tag css-topic-tag">🎨 Media Queries</a>
+            <a href="/csslessons/responsive/mobile-first.html" class="topic-tag css-topic-tag">🎨 Mobile-First Design</a>
+            <a href="/csslessons/selectors/backgrounds.html" class="topic-tag css-topic-tag">🎨 CSS Backgrounds</a>
+            <a href="/csslessons/responsive/viewport-units.html" class="topic-tag css-topic-tag">🎨 Viewport Units</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between object-fit and background-size? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>They work the same way but apply to different things. <code>object-fit</code> applies to replaced elements — <code>&lt;img&gt;</code>, <code>&lt;video&gt;</code>, <code>&lt;canvas&gt;</code> — controlling how the element's content fills its box. <code>background-size</code> applies to CSS background images. Both support the same values: <code>cover</code>, <code>contain</code>, explicit sizes. Use <code>&lt;img&gt;</code> with <code>object-fit</code> for content images (accessible, indexable by search engines, can be lazy-loaded). Use background-image for purely decorative images.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I use srcset or the picture element? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <strong>srcset + sizes</strong> (on a regular <code>&lt;img&gt;</code>) when you have the same image at different resolutions — the browser picks the best size for the screen. Use <strong>&lt;picture&gt;</strong> when: (1) you want to serve different image formats (WebP with JPEG fallback), or (2) you want art direction — a different crop or composition at different screen sizes. In practice, most images need srcset for resolution switching and picture for format selection.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I prevent layout shift from images? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Three things: (1) Always set <code>width</code> and <code>height</code> attributes on <code>&lt;img&gt;</code> tags matching the image's natural dimensions. (2) Add <code>height: auto</code> in your CSS reset so the image still scales responsively. (3) Optionally add <code>aspect-ratio</code> in CSS as a backup. The browser uses the HTML dimensions to reserve the correct space in the layout before the image loads, eliminating the reflow that causes CLS.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/csslessons/responsive/media-queries.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Media Queries</span>
+          </a>
+          <a href="/csslessons/responsive/mobile-first.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Mobile-First Design</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
