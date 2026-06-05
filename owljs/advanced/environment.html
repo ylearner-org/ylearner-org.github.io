@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS Environment & Services – useEnv, useService | ylearner</title>
+  <meta name="description" content="Master OWL JS environment and services: useEnv() for global data, useService() for Odoo services, common Odoo services (orm, notification, action, user, router), and providing custom services.">
+  <meta name="keywords" content="OWL JS useEnv, OWL useService, OWL JS environment, Odoo OWL services, OWL orm service, OWL notification service, OWL action service, Odoo Web Library environment, OWL JS tutorial services">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/owljs/advanced/environment.html">
+  <meta property="og:title" content="OWL JS Environment &amp; Services – useEnv, useService | ylearner">
+  <meta property="og:description" content="useEnv() for global data access, useService() for Odoo services — complete OWL JS environment and service injection tutorial.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/owljs/advanced/environment.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS useEnv and useService Guide | ylearner">
+  <meta name="twitter:description" content="useEnv, useService, Odoo services (orm, notification, action) — complete OWL JS environment tutorial.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS Environment and Services",
+    "description": "Complete guide to OWL JS environment and service injection: useEnv() for global data, useService() for Odoo services, common Odoo services reference, and providing custom services.",
+    "educationalLevel": "Intermediate",
+    "keywords": "OWL JS useEnv, useService, Odoo services, orm, notification, action, environment, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/advanced/sub-components.html">Advanced OWL</a><span class="separator">›</span>
+          <span class="current">Environment &amp; Services</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Advanced OWL</div>
+          <h1>OWL JS Environment &amp; Services – useEnv and useService</h1>
+          <p class="lesson-intro">When data or functionality needs to be available to many components at different depths of the component tree, prop drilling becomes unmanageable. OWL solves this with the <strong>environment</strong> — an object shared by all components in an application that any component can access via <code>useEnv()</code>. In Odoo, the environment hosts the <strong>services</strong> system: a registry of cross-cutting capabilities (ORM, notifications, navigation, user info) injected into any component with <code>useService()</code>. This lesson covers both the raw OWL environment and the Odoo services layer.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 4 of 6</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="useenv">useEnv() — The Shared Environment</h2>
+          <p>Every OWL component has access to a shared <code>env</code> object. <code>useEnv()</code> returns it. In a standalone app you populate it when calling <code>mount()</code>; in Odoo it is already populated by the framework.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – standalone app: providing env</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { mount } from "@odoo/owl";
+import App from "./App";
+
+// Pass env via mount options — available to ALL descendants
+mount(App, document.getElementById("app"), {
+  env: {
+    // Any data or functions you want globally available
+    config: {
+      apiBase:  "https://api.example.com",
+      theme:    "light",
+      locale:   "en-US",
+    },
+    formatDate(date) {
+      return new Intl.DateTimeFormat("en-US").format(date);
+    },
+  },
+});</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – reading env in any component</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml, useEnv } from "@odoo/owl";
+
+class InvoiceDate extends Component {
+  static template = xml`
+    &lt;span t-esc="formatted"/&gt;
+  `;
+
+  setup() {
+    // Access the shared environment — works at ANY depth in the tree
+    this.env = useEnv();
+  }
+
+  get formatted() {
+    // Use the shared formatDate function from env
+    return this.env.formatDate(this.props.date);
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="useservice">useService() in Odoo</h2>
+          <p>Odoo extends the OWL environment with a <strong>services registry</strong>. <code>useService("serviceName")</code> is a custom hook that reads the named service from <code>env.services</code>. Services are singletons — one instance per application.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – useService usage</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { Component, xml, useState, onWillStart } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
+
+class SaleOrderList extends Component {
+  static template = xml`
+    &lt;div&gt;
+      &lt;t t-if="state.isLoading"&gt;&lt;span&gt;Loading…&lt;/span&gt;&lt;/t&gt;
+      &lt;table t-else=""&gt;
+        &lt;tr t-foreach="state.orders" t-as="order" t-key="order.id"&gt;
+          &lt;td t-esc="order.name"/&gt;
+          &lt;td t-esc="order.partner_id[1]"/&gt;
+          &lt;td t-esc="order.amount_total"/&gt;
+          &lt;td&gt;
+            &lt;button t-on-click="() =&gt; openOrder(order.id)"&gt;Open&lt;/button&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+  `;
+
+  state = useState({ orders: [], isLoading: true });
+
+  setup() {
+    // Inject services — call in setup() only
+    this.orm          = useService("orm");
+    this.action       = useService("action");
+    this.notification = useService("notification");
+    this.user         = useService("user");
+
+    onWillStart(() =&gt; this.loadOrders());
+  }
+
+  async loadOrders() {
+    try {
+      this.state.orders = await this.orm.searchRead(
+        "sale.order",
+        [["user_id", "=", this.user.userId]],
+        ["name", "partner_id", "amount_total", "state"],
+        { limit: 50, order: "date_order desc" }
+      );
+    } catch {
+      this.notification.add("Failed to load orders", { type: "danger" });
+    } finally {
+      this.state.isLoading = false;
+    }
+  }
+
+  openOrder(id) {
+    this.action.doAction({
+      type:     "ir.actions.act_window",
+      res_model: "sale.order",
+      res_id:   id,
+      views:    [[false, "form"]],
+    });
+  }
+}</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="odoo-services-reference">Odoo Services Reference</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Service name</th><th>Import</th><th>Key methods / properties</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>"orm"</code></td><td><code>useService("orm")</code></td><td><code>read(model, ids, fields)</code>, <code>searchRead(model, domain, fields)</code>, <code>write(model, ids, vals)</code>, <code>create(model, vals)</code>, <code>unlink(model, ids)</code>, <code>call(model, method, args)</code></td></tr>
+                <tr><td><code>"notification"</code></td><td><code>useService("notification")</code></td><td><code>add(message, { type, sticky, buttons })</code> — type: <code>"info"</code>, <code>"success"</code>, <code>"warning"</code>, <code>"danger"</code></td></tr>
+                <tr><td><code>"action"</code></td><td><code>useService("action")</code></td><td><code>doAction(action)</code>, <code>doAction(xmlid)</code>, <code>switchView(type)</code></td></tr>
+                <tr><td><code>"user"</code></td><td><code>useService("user")</code></td><td><code>userId</code>, <code>name</code>, <code>lang</code>, <code>tz</code>, <code>isAdmin</code>, <code>hasGroup(xmlid)</code></td></tr>
+                <tr><td><code>"router"</code></td><td><code>useService("router")</code></td><td><code>navigate(href)</code>, <code>current.hash</code>, <code>pushState(state)</code></td></tr>
+                <tr><td><code>"dialog"</code></td><td><code>useService("dialog")</code></td><td><code>add(DialogComponent, props)</code> — open dialogs programmatically</td></tr>
+                <tr><td><code>"company"</code></td><td><code>useService("company")</code></td><td><code>currentCompany</code>, <code>allowedCompanies</code>, currency info</td></tr>
+                <tr><td><code>"rpc"</code></td><td><code>useService("rpc")</code></td><td>Low-level RPC calls (prefer <code>orm</code> service when possible)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="env-vs-props">env vs Props — When to Use Each</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Use props when</th><th>Use env/services when</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Data is specific to one component or its subtree</td><td>Data/capability needed by many components at any depth</td></tr>
+                <tr><td>Parent explicitly controls what child receives</td><td>Global cross-cutting concerns (auth, theming, i18n, ORM)</td></tr>
+                <tr><td>The relationship is direct parent → child</td><td>3+ levels of depth (prop drilling becomes unmanageable)</td></tr>
+                <tr><td>You want type-safe, documented component interface</td><td>Singletons that must not be duplicated</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>useEnv()</code> returns the shared environment object available to all components — the OWL equivalent of React Context.</li>
+              <li>In standalone apps, provide the env via the <code>env</code> option of <code>mount()</code>.</li>
+              <li>In Odoo, use <code>useService("name")</code> (from <code>@web/core/utils/hooks</code>) to inject framework services.</li>
+              <li>Key Odoo services: <code>orm</code> (database), <code>notification</code> (toasts), <code>action</code> (navigation), <code>user</code> (current user), <code>dialog</code> (programmatic dialogs).</li>
+              <li>Services are singletons — one instance per app — injected wherever needed without prop drilling.</li>
+              <li>Always call <code>useService()</code> in <code>setup()</code> — not in methods or async callbacks.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/owljs/advanced/hooks.html" class="topic-tag owl-topic-tag">🦉 Custom Hooks</a>
+            <a href="/owljs/odoo/owl-in-odoo.html" class="topic-tag owl-topic-tag">🦉 OWL in Odoo</a>
+            <a href="/owljs/odoo/services.html" class="topic-tag owl-topic-tag">🦉 Odoo Services</a>
+            <a href="/owljs/odoo/rpc-calls.html" class="topic-tag owl-topic-tag">🦉 RPC – Calling Python</a>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Exercise</h3>
+            <p>Build a <code>CurrentUserBadge</code> Odoo component using services:</p>
+            <ol>
+              <li>Use <code>useService("user")</code> to get the current user's name, language, and timezone.</li>
+              <li>Display the name with a greeting based on time of day (Morning/Afternoon/Evening) — compute it from <code>new Date().getHours()</code>.</li>
+              <li>Add a "Logout" button that calls <code>window.location.href = "/web/session/logout"</code>.</li>
+              <li>Add an "Admin Panel" button visible only when <code>user.isAdmin</code> is true. Clicking it calls <code>action.doAction("base_setup.action_general_configuration")</code>.</li>
+              <li>Show a notification using <code>useService("notification")</code> when the component mounts: "Welcome back, [name]!".</li>
+            </ol>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I modify the env after mount? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The <code>env</code> object itself is frozen in OWL (you cannot add or delete top-level keys after mount). However, if your env contains reactive objects (created with <code>reactive()</code> from OWL), mutations on those objects will cause components that read them to re-render. For Odoo, env mutation is managed by the framework — you do not modify it directly.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use useService outside of Odoo? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>useService</code> is an Odoo-specific utility in <code>@web/core/utils/hooks</code>. It reads from <code>env.services</code> which Odoo populates. In a standalone OWL app (without Odoo), use <code>useEnv()</code> directly and read whatever you put in the env. You can implement your own service-like pattern by putting service objects into the env at <code>mount()</code> time.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/advanced/hooks.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Custom Hooks</span>
+          </a>
+          <a href="/owljs/advanced/error-handling.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Error Handling</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

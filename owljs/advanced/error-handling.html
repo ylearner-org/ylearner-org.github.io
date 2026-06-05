@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS Error Handling – Error Boundaries and Async Errors | ylearner</title>
+  <meta name="description" content="Complete guide to OWL JS error handling: onError for error boundaries, try/catch in lifecycle hooks, async error patterns, stale component prevention, error recovery, and production error logging strategies.">
+  <meta name="keywords" content="OWL JS error handling, OWL error boundary, OWL onError hook, OWL async error, OWL try catch lifecycle, Odoo Web Library error handling, OWL JS error recovery tutorial">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/owljs/advanced/error-handling.html">
+  <meta property="og:title" content="OWL JS Error Handling – Boundaries and Async Errors | ylearner">
+  <meta property="og:description" content="onError boundaries, try/catch in hooks, async error patterns, and error recovery — complete OWL JS error handling tutorial.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/owljs/advanced/error-handling.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS Error Handling Complete Guide | ylearner">
+  <meta name="twitter:description" content="Error boundaries with onError, async errors, error recovery patterns — OWL JS error handling tutorial.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS Error Handling",
+    "description": "Complete guide to OWL JS error handling: onError error boundaries, try/catch in lifecycle hooks, async error patterns, error recovery, and production error logging.",
+    "educationalLevel": "Intermediate",
+    "keywords": "OWL JS error handling, error boundary, onError, async errors, error recovery, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/advanced/sub-components.html">Advanced OWL</a><span class="separator">›</span>
+          <span class="current">Error Handling</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Advanced OWL</div>
+          <h1>OWL JS Error Handling – Boundaries, Async Errors &amp; Recovery</h1>
+          <p class="lesson-intro">Unhandled errors in OWL components crash the component that threw and propagate up the tree. Without an error boundary, a bug in one child widget can bring down the entire page. OWL provides two complementary error-handling mechanisms: <code>onError</code> for parent components to catch errors from their children and show fallback UI, and <code>try/catch</code> inside lifecycle hooks for handling expected async errors. This lesson covers both patterns, plus async error pitfalls, error recovery, and production logging strategies.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 5 of 6</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="onerror">onError — Error Boundary Components</h2>
+          <p><code>onError</code> registers a catch handler on a component. Any error thrown by a descendant component's render, lifecycle hook, or async operation is caught here. The catching component can then show fallback UI instead of crashing.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – error boundary component</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml, useState, onError } from "@odoo/owl";
+
+class ErrorBoundary extends Component {
+  static template = xml`
+    &lt;t t-if="state.error"&gt;
+      &lt;div class="error-boundary"&gt;
+        &lt;h3&gt;⚠️ Something went wrong&lt;/h3&gt;
+        &lt;p t-esc="state.errorMessage"/&gt;
+        &lt;details t-if="state.errorStack"&gt;
+          &lt;summary&gt;Technical details&lt;/summary&gt;
+          &lt;pre t-esc="state.errorStack"/&gt;
+        &lt;/details&gt;
+        &lt;button t-on-click="retry"&gt;Try Again&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/t&gt;
+    &lt;t t-else=""&gt;
+      &lt;t t-slot="default"/&gt;
+    &lt;/t&gt;
+  `;
+
+  state = useState({ error: false, errorMessage: "", errorStack: "" });
+
+  setup() {
+    onError((error) =&gt; {
+      console.error("[ErrorBoundary] Caught:", error);
+
+      this.state.error        = true;
+      this.state.errorMessage = error?.message || "An unexpected error occurred.";
+      this.state.errorStack   = error?.stack    || "";
+
+      // Optionally: report to error tracking service
+      // logToSentry(error);
+    });
+  }
+
+  retry() {
+    // Reset the error state to attempt re-rendering the children
+    this.state.error        = false;
+    this.state.errorMessage = "";
+    this.state.errorStack   = "";
+    // Note: the child component needs a fresh key to truly remount
+  }
+}
+
+// Usage — wrap risky widgets
+class Dashboard extends Component {
+  static components = { ErrorBoundary, SalesSummary, RevenueChart };
+
+  static template = xml`
+    &lt;div class="dashboard"&gt;
+      &lt;ErrorBoundary&gt;
+        &lt;SalesSummary/&gt;
+      &lt;/ErrorBoundary&gt;
+      &lt;ErrorBoundary&gt;
+        &lt;RevenueChart/&gt;
+      &lt;/ErrorBoundary&gt;
+    &lt;/div&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Wrap each independent widget in its own error boundary</strong>
+              <p>Wrapping the entire page in one error boundary means any error kills the whole page. Wrapping each independent widget in its own boundary keeps failures isolated — one broken chart does not crash the sales summary next to it. This is the Odoo pattern: each view section has independent error recovery.</p>
+            </div>
+          </div>
+
+          <h2 id="trycatch-lifecycle">try/catch in Lifecycle Hooks</h2>
+          <p>For expected errors — network failures, validation errors, 404s — handle them locally with try/catch in the relevant hook:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – try/catch in onWillStart</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class PartnerWidget extends Component {
+  state = useState({
+    partner:   null,
+    isLoading: true,
+    error:     null,
+  });
+
+  setup() {
+    this.orm = useService("orm");
+
+    onWillStart(async () =&gt; {
+      try {
+        const [partner] = await this.orm.read(
+          "res.partner",
+          [this.props.partnerId],
+          ["name", "email", "phone", "image_128"]
+        );
+        this.state.partner   = partner;
+      } catch (err) {
+        // Handle locally — no need for an error boundary
+        this.state.error = err.message || "Failed to load partner.";
+      } finally {
+        this.state.isLoading = false;
+      }
+    });
+  }
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;div t-if="state.isLoading"&gt;Loading…&lt;/div&gt;
+      &lt;div t-elif="state.error" class="alert-danger" t-esc="state.error"/&gt;
+      &lt;div t-else=""&gt;
+        &lt;strong t-esc="state.partner.name"/&gt;
+        &lt;span t-esc="state.partner.email"/&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="async-errors">Async Error Patterns</h2>
+
+          <h3 id="event-handler-errors">Errors in Event Handlers</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – try/catch in event handlers</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class SaveButton extends Component {
+  state = useState({ isSaving: false, error: null });
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;button t-att-disabled="state.isSaving" t-on-click="save"&gt;
+        &lt;t t-if="state.isSaving"&gt;Saving…&lt;/t&gt;
+        &lt;t t-else=""&gt;Save&lt;/t&gt;
+      &lt;/button&gt;
+      &lt;p t-if="state.error" class="text-danger" t-esc="state.error"/&gt;
+    &lt;/div&gt;
+  `;
+
+  async save() {
+    this.state.isSaving = true;
+    this.state.error    = null;
+    try {
+      await this.props.onSave();
+      this.notification.add("Saved!", { type: "success" });
+    } catch (err) {
+      // UserError from Odoo server has a human-readable message
+      this.state.error = err?.data?.message || err.message || "Save failed.";
+    } finally {
+      this.state.isSaving = false;
+    }
+  }
+}</code></pre>
+          </div>
+
+          <h3 id="retryable-errors">Retryable Errors with Exponential Backoff</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – retry with backoff</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">async function withRetry(fn, { retries = 3, delay = 500 } = {}) {
+  for (let attempt = 0; attempt &lt; retries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (attempt === retries - 1) throw err;       // last attempt — rethrow
+      await new Promise(r =&gt; setTimeout(r, delay * (attempt + 1)));  // backoff
+    }
+  }
+}
+
+// Usage in onWillStart:
+onWillStart(async () =&gt; {
+  try {
+    this.state.data = await withRetry(
+      () =&gt; this.orm.searchRead("sale.order", [], ["name"], { limit: 10 }),
+      { retries: 3, delay: 300 }
+    );
+  } catch (err) {
+    this.state.error = "Could not load after 3 attempts. Please refresh.";
+  }
+});</code></pre>
+          </div>
+
+          <h2 id="error-vs-boundary">When to Use onError vs try/catch</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Scenario</th><th>Use</th><th>Why</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Expected network / validation errors</td><td><code>try/catch</code></td><td>Local handling — component knows how to recover</td></tr>
+                <tr><td>Third-party widget might crash</td><td><code>onError</code> boundary</td><td>Isolate crash, show fallback, don't know child internals</td></tr>
+                <tr><td>Async error in your own component</td><td><code>try/catch</code> in the async function</td><td>You control the code — handle it explicitly</td></tr>
+                <tr><td>Rendering error (template bugs, null dereference)</td><td><code>onError</code> in parent</td><td>Cannot try/catch synchronous render errors</td></tr>
+                <tr><td>Plugin / dynamic widget system</td><td><code>onError</code> boundary</td><td>Unknown plugin code should not crash the host</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>onError(callback)</code> makes a component an error boundary — it catches errors from all descendants including render errors, lifecycle errors, and async rejections.</li>
+              <li>Show fallback UI in the error state and log the error for debugging. Provide a "Retry" button when recovery is possible.</li>
+              <li>Wrap each independent widget section in its own error boundary to isolate failures.</li>
+              <li>Use <code>try/catch</code> in lifecycle hooks and event handlers for expected errors you know how to recover from.</li>
+              <li>Always guard async operations with try/catch and set a loading/error state in <code>finally</code>.</li>
+              <li>Check for <code>err?.data?.message</code> in Odoo — server-side errors include a human-readable message in <code>data.message</code>.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/owljs/lifecycle/unmount.html" class="topic-tag owl-topic-tag">🦉 willUnmount &amp; Cleanup</a>
+            <a href="/owljs/lifecycle/will-start.html" class="topic-tag owl-topic-tag">🦉 willStart &amp; Async Init</a>
+            <a href="/owljs/advanced/concurrency.html" class="topic-tag owl-topic-tag">🦉 Concurrency Model</a>
+            <a href="/owljs/advanced/environment.html" class="topic-tag owl-topic-tag">🦉 Environment &amp; Services</a>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Exercise</h3>
+            <p>Build a robust <code>RemoteWidget</code> component with full error handling:</p>
+            <ol>
+              <li>Fetch data in <code>onWillStart</code> with <code>try/catch/finally</code>. Show loading → data → error states.</li>
+              <li>Add a "Refresh" button that re-fetches (simulating a network error 50% of the time with <code>Math.random() &lt; 0.5</code>).</li>
+              <li>Implement <code>withRetry</code> on the fetch — 3 attempts with 300ms backoff.</li>
+              <li>Wrap <code>RemoteWidget</code> in an <code>ErrorBoundary</code> that uses <code>t-key="state.retryKey"</code> on the inner child, incremented on retry — this forces a full remount of the widget.</li>
+              <li>Log errors to console with timestamp and component name.</li>
+            </ol>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does onError catch errors in event handlers? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, if the event handler throws synchronously. For async handlers, only rejected Promises that OWL is aware of are caught. If an async event handler throws after the current render cycle, the rejection may be unhandled. Always use try/catch in async event handlers and set error state explicitly rather than relying on <code>onError</code> to catch async rejections.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I force a child component to remount after an error? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Change the child's <code>t-key</code> value. OWL treats a different <code>t-key</code> as a completely new component instance — it unmounts the old one and mounts a fresh one. In the error boundary's retry method, increment a <code>retryKey</code> state value: <code>this.state.retryKey++</code>. The template uses <code>&lt;RiskyChild t-key="state.retryKey"/&gt;</code>. The new instance runs <code>onWillStart</code> fresh.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/advanced/environment.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Environment &amp; Services</span>
+          </a>
+          <a href="/owljs/advanced/concurrency.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Concurrency Model</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
