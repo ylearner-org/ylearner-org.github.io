@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Grid – Complete Guide with Examples | ylearner</title>
+  <meta name="description" content="Master CSS Grid: grid-template-columns, grid-template-rows, fr unit, repeat(), minmax(), grid-area, auto-fit, auto-fill, and real page layouts. Free tutorial with examples.">
+  <meta name="keywords" content="CSS Grid, CSS grid-template-columns, CSS fr unit, CSS repeat, CSS minmax, CSS grid-area, CSS auto-fit auto-fill, CSS grid tutorial, CSS grid layout">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/csslessons/layout/grid.html">
+  <meta property="og:title" content="CSS Grid – Complete Guide | ylearner">
+  <meta property="og:description" content="The complete CSS Grid guide — columns, rows, fr unit, repeat(), minmax(), grid-area, auto-fit, and real page layouts.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/csslessons/layout/grid.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CSS Grid Complete Guide | ylearner">
+  <meta name="twitter:description" content="grid-template-columns, fr, repeat(), minmax(), grid-area — complete CSS Grid tutorial with real layouts.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "CSS Grid",
+    "description": "Complete CSS Grid guide — grid-template-columns, grid-template-rows, fr unit, repeat(), minmax(), grid-area, auto-fit, auto-fill, and real page layout examples.",
+    "educationalLevel": "Beginner",
+    "keywords": "CSS Grid, grid-template-columns, fr unit, repeat, minmax, grid-area, CSS layout",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+  <style>
+    .grid-demo { display:grid; gap:8px; background:var(--bg-secondary); border:2px dashed var(--border-color); border-radius:8px; padding:10px; margin:.75rem 0 1.5rem; }
+    .g-item { background:#1572B6; color:#fff; border-radius:4px; padding:10px; font-size:.8rem; font-weight:700; display:flex; align-items:center; justify-content:center; min-height:40px; }
+    .g-item.green { background:#2e7d32; }
+    .g-item.red   { background:#c62828; }
+    .g-item.gold  { background:#b8860b; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">
+          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1755924855244642" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/csslessons/what-is-css.html">CSS</a><span class="separator">›</span>
+          <a href="/csslessons/layout/display.html">CSS Layout</a><span class="separator">›</span>
+          <span class="current">CSS Grid</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">📐 CSS Layout</div>
+          <h1>CSS Grid – Two-Dimensional Layout Mastery</h1>
+          <p class="lesson-intro">CSS Grid is the most powerful layout system ever added to CSS. Unlike flexbox (one-dimensional), Grid works in two dimensions simultaneously — rows and columns. It can build full page layouts, image galleries, dashboards, and complex component structures that were impossible without it. In this lesson you will learn the complete CSS Grid API: defining columns and rows, the <code>fr</code> unit, <code>repeat()</code>, <code>minmax()</code>, placing items, named areas, and the responsive patterns every developer needs.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 30 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 4 of 6</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="activating">Activating CSS Grid</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">.container { display: grid; }
+/* or: */
+.container { display: inline-grid; }  /* grid that flows inline */</code></pre>
+          </div>
+          <p>Direct children of a grid container automatically become <strong>grid items</strong>. Without defining columns/rows, items stack vertically in a single column (like block display).</p>
+
+          <h2 id="columns-rows">grid-template-columns &amp; grid-template-rows</h2>
+          <p>Define the grid's track structure. Each value in the list defines one column (or row) and its size.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* 3 equal columns of 200px each */
+grid-template-columns: 200px 200px 200px;
+
+/* 3 columns with different sizes */
+grid-template-columns: 260px 1fr 1fr;   /* sidebar + 2 equal mains */
+
+/* 2 rows of specific heights */
+grid-template-rows: 64px 1fr;           /* fixed header + flexible content */</code></pre>
+          </div>
+
+          <div class="grid-demo" style="grid-template-columns:1fr 1fr 1fr;">
+            <div class="g-item">1</div>
+            <div class="g-item">2</div>
+            <div class="g-item">3</div>
+            <div class="g-item">4</div>
+            <div class="g-item">5</div>
+            <div class="g-item">6</div>
+          </div>
+
+          <h2 id="fr-unit">The fr Unit – Fractional Space</h2>
+          <p><code>fr</code> (fraction) represents a fraction of the <strong>available free space</strong> in the grid container. It's the most important CSS Grid unit.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – fr unit</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* 3 equal columns — each gets 1/3 of available width */
+grid-template-columns: 1fr 1fr 1fr;
+
+/* Unequal — first gets 1/4, second 3/4 */
+grid-template-columns: 1fr 3fr;
+
+/* Mix px and fr — px columns are sized first, fr gets the rest */
+grid-template-columns: 260px 1fr;   /* fixed sidebar + flexible main */
+grid-template-columns: 260px 1fr 300px;  /* sidebar + main + ads */</code></pre>
+          </div>
+
+          <h2 id="repeat">repeat() – Shorthand for Repeated Tracks</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – repeat()</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Verbose */
+grid-template-columns: 1fr 1fr 1fr 1fr;
+
+/* Same with repeat(count, size) */
+grid-template-columns: repeat(4, 1fr);
+
+/* Repeat a pattern */
+grid-template-columns: repeat(3, 1fr 2fr);
+/* = 1fr 2fr 1fr 2fr 1fr 2fr */
+
+/* auto-fill — create as many columns as fit */
+grid-template-columns: repeat(auto-fill, 200px);
+
+/* auto-fit — same but collapses empty tracks */
+grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));</code></pre>
+          </div>
+
+          <h2 id="minmax">minmax() – Flexible Track Sizing</h2>
+          <p><code>minmax(min, max)</code> defines a track that is at least <code>min</code> wide and at most <code>max</code> wide.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – minmax()</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Column that's at least 200px but can grow to fill space */
+grid-template-columns: repeat(3, minmax(200px, 1fr));
+
+/* The responsive card grid — the most used Grid pattern */
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+/* Creates as many 280px+ columns as fit. When space is tight:
+   fewer columns. When space is wide: more columns. Zero media queries! */</code></pre>
+          </div>
+
+          <div class="grid-demo" style="grid-template-columns:repeat(auto-fit,minmax(100px,1fr));">
+            <div class="g-item">Auto A</div>
+            <div class="g-item">Auto B</div>
+            <div class="g-item">Auto C</div>
+            <div class="g-item">Auto D</div>
+          </div>
+
+          <div class="ad-container ad-inline">
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1755924855244642" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+          </div>
+
+          <h2 id="gap">gap – Spacing Between Tracks</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">gap: 24px;              /* equal row and column gap */
+gap: 16px 24px;         /* row-gap: 16px, column-gap: 24px */
+row-gap: 16px;
+column-gap: 24px;</code></pre>
+          </div>
+
+          <h2 id="placing-items">Placing Items – grid-column &amp; grid-row</h2>
+          <p>Grid items can be placed on specific lines. Grid lines are numbered from 1 (or -1 from the end).</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Placing items</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* grid-column: start / end */
+.wide-item {
+  grid-column: 1 / 3;    /* spans from line 1 to line 3 (2 columns) */
+}
+
+/* span keyword — span N tracks */
+.wide-item {
+  grid-column: span 2;   /* spans 2 columns from wherever it auto-places */
+}
+
+/* grid-row: start / end */
+.tall-item {
+  grid-row: 1 / 3;       /* spans 2 rows */
+}
+
+/* From the end — -1 = last line */
+.full-width {
+  grid-column: 1 / -1;   /* spans all columns regardless of how many */
+}</code></pre>
+          </div>
+
+          <div class="grid-demo" style="grid-template-columns:repeat(3,1fr); grid-template-rows:auto auto;">
+            <div class="g-item" style="grid-column:1/-1;">Full width (1/-1)</div>
+            <div class="g-item">1</div>
+            <div class="g-item green" style="grid-column:span 2;">span 2</div>
+          </div>
+
+          <h2 id="grid-area">Named Grid Areas</h2>
+          <p>The most readable way to define complex layouts. Name areas in the template, then assign items to areas.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Named areas</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">.page {
+  display: grid;
+  grid-template-areas:
+    "header  header  header"
+    "sidebar main    main"
+    "footer  footer  footer";
+  grid-template-columns: 260px 1fr 1fr;
+  grid-template-rows: 64px 1fr 60px;
+  min-height: 100vh;
+  gap: 0;
+}
+
+.site-header { grid-area: header; }
+.sidebar     { grid-area: sidebar; }
+.main-content { grid-area: main; }
+.site-footer { grid-area: footer; }
+
+/* Use . (dot) for an empty cell */
+grid-template-areas:
+  "header header"
+  "sidebar main"
+  ". footer";</code></pre>
+          </div>
+
+          <div class="grid-demo" style="grid-template-areas:'h h h' 's m m' 'f f f'; grid-template-columns:80px 1fr 1fr; grid-template-rows:36px 60px 36px;">
+            <div class="g-item" style="grid-area:h;">Header</div>
+            <div class="g-item green" style="grid-area:s;">Sidebar</div>
+            <div class="g-item" style="grid-area:m;">Main</div>
+            <div class="g-item gold" style="grid-area:f;">Footer</div>
+          </div>
+
+          <h2 id="alignment">Alignment in Grid</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Grid alignment</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Align ALL items within their cells */
+align-items: start | end | center | stretch;    /* cross axis (vertical) */
+justify-items: start | end | center | stretch;  /* main axis (horizontal) */
+place-items: center;                            /* shorthand: align + justify */
+
+/* Align individual item within its cell */
+align-self: center;    /* vertical */
+justify-self: center;  /* horizontal */
+place-self: center;    /* shorthand */
+
+/* Align entire grid inside container (when grid is smaller than container) */
+align-content: start | end | center | space-between | space-around;
+justify-content: center;</code></pre>
+          </div>
+
+          <h2 id="real-patterns">Real-World Grid Patterns</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Practical patterns</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* 1. Responsive card grid — no media queries needed */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+/* 2. Full-page layout */
+.app {
+  display: grid;
+  grid-template-rows: 60px 1fr 48px;
+  grid-template-areas: "header" "main" "footer";
+  min-height: 100vh;
+}
+
+/* 3. Image masonry-style gallery */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 200px;
+  gap: 12px;
+}
+.gallery .featured {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+/* 4. 12-column layout (like Bootstrap) */
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+}
+.col-6  { grid-column: span 6; }   /* half width */
+.col-4  { grid-column: span 4; }   /* one third */
+.col-3  { grid-column: span 3; }   /* one quarter */
+
+/* 5. CSS Grid centering (alternative to flexbox) */
+.center {
+  display: grid;
+  place-items: center;
+}</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>display: grid</strong> — activates Grid on the container.</li>
+              <li><strong>grid-template-columns / rows</strong> — define the track structure.</li>
+              <li><strong>fr</strong> — fractional unit. <code>1fr</code> = equal share of available space.</li>
+              <li><strong>repeat(count, size)</strong> — shorthand for repeated tracks.</li>
+              <li><strong>minmax(min, max)</strong> — flexible track that stays between min and max.</li>
+              <li><strong>repeat(auto-fit, minmax(280px, 1fr))</strong> — the responsive card grid pattern.</li>
+              <li><strong>grid-column/row: start / end</strong> — place items on specific lines. <code>span N</code> to span N tracks.</li>
+              <li><strong>grid-column: 1 / -1</strong> — always spans all columns.</li>
+              <li><strong>grid-template-areas</strong> + <strong>grid-area</strong> — named layout regions, most readable approach.</li>
+              <li><strong>gap</strong> — spacing between rows and columns.</li>
+              <li><strong>place-items: center</strong> — center all items in cells.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/csslessons/layout/flexbox.html" class="topic-tag css-topic-tag">🎨 CSS Flexbox</a>
+            <a href="/csslessons/responsive/media-queries.html" class="topic-tag css-topic-tag">🎨 Media Queries</a>
+            <a href="/csslessons/layout/display.html" class="topic-tag css-topic-tag">🎨 CSS Display</a>
+            <a href="/csslessons/layout/float.html" class="topic-tag css-topic-tag">🎨 CSS Float</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between auto-fill and auto-fit? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Both create as many columns as fit the container. The difference appears when there are fewer items than columns: <strong>auto-fill</strong> creates empty tracks (the grid has empty columns), <strong>auto-fit</strong> collapses empty tracks (the existing items stretch to fill the space). For most card grids you want <code>auto-fit</code> so items expand when there are fewer of them. Use <code>auto-fill</code> when you want a fixed grid structure regardless of item count.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When should I use CSS Grid vs Flexbox? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Grid excels at <strong>two-dimensional layouts</strong> — when you need to control both rows and columns simultaneously, or when the parent controls the layout (known size containers). Flexbox excels at <strong>one-dimensional layouts</strong> — rows of items, vertical stacking, when the content controls the size (unknown sizes). In practice: Grid for page-level layout, Grid for galleries and card grids, Flexbox for navigation bars, button groups, form rows, and component internals. They're complementary — use both in the same project.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I make a responsive grid without media queries? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The magic one-liner: <code>grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))</code>. This creates as many columns as fit, where each is at least 280px wide and at most 1fr (fills available space). On a narrow viewport: 1 column. On a medium viewport: 2 columns. On a wide viewport: 3+ columns. No media queries needed. Adjust 280px to suit your content — it's the breakpoint where columns collapse.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the grid-area property? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>grid-area</code> has two uses: (1) Assign a named area to a grid item, where the name corresponds to a region defined in <code>grid-template-areas</code> — e.g., <code>grid-area: sidebar</code>. (2) Shorthand for row-start / column-start / row-end / column-end — e.g., <code>grid-area: 1 / 1 / 3 / 4</code>. The named approach is much more readable and is preferred for complex layouts.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/csslessons/layout/flexbox.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">CSS Flexbox</span>
+          </a>
+          <a href="/csslessons/layout/float.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">CSS Float</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer">
+          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1755924855244642" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1755924855244642" data-ad-slot="auto" data-ad-format="rectangle" data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

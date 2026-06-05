@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Position – static, relative, absolute, fixed, sticky Explained | ylearner</title>
+  <meta name="description" content="Master CSS positioning: static, relative, absolute, fixed, and sticky. Learn top/left/right/bottom offsets, z-index, stacking contexts, and real-world positioning patterns.">
+  <meta name="keywords" content="CSS position, CSS absolute, CSS relative, CSS fixed, CSS sticky, CSS position tutorial, CSS top left right bottom, CSS z-index, CSS stacking context">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/csslessons/layout/position.html">
+  <meta property="og:title" content="CSS Position – static, relative, absolute, fixed, sticky | ylearner">
+  <meta property="og:description" content="Every CSS position value explained — static, relative, absolute, fixed, sticky — with real-world use cases and examples.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/csslessons/layout/position.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CSS Position Complete Guide | ylearner">
+  <meta name="twitter:description" content="static, relative, absolute, fixed, sticky — every CSS position value with examples and use cases.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "CSS Position",
+    "description": "Complete guide to CSS positioning — static, relative, absolute, fixed, sticky — with top/left/right/bottom offsets, z-index, and real-world layout patterns.",
+    "educationalLevel": "Beginner",
+    "keywords": "CSS position, CSS absolute, CSS fixed, CSS sticky, CSS relative, CSS z-index",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+  <style>
+    .pos-demo-wrap { position:relative; height:140px; background:var(--bg-secondary); border:2px dashed var(--border-color); border-radius:8px; margin:1rem 0 1.5rem; overflow:hidden; }
+    .pos-box { width:80px; height:40px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:700; color:white; }
+    .pos-blue  { background:#1572B6; }
+    .pos-green { background:#2e7d32; }
+    .pos-red   { background:#c62828; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">
+          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1755924855244642" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/csslessons/what-is-css.html">CSS</a><span class="separator">›</span>
+          <a href="/csslessons/layout/display.html">CSS Layout</a><span class="separator">›</span>
+          <span class="current">CSS Position</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">📐 CSS Layout</div>
+          <h1>CSS Position – Placing Elements Exactly Where You Want</h1>
+          <p class="lesson-intro">Normal document flow places elements one after another. The <code>position</code> property breaks elements out of that flow — letting you place them precisely on the page, layer them on top of each other, fix them to the viewport, or make them stick during scroll. It is one of the most powerful and most misunderstood properties in CSS. In this lesson you will learn all five position values, when to use each one, how offset properties work, and how to control stacking order with <code>z-index</code>.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 2 of 6</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="the-five-values">The Five Position Values</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – All position values</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">position: static;    /* default — in normal flow, offsets have no effect */
+position: relative;  /* in normal flow + offset from its own position */
+position: absolute;  /* removed from flow, positioned inside nearest non-static ancestor */
+position: fixed;     /* removed from flow, positioned relative to the viewport */
+position: sticky;    /* in flow until threshold, then fixed within its scroll container */</code></pre>
+          </div>
+
+          <h2 id="static">position: static (Default)</h2>
+          <p>Every element is <code>static</code> by default. It sits in normal document flow. <code>top</code>, <code>left</code>, <code>right</code>, <code>bottom</code>, and <code>z-index</code> have <strong>no effect</strong> on static elements.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Default — you rarely need to write this explicitly */
+.element { position: static; }
+
+/* Reset positioning from a more specific rule */
+.no-position { position: static; }</code></pre>
+          </div>
+
+          <h2 id="relative">position: relative</h2>
+          <p>The element stays in normal flow but can be <strong>offset from its natural position</strong> using <code>top</code>, <code>left</code>, <code>right</code>, <code>bottom</code>. The space it originally occupied is preserved — other elements don't fill it.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">.shifted {
+  position: relative;
+  top: 20px;     /* move 20px down from where it would be */
+  left: 30px;    /* move 30px right from where it would be */
+}
+
+/* Most important use: creating a positioning context for children */
+.card {
+  position: relative;  /* children with position: absolute reference this */
+}
+
+/* Slight nudge for visual alignment */
+.icon {
+  position: relative;
+  top: 2px;  /* nudge 2px down to optically align with text */
+}</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Most common use of position: relative</strong>
+              <p>You will use <code>position: relative</code> far more as a <em>positioning context</em> for absolutely positioned children than as an actual offset. Add it to any parent you want to be the "containing block" for its absolutely positioned children.</p>
+            </div>
+          </div>
+
+          <h2 id="absolute">position: absolute</h2>
+          <p>The element is <strong>removed from normal flow</strong> — surrounding elements act as if it doesn't exist. It is positioned relative to its nearest ancestor that has <code>position</code> set to anything other than <code>static</code>. If no such ancestor exists, it positions relative to the <code>&lt;html&gt;</code> element (the initial containing block).</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – absolute positioning pattern</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Parent: create the positioning context */
+.card {
+  position: relative;
+  padding: 20px;
+}
+
+/* Child: position inside the card */
+.badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #e63946;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: .75rem;
+}
+
+/* Cover entire parent (overlay) */
+.overlay {
+  position: absolute;
+  inset: 0;  /* shorthand for top:0; right:0; bottom:0; left:0 */
+  background: rgba(0, 0, 0, 0.5);
+}</code></pre>
+          </div>
+
+          <div class="pos-demo-wrap" aria-label="Absolute positioning demo">
+            <div class="pos-box pos-blue" style="position:absolute; bottom:8px; left:8px;">absolute<br>bottom-left</div>
+            <div class="pos-box pos-green" style="position:absolute; top:8px; right:8px;">absolute<br>top-right</div>
+            <div class="pos-box pos-red" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);">centered</div>
+          </div>
+
+          <h3>Common absolute positioning patterns</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Patterns</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Center absolutely positioned element */
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Pin to a corner */
+.top-right  { position: absolute; top:  0; right:  0; }
+.top-left   { position: absolute; top:  0; left:   0; }
+.bottom-right { position: absolute; bottom: 0; right: 0; }
+
+/* Fill entire parent */
+.fill {
+  position: absolute;
+  inset: 0;   /* = top:0; right:0; bottom:0; left:0 */
+}
+
+/* Tooltip above an element */
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);  /* 8px above the parent */
+  left: 50%;
+  transform: translateX(-50%);
+}</code></pre>
+          </div>
+
+          <div class="ad-container ad-inline">
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1755924855244642" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+          </div>
+
+          <h2 id="fixed">position: fixed</h2>
+          <p>Like <code>absolute</code>, the element is removed from normal flow. But it is positioned relative to the <strong>viewport</strong> — it stays in the same place as the user scrolls.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Fixed positioning</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Sticky header */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;      /* stretch to full width */
+  height: 60px;
+  background: white;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+}
+
+/* Compensate — body needs top padding to prevent content hiding under header */
+body { padding-top: 60px; }
+
+/* Cookie banner at bottom */
+.cookie-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #222;
+  color: white;
+  padding: 16px 24px;
+  z-index: 200;
+}
+
+/* Back to top button */
+.scroll-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #1572B6;
+  color: white;
+  z-index: 50;
+}</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Fixed positioning and transforms</strong>
+              <p>If any ancestor element has a <code>transform</code>, <code>filter</code>, or <code>perspective</code> property set (other than <code>none</code>), the fixed element positions relative to <em>that ancestor</em>, not the viewport. This is a common gotcha — if your fixed element isn't sticking to the viewport, check for transformed ancestors.</p>
+            </div>
+          </div>
+
+          <h2 id="sticky">position: sticky</h2>
+          <p>A hybrid of <code>relative</code> and <code>fixed</code>. The element behaves as <code>relative</code> until it reaches a threshold (defined by <code>top</code>, <code>left</code>, etc.) while scrolling, then it "sticks" in that position within its scroll container — until the container scrolls out of view.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Sticky positioning</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Sticky table header */
+th {
+  position: sticky;
+  top: 0;               /* sticks when it reaches 0px from viewport top */
+  background: #1572B6;
+  color: white;
+  z-index: 1;
+}
+
+/* Sticky sidebar */
+.sidebar {
+  position: sticky;
+  top: 80px;            /* 80px gap from viewport top (for fixed header) */
+  align-self: start;    /* needed in flex/grid — prevents sidebar stretching */
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+/* Sticky section labels in a list */
+.section-label {
+  position: sticky;
+  top: 60px;
+  background: var(--bg-secondary);
+  padding: 8px 16px;
+  font-weight: bold;
+  border-bottom: 1px solid var(--border-color);
+}</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>sticky requires a threshold AND scroll room</strong>
+              <p>You must set at least one of <code>top</code>, <code>bottom</code>, <code>left</code>, <code>right</code> — without it, sticky behaves like <code>relative</code>. The sticky element also only sticks within its parent container — once the parent scrolls off-screen, the sticky element goes with it. If your sticky element isn't working, check: (1) threshold is set, (2) parent isn't <code>overflow: hidden</code>, (3) there is enough scroll room.</p>
+            </div>
+          </div>
+
+          <h2 id="offsets">Offset Properties: top, right, bottom, left, inset</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Offset properties</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Individual offsets */
+top: 20px;        /* move from top edge of containing block */
+right: 0;         /* align to right edge */
+bottom: 24px;     /* offset from bottom */
+left: 50%;        /* 50% from left edge */
+
+/* Negative values pull in the opposite direction */
+top: -10px;       /* move 10px above the top edge */
+left: -20px;      /* move 20px to the left of the left edge */
+
+/* Percentage — relative to the containing block's dimensions */
+top: 50%;         /* 50% of containing block height */
+left: 50%;        /* 50% of containing block width */
+
+/* inset shorthand — logical equivalent of top/right/bottom/left */
+inset: 0;                    /* all sides: 0 */
+inset: 10px 20px;            /* top/bottom: 10px, left/right: 20px */
+inset: 10px 20px 30px 40px; /* top right bottom left */
+
+/* Logical inset variants */
+inset-block: 0;    /* top + bottom */
+inset-inline: 0;   /* left + right */</code></pre>
+          </div>
+
+          <h2 id="z-index">z-index – Stacking Order</h2>
+          <p><code>z-index</code> controls which positioned element appears on top when elements overlap. Higher values appear on top. Only works on elements with <code>position</code> other than <code>static</code>.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – z-index</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Simple stacking */
+.background { position: absolute; z-index: 0; }
+.content    { position: absolute; z-index: 1; }
+.overlay    { position: absolute; z-index: 2; }
+
+/* Common z-index scale for a design system */
+:root {
+  --z-base:    0;
+  --z-raised:  1;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-fixed:    300;
+  --z-modal:    400;
+  --z-toast:    500;
+}
+
+/* Auto — removes element from stacking context */
+z-index: auto;
+
+/* Negative z-index — behind normal flow elements */
+.watermark { position: absolute; z-index: -1; }</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Stacking contexts</strong>
+              <p>A <strong>stacking context</strong> is an isolated z-index universe. Elements inside a stacking context are stacked relative to each other, not to the global page. Stacking contexts are created by: <code>position + z-index</code> (not auto), <code>opacity &lt; 1</code>, <code>transform</code>, <code>filter</code>, <code>will-change</code>, and several other properties. This is why a z-index of 9999 inside a transformed container may still appear behind an element with z-index 1 outside it.</p>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>static</strong> — default. In normal flow. Offsets and z-index have no effect.</li>
+              <li><strong>relative</strong> — in normal flow, offset from its own natural position. Mainly used to create a containing block for absolute children.</li>
+              <li><strong>absolute</strong> — removed from flow. Positioned inside nearest non-static ancestor. Use for badges, tooltips, overlays.</li>
+              <li><strong>fixed</strong> — removed from flow. Positioned relative to viewport. Stays during scroll. Use for sticky headers, modals, toasts.</li>
+              <li><strong>sticky</strong> — relative until threshold, then fixed within scroll container. Use for sticky nav, table headers, sidebars.</li>
+              <li><strong>inset</strong> — shorthand for top/right/bottom/left. <code>inset: 0</code> fills the parent.</li>
+              <li><strong>z-index</strong> — stacking order. Only works on positioned elements. Define a scale for your project.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/csslessons/layout/display.html" class="topic-tag css-topic-tag">🎨 CSS Display</a>
+            <a href="/csslessons/layout/flexbox.html" class="topic-tag css-topic-tag">🎨 CSS Flexbox</a>
+            <a href="/csslessons/layout/z-index.html" class="topic-tag css-topic-tag">🎨 CSS Z-index (Deep Dive)</a>
+            <a href="/csslessons/selectors/box-model.html" class="topic-tag css-topic-tag">🎨 CSS Box Model</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why is my absolutely positioned element not in the right place? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The most common cause: the element is not positioning relative to the parent you think it is. An absolutely positioned element positions relative to its nearest ancestor with any <code>position</code> value other than <code>static</code>. If none exists, it positions relative to <code>&lt;html&gt;</code>. Fix: add <code>position: relative</code> to the intended parent container. Then check your <code>top</code>/<code>left</code>/<code>right</code>/<code>bottom</code> values — positive <code>top</code> moves down from the top edge, positive <code>left</code> moves right from the left edge.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why doesn't my sticky element stick? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Four common causes: (1) No threshold set — you must have at least one of <code>top</code>, <code>bottom</code>, <code>left</code>, <code>right</code>. (2) Parent has <code>overflow: hidden</code>, <code>overflow: auto</code>, or <code>overflow: scroll</code> — this breaks sticky by confining it to the parent's scroll context. (3) Parent isn't tall enough — sticky only works while the parent is taller than the sticky element and in the viewport. (4) Parent has a set height equal to its content — no scroll room means no sticky effect.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between fixed and sticky? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>fixed</code> is always positioned relative to the viewport — it's removed from flow immediately and stays put regardless of DOM position. <code>sticky</code> participates in normal flow until it reaches the threshold during scroll, then temporarily fixes in place. Crucially, sticky is scoped to its parent container — once the parent scrolls out, the sticky element goes with it. Fixed stays on screen no matter what. Use fixed for global UI elements (headers, modals). Use sticky for in-page elements (table headers, sidebars, section labels).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does a high z-index not work? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>z-index only works on positioned elements (<code>position</code> other than <code>static</code>). If the element is <code>static</code>, z-index is ignored. The other common cause: stacking contexts. If the element is inside a stacking context (created by transform, opacity, filter, etc.), its z-index only competes with siblings in the same context — not the global page. Setting z-index: 9999 inside a transformed parent won't place it above elements outside that parent's stacking context.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/csslessons/layout/display.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">CSS Display</span>
+          </a>
+          <a href="/csslessons/layout/flexbox.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">CSS Flexbox</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer">
+          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1755924855244642" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1755924855244642" data-ad-slot="auto" data-ad-format="rectangle" data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Float – How It Works, Clearing, and When to Use It | ylearner</title>
+  <meta name="description" content="Understand CSS float: how float works, text wrapping, clearing floats with clear and clearfix, float vs flexbox vs grid, and when float is still relevant today.">
+  <meta name="keywords" content="CSS float, CSS clear, CSS clearfix, CSS float left, CSS float right, CSS float tutorial, clear both CSS, CSS text wrap image">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/csslessons/layout/float.html">
+  <meta property="og:title" content="CSS Float – How It Works and When to Use It | ylearner">
+  <meta property="og:description" content="CSS float, clearing floats, clearfix pattern, and when float is still the right tool vs flexbox and grid.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/csslessons/layout/float.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CSS Float Complete Guide | ylearner">
+  <meta name="twitter:description" content="How CSS float works, clearing floats, clearfix, and when to use float in modern CSS.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "CSS Float",
+    "description": "Complete CSS float guide — how float works, text wrapping, clearing floats, clearfix, and when to use float in modern CSS development.",
+    "educationalLevel": "Beginner",
+    "keywords": "CSS float, CSS clear, clearfix, float left, float right",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">
+          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1755924855244642" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/csslessons/what-is-css.html">CSS</a><span class="separator">›</span>
+          <a href="/csslessons/layout/display.html">CSS Layout</a><span class="separator">›</span>
+          <span class="current">CSS Float</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">📐 CSS Layout</div>
+          <h1>CSS Float – How It Works and When to Use It</h1>
+          <p class="lesson-intro">CSS <code>float</code> was the backbone of web layout for over a decade before flexbox and grid arrived. Understanding it is still essential — you will encounter it in legacy codebases, and it remains the <em>correct</em> tool for wrapping text around images. In this lesson you will learn exactly how float works, why it causes layout problems, how to fix those problems with <code>clear</code> and the clearfix pattern, and when float is still the right choice in modern CSS.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 16 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 5 of 6</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="what-float-does">What float Does</h2>
+          <p><code>float</code> pushes an element to the left or right of its container, removing it from normal flow. Subsequent <strong>inline content</strong> (text, inline elements) flows around the floated element. Block-level siblings, however, flow <em>under</em> the floated element (they ignore it).</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – float values</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">float: left;    /* push element to the left, content wraps on the right */
+float: right;   /* push element to the right, content wraps on the left */
+float: none;    /* default — no float */
+float: inline-start;  /* logical version — left in LTR, right in RTL */
+float: inline-end;</code></pre>
+          </div>
+
+          <h2 id="text-wrapping">Image + Text Wrapping — Float's Best Use</h2>
+          <p>Wrapping text around an image is float's original purpose and where it still shines today:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS + HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Float the image left so text wraps on its right */
+.article-image {
+  float: left;
+  width: 280px;
+  margin: 0 24px 16px 0;  /* space between image and text */
+  border-radius: 6px;
+}</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;article&gt;
+  &lt;img class="article-image" src="photo.jpg" alt="Description"&gt;
+  &lt;p&gt;This text wraps naturally around the floated image.
+     The float removes the image from flow but inline content
+     respects its position and wraps around it.&lt;/p&gt;
+  &lt;p&gt;Additional paragraphs continue to wrap if the image
+     is still taller than the text above.&lt;/p&gt;
+&lt;/article&gt;</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Float left demo</div>
+            <div style="overflow:auto;">
+              <div style="float:left;width:100px;height:80px;background:#1572B6;border-radius:6px;margin:0 16px 8px 0;display:flex;align-items:center;justify-content:center;color:white;font-size:.75rem;font-weight:700;">Image</div>
+              <p style="margin:0;">This text wraps around the floated element on the left. The float removes the element from normal flow so that inline content — text, links, inline elements — flows around it naturally. This is exactly how newspaper layouts work.</p>
+            </div>
+          </div>
+
+          <div class="ad-container ad-inline">
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1755924855244642" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+          </div>
+
+          <h2 id="container-collapse">The Container Collapse Problem</h2>
+          <p>When all children are floated, the parent container collapses to zero height — it can't see floated children. This is the most notorious float problem:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">HTML + CSS – The collapse problem</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-html">&lt;div class="parent"&gt;    &lt;!-- height collapses to 0! --&gt;
+  &lt;div class="child" style="float: left;"&gt;Floated&lt;/div&gt;
+  &lt;div class="child" style="float: left;"&gt;Floated&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;This paragraph sits where the parent should be&lt;/p&gt;</code></pre>
+          </div>
+          <p>The parent's background, border, and padding are all invisible because the parent has no height.</p>
+
+          <h2 id="clear">clear – Stopping Float Wrap</h2>
+          <p><code>clear</code> tells an element to move below any floats instead of flowing alongside them.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – clear property</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">clear: left;   /* move below left-floated elements */
+clear: right;  /* move below right-floated elements */
+clear: both;   /* move below all floated elements (most common) */
+clear: none;   /* default — don't clear */
+
+/* Example: footer below floated columns */
+.footer { clear: both; }
+
+/* Stop text from wrapping past a specific point */
+.clearfix-element { clear: both; }</code></pre>
+          </div>
+
+          <h2 id="clearfix">The Clearfix Pattern</h2>
+          <p>The modern, CSS-only solution to the container collapse problem. Instead of adding a clearing element to the HTML, use a pseudo-element:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Clearfix</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Classic clearfix — add .clearfix to the container with floated children */
+.clearfix::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+/* Modern alternative — display: flow-root creates a new formatting context */
+.container { display: flow-root; }
+/* This contains floats without any pseudo-elements */
+
+/* Also works but has side effects: */
+.container { overflow: hidden; }  /* clips content — use with caution */</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Prefer display: flow-root over clearfix</strong>
+              <p><code>display: flow-root</code> creates a new block formatting context, which contains floated children without needing pseudo-elements. It's cleaner, has no side effects (unlike <code>overflow: hidden</code>), and is the modern best practice. The clearfix hack is still widely used in legacy code, so you need to recognize it.</p>
+            </div>
+          </div>
+
+          <h2 id="float-vs-modern">Float vs Flexbox vs Grid</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – When to use what</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* USE FLOAT for: */
+/* 1. Text wrapping around images */
+.article img { float: left; margin-right: 16px; }
+
+/* 2. Drop caps */
+.article p:first-of-type::first-letter {
+  float: left;
+  font-size: 3em;
+  line-height: 0.8;
+  margin-right: 4px;
+}
+
+/* DON'T USE FLOAT for: */
+/* Navigation bars — use display: flex */
+/* Multi-column page layout — use display: grid */
+/* Card grids — use display: grid with auto-fit */
+/* Equal-height columns — use display: flex */
+/* Any layout that needs vertical alignment — use flex or grid */</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Float in legacy codebases</strong>
+              <p>If you work on any codebase more than 5 years old, you will encounter float-based layouts with clearfix everywhere. Understanding float helps you maintain and gradually modernize this code — replacing float column layouts with flex or grid as you touch each component.</p>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>float: left/right</strong> — pushes element to an edge, inline content wraps around it.</li>
+              <li>Float removes the element from normal block flow but inline content still wraps around it.</li>
+              <li><strong>Container collapse</strong> — parents of floated elements lose their height.</li>
+              <li><strong>clear: both</strong> — forces an element below all floats.</li>
+              <li><strong>Clearfix</strong> — <code>.clearfix::after { content:""; display:block; clear:both; }</code> contains floats.</li>
+              <li><strong>display: flow-root</strong> — modern replacement for clearfix. No pseudo-elements needed.</li>
+              <li>Use float for: text wrapping around images, drop caps.</li>
+              <li>Use flexbox/grid for: all layout work.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/csslessons/layout/flexbox.html" class="topic-tag css-topic-tag">🎨 CSS Flexbox</a>
+            <a href="/csslessons/layout/grid.html" class="topic-tag css-topic-tag">🎨 CSS Grid</a>
+            <a href="/csslessons/layout/display.html" class="topic-tag css-topic-tag">🎨 CSS Display</a>
+            <a href="/csslessons/layout/z-index.html" class="topic-tag css-topic-tag">🎨 CSS Z-index</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Should I still learn CSS float? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — for two reasons: (1) You will encounter float in legacy codebases and need to understand and maintain it. (2) Float is still the right tool for wrapping text around images. However, you should not use float for page layout or component layout in new projects — use flexbox and grid instead. Learning float takes 30 minutes; it's worth it just for legacy code comprehension.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is clearfix and why do I see it everywhere? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Clearfix is a CSS hack from the pre-flexbox era (2000s–2010s) to fix the container collapse problem caused by floated children. It works by injecting an invisible clearing pseudo-element after the container's content, forcing the container to expand around its floated children. It's found in nearly every legacy project and in older versions of Bootstrap. In new code, use <code>display: flow-root</code> or switch the layout to flexbox/grid which don't have the collapse problem at all.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens if I don't clear my floats? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The parent container collapses to zero height (no height from floated children). Elements after the container overlap the floated elements rather than appearing below them. Background colors and borders on the parent become invisible. Text from subsequent sections flows around the floated elements unexpectedly. In short: layout breaks in confusing ways. Always contain floats with clearfix, <code>overflow: hidden</code>, or <code>display: flow-root</code> on the parent.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/csslessons/layout/grid.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">CSS Grid</span>
+          </a>
+          <a href="/csslessons/layout/z-index.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">CSS Z-index</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer">
+          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1755924855244642" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1755924855244642" data-ad-slot="auto" data-ad-format="rectangle" data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
