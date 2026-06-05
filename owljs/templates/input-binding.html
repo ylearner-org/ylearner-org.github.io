@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS Input Binding – t-model Two-Way Binding Complete Guide | ylearner</title>
+  <meta name="description" content="Master OWL JS t-model for two-way input binding: text, number, checkbox, radio buttons, select dropdowns, textarea, and modifiers (lazy, trim, number). Build complete forms with validation patterns.">
+  <meta name="keywords" content="OWL JS t-model, OWL input binding, OWL two-way binding, OWL form handling, OWL checkbox t-model, OWL select t-model, OWL JS form tutorial, Odoo Web Library t-model, OWL t-model lazy">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/owljs/templates/input-binding.html">
+  <meta property="og:title" content="OWL JS t-model – Two-Way Input Binding Complete Guide | ylearner">
+  <meta property="og:description" content="t-model for text, number, checkbox, radio, select, textarea. Modifiers lazy/trim/number, form validation patterns, and real-world OWL JS form examples.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/owljs/templates/input-binding.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS t-model Input Binding Guide | ylearner">
+  <meta name="twitter:description" content="t-model for all input types, modifiers, and form validation — complete OWL JS two-way binding tutorial.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS Input Binding (t-model)",
+    "description": "Complete guide to OWL JS t-model two-way binding: text, number, checkbox, radio, select, textarea, modifiers (lazy, trim, number), and form validation patterns.",
+    "educationalLevel": "Beginner",
+    "keywords": "OWL JS t-model, input binding, two-way binding, form handling, checkbox, select, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/templates/conditional.html">Dynamic Templates</a><span class="separator">›</span>
+          <span class="current">Input Binding (t-model)</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Dynamic Templates</div>
+          <h1>OWL JS Input Binding – t-model Two-Way Binding</h1>
+          <p class="lesson-intro"><code>t-model</code> is OWL's two-way binding directive for form inputs. It simultaneously sets the input's display value from a reactive state property and attaches an event listener that updates the state whenever the user types. This eliminates the manual <code>value + onChange</code> boilerplate you would write in vanilla JavaScript. <code>t-model</code> works with every HTML form element — text inputs, checkboxes, radio buttons, selects, and textareas — and supports modifiers to control <em>when</em> and <em>how</em> the value is synced.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 3 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="how-tmodel-works">How t-model Works</h2>
+          <p><code>t-model</code> sets up a two-way connection between a state property and a form input. Internally, OWL sets the input's value from the state and listens to the appropriate event (usually <code>input</code>) to write changes back:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – basic t-model</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class SearchBox extends Component {
+  state = useState({ query: "" });
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;!-- t-model links input.value ↔ state.query --&gt;
+      &lt;input type="text" t-model="state.query" placeholder="Search…"/&gt;
+      &lt;p&gt;You typed: &lt;t t-esc="state.query"/&gt;&lt;/p&gt;
+    &lt;/div&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>t-model uses the input event by default</strong>
+              <p><code>t-model</code> updates state on every keystroke (the <code>input</code> event). Use <code>t-model.lazy</code> if you want updates only when the field loses focus or the user commits a change (the <code>change</code> event). For heavy computed operations on each keystroke, <code>t-model.lazy</code> can improve performance significantly.</p>
+            </div>
+          </div>
+
+          <h2 id="text-inputs">Text, Email, Password, Number Inputs</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – text input types</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;form&gt;
+  &lt;!-- Text --&gt;
+  &lt;input type="text"     t-model="state.name"     placeholder="Full name"/&gt;
+
+  &lt;!-- Email --&gt;
+  &lt;input type="email"    t-model="state.email"    placeholder="Email address"/&gt;
+
+  &lt;!-- Password --&gt;
+  &lt;input type="password" t-model="state.password" placeholder="Password"/&gt;
+
+  &lt;!-- Number — state.age will be a string by default --&gt;
+  &lt;input type="number"   t-model="state.age"      min="0" max="120"/&gt;
+
+  &lt;!-- Use .number modifier to get a real Number type --&gt;
+  &lt;input type="number"   t-model.number="state.price" step="0.01"/&gt;
+
+  &lt;!-- Search --&gt;
+  &lt;input type="search"   t-model="state.query"    placeholder="Search…"/&gt;
+&lt;/form&gt;</code></pre>
+          </div>
+
+          <h2 id="checkbox">Checkboxes</h2>
+          <p>For a single checkbox, <code>t-model</code> binds to a boolean state property — checked = true, unchecked = false.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – checkbox binding</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Single checkbox ↔ boolean --&gt;
+&lt;label&gt;
+  &lt;input type="checkbox" t-model="state.agree"/&gt;
+  I agree to the terms
+&lt;/label&gt;
+&lt;button t-att-disabled="!state.agree"&gt;Continue&lt;/button&gt;
+
+&lt;!-- Multiple checkboxes ↔ array of selected values --&gt;
+&lt;!-- state.selectedRoles = [] --&gt;
+&lt;label&gt;&lt;input type="checkbox" t-model="state.selectedRoles" value="admin"/&gt; Admin&lt;/label&gt;
+&lt;label&gt;&lt;input type="checkbox" t-model="state.selectedRoles" value="editor"/&gt; Editor&lt;/label&gt;
+&lt;label&gt;&lt;input type="checkbox" t-model="state.selectedRoles" value="viewer"/&gt; Viewer&lt;/label&gt;
+&lt;!-- state.selectedRoles will be e.g. ['admin', 'editor'] --&gt;</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="radio">Radio Buttons</h2>
+          <p>Radio buttons in a group all bind to the same state property. The value of the currently selected radio becomes the state value.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – radio button binding</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- state.plan = 'free' | 'pro' | 'enterprise' --&gt;
+&lt;fieldset&gt;
+  &lt;legend&gt;Select Plan&lt;/legend&gt;
+  &lt;label&gt;
+    &lt;input type="radio" t-model="state.plan" value="free"/&gt; Free
+  &lt;/label&gt;
+  &lt;label&gt;
+    &lt;input type="radio" t-model="state.plan" value="pro"/&gt; Pro ($9/mo)
+  &lt;/label&gt;
+  &lt;label&gt;
+    &lt;input type="radio" t-model="state.plan" value="enterprise"/&gt; Enterprise
+  &lt;/label&gt;
+&lt;/fieldset&gt;
+&lt;p&gt;Selected plan: &lt;strong t-esc="state.plan"/&gt;&lt;/p&gt;</code></pre>
+          </div>
+
+          <h2 id="select">Select Dropdowns</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – select binding</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Single select ↔ string value --&gt;
+&lt;select t-model="state.country"&gt;
+  &lt;option value=""&gt;-- Select country --&lt;/option&gt;
+  &lt;option value="us"&gt;United States&lt;/option&gt;
+  &lt;option value="gb"&gt;United Kingdom&lt;/option&gt;
+  &lt;option value="de"&gt;Germany&lt;/option&gt;
+&lt;/select&gt;
+
+&lt;!-- Dynamic options from state --&gt;
+&lt;select t-model="state.selectedCategory"&gt;
+  &lt;option value=""&gt;All Categories&lt;/option&gt;
+  &lt;option
+    t-foreach="state.categories"
+    t-as="cat"
+    t-key="cat.id"
+    t-att-value="cat.id"
+    t-esc="cat.name"
+  /&gt;
+&lt;/select&gt;
+
+&lt;!-- Multiple select ↔ array --&gt;
+&lt;!-- state.selectedTags = [] --&gt;
+&lt;select multiple="multiple" t-model="state.selectedTags"&gt;
+  &lt;option value="js"&gt;JavaScript&lt;/option&gt;
+  &lt;option value="owl"&gt;OWL JS&lt;/option&gt;
+  &lt;option value="odoo"&gt;Odoo&lt;/option&gt;
+&lt;/select&gt;</code></pre>
+          </div>
+
+          <h2 id="textarea">Textarea</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – textarea binding</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Textarea works exactly like text input --&gt;
+&lt;textarea
+  t-model="state.description"
+  rows="5"
+  placeholder="Enter description…"
+&gt;&lt;/textarea&gt;
+
+&lt;!-- Show character count --&gt;
+&lt;p&gt;&lt;t t-esc="state.description.length"/&gt; / 500 characters&lt;/p&gt;</code></pre>
+          </div>
+
+          <h2 id="modifiers">t-model Modifiers</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Modifier</th><th>Effect</th><th>When to use</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>t-model.lazy</code></td><td>Updates state on <code>change</code> event (blur / commit) instead of every <code>input</code></td><td>Expensive validations, large forms where live updates hurt performance</td></tr>
+                <tr><td><code>t-model.trim</code></td><td>Automatically trims leading/trailing whitespace before storing</td><td>Name, email, username fields — users often accidentally add spaces</td></tr>
+                <tr><td><code>t-model.number</code></td><td>Converts the string value to a JavaScript <code>Number</code> before storing</td><td>All numeric inputs — prevents string concatenation bugs like <code>"5" + 3 = "53"</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – modifiers in practice</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- .lazy: update only on blur --&gt;
+&lt;input type="text" t-model.lazy="state.username" placeholder="Username"/&gt;
+
+&lt;!-- .trim: auto-strip whitespace --&gt;
+&lt;input type="text" t-model.trim="state.email" placeholder="Email"/&gt;
+
+&lt;!-- .number: store as Number, not string --&gt;
+&lt;input type="number" t-model.number="state.quantity" min="1"/&gt;
+&lt;p&gt;Total: $&lt;t t-esc="state.quantity * props.price"/&gt;&lt;/p&gt;
+&lt;!-- Without .number: "5" * 9.99 = 49.95 (JS coerces) but "5" + 3 = "53" --&gt;
+&lt;!-- With .number: state.quantity is already 5 (Number) --&gt;
+
+&lt;!-- Combine modifiers --&gt;
+&lt;input type="text" t-model.lazy.trim="state.tag" placeholder="Tag name"/&gt;</code></pre>
+          </div>
+
+          <h2 id="complete-form">Complete Form Example</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – full registration form</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class RegisterForm extends Component {
+  formData = useState({
+    name:     "",
+    email:    "",
+    password: "",
+    role:     "viewer",
+    agree:    false,
+  });
+
+  ui = useState({ errors: {}, submitted: false });
+
+  static template = xml`
+    &lt;form t-on-submit.prevent="submit" t-if="!ui.submitted"&gt;
+      &lt;div&gt;
+        &lt;label&gt;Name&lt;/label&gt;
+        &lt;input type="text" t-model.trim="formData.name"/&gt;
+        &lt;span t-if="ui.errors.name" class="error" t-esc="ui.errors.name"/&gt;
+      &lt;/div&gt;
+
+      &lt;div&gt;
+        &lt;label&gt;Email&lt;/label&gt;
+        &lt;input type="email" t-model.trim="formData.email"/&gt;
+        &lt;span t-if="ui.errors.email" class="error" t-esc="ui.errors.email"/&gt;
+      &lt;/div&gt;
+
+      &lt;div&gt;
+        &lt;label&gt;Password&lt;/label&gt;
+        &lt;input type="password" t-model="formData.password"/&gt;
+      &lt;/div&gt;
+
+      &lt;fieldset&gt;
+        &lt;legend&gt;Role&lt;/legend&gt;
+        &lt;label&gt;&lt;input type="radio" t-model="formData.role" value="viewer"/&gt; Viewer&lt;/label&gt;
+        &lt;label&gt;&lt;input type="radio" t-model="formData.role" value="editor"/&gt; Editor&lt;/label&gt;
+        &lt;label&gt;&lt;input type="radio" t-model="formData.role" value="admin"/&gt; Admin&lt;/label&gt;
+      &lt;/fieldset&gt;
+
+      &lt;label&gt;
+        &lt;input type="checkbox" t-model="formData.agree"/&gt;
+        I agree to the Terms of Service
+      &lt;/label&gt;
+
+      &lt;button type="submit" t-att-disabled="!formData.agree"&gt;Register&lt;/button&gt;
+    &lt;/form&gt;
+
+    &lt;div t-if="ui.submitted" class="success"&gt;
+      Account created for &lt;t t-esc="formData.email"/&gt;!
+    &lt;/div&gt;
+  `;
+
+  validate() {
+    const errors = {};
+    if (!this.formData.name)                    errors.name  = "Name is required.";
+    if (!this.formData.email.includes("@"))     errors.email = "Valid email required.";
+    this.ui.errors = errors;
+    return Object.keys(errors).length === 0;
+  }
+
+  submit() {
+    if (!this.validate()) return;
+    // save…
+    this.ui.submitted = true;
+  }
+}</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>t-model</code> creates two-way binding: state → input display, input event → state update.</li>
+              <li>Works on: <code>input[text/email/password/number/search]</code>, <code>input[checkbox]</code>, <code>input[radio]</code>, <code>select</code>, <code>textarea</code>.</li>
+              <li>Single checkbox ↔ boolean. Multiple checkboxes with same <code>t-model</code> ↔ array of checked values.</li>
+              <li>Radio group: all radios bind to the same state property; selected value = state value.</li>
+              <li><code>t-model.lazy</code> — update on blur/change instead of every keystroke.</li>
+              <li><code>t-model.trim</code> — strip whitespace before storing.</li>
+              <li><code>t-model.number</code> — convert to Number before storing (always use for numeric inputs).</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/owljs/templates/conditional.html" class="topic-tag owl-topic-tag">🦉 Conditional Rendering</a>
+            <a href="/owljs/core/events.html" class="topic-tag owl-topic-tag">🦉 Event Handling</a>
+            <a href="/owljs/core/state.html" class="topic-tag owl-topic-tag">🦉 State &amp; useState</a>
+            <a href="/owljs/templates/dynamic-attrs.html" class="topic-tag owl-topic-tag">🦉 Dynamic Attributes</a>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Exercise</h3>
+            <p>Build a <code>ProductFilterPanel</code> using all t-model input types:</p>
+            <ol>
+              <li>Text input with <code>t-model.trim</code> for a name search query.</li>
+              <li>Number inputs with <code>t-model.number</code> for min/max price range.</li>
+              <li>A group of checkboxes for categories (Electronics, Clothing, Books, Food).</li>
+              <li>A select dropdown for sort order (Name A→Z, Price Low→High, Newest first).</li>
+              <li>A checkbox for "In stock only".</li>
+              <li>Use a getter <code>filteredProducts</code> that applies all active filters to a hard-coded product array. Display the count of matching products.</li>
+              <li>A "Clear Filters" button that resets all state to defaults.</li>
+            </ol>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I use t-model on a custom child component? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not directly — <code>t-model</code> is designed for native HTML form elements. For custom input components, pass a <code>value</code> prop and an <code>onInput</code> or <code>onChange</code> callback prop instead. The child calls <code>props.onInput(newValue)</code> when its internal value changes; the parent updates its state, which flows back down as the <code>value</code> prop. This is the standard controlled-input pattern.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does my number input store a string? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>All HTML input values are strings, even for <code>type="number"</code>. Without <code>t-model.number</code>, OWL stores the string <code>"42"</code> in state. Add <code>.number</code> modifier: <code>t-model.number="state.age"</code>. Then OWL calls <code>parseFloat()</code> on the value before storing. If the input is empty or not a valid number, <code>NaN</code> is stored — add a guard: <code>this.state.age || 0</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I programmatically clear a form? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Since <code>t-model</code> reads from state, resetting state resets the form. Assign all form state fields back to their initial values: <code>Object.assign(this.formData, { name: '', email: '', agree: false })</code>. The inputs bound to those state properties will automatically display the reset values on re-render. No DOM manipulation needed — this is the advantage of two-way binding.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I combine t-model with t-on-input for additional logic? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — <code>t-model</code> and <code>t-on-input</code> on the same element both fire. OWL applies the <code>t-model</code> binding first (updating state), then your <code>t-on-input</code> handler. In the handler, <code>this.state.field</code> already has the updated value. This is useful for live validation, debouncing, or triggering search after a state update.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/templates/list-rendering.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">List Rendering (t-foreach)</span>
+          </a>
+          <a href="/owljs/templates/dynamic-attrs.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Dynamic Attributes (t-att)</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

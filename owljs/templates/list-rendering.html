@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS List Rendering – t-foreach, t-as, t-key Complete Guide | ylearner</title>
+  <meta name="description" content="Complete guide to OWL JS list rendering with t-foreach, t-as, and t-key. Loop variables, nested loops, object iteration, key best practices, empty state handling, and performance tips for Odoo developers.">
+  <meta name="keywords" content="OWL JS t-foreach, OWL list rendering, OWL t-as t-key, OWL loop template, OWL foreach index, OWL nested loops, Odoo Web Library t-foreach, OWL JS array rendering tutorial">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/owljs/templates/list-rendering.html">
+  <meta property="og:title" content="OWL JS List Rendering – t-foreach Complete Guide | ylearner">
+  <meta property="og:description" content="t-foreach, t-as, t-key in OWL JS: loop variables, nested loops, object iteration, key best practices, and empty state handling.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/owljs/templates/list-rendering.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS t-foreach List Rendering Guide | ylearner">
+  <meta name="twitter:description" content="t-foreach with t-as and t-key — loop variables, nested loops, object keys, and empty state in OWL JS.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS List Rendering (t-foreach)",
+    "description": "Complete guide to OWL JS t-foreach for list rendering: t-as and t-key, loop variables, nested iteration, object looping, empty states, and performance best practices.",
+    "educationalLevel": "Beginner",
+    "keywords": "OWL JS t-foreach, list rendering, t-as, t-key, loop variables, nested loops, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/templates/conditional.html">Dynamic Templates</a><span class="separator">›</span>
+          <span class="current">List Rendering (t-foreach)</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Dynamic Templates</div>
+          <h1>OWL JS List Rendering – t-foreach, t-as, and t-key</h1>
+          <p class="lesson-intro">Rendering lists — arrays of items, database records, table rows — is one of the most common tasks in any OWL application. The <code>t-foreach</code> directive iterates over any JavaScript array or object, <code>t-as</code> names the loop variable, and <code>t-key</code> provides the stable identity OWL needs for efficient DOM diffing. This lesson covers every aspect of list rendering: the three required attributes, built-in loop variables, nested loops, iterating over objects, empty state handling, and the subtle key pitfalls that cause list-rendering bugs.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 2 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="foreach-basics">The Three Required Attributes</h2>
+          <p><code>t-foreach</code>, <code>t-as</code>, and <code>t-key</code> always appear together on the same element. Think of them as the QWeb equivalent of JavaScript's <code>array.map(item => &lt;li key={item.id}&gt;...&lt;/li&gt;)</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – basic t-foreach</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;ul&gt;
+  &lt;!--
+    t-foreach: the iterable (array or object)
+    t-as:      name for the current item variable
+    t-key:     unique stable identifier for each item
+  --&gt;
+  &lt;li
+    t-foreach="state.todos"
+    t-as="todo"
+    t-key="todo.id"
+  &gt;
+    &lt;t t-esc="todo.text"/&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>All three attributes are required — never omit t-key</strong>
+              <p>OWL will render the list without <code>t-key</code>, but it falls back to using the loop index as the key, which causes subtle DOM reuse bugs when items are inserted, deleted, or reordered. Always provide a stable, unique <code>t-key</code> from your data — typically a database ID. The loop index (<code>todo_index</code>) is only acceptable when the list is purely display-only and never reordered or filtered.</p>
+            </div>
+          </div>
+
+          <h2 id="loop-variables">Built-In Loop Variables</h2>
+          <p>OWL injects helper variables into every <code>t-foreach</code> loop. They use the <code>t-as</code> name as a prefix:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Variable</th><th>Description</th><th>Example (t-as="item")</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>item</code></td><td>Current element</td><td><code>item.name</code></td></tr>
+                <tr><td><code>item_index</code></td><td>Zero-based index</td><td><code>item_index</code> → 0, 1, 2…</td></tr>
+                <tr><td><code>item_first</code></td><td>True for first element</td><td><code>item_first</code> → true / false</td></tr>
+                <tr><td><code>item_last</code></td><td>True for last element</td><td><code>item_last</code> → true / false</td></tr>
+                <tr><td><code>item_size</code></td><td>Total number of items</td><td><code>item_size</code> → 5</td></tr>
+                <tr><td><code>item_value</code></td><td>Value when iterating an object</td><td><code>item_value</code> (item = key, item_value = value)</td></tr>
+                <tr><td><code>item_odd</code></td><td>True for odd-indexed items</td><td><code>item_odd</code> → alternating true/false</td></tr>
+                <tr><td><code>item_even</code></td><td>True for even-indexed items</td><td><code>item_even</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – using loop variables</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;ul&gt;
+  &lt;li
+    t-foreach="state.steps"
+    t-as="step"
+    t-key="step.id"
+    t-att-class="{
+      'step': true,
+      'step--first': step_first,
+      'step--last':  step_last,
+      'step--odd':   step_odd
+    }"
+  &gt;
+    &lt;span class="step-number"&gt;&lt;t t-esc="step_index + 1"/&gt;/&lt;t t-esc="step_size"/&gt;&lt;/span&gt;
+    &lt;span t-esc="step.title"/&gt;
+    &lt;span t-if="step_last" class="badge"&gt;Last&lt;/span&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="empty-state">Empty State Handling</h2>
+          <p>Always show feedback when a list is empty. Combine <code>t-if</code> with <code>t-foreach</code>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – empty state pattern</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Pattern 1: separate t-if guards --&gt;
+&lt;p t-if="state.items.length === 0" class="empty-state"&gt;
+  No items yet. &lt;a href="#" t-on-click.prevent="addFirst"&gt;Add one&lt;/a&gt;.
+&lt;/p&gt;
+&lt;ul t-if="state.items.length &gt; 0"&gt;
+  &lt;li t-foreach="state.items" t-as="item" t-key="item.id" t-esc="item.name"/&gt;
+&lt;/ul&gt;
+
+&lt;!-- Pattern 2: using t-else --&gt;
+&lt;ul t-if="state.items.length"&gt;
+  &lt;li t-foreach="state.items" t-as="item" t-key="item.id" t-esc="item.name"/&gt;
+&lt;/ul&gt;
+&lt;p t-else="" class="empty-state"&gt;No items.&lt;/p&gt;</code></pre>
+          </div>
+
+          <h2 id="loop-on-components">Looping Over Component Tags</h2>
+          <p>You can place <code>t-foreach</code> directly on a component tag to render a component for each item:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – loop on a component</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Render a ProductCard for each product --&gt;
+&lt;ProductCard
+  t-foreach="state.products"
+  t-as="product"
+  t-key="product.id"
+  name="product.name"
+  price="product.price"
+  imageUrl="product.imageUrl"
+  onAddToCart.bind="addToCart"
+/&gt;</code></pre>
+          </div>
+
+          <h2 id="object-iteration">Iterating Over Objects</h2>
+          <p>When you pass a plain object to <code>t-foreach</code>, the loop variable (<code>t-as</code>) is the key and <code>[as]_value</code> is the value — equivalent to <code>Object.entries()</code>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – iterating an object</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- state.config = { theme: 'dark', lang: 'en', timezone: 'UTC' } --&gt;
+&lt;dl&gt;
+  &lt;t t-foreach="state.config" t-as="key" t-key="key"&gt;
+    &lt;dt t-esc="key"/&gt;        &lt;!-- key = 'theme', 'lang', 'timezone' --&gt;
+    &lt;dd t-esc="key_value"/&gt;  &lt;!-- key_value = 'dark', 'en', 'UTC' --&gt;
+  &lt;/t&gt;
+&lt;/dl&gt;
+
+&lt;!-- More explicit: use Object.entries in a getter --&gt;</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – Object.entries via getter</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class ConfigTable extends Component {
+  state = useState({
+    config: { theme: "dark", lang: "en", timezone: "UTC" },
+  });
+
+  // More readable than using object iteration directly
+  get configEntries() {
+    return Object.entries(this.state.config);
+  }
+
+  static template = xml`
+    &lt;dl&gt;
+      &lt;t t-foreach="configEntries" t-as="entry" t-key="entry[0]"&gt;
+        &lt;dt t-esc="entry[0]"/&gt;
+        &lt;dd t-esc="entry[1]"/&gt;
+      &lt;/t&gt;
+    &lt;/dl&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <h2 id="nested-loops">Nested Loops</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – nested t-foreach</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Render a table: rows × columns --&gt;
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr t-foreach="state.rows" t-as="row" t-key="row.id"&gt;
+      &lt;td
+        t-foreach="row.cells"
+        t-as="cell"
+        t-key="cell.id"
+        t-esc="cell.value"
+      /&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;!-- Category → items tree --&gt;
+&lt;div t-foreach="state.categories" t-as="cat" t-key="cat.id" class="category"&gt;
+  &lt;h3 t-esc="cat.name"/&gt;
+  &lt;ul&gt;
+    &lt;li t-foreach="cat.items" t-as="item" t-key="item.id" t-esc="item.name"/&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+          </div>
+
+          <h2 id="key-best-practices">t-key Best Practices</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Scenario</th><th>Recommended t-key</th><th>Why</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Database records (Odoo)</td><td><code>t-key="record.id"</code></td><td>IDs are unique and stable</td></tr>
+                <tr><td>Static display list, never reordered</td><td><code>t-key="item_index"</code></td><td>Index is fine when list never changes</td></tr>
+                <tr><td>Filterable/sortable list</td><td><code>t-key="item.id"</code></td><td>Index breaks when items are rearranged</td></tr>
+                <tr><td>String array (unique strings)</td><td><code>t-key="tag"</code></td><td>String itself is the identity</td></tr>
+                <tr><td>Number range</td><td><code>t-key="n"</code></td><td>Number itself is unique</td></tr>
+                <tr><td>Generated client-side items</td><td><code>t-key="item.clientId"</code></td><td>Assign a <code>crypto.randomUUID()</code> at creation</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>t-foreach</code>, <code>t-as</code>, and <code>t-key</code> always appear together. Never omit <code>t-key</code>.</li>
+              <li>Loop variables: <code>[as]_index</code>, <code>[as]_first</code>, <code>[as]_last</code>, <code>[as]_size</code>, <code>[as]_odd</code>, <code>[as]_even</code>.</li>
+              <li>For object iteration: the loop variable is the key, <code>[as]_value</code> is the value.</li>
+              <li>Always show an empty state when the list might be empty — use <code>t-if</code> before or after the loop.</li>
+              <li><code>t-foreach</code> works on both HTML elements and component tags.</li>
+              <li>Use a stable unique value from your data for <code>t-key</code> — not the loop index when the list can be filtered or reordered.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/owljs/templates/conditional.html" class="topic-tag owl-topic-tag">🦉 Conditional Rendering</a>
+            <a href="/owljs/core/state.html" class="topic-tag owl-topic-tag">🦉 State &amp; useState</a>
+            <a href="/owljs/templates/input-binding.html" class="topic-tag owl-topic-tag">🦉 Input Binding (t-model)</a>
+            <a href="/owljs/core/events.html" class="topic-tag owl-topic-tag">🦉 Event Handling</a>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Exercise</h3>
+            <p>Build a <code>DataGrid</code> component with full list rendering features:</p>
+            <ol>
+              <li>State: array of <code>{ id, name, department, salary }</code> employees (at least 8).</li>
+              <li>Render a <code>&lt;table&gt;</code>. Use <code>t-foreach</code> for rows. Apply alternating row colors using <code>item_odd</code> / <code>item_even</code> via <code>t-att-class</code>.</li>
+              <li>Show row numbers using <code>item_index + 1</code>.</li>
+              <li>Add a "Department" filter dropdown. Use a getter to return filtered employees. When filter is "All", show all rows.</li>
+              <li>Show an empty state message when no employees match the filter.</li>
+              <li>Add a "Delete" button per row. Use an inline arrow function to pass the employee ID to a delete method.</li>
+            </ol>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">Frequently Asked Questions</h2>
+            <div class="faq-item">
+              <div class="faq-question">What happens if two items have the same t-key value? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Duplicate keys cause undefined behavior — OWL may reuse the wrong DOM node during diffing, leading to mismatched content, incorrect event handlers, or component state attached to the wrong item. Always ensure keys are unique across the entire list. If your data source has duplicate IDs (e.g., after a merge), deduplicate before rendering or generate a composite key like <code>t-key="item.type + '-' + item.id"</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use t-foreach on a &lt;t&gt; tag? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — <code>&lt;t t-foreach="items" t-as="item" t-key="item.id"&gt;...&lt;/t&gt;</code> renders the children for each item without wrapping them in an extra DOM element. This is useful when you need to render multiple sibling elements per item (e.g., a <code>&lt;dt&gt;</code>/<code>&lt;dd&gt;</code> pair for each entry in a definition list) without adding an extra wrapper that would break the HTML structure.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does my list not update when I push to the array? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Make sure your array is inside a <code>useState</code> object — not a plain class property. Plain properties are not reactive. <code>this.items.push(x)</code> on a plain array does nothing visible. With <code>this.state.items.push(x)</code> (where <code>state = useState({items: []})</code>), the Proxy intercepts the push and schedules a re-render. If you do have <code>useState</code> but still see no update, check whether you are accidentally shadowing: <code>const items = this.state.items; items.push(x);</code> — the shadow variable is a Proxy reference, so this should work. The common real mistake is using a plain array instead of putting it in state.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I render a numbered list starting from 1? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use the <code>item_index</code> variable (zero-based) and add 1: <code>&lt;span t-esc="item_index + 1"/&gt;</code>. For an HTML ordered list, you can also use a plain <code>&lt;ol&gt;</code> and let the browser handle numbering automatically — no JavaScript needed.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/templates/conditional.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Conditional Rendering</span>
+          </a>
+          <a href="/owljs/templates/input-binding.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Input Binding (t-model)</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
