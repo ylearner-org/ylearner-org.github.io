@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS Form Validation – Real-Time Validation with OWL | ylearner</title>
+  <meta name="description" content="Build a form with real-time validation in OWL JS. Covers touched/dirty field tracking, async validators, cross-field validation, submit guards, and integration with Odoo form views using record constraints.">
+  <meta name="keywords" content="OWL JS form validation, OWL JS form example, OWL JS input validation, t-model OWL validation, Odoo OWL form, OWL JS real-time validation, OWL JS form project">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/owljs/projects/form-validation.html">
+  <meta property="og:title" content="OWL JS Form with Real-Time Validation | ylearner">
+  <meta property="og:description" content="Build a real-time validated form in OWL JS: touched tracking, async validators, cross-field checks, and Odoo form integration.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/owljs/projects/form-validation.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS Form Validation Project 2026 | ylearner">
+  <meta name="twitter:description" content="Complete OWL JS form validation tutorial with real-time feedback, async validators, and Odoo integration.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS Form Validation – Real-Time Validation",
+    "description": "Build a form with real-time validation in OWL JS covering touched state, async validators, cross-field validation, and Odoo form integration.",
+    "educationalLevel": "Intermediate",
+    "keywords": "OWL JS form, validation, t-model, async validator, Odoo form",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header">Ad – 728×90</div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/projects/todo-app.html">Projects</a><span class="separator">›</span>
+          <span class="current">Form Validation</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Project</div>
+          <h1>OWL JS Form with Real-Time Validation</h1>
+          <p class="lesson-intro">Forms are the most interaction-heavy UI pattern. A form done right shows errors only after the user has touched a field (not before), validates asynchronously when uniqueness must be checked against a server, cross-validates related fields (e.g., password and confirm), and disables submit until every rule passes. This project builds a user registration form implementing all of these patterns in OWL JS, then shows how the same patterns map to Odoo form view constraints.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 40 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="what-youll-build">What You'll Build</h2>
+          <p>A user registration form with these fields and rules:</p>
+
+          <table class="data-table">
+            <thead>
+              <tr><th>Field</th><th>Rules</th><th>Type</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Username</td><td>Required, 3–20 chars, alphanumeric, unique (async)</td><td>text</td></tr>
+              <tr><td>Email</td><td>Required, valid email format</td><td>email</td></tr>
+              <tr><td>Password</td><td>Required, min 8 chars, must contain number</td><td>password</td></tr>
+              <tr><td>Confirm Password</td><td>Must match Password</td><td>password</td></tr>
+              <tr><td>Age</td><td>Required, number, 18–120</td><td>number</td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="validation-architecture">Validation Architecture</h2>
+          <p>State has three parallel objects: <code>fields</code> (values), <code>errors</code> (error strings), <code>touched</code> (whether user has blurred the field). Only show an error when a field is touched.</p>
+
+          <pre><code class="language-javascript">// RegistrationForm.js
+/** @odoo-module **/
+import { Component, useState } from "@odoo/owl";
+
+export class RegistrationForm extends Component {
+  static template = "my_module.RegistrationForm";
+
+  setup() {
+    this.state = useState({
+      fields: {
+        username: "",
+        email: "",
+        password: "",
+        confirm: "",
+        age: "",
+      },
+      errors: {
+        username: "",
+        email: "",
+        password: "",
+        confirm: "",
+        age: "",
+      },
+      touched: {
+        username: false,
+        email: false,
+        password: false,
+        confirm: false,
+        age: false,
+      },
+      submitting: false,
+      submitError: "",
+      submitted: false,
+    });
+  }
+
+  // Mark field as touched on blur, then validate
+  onBlur(field) {
+    this.state.touched[field] = true;
+    this.validateField(field);
+  }
+
+  // Validate a single field
+  validateField(field) {
+    const v = this.state.fields[field];
+
+    switch (field) {
+      case "username": {
+        if (!v) { this.state.errors.username = "Username is required."; break; }
+        if (v.length &lt; 3) { this.state.errors.username = "Min 3 characters."; break; }
+        if (v.length &gt; 20) { this.state.errors.username = "Max 20 characters."; break; }
+        if (!/^[a-zA-Z0-9_]+$/.test(v)) { this.state.errors.username = "Only letters, numbers, underscores."; break; }
+        this.state.errors.username = "";
+        break;
+      }
+      case "email": {
+        if (!v) { this.state.errors.email = "Email is required."; break; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { this.state.errors.email = "Enter a valid email."; break; }
+        this.state.errors.email = "";
+        break;
+      }
+      case "password": {
+        if (!v) { this.state.errors.password = "Password is required."; break; }
+        if (v.length &lt; 8) { this.state.errors.password = "Min 8 characters."; break; }
+        if (!/\d/.test(v)) { this.state.errors.password = "Must contain at least one number."; break; }
+        this.state.errors.password = "";
+        // Re-validate confirm if it was already touched
+        if (this.state.touched.confirm) this.validateField("confirm");
+        break;
+      }
+      case "confirm": {
+        if (!v) { this.state.errors.confirm = "Please confirm your password."; break; }
+        if (v !== this.state.fields.password) { this.state.errors.confirm = "Passwords do not match."; break; }
+        this.state.errors.confirm = "";
+        break;
+      }
+      case "age": {
+        const n = Number(v);
+        if (!v) { this.state.errors.age = "Age is required."; break; }
+        if (isNaN(n) || !Number.isInteger(n)) { this.state.errors.age = "Enter a whole number."; break; }
+        if (n &lt; 18) { this.state.errors.age = "Must be 18 or older."; break; }
+        if (n &gt; 120) { this.state.errors.age = "Enter a valid age."; break; }
+        this.state.errors.age = "";
+        break;
+      }
+    }
+  }
+
+  get isFormValid() {
+    const { errors } = this.state;
+    return Object.values(errors).every(e => e === "") &&
+           Object.values(this.state.fields).every(v => v !== "");
+  }
+
+  async onSubmit(ev) {
+    ev.preventDefault();
+    // Touch all fields to show any remaining errors
+    for (const field of Object.keys(this.state.touched)) {
+      this.state.touched[field] = true;
+      this.validateField(field);
+    }
+    if (!this.isFormValid) return;
+
+    this.state.submitting = true;
+    this.state.submitError = "";
+    try {
+      await this.checkUsernameUnique(this.state.fields.username);
+      // Submit to server...
+      await new Promise(r => setTimeout(r, 800)); // simulate API call
+      this.state.submitted = true;
+    } catch (err) {
+      this.state.submitError = err.message;
+    } finally {
+      this.state.submitting = false;
+    }
+  }
+
+  async checkUsernameUnique(username) {
+    // Simulate server check — replace with actual orm.searchCount or rpc call
+    const taken = ["admin", "odoo", "user"];
+    await new Promise(r => setTimeout(r, 300));
+    if (taken.includes(username.toLowerCase())) {
+      this.state.errors.username = "Username already taken.";
+      throw new Error("Username already taken.");
+    }
+  }
+}</code></pre>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="template">Template</h2>
+          <pre><code class="language-xml">&lt;!-- RegistrationForm.xml --&gt;
+&lt;templates&gt;
+  &lt;t t-name="my_module.RegistrationForm"&gt;
+    &lt;div class="reg-form-wrapper"&gt;
+
+      &lt;!-- Success state --&gt;
+      &lt;t t-if="state.submitted"&gt;
+        &lt;div class="success-banner"&gt;
+          ✓ Registration complete! Welcome, &lt;strong t-esc="state.fields.username" /&gt;.
+        &lt;/div&gt;
+      &lt;/t&gt;
+
+      &lt;form t-else="" class="reg-form" t-on-submit="onSubmit" novalidate="1"&gt;
+        &lt;h2&gt;Create Account&lt;/h2&gt;
+
+        &lt;t t-if="state.submitError"&gt;
+          &lt;div class="form-error-banner" t-esc="state.submitError" /&gt;
+        &lt;/t&gt;
+
+        &lt;!-- Username --&gt;
+        &lt;div t-att-class="'form-group' + (state.touched.username and state.errors.username ? ' has-error' : '') + (state.touched.username and !state.errors.username and state.fields.username ? ' has-success' : '')"&gt;
+          &lt;label for="username"&gt;Username&lt;/label&gt;
+          &lt;input
+            id="username"
+            type="text"
+            t-model.trim="state.fields.username"
+            t-on-blur="() =&gt; onBlur('username')"
+            t-on-input="() =&gt; state.touched.username and validateField('username')"
+            placeholder="e.g. john_doe"
+            autocomplete="username"
+          /&gt;
+          &lt;span class="field-error" t-if="state.touched.username and state.errors.username" t-esc="state.errors.username" /&gt;
+          &lt;span class="field-ok"   t-if="state.touched.username and !state.errors.username and state.fields.username"&gt;✓&lt;/span&gt;
+        &lt;/div&gt;
+
+        &lt;!-- Email --&gt;
+        &lt;div t-att-class="'form-group' + (state.touched.email and state.errors.email ? ' has-error' : '') + (state.touched.email and !state.errors.email and state.fields.email ? ' has-success' : '')"&gt;
+          &lt;label for="email"&gt;Email&lt;/label&gt;
+          &lt;input
+            id="email"
+            type="email"
+            t-model.trim="state.fields.email"
+            t-on-blur="() =&gt; onBlur('email')"
+            t-on-input="() =&gt; state.touched.email and validateField('email')"
+            placeholder="you@example.com"
+            autocomplete="email"
+          /&gt;
+          &lt;span class="field-error" t-if="state.touched.email and state.errors.email" t-esc="state.errors.email" /&gt;
+        &lt;/div&gt;
+
+        &lt;!-- Password --&gt;
+        &lt;div t-att-class="'form-group' + (state.touched.password and state.errors.password ? ' has-error' : '') + (state.touched.password and !state.errors.password and state.fields.password ? ' has-success' : '')"&gt;
+          &lt;label for="password"&gt;Password&lt;/label&gt;
+          &lt;input
+            id="password"
+            type="password"
+            t-model="state.fields.password"
+            t-on-blur="() =&gt; onBlur('password')"
+            t-on-input="() =&gt; state.touched.password and validateField('password')"
+            autocomplete="new-password"
+          /&gt;
+          &lt;span class="field-error" t-if="state.touched.password and state.errors.password" t-esc="state.errors.password" /&gt;
+          &lt;PasswordStrength t-if="state.fields.password" password="state.fields.password" /&gt;
+        &lt;/div&gt;
+
+        &lt;!-- Confirm Password --&gt;
+        &lt;div t-att-class="'form-group' + (state.touched.confirm and state.errors.confirm ? ' has-error' : '') + (state.touched.confirm and !state.errors.confirm and state.fields.confirm ? ' has-success' : '')"&gt;
+          &lt;label for="confirm"&gt;Confirm Password&lt;/label&gt;
+          &lt;input
+            id="confirm"
+            type="password"
+            t-model="state.fields.confirm"
+            t-on-blur="() =&gt; onBlur('confirm')"
+            t-on-input="() =&gt; state.touched.confirm and validateField('confirm')"
+            autocomplete="new-password"
+          /&gt;
+          &lt;span class="field-error" t-if="state.touched.confirm and state.errors.confirm" t-esc="state.errors.confirm" /&gt;
+        &lt;/div&gt;
+
+        &lt;!-- Age --&gt;
+        &lt;div t-att-class="'form-group' + (state.touched.age and state.errors.age ? ' has-error' : '') + (state.touched.age and !state.errors.age and state.fields.age ? ' has-success' : '')"&gt;
+          &lt;label for="age"&gt;Age&lt;/label&gt;
+          &lt;input
+            id="age"
+            type="number"
+            t-model.number="state.fields.age"
+            t-on-blur="() =&gt; onBlur('age')"
+            t-on-input="() =&gt; state.touched.age and validateField('age')"
+            min="18"
+            max="120"
+          /&gt;
+          &lt;span class="field-error" t-if="state.touched.age and state.errors.age" t-esc="state.errors.age" /&gt;
+        &lt;/div&gt;
+
+        &lt;button
+          type="submit"
+          class="submit-btn"
+          t-att-disabled="state.submitting"
+        &gt;
+          &lt;t t-if="state.submitting"&gt;Creating account…&lt;/t&gt;
+          &lt;t t-else=""&gt;Create Account&lt;/t&gt;
+        &lt;/button&gt;
+      &lt;/form&gt;
+    &lt;/div&gt;
+  &lt;/t&gt;
+&lt;/templates&gt;</code></pre>
+
+          <h2 id="password-strength">PasswordStrength Sub-Component</h2>
+          <pre><code class="language-javascript">// PasswordStrength.js
+/** @odoo-module **/
+import { Component } from "@odoo/owl";
+
+export class PasswordStrength extends Component {
+  static template = "my_module.PasswordStrength";
+  static props = { password: String };
+
+  get score() {
+    const p = this.props.password;
+    let s = 0;
+    if (p.length &gt;= 8)  s++;
+    if (p.length &gt;= 12) s++;
+    if (/[A-Z]/.test(p)) s++;
+    if (/[0-9]/.test(p)) s++;
+    if (/[^A-Za-z0-9]/.test(p)) s++;
+    return s;  // 0–5
+  }
+
+  get label()  { return ["Very Weak","Weak","Fair","Good","Strong","Very Strong"][this.score]; }
+  get color()  { return ["#e74c3c","#e67e22","#f1c40f","#2ecc71","#27ae60","#1abc9c"][this.score]; }
+}</code></pre>
+
+          <pre><code class="language-xml">&lt;t t-name="my_module.PasswordStrength"&gt;
+  &lt;div class="password-strength"&gt;
+    &lt;div class="strength-bar"&gt;
+      &lt;span
+        t-foreach="[1,2,3,4,5]"
+        t-as="i"
+        t-key="i"
+        class="strength-segment"
+        t-att-style="i &lt;= score ? 'background:' + color : ''"
+      /&gt;
+    &lt;/div&gt;
+    &lt;span class="strength-label" t-att-style="'color:' + color" t-esc="label" /&gt;
+  &lt;/div&gt;
+&lt;/t&gt;</code></pre>
+
+          <h2 id="async-uniqueness">Async Uniqueness Check with Odoo ORM</h2>
+          <pre><code class="language-javascript">// Replace checkUsernameUnique with real ORM call
+async checkUsernameUnique(username) {
+  const count = await this.orm.searchCount(
+    "res.users",
+    [["login", "=", username]],
+  );
+  if (count &gt; 0) {
+    this.state.errors.username = "Username already taken.";
+    throw new Error("Username already taken.");
+  }
+}</code></pre>
+
+          <h2 id="custom-hook">Extract useFormValidation Hook</h2>
+          <p>Reuse validation logic across multiple forms with a custom hook:</p>
+
+          <pre><code class="language-javascript">// hooks/useFormValidation.js
+/** @odoo-module **/
+import { useState } from "@odoo/owl";
+
+export function useFormValidation(initialFields, validators) {
+  const state = useState({
+    fields: { ...initialFields },
+    errors:  Object.fromEntries(Object.keys(initialFields).map(k => [k, ""])),
+    touched: Object.fromEntries(Object.keys(initialFields).map(k => [k, false])),
+  });
+
+  function validate(field) {
+    const validator = validators[field];
+    if (validator) {
+      state.errors[field] = validator(state.fields[field], state.fields) || "";
+    }
+  }
+
+  function touch(field) {
+    state.touched[field] = true;
+    validate(field);
+  }
+
+  function touchAll() {
+    for (const field of Object.keys(state.fields)) touch(field);
+  }
+
+  const isValid = () =>
+    Object.keys(state.fields).every(f => {
+      validate(f);
+      return !state.errors[f];
+    });
+
+  return { state, validate, touch, touchAll, isValid };
+}</code></pre>
+
+          <pre><code class="language-javascript">// Usage in component
+setup() {
+  const { state, touch, touchAll, isValid } = useFormValidation(
+    { username: "", email: "", password: "" },
+    {
+      username: (v) =&gt; !v ? "Required" : v.length &lt; 3 ? "Min 3 chars" : "",
+      email:    (v) =&gt; !v ? "Required" : !/\S+@\S+\.\S+/.test(v) ? "Invalid email" : "",
+      password: (v) =&gt; !v ? "Required" : v.length &lt; 8 ? "Min 8 chars" : "",
+    }
+  );
+  this.form = state;
+  this.touch = touch;
+  this.touchAll = touchAll;
+  this.isFormValid = isValid;
+}</code></pre>
+
+          <h2 id="css">CSS</h2>
+          <pre><code class="language-css">.reg-form-wrapper { max-width: 440px; margin: 40px auto; }
+
+.reg-form { display: flex; flex-direction: column; gap: 18px; padding: 28px; border: 1px solid #e0e0e0; border-radius: 8px; }
+
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-group label { font-size: 13px; font-weight: 600; color: #1d2327; }
+.form-group input {
+  padding: 9px 12px;
+  border: 1px solid #ccd0d4;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.15s;
+}
+.form-group.has-error input  { border-color: #d63638; }
+.form-group.has-success input { border-color: #00a32a; }
+.field-error { font-size: 12px; color: #d63638; }
+.field-ok    { font-size: 12px; color: #00a32a; }
+
+.submit-btn {
+  padding: 10px;
+  background: #2271b1;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.success-banner { padding: 16px; background: #edfaef; border: 1px solid #00a32a; border-radius: 4px; color: #1d7a1d; }
+.form-error-banner { padding: 10px; background: #fce8e8; border: 1px solid #d63638; border-radius: 4px; color: #a20e0e; font-size: 13px; }
+
+.password-strength { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.strength-bar { display: flex; gap: 3px; }
+.strength-segment { width: 28px; height: 4px; background: #e0e0e0; border-radius: 2px; transition: background 0.2s; }</code></pre>
+
+        </article>
+
+        <div class="summary-box">
+          <h3>What You Learned</h3>
+          <ul>
+            <li><strong>touched state</strong>: show errors only after user has left a field — better UX than immediate validation</li>
+            <li><strong>validateField()</strong>: per-field switch statement, sets error string or clears it</li>
+            <li><strong>Cross-field validation</strong>: password change re-validates confirm field if already touched</li>
+            <li><strong>Async uniqueness check</strong>: called on submit, throws to halt form submission</li>
+            <li><strong>touchAll() on submit</strong>: reveals all errors if user tries to submit without touching every field</li>
+            <li><strong>useFormValidation hook</strong>: encapsulates validation state for reuse across components</li>
+          </ul>
+        </div>
+
+        <div class="related-topics">
+          <span class="owl-topic-tag">t-model</span>
+          <span class="owl-topic-tag">useState</span>
+          <span class="owl-topic-tag">Custom Hooks</span>
+          <span class="owl-topic-tag">t-on-blur</span>
+          <span class="owl-topic-tag">Async Validators</span>
+          <span class="owl-topic-tag">Cross-Field Validation</span>
+        </div>
+
+        <div class="exercise-box">
+          <h3>Extend the Project</h3>
+          <ol>
+            <li>Add debounced async validation: check username uniqueness 500ms after the user stops typing (not just on blur), using <code>useDebounce</code> custom hook.</li>
+            <li>Add a phone number field with international format validation using a regex, and mask the input to auto-insert hyphens.</li>
+            <li>Implement a multi-step form: split the fields into two pages (Account Info / Personal Info) with Back/Next navigation, validating only the current page's fields before proceeding.</li>
+            <li>Replace the vanilla form with an Odoo wizard (transient model): create the <code>my.registration.wizard</code> model, add Python validation in <code>_check_username</code>, and use <code>record.update()</code> in the OWL wizard component.</li>
+          </ol>
+        </div>
+
+        <section class="faq-section">
+          <h2>FAQ</h2>
+          <details>
+            <summary>Why not use the native HTML required / pattern attributes?</summary>
+            <p>Native browser validation fires on submit and shows browser-styled tooltips that cannot be customised. OWL (or any framework) form validation gives full control over when errors appear, how they look, async validation, and cross-field rules. Use <code>novalidate</code> on the <code>&lt;form&gt;</code> element to disable browser validation and rely on your own logic.</p>
+          </details>
+          <details>
+            <summary>How do I prevent double-submit?</summary>
+            <p>Set <code>this.state.submitting = true</code> before the async call and bind <code>t-att-disabled="state.submitting"</code> to the submit button. Also guard at the top of <code>onSubmit</code>: <code>if (this.state.submitting) return;</code> to handle race conditions from keyboard/mouse double-fire.</p>
+          </details>
+          <details>
+            <summary>Is there a validation library for OWL?</summary>
+            <p>OWL does not ship a built-in validation library. Odoo's own form infrastructure uses Python-side constraint validation (<code>@api.constrains</code>) and surfaces errors via the <code>UserError</code> exception. For standalone OWL apps, lightweight libraries like <code>vest</code> or <code>yup</code> work well — import them as ES modules and call them inside your <code>validateField</code> methods.</p>
+          </details>
+        </section>
+
+        <nav class="lesson-nav">
+          <a class="prev-lesson" href="/owljs/projects/counter.html">← Counter Widget</a>
+          <a class="next-lesson" href="/owljs/projects/dashboard.html">Dashboard Component →</a>
+        </nav>
+
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+
+      </main>
+      <aside class="right-sidebar">
+        <div class="toc-container">
+          <h3 class="toc-title">Contents</h3>
+          <nav class="toc" aria-label="Table of Contents">
+            <ul>
+              <li><a href="#what-youll-build">What You'll Build</a></li>
+              <li><a href="#validation-architecture">Validation Architecture</a></li>
+              <li><a href="#template">Template</a></li>
+              <li><a href="#password-strength">PasswordStrength Component</a></li>
+              <li><a href="#async-uniqueness">Async Uniqueness Check</a></li>
+              <li><a href="#custom-hook">useFormValidation Hook</a></li>
+              <li><a href="#css">CSS</a></li>
+            </ul>
+          </nav>
+        </div>
+        <div class="ad-container ad-sidebar">Ad – 250×250</div>
+      </aside>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 ylearner &mdash; a product by <a href="https://algorid.com" target="_blank" rel="noopener">Algorid Limited</a></p>
+  </footer>
+  <button class="scroll-top" id="scrollTop" aria-label="Back to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
