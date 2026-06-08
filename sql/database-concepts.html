@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Database Concepts – Tables, Keys, Schemas &amp; Relationships | ylearner</title>
+  <meta name="description" content="Learn core database concepts: tables, primary keys, foreign keys, relationship types (one-to-one, one-to-many, many-to-many), schemas, and indexes. Essential foundations before writing SQL.">
+  <meta name="keywords" content="database concepts, primary key, foreign key, database relationships, one-to-many, many-to-many, database schema, SQL tables, relational database fundamentals">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/database-concepts.html">
+  <meta property="og:title" content="Database Concepts – Tables, Keys, Schemas &amp; Relationships | ylearner">
+  <meta property="og:description" content="Master the foundational database concepts every SQL developer must know: tables, primary keys, foreign keys, relationship types, schemas, and indexes.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/database-concepts.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Database Concepts – Tables, Keys, Schemas &amp; Relationships | ylearner">
+  <meta name="twitter:description" content="Learn primary keys, foreign keys, relationships, and schemas — the building blocks of every relational database.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Database Concepts – Tables, Keys, Schemas & Relationships",
+    "description": "Core relational database concepts for SQL beginners: tables, primary keys, foreign keys, relationship types, schemas, and a brief introduction to indexes.",
+    "educationalLevel": "Beginner",
+    "keywords": "database concepts, primary key, foreign key, database relationships, schema, SQL tables",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <span class="current">Database Concepts</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🗄️ Introduction</div>
+          <h1>Database Concepts – Tables, Keys, Schemas &amp; Relationships</h1>
+          <p class="lesson-intro">Before writing complex SQL queries, you need to understand how relational databases are organised. This lesson covers the fundamental building blocks: <strong>tables</strong> (where data lives), <strong>primary keys</strong> (unique row identifiers), <strong>foreign keys</strong> (links between tables), the three <strong>relationship types</strong> (one-to-one, one-to-many, many-to-many), <strong>schemas</strong> (the blueprint), and a brief introduction to <strong>indexes</strong>. These concepts underpin everything you will do in SQL.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="tables">Tables – Where Data Lives</h2>
+          <p>A <strong>table</strong> is the fundamental unit of storage in a relational database. Think of it as a spreadsheet: data is organised into <strong>rows</strong> (also called records or tuples) and <strong>columns</strong> (also called fields or attributes). Unlike a spreadsheet, however, a database table enforces strict rules — every column has a defined data type, and the database engine validates every row against those rules before accepting it.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <caption>Example: <code>employees</code> table</caption>
+              <thead>
+                <tr><th>id</th><th>first_name</th><th>last_name</th><th>department</th><th>salary</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>Alice</td><td>Johnson</td><td>Engineering</td><td>85000</td></tr>
+                <tr><td>2</td><td>Bob</td><td>Smith</td><td>Marketing</td><td>62000</td></tr>
+                <tr><td>3</td><td>Carol</td><td>Lee</td><td>Engineering</td><td>91000</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>Key terminology to know:</p>
+          <ul>
+            <li><strong>Row / Record</strong> — one complete entry in the table (e.g. one employee).</li>
+            <li><strong>Column / Field</strong> — one attribute of every row (e.g. <code>salary</code>).</li>
+            <li><strong>Cell</strong> — the intersection of one row and one column — holds a single value.</li>
+            <li><strong>NULL</strong> — a special marker meaning "no value" or "unknown". Different from zero or an empty string.</li>
+          </ul>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Tables are not files</strong>
+              <p>Although a database is ultimately stored on disk, you should never think of a table as a file. The database engine manages how data is physically stored — in pages, using B-tree indexes, with write-ahead logs. As a SQL developer, you only interact with the logical table structure. The physical storage is the engine's concern.</p>
+            </div>
+          </div>
+
+          <h2 id="primary-key">Primary Key – The Unique Row Identifier</h2>
+          <p>Every table should have a <strong>primary key</strong> — a column (or set of columns) whose value is <strong>unique for every row</strong> and never NULL. The primary key is the definitive way to identify a specific record. Without a primary key, you cannot reliably reference a single row.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- The id column is the primary key — unique, auto-incremented integer
+CREATE TABLE employees (
+    id         INT          PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(100) NOT NULL,
+    last_name  VARCHAR(100) NOT NULL,
+    department VARCHAR(100),
+    salary     DECIMAL(10, 2)
+);</code></pre>
+          </div>
+
+          <p>Best practices for primary keys:</p>
+          <ul>
+            <li><strong>Use <code>AUTO_INCREMENT</code> (MySQL) or <code>SERIAL</code> (PostgreSQL)</strong> — let the database assign IDs automatically. You never have to worry about duplicates.</li>
+            <li><strong>Keep it simple</strong> — a single integer column named <code>id</code> is the most common and practical primary key.</li>
+            <li><strong>Never use user-provided data as a PK</strong> — email addresses, usernames, or phone numbers can change. Integers cannot be taken back once assigned.</li>
+            <li><strong>Composite primary keys</strong> — using two or more columns together as a PK is valid, but usually a sign that a junction table is the right model.</li>
+          </ul>
+
+          <h2 id="foreign-key">Foreign Key – Linking Tables Together</h2>
+          <p>A <strong>foreign key</strong> is a column in one table that references the <strong>primary key</strong> of another table. This link creates a relationship between the two tables and enforces <strong>referential integrity</strong> — the database ensures you cannot create a foreign key value that points to a row that does not exist.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Users table (parent)
+CREATE TABLE users (
+    id    INT         PRIMARY KEY AUTO_INCREMENT,
+    name  VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL
+);
+
+-- Orders table (child) — references users
+CREATE TABLE orders (
+    id         INT          PRIMARY KEY AUTO_INCREMENT,
+    user_id    INT          NOT NULL,
+    total      DECIMAL(10, 2),
+    order_date DATE,
+    -- FK: user_id must match an id in the users table
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Referential integrity in action</strong>
+              <p>With the foreign key in place, trying to insert an order with <code>user_id = 999</code> when no user with <code>id = 999</code> exists will be rejected by the database with an error. Similarly, trying to delete a user who has existing orders will also fail — unless you configure <code>ON DELETE CASCADE</code> to automatically delete related orders.</p>
+            </div>
+          </div>
+
+          <h2 id="relationships">Relationship Types</h2>
+          <p>Relationships between tables come in three patterns. Understanding them is essential for designing a good schema:</p>
+
+          <h3>One-to-One (1:1)</h3>
+          <p>Each row in Table A corresponds to exactly one row in Table B, and vice versa. This is relatively rare — often used to split a table for performance reasons or to separate sensitive data (e.g. a <code>users</code> table and a separate <code>user_profiles</code> table with extended personal information).</p>
+
+          <h3>One-to-Many (1:N) — Most Common</h3>
+          <p>One row in Table A can relate to <strong>many rows</strong> in Table B, but each row in Table B relates to only one row in Table A. This is the most common relationship in any database. Examples: one user has many orders; one department has many employees; one blog post has many comments.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>users (1)</th><th>orders (many)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>user id=1 (Alice)</td><td>order id=101 (user_id=1)</td></tr>
+                <tr><td></td><td>order id=102 (user_id=1)</td></tr>
+                <tr><td></td><td>order id=103 (user_id=1)</td></tr>
+                <tr><td>user id=2 (Bob)</td><td>order id=104 (user_id=2)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Many-to-Many (M:N)</h3>
+          <p>Rows in Table A can relate to many rows in Table B, and rows in Table B can relate to many rows in Table A. This requires a <strong>junction table</strong> (also called a bridge table or associative table) that holds pairs of foreign keys.</p>
+          <p>Example: students and courses — a student can enrol in many courses, and a course can have many students.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">CREATE TABLE students (
+    id   INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE courses (
+    id    INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(200) NOT NULL
+);
+
+-- Junction table: holds student-course pairs
+CREATE TABLE enrollments (
+    student_id INT NOT NULL,
+    course_id  INT NOT NULL,
+    enrolled_at DATE,
+    PRIMARY KEY (student_id, course_id),          -- composite PK
+    FOREIGN KEY (student_id) REFERENCES students(id),
+    FOREIGN KEY (course_id)  REFERENCES courses(id)
+);</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="schemas">Schemas – The Blueprint</h2>
+          <p>A <strong>schema</strong> is the complete structural definition of a database — all its tables, columns, data types, constraints, indexes, and relationships. The schema is the blueprint that tells the database how data must be structured before any actual data is stored.</p>
+
+          <p>Schemas serve two purposes:</p>
+          <ul>
+            <li><strong>Enforcement</strong> — the database engine validates every INSERT and UPDATE against the schema and rejects data that violates the rules (wrong type, NULL in a NOT NULL column, duplicate primary key, broken foreign key).</li>
+            <li><strong>Communication</strong> — a schema is also documentation. Reading a schema tells you exactly what data an application stores and how entities relate to each other.</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – complete schema example</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Schema for a minimal e-commerce database
+CREATE TABLE users (
+    id         INT          PRIMARY KEY AUTO_INCREMENT,
+    email      VARCHAR(255) UNIQUE NOT NULL,
+    name       VARCHAR(100) NOT NULL,
+    created_at DATETIME     DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE products (
+    id          INT            PRIMARY KEY AUTO_INCREMENT,
+    name        VARCHAR(200)   NOT NULL,
+    price       DECIMAL(10, 2) NOT NULL,
+    stock       INT            DEFAULT 0
+);
+
+CREATE TABLE orders (
+    id         INT            PRIMARY KEY AUTO_INCREMENT,
+    user_id    INT            NOT NULL,
+    total      DECIMAL(10, 2),
+    created_at DATETIME       DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE order_items (
+    id         INT            PRIMARY KEY AUTO_INCREMENT,
+    order_id   INT            NOT NULL,
+    product_id INT            NOT NULL,
+    quantity   INT            NOT NULL,
+    unit_price DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (order_id)   REFERENCES orders(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);</code></pre>
+          </div>
+
+          <h2 id="indexes-intro">Indexes – Speed Up Lookups</h2>
+          <p>As your table grows to millions of rows, queries that filter on a column (e.g. <code>WHERE email = 'alice@example.com'</code>) will slow to a crawl if the database has to scan every single row. An <strong>index</strong> is a separate data structure (usually a B-tree) that the database builds and maintains alongside your table to enable fast lookups by specific column values — like the index at the back of a book.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Without an index, this scans every row (full table scan)
+SELECT * FROM users WHERE email = 'alice@example.com';
+
+-- Create an index on the email column
+CREATE INDEX idx_users_email ON users(email);
+
+-- Now the query uses the index — fast even with millions of rows
+SELECT * FROM users WHERE email = 'alice@example.com';</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Indexes speed up reads but slow down writes</strong>
+              <p>Every time you INSERT, UPDATE, or DELETE a row, the database must also update every index on that table. For tables with many indexes and high write volume, this overhead becomes significant. Index only the columns you actually filter or sort on — the primary key and foreign key columns are indexed automatically in most databases.</p>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A <strong>table</strong> organises data into rows (records) and columns (fields) — the fundamental unit of a relational database.</li>
+              <li>A <strong>primary key</strong> is a column (or columns) uniquely identifying each row. Every table should have one — typically an auto-incrementing integer <code>id</code>.</li>
+              <li>A <strong>foreign key</strong> is a column that references the primary key of another table, creating a relationship and enforcing referential integrity.</li>
+              <li>The three relationship types: <strong>one-to-one</strong> (rare), <strong>one-to-many</strong> (most common), <strong>many-to-many</strong> (requires a junction table).</li>
+              <li>A <strong>schema</strong> is the structural blueprint of a database — tables, columns, types, and constraints defined before any data is stored.</li>
+              <li>An <strong>index</strong> speeds up column lookups dramatically on large tables, at the cost of slower writes.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/sql-vs-nosql.html" class="topic-tag sql-topic-tag">🗄️ SQL vs NoSQL</a>
+            <a href="/sql/sql-installation.html" class="topic-tag sql-topic-tag">🗄️ SQL Installation</a>
+            <a href="/sql/basics/select-statement.html" class="topic-tag sql-topic-tag">🗄️ SELECT Statement</a>
+            <a href="/sql/tables/create-table.html" class="topic-tag sql-topic-tag">🗄️ CREATE TABLE</a>
+            <a href="/sql/tables/constraints.html" class="topic-tag sql-topic-tag">🗄️ Constraints</a>
+            <a href="/sql/joins/inner-join.html" class="topic-tag sql-topic-tag">🗄️ INNER JOIN</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can a table have more than one primary key? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A table can have only <em>one</em> primary key constraint, but that primary key can span <em>multiple columns</em> — this is called a composite primary key. For example, in an <code>enrollments</code> junction table, the combination of <code>student_id</code> and <code>course_id</code> together can serve as the primary key. In practice, most tables use a single auto-incrementing integer column as the primary key for simplicity.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens if I delete a row that other rows reference via a foreign key? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>By default, the database will reject the deletion with a referential integrity error. You have three options when defining the foreign key: <code>ON DELETE RESTRICT</code> (default — reject the delete), <code>ON DELETE CASCADE</code> (automatically delete all child rows too), and <code>ON DELETE SET NULL</code> (set the foreign key column to NULL in all child rows). Choose the behaviour that matches your application's data model. <code>CASCADE</code> is convenient but can cause unintended mass deletions if used carelessly.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between a schema and a database? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The terminology varies by database system. In MySQL, "database" and "schema" are used interchangeably — <code>CREATE DATABASE</code> and <code>CREATE SCHEMA</code> do the same thing. In PostgreSQL and SQL Server, a database is a top-level container that can hold multiple schemas, which in turn hold tables. In common usage, "schema" usually refers to the structural definition (tables, columns, constraints) of a database, while "database" refers to the entire instance including the data.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why is the primary key usually an integer and not the email or username? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Three reasons. First, integers are compact and fast to compare — joining tables on integers is faster than joining on variable-length strings. Second, user-controlled values can change (people change their email address or username), but a primary key must be stable because it is referenced by foreign keys in other tables. Third, auto-incrementing integers are guaranteed unique by the database with no extra logic. Using a natural key (email, username) as a primary key creates fragile schemas that break when values need to change.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/sql-vs-nosql.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">SQL vs NoSQL</span>
+          </a>
+          <a href="/sql/sql-installation.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">SQL Installation</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

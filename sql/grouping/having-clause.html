@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL HAVING – Filtering Groups After Aggregation | ylearner</title>
+  <meta name="description" content="Learn how SQL HAVING filters groups after GROUP BY aggregation. Understand the difference between WHERE and HAVING, and the correct SQL execution order.">
+  <meta name="keywords" content="SQL HAVING, HAVING clause tutorial, HAVING vs WHERE, SQL filter groups, HAVING COUNT, SQL execution order, SQL GROUP BY HAVING">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/grouping/having-clause.html">
+  <meta property="og:title" content="SQL HAVING – Filtering Groups After Aggregation | ylearner">
+  <meta property="og:description" content="Understand SQL HAVING: filter aggregated groups, not individual rows. See HAVING vs WHERE, execution order, and real-world examples.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/grouping/having-clause.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL HAVING Clause","description":"SQL HAVING filters groups produced by GROUP BY. Covers HAVING vs WHERE, execution order, and practical examples.","educationalLevel":"Intermediate","keywords":"SQL HAVING, HAVING vs WHERE, SQL execution order","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/grouping/having-clause.html">Grouping</a><span class="separator">›</span>
+          <span class="current">HAVING Clause</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📊 Grouping &amp; Aggregation</div>
+          <h1>SQL HAVING – Filtering Groups After Aggregation</h1>
+          <p class="lesson-intro">WHERE filters rows before they are grouped. HAVING filters the groups themselves after aggregation. This is a critical distinction — you cannot use aggregate functions inside a WHERE clause, which is exactly why HAVING exists.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="having-vs-where">HAVING vs WHERE</h2>
+          <p>The key distinction: <strong>WHERE filters rows</strong>, <strong>HAVING filters groups</strong>.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Clause</th><th>Filters</th><th>When it runs</th><th>Can use aggregates?</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><code>WHERE</code></td>
+                  <td>Individual rows</td>
+                  <td>Before GROUP BY</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <td><code>HAVING</code></td>
+                  <td>Groups (after aggregation)</td>
+                  <td>After GROUP BY</td>
+                  <td>Yes</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- WRONG: cannot use aggregate in WHERE
+SELECT department, COUNT(*) AS cnt
+FROM employees
+WHERE COUNT(*) > 5          -- ERROR: aggregate functions not allowed in WHERE
+GROUP BY department;
+
+-- CORRECT: use HAVING for post-aggregation filtering
+SELECT department, COUNT(*) AS cnt
+FROM employees
+GROUP BY department
+HAVING COUNT(*) > 5;        -- filters groups, not rows</code></pre>
+          </div>
+
+          <h2 id="having-syntax">HAVING Syntax</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">SELECT   column1, aggregate_function(column2) AS alias
+FROM     table_name
+WHERE    row_condition          -- optional: filter rows first
+GROUP BY column1
+HAVING   group_condition        -- filter groups after aggregation
+ORDER BY column1;</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>HAVING can reference SELECT aliases (in some databases)</strong>
+              <p>MySQL and PostgreSQL allow referencing a SELECT alias in HAVING: <code>HAVING cnt &gt; 5</code>. Standard SQL requires repeating the expression: <code>HAVING COUNT(*) &gt; 5</code>. For portability, use the full expression in HAVING.</p>
+            </div>
+          </div>
+
+          <h2 id="practical-example">Practical Examples</h2>
+          <p>Find departments with more than 2 employees and an average salary above 70,000:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">SELECT
+    department,
+    COUNT(*)        AS headcount,
+    AVG(salary)     AS avg_salary
+FROM employees
+WHERE status = 'active'          -- filter to active employees first
+GROUP BY department
+HAVING COUNT(*) > 2
+   AND AVG(salary) > 70000
+ORDER BY avg_salary DESC;</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Result</div>
+            Only departments with more than 2 active employees AND an average salary above 70,000 appear.
+            Departments with fewer employees or lower averages are excluded by HAVING.
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <p>Find product categories where total revenue exceeded 100,000 last year:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">SELECT
+    category,
+    SUM(price * quantity) AS total_revenue
+FROM order_items
+JOIN products USING (product_id)
+WHERE YEAR(order_date) = 2025
+GROUP BY category
+HAVING SUM(price * quantity) > 100000
+ORDER BY total_revenue DESC;</code></pre>
+          </div>
+
+          <h2 id="execution-order">SQL Execution Order</h2>
+          <p>Understanding the logical order SQL processes a query is essential to writing correct HAVING clauses:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Step</th><th>Clause</th><th>What happens</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td><code>FROM</code> / <code>JOIN</code></td><td>Build the full dataset from tables</td></tr>
+                <tr><td>2</td><td><code>WHERE</code></td><td>Filter individual rows</td></tr>
+                <tr><td>3</td><td><code>GROUP BY</code></td><td>Collapse rows into groups</td></tr>
+                <tr><td>4</td><td><code>HAVING</code></td><td>Filter groups based on aggregate conditions</td></tr>
+                <tr><td>5</td><td><code>SELECT</code></td><td>Choose and compute output columns</td></tr>
+                <tr><td>6</td><td><code>ORDER BY</code></td><td>Sort the result set</td></tr>
+                <tr><td>7</td><td><code>LIMIT</code> / <code>OFFSET</code></td><td>Restrict the number of rows returned</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Performance tip: filter early with WHERE</strong>
+              <p>If you can eliminate rows before grouping, do so with WHERE. Fewer rows to group means the database engine does less work. Use HAVING only for conditions that genuinely depend on aggregate results.</p>
+            </div>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>HAVING</strong> filters groups produced by GROUP BY — it runs after aggregation.</li>
+              <li><strong>WHERE</strong> filters individual rows before grouping; it cannot reference aggregate functions.</li>
+              <li>SQL execution order: <code>FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY</code>.</li>
+              <li>HAVING supports <strong>AND / OR</strong> to combine multiple group conditions.</li>
+              <li>Filter with WHERE whenever possible for better performance; use HAVING only for aggregate conditions.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/grouping/group-by.html" class="topic-tag sql-topic-tag">🗄️ GROUP BY</a>
+            <a href="/sql/grouping/rollup-cube.html" class="topic-tag sql-topic-tag">🗄️ ROLLUP &amp; CUBE</a>
+            <a href="/sql/filtering/where-clause.html" class="topic-tag sql-topic-tag">🗄️ WHERE Clause</a>
+            <a href="/sql/functions/aggregate-functions.html" class="topic-tag sql-topic-tag">🗄️ Aggregate Functions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can HAVING be used without GROUP BY? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, technically. Without GROUP BY the entire table is treated as a single group. <code>HAVING COUNT(*) > 100</code> with no GROUP BY checks whether the table has more than 100 rows and returns either all rows or no rows. In practice this is rarely useful and is a sign of a misunderstanding — use GROUP BY for meaningful grouping.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use HAVING with non-aggregate columns? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>You can, but it is redundant. <code>HAVING department = 'Engineering'</code> is valid SQL, but the same filter should be written as <code>WHERE department = 'Engineering'</code> — it runs earlier, eliminates rows before grouping, and is more efficient.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does SELECT alias not always work in HAVING? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Because HAVING is evaluated at step 4 in the logical order, and SELECT aliases are assigned at step 5. Some databases (MySQL, PostgreSQL) extend standard SQL to allow aliases in HAVING, but SQL Server and Oracle require the full expression. Write <code>HAVING COUNT(*) > 5</code> rather than <code>HAVING cnt > 5</code> for maximum portability.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/grouping/group-by.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">GROUP BY</span>
+          </a>
+          <a href="/sql/grouping/rollup-cube.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">ROLLUP &amp; CUBE</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

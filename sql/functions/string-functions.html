@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL String Functions – UPPER, LOWER, SUBSTRING, CONCAT | ylearner</title>
+  <meta name="description" content="Master SQL string functions: UPPER, LOWER, LENGTH, SUBSTRING, CONCAT, TRIM, REPLACE, POSITION and more. Includes dialect comparison for MySQL, PostgreSQL, and SQLite.">
+  <meta name="keywords" content="SQL string functions, UPPER LOWER SQL, SUBSTRING SQL, CONCAT SQL, TRIM SQL, REPLACE SQL, SQL text functions, SQL tutorial">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/functions/string-functions.html">
+  <meta property="og:title" content="SQL String Functions – UPPER, LOWER, SUBSTRING, CONCAT | ylearner">
+  <meta property="og:description" content="Master SQL string functions: UPPER, LOWER, LENGTH, SUBSTRING, CONCAT, TRIM, REPLACE, POSITION and more with dialect comparison.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/functions/string-functions.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL String Functions","description":"Learn SQL string functions including UPPER, LOWER, LENGTH, SUBSTRING, CONCAT, TRIM, REPLACE, and POSITION with examples across MySQL, PostgreSQL, and SQLite.","educationalLevel":"Intermediate","keywords":"SQL string functions, UPPER, LOWER, SUBSTRING, CONCAT","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/functions/string-functions.html">Functions</a><span class="separator">›</span>
+          <span class="current">String Functions</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ SQL Functions</div>
+          <h1>SQL String Functions – UPPER, LOWER, SUBSTRING, CONCAT</h1>
+          <p class="lesson-intro">String functions let you transform, slice, search, and format text directly inside SQL queries — no application code needed. This lesson covers the most important string functions with practical examples and a cross-dialect comparison table for MySQL, PostgreSQL, and SQLite.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="upper-lower">UPPER() and LOWER()</h2>
+          <p><code>UPPER()</code> converts a string to all uppercase; <code>LOWER()</code> converts it to all lowercase. Both are supported identically in MySQL, PostgreSQL, and SQLite.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT UPPER('hello world');     -- 'HELLO WORLD'
+SELECT LOWER('SQL Is FUN');      -- 'sql is fun'
+
+-- Practical: normalise email comparison
+SELECT *
+FROM users
+WHERE LOWER(email) = LOWER('User@Example.COM');
+
+-- Format display names
+SELECT
+  UPPER(LEFT(first_name, 1)) || LOWER(SUBSTRING(first_name, 2)) AS formatted_name
+FROM employees;</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Case-insensitive searches</strong>
+              <p>Wrap both sides in <code>LOWER()</code> for case-insensitive comparisons instead of relying on database collation settings — this works consistently across all databases.</p>
+            </div>
+          </div>
+
+          <h2 id="length">LENGTH() and CHAR_LENGTH()</h2>
+          <p><code>LENGTH()</code> returns the number of characters (or bytes, depending on dialect). <code>CHAR_LENGTH()</code> always returns the character count regardless of encoding — prefer it when working with multi-byte Unicode characters.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT LENGTH('Hello');          -- 5
+SELECT CHAR_LENGTH('Hello');     -- 5
+
+-- Find products with names longer than 30 characters
+SELECT product_name, CHAR_LENGTH(product_name) AS name_len
+FROM products
+WHERE CHAR_LENGTH(product_name) > 30
+ORDER BY name_len DESC;
+
+-- Validate phone number format (must be exactly 10 digits)
+SELECT phone
+FROM contacts
+WHERE LENGTH(REPLACE(phone, '-', '')) != 10;</code></pre>
+          </div>
+
+          <h2 id="substring">SUBSTRING()</h2>
+          <p><code>SUBSTRING(str, start, length)</code> extracts a portion of a string. Note: SQL string positions start at <strong>1</strong>, not 0.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT SUBSTRING('Hello World', 1, 5);   -- 'Hello'
+SELECT SUBSTRING('Hello World', 7);       -- 'World' (no length = rest of string)
+SELECT SUBSTR('Hello World', 7, 5);       -- 'World' (SUBSTR is an alias)
+
+-- Extract year from an ISO date string
+SELECT order_id, SUBSTRING(order_date, 1, 4) AS order_year
+FROM orders;
+
+-- Get domain from email
+SELECT
+  email,
+  SUBSTRING(email, POSITION('@' IN email) + 1) AS domain
+FROM users;</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>LEFT() and RIGHT() shortcuts</strong>
+              <p><code>LEFT(str, n)</code> extracts the first <em>n</em> characters; <code>RIGHT(str, n)</code> extracts the last <em>n</em>. They are available in MySQL and PostgreSQL as convenient alternatives to SUBSTRING.</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT LEFT('Hello World', 5);    -- 'Hello'
+SELECT RIGHT('Hello World', 5);   -- 'World'
+
+-- Extract country code from phone
+SELECT RIGHT(phone, 4) AS last_four
+FROM customers;</code></pre>
+          </div>
+
+          <h2 id="concat">CONCAT()</h2>
+          <p>CONCAT combines two or more strings into one. MySQL uses the <code>CONCAT()</code> function; PostgreSQL and SQLite support the <code>||</code> operator (which is also valid in MySQL 8+).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- MySQL / PostgreSQL / SQLite function style
+SELECT CONCAT('Hello', ' ', 'World');    -- 'Hello World'
+
+-- PostgreSQL / SQLite operator style
+SELECT 'Hello' || ' ' || 'World';        -- 'Hello World'
+
+-- Build full name from separate columns
+SELECT
+  CONCAT(first_name, ' ', last_name) AS full_name,
+  CONCAT(city, ', ', country)        AS location
+FROM employees;
+
+-- MySQL CONCAT_WS: join with separator (skips NULLs automatically)
+SELECT CONCAT_WS(', ', street, city, state, zip) AS address
+FROM addresses;</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="trim">TRIM, LTRIM, RTRIM</h2>
+          <p>Trim functions remove leading and/or trailing characters (whitespace by default) from a string. Essential for cleaning user-entered data.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT TRIM('  hello  ');         -- 'hello'
+SELECT LTRIM('  hello  ');        -- 'hello  ' (left only)
+SELECT RTRIM('  hello  ');        -- '  hello' (right only)
+
+-- Remove a specific character (PostgreSQL / MySQL)
+SELECT TRIM(LEADING '0' FROM '0001234');    -- '1234'
+SELECT TRIM(TRAILING '.' FROM 'price.');    -- 'price'
+SELECT TRIM(BOTH '*' FROM '***sale***');    -- 'sale'
+
+-- Practical: clean up imported data
+UPDATE products
+SET product_name = TRIM(product_name)
+WHERE product_name != TRIM(product_name);</code></pre>
+          </div>
+
+          <h2 id="replace">REPLACE()</h2>
+          <p><code>REPLACE(str, find, replacement)</code> replaces every occurrence of <em>find</em> in <em>str</em> with <em>replacement</em>. The replacement can be an empty string to delete characters.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT REPLACE('Hello World', 'World', 'SQL');  -- 'Hello SQL'
+SELECT REPLACE('2026-06-08', '-', '/');          -- '2026/06/08'
+
+-- Remove all spaces
+SELECT REPLACE('hello world', ' ', '');          -- 'helloworld'
+
+-- Standardise phone numbers: remove dashes and spaces
+SELECT REPLACE(REPLACE(phone, '-', ''), ' ', '') AS clean_phone
+FROM contacts;
+
+-- Mask sensitive data (keep last 4 digits)
+SELECT
+  CONCAT(REPEAT('*', LENGTH(card_number) - 4),
+         RIGHT(card_number, 4)) AS masked_card
+FROM payments;</code></pre>
+          </div>
+
+          <h2 id="position">POSITION() / INSTR() / STRPOS()</h2>
+          <p>These functions find the starting position of a substring within a string. They return 0 (MySQL) or 0/NULL depending on dialect when not found.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- ANSI SQL (MySQL, PostgreSQL)
+SELECT POSITION('@' IN 'user@example.com');   -- 5
+
+-- MySQL / SQLite alternative
+SELECT INSTR('user@example.com', '@');        -- 5
+
+-- PostgreSQL alternative
+SELECT STRPOS('user@example.com', '@');       -- 5
+
+-- Find emails that contain a sub-domain
+SELECT email
+FROM users
+WHERE POSITION('.' IN SUBSTRING(email, POSITION('@' IN email))) > 0;
+
+-- Return 0 if not found
+SELECT POSITION('xyz' IN 'Hello World');      -- 0 (not found)</code></pre>
+          </div>
+
+          <h2 id="functions-table">Dialect Comparison Table</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Function</th><th>MySQL</th><th>PostgreSQL</th><th>SQLite</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Uppercase</td><td><code>UPPER()</code></td><td><code>UPPER()</code></td><td><code>UPPER()</code></td></tr>
+                <tr><td>Lowercase</td><td><code>LOWER()</code></td><td><code>LOWER()</code></td><td><code>LOWER()</code></td></tr>
+                <tr><td>String length</td><td><code>CHAR_LENGTH()</code></td><td><code>LENGTH()</code></td><td><code>LENGTH()</code></td></tr>
+                <tr><td>Extract substring</td><td><code>SUBSTRING()</code></td><td><code>SUBSTRING()</code></td><td><code>SUBSTR()</code></td></tr>
+                <tr><td>Concatenate</td><td><code>CONCAT()</code></td><td><code>||</code> or <code>CONCAT()</code></td><td><code>||</code></td></tr>
+                <tr><td>Trim whitespace</td><td><code>TRIM()</code></td><td><code>TRIM()</code></td><td><code>TRIM()</code></td></tr>
+                <tr><td>Find position</td><td><code>INSTR()</code></td><td><code>STRPOS()</code></td><td><code>INSTR()</code></td></tr>
+                <tr><td>First N chars</td><td><code>LEFT()</code></td><td><code>LEFT()</code></td><td><code>SUBSTR(s,1,n)</code></td></tr>
+                <tr><td>Last N chars</td><td><code>RIGHT()</code></td><td><code>RIGHT()</code></td><td><code>SUBSTR(s,-n)</code></td></tr>
+                <tr><td>Repeat string</td><td><code>REPEAT()</code></td><td><code>REPEAT()</code></td><td>No built-in</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>UPPER() / LOWER()</strong> — Convert case. Use for case-insensitive comparisons.</li>
+              <li><strong>LENGTH() / CHAR_LENGTH()</strong> — Count characters. Prefer CHAR_LENGTH() for Unicode safety.</li>
+              <li><strong>SUBSTRING(str, start, len)</strong> — Extract a portion. SQL positions start at 1.</li>
+              <li><strong>CONCAT() / ||</strong> — Join strings. Use CONCAT_WS() to join with separator and skip NULLs.</li>
+              <li><strong>TRIM / LTRIM / RTRIM</strong> — Remove leading/trailing characters. Great for data cleaning.</li>
+              <li><strong>REPLACE(str, find, new)</strong> — Replace all occurrences. Pass empty string to delete.</li>
+              <li><strong>POSITION / INSTR / STRPOS</strong> — Find substring position. Returns 0 if not found.</li>
+              <li><strong>LEFT(str, n) / RIGHT(str, n)</strong> — Shorthand for extracting from start or end.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/functions/numeric-functions.html" class="topic-tag sql-topic-tag">🗄️ Numeric Functions</a>
+            <a href="/sql/functions/date-functions.html" class="topic-tag sql-topic-tag">🗄️ Date Functions</a>
+            <a href="/sql/functions/aggregate-functions.html" class="topic-tag sql-topic-tag">🗄️ Aggregate Functions</a>
+            <a href="/sql/functions/null-functions.html" class="topic-tag sql-topic-tag">🗄️ NULL Handling</a>
+            <a href="/sql/filtering/where-clause.html" class="topic-tag sql-topic-tag">🗄️ WHERE Clause</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between LENGTH() and CHAR_LENGTH()?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In MySQL, <code>LENGTH()</code> returns the byte length of the string, while <code>CHAR_LENGTH()</code> returns the character count. For ASCII text they are the same. For multi-byte characters (e.g. Chinese, Arabic, emoji), <code>LENGTH()</code> may return a larger number. In PostgreSQL and SQLite, <code>LENGTH()</code> always returns character count. Use <code>CHAR_LENGTH()</code> in MySQL to be safe with Unicode data.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Does CONCAT() handle NULL values?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In MySQL, <code>CONCAT()</code> returns NULL if any argument is NULL. To handle NULLs gracefully, use <code>CONCAT_WS(separator, ...)</code> which skips NULL arguments, or wrap each argument in <code>COALESCE(col, '')</code>. In PostgreSQL, the <code>||</code> operator also returns NULL if either operand is NULL, so use <code>COALESCE()</code> around nullable columns.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Are string function names case-sensitive in SQL?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — SQL keywords and built-in function names are case-insensitive. <code>UPPER()</code>, <code>upper()</code>, and <code>Upper()</code> all work. By convention, function names are written in uppercase to distinguish them from column or table names, but the database treats them the same way.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does SUBSTRING start at position 1 and not 0?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>SQL uses 1-based string indexing by the ANSI standard — the first character is at position 1. This differs from most programming languages (Python, JavaScript) which use 0-based indexing. If you pass 0 as the start position in MySQL it is treated as 1; in PostgreSQL it is treated as returning from the start of the string.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/filtering/between-in.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">BETWEEN and IN</span>
+          </a>
+          <a href="/sql/functions/numeric-functions.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Numeric Functions</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

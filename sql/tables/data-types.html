@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Data Types – Integers, Strings, Dates &amp; More | ylearner</title>
+  <meta name="description" content="Learn all essential SQL data types — numeric (INT, DECIMAL), string (VARCHAR, TEXT), date/time (DATE, TIMESTAMP), and BOOLEAN — with dialect comparison for MySQL, PostgreSQL, and SQLite.">
+  <meta name="keywords" content="SQL data types, SQL INT, SQL VARCHAR, SQL DATE, SQL DECIMAL, SQL BOOLEAN, MySQL data types, PostgreSQL data types, SQLite data types">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/tables/data-types.html">
+  <meta property="og:title" content="SQL Data Types – Integers, Strings, Dates &amp; More | ylearner">
+  <meta property="og:description" content="Master SQL data types with clear examples. Covers numeric, string, date/time, and boolean types plus a MySQL vs PostgreSQL vs SQLite comparison table.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/tables/data-types.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Data Types – Integers, Strings, Dates & More","description":"Learn all essential SQL data types — numeric, string, date/time, and boolean — with dialect differences across MySQL, PostgreSQL, and SQLite.","educationalLevel":"Beginner","keywords":"SQL data types, INT, VARCHAR, DATE, DECIMAL, BOOLEAN","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/tables/data-types.html">Tables &amp; Schema</a><span class="separator">›</span>
+          <span class="current">SQL Data Types</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🏗️ Tables &amp; Schema</div>
+          <h1>SQL Data Types – Integers, Strings, Dates &amp; More</h1>
+          <p class="lesson-intro">Every column in a SQL table must declare a data type. Choosing the right type keeps your data consistent, saves storage, and helps the database engine optimise queries. This lesson covers the four main categories — numeric, string, date/time, and boolean — and compares how MySQL, PostgreSQL, and SQLite handle each one.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="numeric-types">Numeric Types</h2>
+          <p>SQL distinguishes between <strong>exact</strong> numeric types (no rounding) and <strong>approximate</strong> floating-point types. Use the right one for the job.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Type</th><th>Storage</th><th>Range</th><th>Use for</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>TINYINT</code></td><td>1 byte</td><td>-128 to 127 (or 0–255 unsigned)</td><td>Flags, small counters</td></tr>
+                <tr><td><code>SMALLINT</code></td><td>2 bytes</td><td>-32,768 to 32,767</td><td>Age, short codes</td></tr>
+                <tr><td><code>INT</code> / <code>INTEGER</code></td><td>4 bytes</td><td>~-2.1 billion to 2.1 billion</td><td>IDs, counts — most common</td></tr>
+                <tr><td><code>BIGINT</code></td><td>8 bytes</td><td>~-9.2 × 10¹⁸ to 9.2 × 10¹⁸</td><td>Large IDs, timestamps as numbers</td></tr>
+                <tr><td><code>DECIMAL(p,s)</code></td><td>variable</td><td>Up to 65 digits (MySQL)</td><td>Money — exact arithmetic</td></tr>
+                <tr><td><code>FLOAT</code> / <code>DOUBLE</code></td><td>4 / 8 bytes</td><td>~±3.4 × 10³⁸ / ±1.8 × 10³⁰⁸</td><td>Scientific measurements</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Never use FLOAT or DOUBLE for money</strong>
+              <p>Floating-point types store approximations. <code>0.1 + 0.2</code> may equal <code>0.30000000000000004</code> internally. For prices, balances, or any financial figure, always use <code>DECIMAL(p,s)</code> — for example <code>DECIMAL(10,2)</code> stores values up to 99,999,999.99 exactly.</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Exact integer examples
+SELECT 2147483647 + 1;   -- INT overflow! Use BIGINT for very large numbers
+
+-- DECIMAL for money: DECIMAL(total_digits, decimal_places)
+price   DECIMAL(10, 2)   -- up to 99,999,999.99
+tax_rate DECIMAL(5, 4)   -- e.g. 0.0875
+
+-- Approximate: fine for science, not finance
+temperature FLOAT        -- 98.6° ± tiny rounding error is acceptable</code></pre>
+          </div>
+
+          <h2 id="string-types">String (Character) Types</h2>
+          <p>SQL has three main string types. The key difference is whether the length is fixed or variable.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Type</th><th>Length</th><th>Padding</th><th>Best for</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>CHAR(n)</code></td><td>Fixed: exactly n</td><td>Right-padded with spaces</td><td>Fixed-length codes (ISO country codes, phone prefixes)</td></tr>
+                <tr><td><code>VARCHAR(n)</code></td><td>Variable: up to n</td><td>No padding</td><td>Names, emails, titles — the most common choice</td></tr>
+                <tr><td><code>TEXT</code></td><td>Unlimited*</td><td>No padding</td><td>Long content: articles, descriptions, comments</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- CHAR: always 2 characters, padded if shorter
+country_code CHAR(2)     -- 'US', 'GB', 'DE'
+
+-- VARCHAR: stores only the characters you give it
+email        VARCHAR(255)  -- 'alice@example.com' (18 chars stored, not 255)
+first_name   VARCHAR(100)
+
+-- TEXT: no length limit (cannot be indexed in full in MySQL without prefix)
+bio          TEXT
+article_body TEXT</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Use VARCHAR, not CHAR, unless the length is truly fixed</strong>
+              <p>CHAR pads shorter values with spaces, which wastes storage and can cause unexpected comparison results. Stick with <code>VARCHAR(n)</code> for almost everything. Use <code>CHAR(n)</code> only for fixed-length codes like ISO 3166 country codes (<code>CHAR(2)</code>) or IBAN prefixes.</p>
+            </div>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="date-types">Date and Time Types</h2>
+          <p>SQL provides dedicated types for dates and times — do not store them as strings or integers.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Type</th><th>Stores</th><th>Example value</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>DATE</code></td><td>Calendar date only</td><td><code>2026-06-08</code></td></tr>
+                <tr><td><code>TIME</code></td><td>Time of day only</td><td><code>14:30:00</code></td></tr>
+                <tr><td><code>DATETIME</code></td><td>Date + time (no timezone)</td><td><code>2026-06-08 14:30:00</code></td></tr>
+                <tr><td><code>TIMESTAMP</code></td><td>Date + time (UTC-aware in MySQL)</td><td><code>2026-06-08 14:30:00</code></td></tr>
+                <tr><td><code>YEAR</code></td><td>Four-digit year (MySQL only)</td><td><code>2026</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">birth_date    DATE        -- '1990-04-15'
+event_time    TIME        -- '09:00:00'
+created_at    TIMESTAMP   -- '2026-06-08 14:30:00' — auto-set on insert
+updated_at    TIMESTAMP   -- '2026-06-08 15:00:00' — auto-set on update
+
+-- Date literals use ISO 8601 format: YYYY-MM-DD
+SELECT * FROM events WHERE event_date = '2026-12-25';
+
+-- Compare date ranges
+SELECT * FROM orders
+WHERE created_at BETWEEN '2026-01-01' AND '2026-12-31 23:59:59';</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Always store timestamps in UTC</strong>
+              <p>Store all DATETIME/TIMESTAMP values in UTC in the database. Convert to the user's local timezone only at the application layer. This prevents bugs when servers change timezones or when users are in different regions. In MySQL, <code>TIMESTAMP</code> columns are automatically stored in UTC and converted on retrieval based on the session timezone.</p>
+            </div>
+          </div>
+
+          <h2 id="boolean-type">BOOLEAN Type</h2>
+          <p>SQL's handling of true/false values varies by database engine.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- PostgreSQL: native BOOLEAN type
+is_active  BOOLEAN DEFAULT TRUE
+is_deleted BOOLEAN DEFAULT FALSE
+
+-- MySQL: TINYINT(1) is used; TRUE=1, FALSE=0
+is_active  TINYINT(1) DEFAULT 1
+-- Or use BOOL/BOOLEAN alias (MySQL stores it as TINYINT(1) internally)
+is_active  BOOL DEFAULT TRUE
+
+-- SQLite: no native boolean; use INTEGER 0/1
+is_active  INTEGER DEFAULT 1
+
+-- Querying booleans
+SELECT * FROM users WHERE is_active = TRUE;   -- PostgreSQL
+SELECT * FROM users WHERE is_active = 1;      -- MySQL / SQLite
+SELECT * FROM users WHERE is_active;          -- shorthand in PostgreSQL</code></pre>
+          </div>
+
+          <h2 id="choosing-types">How to Choose the Right Type</h2>
+          <p>Follow these practical rules when designing your schema:</p>
+          <ul>
+            <li><strong>Use the smallest type that fits.</strong> <code>TINYINT</code> for a 0–100 rating saves storage compared to <code>INT</code>, especially across millions of rows.</li>
+            <li><strong>Use <code>DECIMAL</code> for money</strong> — never <code>FLOAT</code> or <code>DOUBLE</code>. A common convention is <code>DECIMAL(10,2)</code> for most currencies.</li>
+            <li><strong>Use <code>VARCHAR</code> over <code>CHAR</code></strong> unless the value is truly fixed-length (e.g., two-letter country codes).</li>
+            <li><strong>Use <code>TEXT</code> for long content</strong> (articles, comments). Be aware that <code>TEXT</code> columns often cannot be fully indexed in MySQL — use a prefix index if needed.</li>
+            <li><strong>Use <code>TIMESTAMP</code> over <code>DATETIME</code></strong> when you need timezone-awareness in MySQL. Use <code>TIMESTAMPTZ</code> in PostgreSQL.</li>
+            <li><strong>Avoid storing numbers as strings.</strong> Sorting '9' > '10' alphabetically is a classic bug. Store numeric values in numeric columns.</li>
+          </ul>
+
+          <h2 id="dialect-differences">Dialect Comparison: MySQL vs PostgreSQL vs SQLite</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Concept</th><th>MySQL</th><th>PostgreSQL</th><th>SQLite</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Auto-increment integer</td><td><code>INT AUTO_INCREMENT</code></td><td><code>SERIAL</code> or <code>GENERATED ALWAYS AS IDENTITY</code></td><td><code>INTEGER PRIMARY KEY</code></td></tr>
+                <tr><td>Variable string</td><td><code>VARCHAR(n)</code></td><td><code>VARCHAR(n)</code> or <code>TEXT</code></td><td><code>TEXT</code> (SQLite is flexible)</td></tr>
+                <tr><td>Unlimited text</td><td><code>TEXT</code>, <code>MEDIUMTEXT</code>, <code>LONGTEXT</code></td><td><code>TEXT</code></td><td><code>TEXT</code></td></tr>
+                <tr><td>Boolean</td><td><code>TINYINT(1)</code></td><td><code>BOOLEAN</code></td><td><code>INTEGER</code> (0/1)</td></tr>
+                <tr><td>Date + time with timezone</td><td><code>TIMESTAMP</code> (converts to UTC)</td><td><code>TIMESTAMPTZ</code></td><td>Stored as TEXT/INTEGER/REAL</td></tr>
+                <tr><td>Exact decimal</td><td><code>DECIMAL(p,s)</code></td><td><code>NUMERIC(p,s)</code></td><td><code>NUMERIC</code> (stored as REAL)</td></tr>
+                <tr><td>Large integer</td><td><code>BIGINT</code></td><td><code>BIGINT</code></td><td><code>INTEGER</code> (always 8-byte)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>SQLite uses dynamic typing</strong>
+              <p>SQLite uses a concept called <em>type affinity</em> rather than strict types. You can declare a column as <code>INTEGER</code> and still store text in it — SQLite will just store what you give it. This makes SQLite very forgiving during development, but it means type errors won't be caught at the database level. Use strict typing in production databases (MySQL, PostgreSQL).</p>
+            </div>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Numeric:</strong> <code>INT</code> for most IDs/counts, <code>BIGINT</code> for very large numbers, <code>DECIMAL(p,s)</code> for money, <code>FLOAT</code>/<code>DOUBLE</code> only for scientific values where small rounding errors are acceptable.</li>
+              <li><strong>String:</strong> <code>VARCHAR(n)</code> is the default choice for most text; <code>CHAR(n)</code> only for fixed-length codes; <code>TEXT</code> for long, unbounded content.</li>
+              <li><strong>Date/Time:</strong> <code>DATE</code> for calendar dates, <code>TIMESTAMP</code> for date+time (store in UTC), <code>TIME</code> for time-of-day only.</li>
+              <li><strong>Boolean:</strong> <code>BOOLEAN</code> in PostgreSQL, <code>TINYINT(1)</code> in MySQL, <code>INTEGER</code> (0/1) in SQLite.</li>
+              <li>Choose the <strong>smallest type that fits</strong> your data to save storage and improve query performance.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/tables/create-table.html" class="topic-tag sql-topic-tag">🗄️ CREATE TABLE</a>
+            <a href="/sql/tables/constraints.html" class="topic-tag sql-topic-tag">🗄️ Constraints</a>
+            <a href="/sql/tables/alter-table.html" class="topic-tag sql-topic-tag">🗄️ ALTER TABLE</a>
+            <a href="/sql/basics/select-statement.html" class="topic-tag sql-topic-tag">🗄️ SELECT Statement</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between DECIMAL and NUMERIC? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In SQL standard and most databases, <code>DECIMAL</code> and <code>NUMERIC</code> are interchangeable synonyms for exact numeric types. Both accept a precision (total digits) and scale (decimal places). PostgreSQL treats them identically. MySQL has a minor internal distinction but they behave the same in practice. Use whichever your team prefers — <code>DECIMAL</code> is more common in MySQL/SQL Server contexts, <code>NUMERIC</code> in PostgreSQL.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I use VARCHAR(255) everywhere? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It is tempting to use <code>VARCHAR(255)</code> as a lazy default, but it is better to choose a meaningful limit. Use <code>VARCHAR(255)</code> for email addresses (the RFC 5321 maximum is 254 characters), but <code>VARCHAR(100)</code> for a first name and <code>VARCHAR(500)</code> for a URL. Setting sensible limits lets the database enforce data integrity — a 10,000-character "first name" is likely a bug. In most databases, declaring a longer VARCHAR does not use more storage for short values; the limit is a constraint, not a reservation.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does TIMESTAMP have a year 2038 problem? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In MySQL, <code>TIMESTAMP</code> is stored internally as a 32-bit Unix timestamp (seconds since 1970-01-01 UTC). A 32-bit signed integer overflows in January 2038. MySQL's maximum <code>TIMESTAMP</code> value is <code>2038-01-19 03:14:07</code> UTC. For dates beyond 2038, use <code>DATETIME</code> in MySQL (which supports years up to 9999) or <code>TIMESTAMPTZ</code> in PostgreSQL. Modern MySQL versions (8.x) and PostgreSQL are not affected for new columns because they use wider storage.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I change a column's data type after the table is created? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — use <code>ALTER TABLE ... MODIFY COLUMN</code> (MySQL) or <code>ALTER TABLE ... ALTER COLUMN ... TYPE</code> (PostgreSQL). However, changing to an incompatible type (e.g., <code>VARCHAR</code> to <code>INT</code> when the column contains non-numeric strings) will fail. Some changes — especially on large tables — lock the table and cause downtime. Plan type changes carefully in production, ideally through a migration tool.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/basics/aliases.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Aliases (AS)</span>
+          </a>
+          <a href="/sql/tables/create-table.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">CREATE TABLE</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
