@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>git rebase – Rewriting Commit History Cleanly | ylearner</title>
+  <meta name="description" content="Master git rebase — understand what rebase does, how it differs from merge, how to use interactive rebase to clean up commits, and the golden rule you must never break.">
+  <meta name="keywords" content="git rebase, interactive rebase, git rebase -i, rebase vs merge, git rebase tutorial, squash commits, rewrite git history">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/git/branching/rebase.html">
+  <meta property="og:title" content="git rebase – Rewriting Commit History Cleanly | ylearner">
+  <meta property="og:description" content="Learn how git rebase rewrites commit history for a cleaner linear timeline. Covers basic rebase, interactive rebase (-i), squash, reword, and the golden rule.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/git/branching/rebase.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"git rebase – Rewriting Commit History Cleanly","description":"Master git rebase: understand what rebase does, interactive rebase with squash/reword/drop, and the golden rule for shared branches.","educationalLevel":"Intermediate","keywords":"git rebase, interactive rebase, rebase vs merge, squash commits git","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <a href="/git/branching/branches-overview.html">Branching &amp; Merging</a><span class="separator">›</span>
+          <span class="current">Rebase</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌿 Branching &amp; Merging</div>
+          <h1>git rebase – Rewriting Commit History Cleanly</h1>
+          <p class="lesson-intro">Rebase is one of Git's most powerful — and most debated — features. It lets you take commits from one branch and re-apply them on top of a different base, producing a clean linear history. Used carefully, it makes your project history readable. Used recklessly on shared branches, it breaks your teammates' repos. This lesson teaches you both the power and the rules.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-rebase">What Is Rebase?</h2>
+          <p>Rebase <strong>re-applies your commits on top of a different base commit</strong>. Instead of creating a merge commit that joins two branches, rebase takes each commit from your branch, lifts it off its current base, and replays it starting from a new base commit.</p>
+          <p>The result: your branch looks like it was created from the latest state of main — no divergence, no merge commit, clean linear history.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Rebase rewrites history</strong>
+              <p>Even though the <em>content</em> of your commits stays the same, rebase creates <em>new commits</em> with new SHA hashes. The original commits still exist temporarily but become unreachable. This is why rebase on shared branches is dangerous — your teammates have the old SHAs and Git can't reconcile them.</p>
+            </div>
+          </div>
+
+          <h2 id="rebase-vs-merge">Rebase vs Merge</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Aspect</th><th>Merge</th><th>Rebase</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>History shape</td>
+                  <td>Preserves branch topology (forked graph)</td>
+                  <td>Creates linear history (straight line)</td>
+                </tr>
+                <tr>
+                  <td>Merge commit</td>
+                  <td>Creates one (with --no-ff or when diverged)</td>
+                  <td>No merge commit</td>
+                </tr>
+                <tr>
+                  <td>Commit SHAs</td>
+                  <td>Original commits unchanged</td>
+                  <td>New commits created (new SHAs)</td>
+                </tr>
+                <tr>
+                  <td>Safety on shared branches</td>
+                  <td>Safe</td>
+                  <td>DANGEROUS — never rebase shared commits</td>
+                </tr>
+                <tr>
+                  <td>Best for</td>
+                  <td>Preserving full branch history, team merges</td>
+                  <td>Cleaning up local feature branch before PR</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="basic-rebase">Basic Rebase</h2>
+          <h3>Before rebase (diverged branches)</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">          C4 ← C5
+         /         ↑
+C1 ← C2 ← C3    feature/login
+                  ↑
+                 main (new commits C6, C7 added after branching)
+
+         C6 ← C7
+        /
+C1 ← C2 ← C3
+                ↑
+               main</code></pre>
+          </div>
+
+          <h3>After: git rebase main (from feature/login)</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">C1 ← C2 ← C3 ← C6 ← C7 ← C4' ← C5'
+                        ↑           ↑
+                       main   feature/login (HEAD)
+
+C4' and C5' are NEW commits (same content as C4/C5, but new SHAs).
+The branch now starts from the tip of main — clean linear history.</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Standard rebase workflow
+git switch feature/login          # make sure you're on the feature branch
+git rebase main                   # rebase onto main
+
+# If there are no conflicts, it completes automatically.
+# If there ARE conflicts, resolve them then:
+git add &lt;resolved-file&gt;
+git rebase --continue             # continue to next commit
+
+# After rebase, merge into main (will be a fast-forward now)
+git switch main
+git merge feature/login           # fast-forward — clean!</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="interactive-rebase">Interactive Rebase</h2>
+          <p>Interactive rebase (<code>git rebase -i</code>) opens a text editor listing your recent commits. You can reorder, rename, squash, or drop individual commits before they get replayed. This is the most powerful way to clean up your commit history before submitting a pull request.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Interactively edit the last 3 commits
+git rebase -i HEAD~3
+
+# OR: interactively rebase everything since branching off main
+git rebase -i main</code></pre>
+          </div>
+
+          <p>Git opens your editor with a list like this:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">pick a1b2c3d Add login form HTML
+pick 9f8e7d6 fix typo
+pick 5c4b3a2 Add login form validation
+pick 2d1e0f9 WIP: more validation
+
+# Commands:
+# p, pick   = use commit as-is
+# r, reword = use commit but edit the message
+# s, squash = combine into previous commit (keep both messages)
+# f, fixup  = combine into previous commit (discard this message)
+# d, drop   = remove this commit entirely
+# (lines can be reordered to reorder commits)</code></pre>
+          </div>
+
+          <h3>Example: squash the messy commits into one clean commit</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">pick a1b2c3d Add login form HTML
+f    9f8e7d6 fix typo            ← fixup: fold into previous, discard message
+s    5c4b3a2 Add login form validation  ← squash: fold in, keep message option
+f    2d1e0f9 WIP: more validation ← fixup: fold in, discard message
+
+# Save and close the editor.
+# Git opens editor again to write the final combined commit message.
+# Result: ONE clean commit instead of four messy ones.</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Command</th><th>Shorthand</th><th>What it does</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>pick</td><td>p</td><td>Use the commit as-is — no change</td></tr>
+                <tr><td>reword</td><td>r</td><td>Use commit but open editor to rewrite the message</td></tr>
+                <tr><td>squash</td><td>s</td><td>Combine into previous commit; opens editor to merge messages</td></tr>
+                <tr><td>fixup</td><td>f</td><td>Combine into previous commit; silently discard this commit's message</td></tr>
+                <tr><td>drop</td><td>d</td><td>Delete this commit entirely from history</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="golden-rule">The Golden Rule of Rebase</h2>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Never rebase commits that have been pushed to a shared branch</strong>
+              <p>When you rebase, Git creates new commits with new SHA hashes. If your teammates already have the original commits (because they pulled them), their Git history now conflicts with yours. When they try to pull, Git sees two different commits with the same content but different hashes — causing confusing merge conflicts and duplicated commit history. This is the most dangerous mistake in Git. The rule: rebase only on <em>your local branch before pushing</em>, or on a branch only you are working on.</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># SAFE: rebase your LOCAL feature branch before pushing
+git switch feature/login
+git rebase -i main          # clean up commits
+git push -u origin feature/login   # first push — fine
+
+# DANGEROUS: rebasing AFTER you've already pushed
+# (teammates or CI have already pulled these commits)
+git rebase main             # creates new SHAs
+git push --force-with-lease # need force push — red flag!
+# This BREAKS anyone who pulled the old branch
+
+# Only OK if you're SURE no one else is on that branch:
+git push --force-with-lease origin feature/login  # safer than --force</code></pre>
+          </div>
+
+          <h2 id="when-to-use">When to Use Rebase</h2>
+
+          <div class="callout callout-success">
+            <span class="callout-icon">✅</span>
+            <div class="callout-content">
+              <strong>Good uses of rebase</strong>
+              <ul>
+                <li><strong>Clean up local feature branch</strong> before opening a pull request — squash "WIP" and "fix typo" commits into logical units.</li>
+                <li><strong>Update feature branch with latest main</strong> — rebase onto main instead of merging main into your branch (avoids merge commit pollution).</li>
+                <li><strong>Interactive rebase to reorder commits</strong> — put related changes together for reviewers.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Abort rebase if something goes wrong
+git rebase --abort
+# Returns everything to pre-rebase state
+
+# If a conflict occurs during rebase, resolve it then:
+git add &lt;resolved-file&gt;
+git rebase --continue
+
+# Skip a problematic commit (use carefully — loses that commit's changes)
+git rebase --skip</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Rebase</strong> re-applies your commits on top of a new base — creating new commit SHAs and a clean linear history.</li>
+              <li><strong>Rebase vs merge</strong>: rebase = linear history (no merge commit); merge = preserves branch topology.</li>
+              <li><code>git rebase main</code> — rebase current branch onto main (update with latest main changes).</li>
+              <li><code>git rebase -i HEAD~N</code> — interactive rebase for last N commits: squash, reword, drop, reorder.</li>
+              <li>Interactive commands: <strong>pick</strong> (keep), <strong>squash</strong> (combine + merge messages), <strong>fixup</strong> (combine + discard message), <strong>reword</strong> (edit message), <strong>drop</strong> (delete).</li>
+              <li><strong>The Golden Rule</strong>: NEVER rebase commits that have been pushed to a shared branch. Rebase only local, unpushed commits.</li>
+              <li><code>git rebase --abort</code> cancels the rebase safely at any point.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/git/branching/merging.html" class="topic-tag git-topic-tag">🔀 Merging Branches</a>
+            <a href="/git/branching/merge-conflicts.html" class="topic-tag git-topic-tag">🔀 Merge Conflicts</a>
+            <a href="/git/remotes/push-pull-fetch.html" class="topic-tag git-topic-tag">🔀 Push, Pull &amp; Fetch</a>
+            <a href="/git/workflows/gitflow.html" class="topic-tag git-topic-tag">🔀 Git Workflows</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">If rebase rewrites history, does it change the actual code? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — the <em>content</em> of the commits stays the same. The code changes introduced by each commit are preserved exactly. What changes is the commit's metadata: its parent hash (which is now a different base), and therefore its own SHA hash. Think of it like printing the same document on new paper — the text is identical, but the paper (the object in Git's store) is new.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What's the difference between squash in interactive rebase and git merge --squash? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Both combine multiple commits into one, but they work differently. <code>git merge --squash</code> combines all commits from a feature branch into a single staged change on the target branch — it doesn't touch the feature branch itself. Interactive rebase's <code>squash</code>/<code>fixup</code> combines commits within the same branch's history, rewriting that branch. Merge squash is for when you're done with the feature; interactive rebase squash is for cleaning up before the merge.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">I already pushed my branch and want to rebase it. What do I do? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>If you're the only one working on that branch (a personal feature branch, not shared), you can rebase locally and then force-push: <code>git push --force-with-lease origin branch-name</code>. The <code>--force-with-lease</code> flag is safer than <code>--force</code> because it checks that no one else has pushed to the remote branch since your last fetch. If you're collaborating with others on the same branch, communicate before rebasing or use merge instead.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I use rebase or merge to keep my feature branch updated with main? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Both work. <code>git rebase main</code> (from your feature branch) gives a cleaner linear history and makes the eventual merge into main a fast-forward. <code>git merge main</code> (into your feature branch) creates merge commits in your feature branch history, which can clutter it. Most teams that care about clean history prefer rebase here — it's a safe use since you're rebasing your own local branch, not shared commits.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/branching/merge-conflicts.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Merge Conflicts</span>
+          </a>
+          <a href="/git/remotes/remotes-overview.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Remotes Overview</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

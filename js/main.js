@@ -594,12 +594,92 @@
     },
   ];
 
+  // ========================
+  // Git Navigation Data
+  // ========================
+  const GIT_NAV_DATA = [
+    {
+      title: '📖 Introduction',
+      items: [
+        { title: 'What is Git?', url: '/git/what-is-git.html' },
+        { title: 'Why Learn Git?', url: '/git/why-learn-git.html' },
+        { title: 'Git vs GitHub vs GitLab', url: '/git/git-vs-github.html' },
+        { title: 'Installing & Configuring Git', url: '/git/git-installation.html' },
+        { title: 'How Git Thinks (Mental Model)', url: '/git/git-mental-model.html' },
+      ]
+    },
+    {
+      title: '🚀 Getting Started',
+      items: [
+        { title: 'git init & git clone', url: '/git/basics/init-clone.html' },
+        { title: 'Staging & Committing', url: '/git/basics/staging-committing.html' },
+        { title: 'git status & git log', url: '/git/basics/status-log.html' },
+        { title: 'Undoing Changes', url: '/git/basics/undoing-changes.html' },
+        { title: 'Viewing Diffs (git diff)', url: '/git/basics/viewing-diffs.html' },
+      ]
+    },
+    {
+      title: '🌿 Branching & Merging',
+      items: [
+        { title: 'Branches Overview', url: '/git/branching/branches-overview.html' },
+        { title: 'Creating & Switching Branches', url: '/git/branching/creating-switching.html' },
+        { title: 'Merging Branches', url: '/git/branching/merging.html' },
+        { title: 'Resolving Merge Conflicts', url: '/git/branching/merge-conflicts.html' },
+        { title: 'Rebasing (git rebase)', url: '/git/branching/rebase.html' },
+      ]
+    },
+    {
+      title: '🌐 Remote Repositories',
+      items: [
+        { title: 'Remotes Overview', url: '/git/remotes/remotes-overview.html' },
+        { title: 'Push, Pull & Fetch', url: '/git/remotes/push-pull-fetch.html' },
+        { title: 'GitHub PR Workflow', url: '/git/remotes/github-workflow.html' },
+        { title: 'SSH Keys & Auth', url: '/git/remotes/ssh-keys.html' },
+      ]
+    },
+    {
+      title: '⚙️ Advanced Git',
+      items: [
+        { title: 'Stashing Changes', url: '/git/advanced/stashing.html' },
+        { title: 'Tags & Releases', url: '/git/advanced/tags-releases.html' },
+        { title: 'Cherry-pick', url: '/git/advanced/cherry-pick.html' },
+        { title: 'Bisect & Blame', url: '/git/advanced/git-bisect.html' },
+        { title: 'Git Hooks', url: '/git/advanced/git-hooks.html' },
+      ]
+    },
+    {
+      title: '🔀 Workflows',
+      items: [
+        { title: 'Git Flow Strategy', url: '/git/workflows/gitflow.html' },
+        { title: 'Feature Branch Workflow', url: '/git/workflows/feature-branch-workflow.html' },
+        { title: 'Conventional Commits', url: '/git/workflows/conventional-commits.html' },
+        { title: '.gitignore & .gitattributes', url: '/git/workflows/gitignore.html' },
+      ]
+    },
+    {
+      title: '🎯 Interview Prep',
+      items: [
+        { title: 'Git Interview Questions', url: '/git/interview/questions.html', badge: 'hot' },
+        { title: 'Practical Exercises', url: '/git/interview/exercises.html' },
+      ]
+    },
+    {
+      title: '🛠️ Projects',
+      items: [
+        { title: 'Version Your First Project', url: '/git/projects/version-your-project.html' },
+        { title: 'Simulate Team Collaboration', url: '/git/projects/team-workflow.html' },
+        { title: 'Open Source Contribution', url: '/git/projects/open-source-contribution.html' },
+      ]
+    },
+  ];
+
   function getNavData() {
     const path = window.location.pathname;
     if (path.includes('/javascript/')) return JS_NAV_DATA;
     if (path.includes('/owljs/')) return OWL_NAV_DATA;
     if (path.includes('/html/')) return HTML_NAV_DATA;
     if (path.includes('/csslessons/')) return CSS_NAV_DATA;
+    if (path.includes('/git/')) return GIT_NAV_DATA;
     return NAV_DATA;
   }
 
@@ -609,11 +689,12 @@
     if (url.includes('/owljs/'))      return 'OWL JS';
     if (url.includes('/html/'))       return 'HTML';
     if (url.includes('/csslessons/')) return 'CSS';
+    if (url.includes('/git/'))        return 'Git';
     return '';
   }
 
   // Search index (with BASE-prefixed URLs for file:// searches)
-  const SEARCH_INDEX = [...NAV_DATA, ...JS_NAV_DATA, ...OWL_NAV_DATA, ...HTML_NAV_DATA, ...CSS_NAV_DATA].flatMap(section =>
+  const SEARCH_INDEX = [...NAV_DATA, ...JS_NAV_DATA, ...OWL_NAV_DATA, ...HTML_NAV_DATA, ...CSS_NAV_DATA, ...GIT_NAV_DATA].flatMap(section =>
     section.items.map(item => {
       const course = courseFromUrl(item.url);
       const sectionName = section.title.replace(/^.{2}\s/, '');

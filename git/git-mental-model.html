@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How Git Thinks – Snapshots, the DAG, and SHA-1 Hashes | ylearner</title>
+  <meta name="description" content="Understand Git's internal mental model: snapshots vs diffs, the three areas (working tree, staging area, repository), the commit DAG, SHA-1 hashes, HEAD, and Git objects. The foundation that makes every other Git concept click.">
+  <meta name="keywords" content="git mental model, git snapshots, git dag, git sha1, git head pointer, git objects, git working tree, git staging area, git index, git internals, how git works">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/git/git-mental-model.html">
+  <meta property="og:title" content="How Git Thinks – Snapshots, the DAG, and SHA-1 Hashes | ylearner">
+  <meta property="og:description" content="Build the correct mental model of Git: snapshots not diffs, the three areas, the commit DAG, SHA-1 hashes, HEAD, and Git objects — the foundation for mastering Git.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/git/git-mental-model.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="How Git Thinks – Snapshots, DAG, SHA-1 | ylearner">
+  <meta name="twitter:description" content="Learn Git's internal model: snapshots, the three areas, commit DAG, SHA-1 hashes, and the HEAD pointer. Makes every other Git concept click into place.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "How Git Thinks – Snapshots, the DAG, and SHA-1 Hashes",
+    "description": "A deep-dive into Git's internal mental model — snapshots vs diffs, the three areas, the commit Directed Acyclic Graph, SHA-1 hashes, the HEAD pointer, and Git object types.",
+    "educationalLevel": "Beginner",
+    "keywords": "git mental model, git snapshots, git dag, git sha1, git objects, git internals",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <span class="current">Git Mental Model</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📖 Introduction</div>
+          <h1>How Git Thinks – Snapshots, the DAG, and SHA-1 Hashes</h1>
+          <p class="lesson-intro">Most developers learn Git by memorising commands. That works — until something goes wrong and you have no idea why. The developers who are <em>genuinely fluent</em> in Git have a correct <strong>mental model of how Git thinks</strong>: Git stores snapshots, not diffs. Commits form a graph, not a list. Every object has a cryptographic hash. HEAD is a pointer, not a fixed concept. In this lesson you will build that mental model from the ground up — and once it clicks, every Git command, every error message, and every tricky scenario will start to make intuitive sense.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="snapshots-not-diffs">Snapshots, Not Diffs</h2>
+          <p>The most fundamental thing to understand about Git is how it stores data. Most older version control systems (CVS, SVN, Perforce) think of history as a <strong>list of file-based changes</strong> — they store the initial version of each file, then record only the lines that changed in each subsequent version.</p>
+          <p>Git is completely different. Git thinks of its data as a <strong>series of snapshots of your entire project</strong>. Every time you commit, Git takes a picture of <em>all</em> your tracked files at that exact moment and stores a reference to that complete snapshot. If a file has not changed since the last commit, Git does not store it again — it simply stores a reference (pointer) to the identical file it stored previously. This is both storage-efficient and conceptually simple: each commit is a <em>complete, self-contained state of your project</em>.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Approach</th><th>How it stores history</th><th>Examples</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Delta-based (diff-based)</strong></td><td>Initial file + list of changes per commit</td><td>SVN, CVS, Perforce</td></tr>
+                <tr><td><strong>Snapshot-based</strong></td><td>Complete state of all files at each commit</td><td>Git</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>This snapshot model is why Git operations like branching, merging, and switching between commits are so fast. Git never needs to "reconstruct" a file version by replaying diffs — it just retrieves the snapshot directly.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Unchanged files are stored once</strong>
+              <p>If your project has 100 files and you change only 3 in a commit, Git stores the 3 new snapshots and points to the existing 97 unchanged file objects. There is no duplication. This is efficient because Git uses content-addressable storage — identical content is only stored once, regardless of how many commits reference it.</p>
+            </div>
+          </div>
+
+          <h2 id="the-three-areas">The Three Areas</h2>
+          <p>Every file in a Git repository exists in one of three distinct areas. Moving files between these areas is what the core Git commands actually do. Getting this model clear in your head removes 80% of the confusion beginners experience with Git.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Area</th><th>Also Called</th><th>Where It Lives</th><th>What It Contains</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Working Tree</strong></td><td>Working Directory</td><td>Your project folder</td><td>The actual files you see and edit in your text editor</td></tr>
+                <tr><td><strong>Staging Area</strong></td><td>Index, Cache</td><td><code>.git/index</code></td><td>A list of files and their content that will go into the next commit</td></tr>
+                <tr><td><strong>Repository</strong></td><td>Git Database, .git dir</td><td><code>.git/</code> folder</td><td>All commits, branches, tags — the complete project history</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Working Tree → Staging Area
+# "git add" copies files from your working tree into the staging area
+git add index.html
+
+# Staging Area → Repository
+# "git commit" takes everything in the staging area and saves a snapshot
+git commit -m "Add homepage"
+
+# Repository → Working Tree
+# "git checkout" or "git restore" copies files from a commit back to your working tree
+git restore index.html</code></pre>
+          </div>
+
+          <p>The <strong>staging area</strong> is the most misunderstood area for beginners. Why does it exist? It gives you fine-grained control over what goes into each commit. If you changed 10 files but only want to commit 3 of them together (because they are logically related), you stage just those 3. The other 7 remain modified in your working tree, ready to be staged in a future commit. This produces a clean, meaningful commit history — which is one of Git's most valuable professional features.</p>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="the-dag">The Commit DAG</h2>
+          <p>Commits in Git do not form a simple linear list — they form a <strong>Directed Acyclic Graph (DAG)</strong>. Each commit stores a reference to its <strong>parent commit</strong> (or two parent commits in the case of a merge). This chain of parent references is what makes Git's history work.</p>
+          <p>"Directed" means the arrows in the graph point in one direction (each commit points to its parent, backwards in time). "Acyclic" means the graph has no cycles — you can never follow parent references and end up back at the same commit.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># View the commit graph as a visual tree (very useful!)
+git log --oneline --graph --all</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Example output — two branches</div>
+            * a1b2c3d (HEAD -&gt; main) Add footer<br>
+            *   9f8e7d6 Merge branch 'feature/nav'<br>
+            |\<br>
+            | * 5c4d3e2 (feature/nav) Add navigation bar<br>
+            | * 2b1a0f9 Add nav styles<br>
+            |/<br>
+            * 7e6d5c4 Initial commit
+          </div>
+
+          <p>When you create a branch and make commits on it, and then merge it back, Git creates a <strong>merge commit</strong> that has <em>two</em> parents — one from each branch. This is what the <code>|\ </code> and <code>|/</code> in the graph above represents. The DAG structure is what makes Git's powerful merge and rebase operations possible.</p>
+
+          <h2 id="sha-hashes">SHA-1 Hashes — Git's Unique IDs</h2>
+          <p>Every single object in Git — every commit, every file version, every directory snapshot — is identified by a <strong>SHA-1 hash</strong>: a 40-character hexadecimal string like <code>a1b2c3d4e5f6789012345678901234567890abcd</code>. This hash is computed from the <em>content</em> of the object.</p>
+          <p>This content-based addressing has profound implications:</p>
+          <ul>
+            <li><strong>Integrity</strong> — If any bit of a file or commit is corrupted, its hash changes, and Git detects the corruption immediately.</li>
+            <li><strong>Deduplication</strong> — Identical content always produces the identical hash, so Git stores duplicate content exactly once.</li>
+            <li><strong>Immutability</strong> — You cannot change a past commit without changing its hash (and all subsequent commits). Git history is tamper-evident.</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># See full commit hashes in the log
+git log
+
+# See abbreviated (short) hashes — first 7 characters
+git log --oneline
+
+# You can reference a commit by its first 4-7 characters
+# as long as they are unique in the repository
+git show a1b2c3d
+
+# Git tells you the hash of the current commit
+git rev-parse HEAD</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ git log --oneline output</div>
+            a1b2c3d (HEAD -&gt; main) Add footer<br>
+            9f8e7d6 Merge branch 'feature/nav'<br>
+            5c4d3e2 Add navigation bar<br>
+            7e6d5c4 Initial commit
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>SHA-1 collision risks</strong>
+              <p>SHA-1 has known theoretical weaknesses, and Git's maintainers are aware. Git is transitioning to SHA-256 for new repositories (<code>git init --object-format=sha256</code>). For practical day-to-day use, SHA-1 collisions in Git repositories remain a non-issue — the risk is theoretical and requires enormous computational effort to exploit in practice.</p>
+            </div>
+          </div>
+
+          <h2 id="head-pointer">HEAD — Where You Are Right Now</h2>
+          <p>In Git, <strong>HEAD</strong> is a special pointer that tells you <em>where you currently are</em> in the repository. Most of the time, HEAD points to a branch name, which in turn points to the latest commit on that branch. When you make a new commit, the branch moves forward to the new commit — and HEAD moves with it, always pointing to the branch tip.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># See what HEAD is pointing at
+cat .git/HEAD
+# Output: ref: refs/heads/main
+
+# After switching branches, HEAD updates
+git switch feature/login
+cat .git/HEAD
+# Output: ref: refs/heads/feature/login
+
+# "Detached HEAD" — HEAD points directly to a commit hash, not a branch
+git checkout a1b2c3d
+cat .git/HEAD
+# Output: a1b2c3d4e5f6789012345678901234567890abcd</code></pre>
+          </div>
+
+          <p>The concept of <strong>detached HEAD</strong> confuses many beginners. It simply means HEAD is pointing directly at a commit instead of at a branch. You are "looking at" that specific commit. If you make commits in this state, they have no branch pointing to them and will be garbage-collected eventually. To keep those commits, create a new branch: <code>git switch -c new-branch-name</code>.</p>
+
+          <h2 id="objects">Git's Four Object Types</h2>
+          <p>Git's object database stores exactly four types of objects. Understanding these types gives you a complete picture of how Git represents your project:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Object Type</th><th>What It Represents</th><th>Contains</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>blob</strong></td><td>A single file's content at a specific version</td><td>Raw file contents (no filename, no metadata)</td></tr>
+                <tr><td><strong>tree</strong></td><td>A directory snapshot</td><td>References to blobs (files) and other trees (subdirectories), plus filenames and permissions</td></tr>
+                <tr><td><strong>commit</strong></td><td>A project snapshot in time</td><td>Reference to a root tree, parent commit(s), author, timestamp, and commit message</td></tr>
+                <tr><td><strong>tag</strong></td><td>A named reference to a specific commit</td><td>Reference to a commit, tagger name, date, and message (for annotated tags)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>When you run <code>git commit</code>, Git creates a new <strong>commit object</strong> that references a <strong>tree object</strong> (the root of your project directory), which in turn references <strong>blob objects</strong> for each tracked file. The commit object also records its parent commit's hash, forming the chain. This is the entire storage model — everything in Git is built from these four object types.</p>
+
+          <div class="callout callout-success">
+            <span class="callout-icon">✅</span>
+            <div class="callout-content">
+              <strong>Why this mental model matters</strong>
+              <p>Once you understand that commits are snapshots in a DAG, that branches are just lightweight pointers to commits, and that HEAD is just a pointer to the current branch — commands like <code>git rebase</code>, <code>git reset</code>, <code>git cherry-pick</code>, and detached HEAD become intuitive rather than mysterious. The mental model is the unlock for everything that follows.</p>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Git stores <strong>snapshots</strong> of your entire project at each commit — not line-by-line diffs like SVN.</li>
+              <li>Every file lives in one of three areas: <strong>working tree</strong> (what you edit), <strong>staging area / index</strong> (what will be committed), <strong>repository / .git</strong> (permanent history).</li>
+              <li>Commits form a <strong>Directed Acyclic Graph (DAG)</strong> — each commit points to its parent(s), enabling branching and merging.</li>
+              <li>Every object is identified by a <strong>SHA-1 hash</strong> of its content — commits, files, and directories all have unique, content-derived hashes.</li>
+              <li><strong>HEAD</strong> is a pointer to your current location — usually points to a branch, which points to the latest commit on that branch.</li>
+              <li>Git has four object types: <strong>blob</strong> (file content), <strong>tree</strong> (directory), <strong>commit</strong> (snapshot + metadata), <strong>tag</strong> (named reference).</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/git/what-is-git.html" class="topic-tag git-topic-tag">🔀 What is Git?</a>
+            <a href="/git/git-installation.html" class="topic-tag git-topic-tag">🔀 Installing Git</a>
+            <a href="/git/basics/init-clone.html" class="topic-tag git-topic-tag">🔀 Init &amp; Clone</a>
+            <a href="/git/basics/staging-committing.html" class="topic-tag git-topic-tag">🔀 Staging &amp; Committing</a>
+            <a href="/git/branching/branches-overview.html" class="topic-tag git-topic-tag">🔀 Branches Overview</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why does Git use SHA-1 instead of just numbering commits 1, 2, 3...? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Sequential numbers only work in centralised systems where one server assigns them. Git is <em>distributed</em> — two developers on opposite sides of the world can make commits simultaneously with no central authority to assign numbers. SHA-1 hashes solve this: because the hash is derived from the commit's content (including timestamp, author, parent hash, and message), two different commits will virtually always produce different hashes, making them unique across all repositories without any coordination.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is a "detached HEAD" and should I be worried? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Detached HEAD means HEAD points directly at a commit hash instead of at a branch name. It is not harmful — you can look around, run <code>git log</code>, even make experimental commits. The only risk is that commits made in detached HEAD state have no branch tracking them, so they can be garbage-collected by Git eventually. To fix detached HEAD, either go back to a branch (<code>git switch main</code>) or create a new branch from your current position (<code>git switch -c my-experiment</code>).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Does Git store complete file copies in every commit? Isn't that wasteful? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Git stores complete snapshots conceptually, but is storage-efficient in practice for two reasons: (1) identical content is stored as the same blob object (referenced by hash), so unchanged files take zero extra space; (2) Git periodically runs a "pack" operation that compresses objects using delta compression, storing only the differences for objects with similar content. The result is that a large repository's <code>.git</code> folder is typically smaller than you would expect from the "complete snapshots" model.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is the staging area really necessary? Can I skip it? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>You can skip it for simple commits using <code>git commit -a</code>, which stages all <em>tracked modified files</em> and commits in one step. But the staging area is genuinely useful: it lets you craft focused, logical commits even when you have made many unrelated changes. Professional developers use the staging area (and <code>git add -p</code> for partial file staging) to produce clean, reviewable commit histories. Good commit hygiene is a professional skill that makes code reviews faster and <code>git bisect</code> more effective.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/git-installation.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Installing &amp; Configuring Git</span>
+          </a>
+          <a href="/git/basics/init-clone.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Init &amp; Clone</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

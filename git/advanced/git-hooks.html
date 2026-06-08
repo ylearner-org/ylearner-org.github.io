@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git Hooks – Automate Checks with .git/hooks | ylearner</title>
+  <meta name="description" content="Learn how to use Git hooks to automate linting, testing, and commit message enforcement. Covers pre-commit, commit-msg, pre-push hooks, and sharing hooks with Husky.">
+  <meta name="keywords" content="git hooks, pre-commit hook, commit-msg hook, pre-push hook, git hooks tutorial, husky git hooks, .git/hooks, automated git checks">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/git/advanced/git-hooks.html">
+  <meta property="og:title" content="Git Hooks – Automate Checks with .git/hooks | ylearner">
+  <meta property="og:description" content="Learn how to use Git hooks to automate linting, testing, and commit message enforcement with pre-commit, commit-msg, and pre-push hooks.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/git/advanced/git-hooks.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Git Hooks – Automate Checks with .git/hooks","description":"Learn how to use Git hooks to automate linting, testing, and commit message enforcement at key Git lifecycle events.","educationalLevel":"Advanced","keywords":"git hooks, pre-commit hook, husky, commit-msg hook","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <span>Advanced Git</span><span class="separator">›</span>
+          <span class="current">Git Hooks</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Advanced Git</div>
+          <h1>Git Hooks – Automate Checks with .git/hooks</h1>
+          <p class="lesson-intro">Git hooks are scripts that run automatically when specific Git events occur — before a commit is made, after a push, before merging. They're your first line of defense: catch lint errors before they pollute the repo, enforce commit message format consistently, run your test suite before any push reaches the remote. This lesson covers the most important hooks, how to write them, and how to share them with your team using Husky.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-are-hooks">What Are Git Hooks?</h2>
+          <p>Git hooks are executable scripts stored in the <code>.git/hooks/</code> directory of your repository. When Git performs certain actions (commit, push, merge, etc.), it checks for a script with a specific name and runs it. If the script exits with a non-zero code, the Git action is <strong>aborted</strong>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># View the sample hooks in any Git repo
+ls .git/hooks/
+# applypatch-msg.sample  commit-msg.sample  pre-commit.sample
+# pre-push.sample        prepare-commit-msg.sample  ...
+
+# A hook is activated by removing the .sample extension
+# and making it executable
+chmod +x .git/hooks/pre-commit</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Hooks are not tracked by Git</strong>
+              <p>The <code>.git/</code> directory is never committed. This means hooks placed directly in <code>.git/hooks/</code> are local to your machine only. To share hooks with your team, you need a strategy like Husky (covered below) or a custom setup script.</p>
+            </div>
+          </div>
+
+          <h2 id="client-hooks">Client-Side Hooks</h2>
+          <p>Client-side hooks run on your local machine and affect your own Git operations:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Hook name</th><th>When it runs</th><th>Common use</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>pre-commit</code></td><td>Before commit message is entered</td><td>Lint, format, test staged files</td></tr>
+                <tr><td><code>prepare-commit-msg</code></td><td>Before commit message editor opens</td><td>Auto-populate commit message</td></tr>
+                <tr><td><code>commit-msg</code></td><td>After commit message is entered</td><td>Validate message format</td></tr>
+                <tr><td><code>post-commit</code></td><td>After commit is created</td><td>Notifications, logging (informational only)</td></tr>
+                <tr><td><code>pre-push</code></td><td>Before push to remote</td><td>Run full test suite</td></tr>
+                <tr><td><code>pre-rebase</code></td><td>Before a rebase starts</td><td>Safety checks</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="server-hooks">Server-Side Hooks</h2>
+          <p>Server-side hooks run on the remote repository server. They're used in self-hosted Git servers (GitLab, Bitbucket self-managed, Gitea) for repository-level enforcement:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Hook name</th><th>When it runs</th><th>Common use</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>pre-receive</code></td><td>Before push is accepted</td><td>Enforce branch policies, reject large files</td></tr>
+                <tr><td><code>update</code></td><td>Once per pushed branch</td><td>Per-branch access control</td></tr>
+                <tr><td><code>post-receive</code></td><td>After push is fully accepted</td><td>Trigger CI/CD, send notifications</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="pre-commit">Writing a pre-commit Hook</h2>
+          <p>The most commonly used hook. It runs before you type your commit message. If it exits non-zero, the commit is cancelled.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash (.git/hooks/pre-commit)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">#!/bin/sh
+# pre-commit: Run ESLint on staged JS files
+
+# Get list of staged JS/TS files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E "\.(js|ts|jsx|tsx)$")
+
+if [ -z "$STAGED_FILES" ]; then
+  exit 0  # No JS/TS files staged, nothing to check
+fi
+
+echo "Running ESLint on staged files..."
+npx eslint $STAGED_FILES
+
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "ESLint failed. Fix the errors above before committing."
+  echo "To bypass (not recommended): git commit --no-verify"
+  exit 1
+fi
+
+echo "ESLint passed!"
+exit 0</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Make the hook executable
+chmod +x .git/hooks/pre-commit
+
+# Test it
+git add src/app.js
+git commit -m "test"
+# Running ESLint on staged files...
+# (ESLint output here)
+# ESLint failed. Fix the errors above before committing.</code></pre>
+          </div>
+
+          <h2 id="commit-msg">Writing a commit-msg Hook</h2>
+          <p>This hook receives the path to the file containing the commit message. Use it to enforce Conventional Commits format or your team's naming conventions:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash (.git/hooks/commit-msg)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">#!/bin/sh
+# commit-msg: Enforce Conventional Commits format
+
+MSG_FILE="$1"
+MSG=$(cat "$MSG_FILE")
+
+# Regex: type(scope): description
+# Types: feat, fix, docs, style, refactor, perf, test, chore, ci, build, revert
+PATTERN="^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)(\(.+\))?: .{1,72}"
+
+if ! echo "$MSG" | grep -qE "$PATTERN"; then
+  echo ""
+  echo "Invalid commit message format!"
+  echo "Expected: type(scope): description"
+  echo "Example:  feat(auth): add OAuth2 login support"
+  echo ""
+  echo "Valid types: feat, fix, docs, style, refactor, perf, test, chore, ci, build, revert"
+  exit 1
+fi
+
+exit 0</code></pre>
+          </div>
+
+          <h2 id="pre-push">Writing a pre-push Hook</h2>
+          <p>Runs before <code>git push</code>. Perfect for running your full test suite — you only want working code reaching the remote:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash (.git/hooks/pre-push)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">#!/bin/sh
+# pre-push: Run tests before pushing
+
+echo "Running test suite before push..."
+npm test
+
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "Tests failed! Push aborted."
+  echo "Fix failing tests before pushing."
+  exit 1
+fi
+
+echo "All tests passed. Pushing..."
+exit 0</code></pre>
+          </div>
+
+          <h2 id="share-hooks">Sharing Hooks with Your Team</h2>
+          <p>Since <code>.git/hooks/</code> is not tracked, you need a strategy to share hooks. A simple approach: keep hooks in a <code>.githooks/</code> directory in your repo and configure Git to use it:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Create a tracked hooks directory
+mkdir .githooks
+cp .git/hooks/pre-commit .githooks/pre-commit
+chmod +x .githooks/pre-commit
+git add .githooks/
+git commit -m "chore: add shared git hooks"
+
+# Each developer configures their Git to use this directory
+git config core.hooksPath .githooks
+
+# Add to onboarding docs or a setup script:
+# echo "git config core.hooksPath .githooks" >> setup.sh</code></pre>
+          </div>
+
+          <h2 id="husky">Husky – Team-Shared Hooks for Node.js Projects</h2>
+          <p><strong>Husky</strong> is the most popular solution for Node.js/npm projects. It installs hooks automatically when developers run <code>npm install</code>, and hooks are defined in <code>package.json</code> or separate config files — fully tracked in your repo.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Install Husky
+npm install --save-dev husky
+
+# Initialize Husky (creates .husky/ directory and configures package.json)
+npx husky init
+
+# Add a pre-commit hook
+echo "npm run lint" > .husky/pre-commit
+
+# Add a commit-msg hook (using commitlint)
+echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg
+
+# Add a pre-push hook
+echo "npm test" > .husky/pre-push
+
+# Commit the hooks — now every developer gets them on npm install
+git add .husky package.json
+git commit -m "chore: add husky git hooks"</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JSON (package.json)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-json">{
+  "scripts": {
+    "prepare": "husky",
+    "lint": "eslint src --ext .js,.ts",
+    "test": "jest --passWithNoTests"
+  },
+  "devDependencies": {
+    "husky": "^9.0.0",
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0"
+  }
+}</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Git hooks</strong> are executable scripts in <code>.git/hooks/</code> that run automatically at Git lifecycle events.</li>
+              <li>Non-zero exit code from a hook <strong>aborts the Git action</strong> (commit, push, etc.).</li>
+              <li><strong>pre-commit</strong> — runs before committing; use for linting and formatting staged files.</li>
+              <li><strong>commit-msg</strong> — validates commit message format; use to enforce Conventional Commits.</li>
+              <li><strong>pre-push</strong> — runs before pushing; use for full test suite execution.</li>
+              <li>Hooks are NOT tracked by Git — share via a <code>.githooks/</code> directory + <code>git config core.hooksPath</code>.</li>
+              <li><strong>Husky</strong> is the standard solution for Node.js teams: installs hooks automatically on <code>npm install</code>.</li>
+              <li>Bypass a hook (emergency only): <code>git commit --no-verify</code>.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/git/workflows/conventional-commits.html" class="topic-tag git-topic-tag">🔀 Conventional Commits</a>
+            <a href="/git/advanced/git-bisect.html" class="topic-tag git-topic-tag">⚙️ git bisect</a>
+            <a href="/git/workflows/gitflow.html" class="topic-tag git-topic-tag">🔀 Git Flow</a>
+            <a href="/git/interview/exercises.html" class="topic-tag git-topic-tag">🎯 Practical Exercises</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I bypass a Git hook? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — use the <code>--no-verify</code> flag: <code>git commit --no-verify</code> or <code>git push --no-verify</code>. This skips all client-side hooks. While this escape hatch is necessary for genuine emergencies (e.g., a broken CI environment during an outage), using it habitually defeats the purpose of having hooks. Server-side hooks (on a self-hosted Git server) cannot be bypassed by individual developers.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What languages can I write Git hooks in? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Any language that can be run as an executable on your system. The shebang line (<code>#!/bin/sh</code>, <code>#!/usr/bin/env python3</code>, <code>#!/usr/bin/env node</code>) tells the OS how to run the script. Shell scripts are most portable across developer machines, but Python, Node.js, Ruby, or any other scripting language works fine as long as it's installed on every developer's machine.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why isn't my hook running? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The two most common reasons: (1) <strong>Missing execute permission</strong> — run <code>chmod +x .git/hooks/pre-commit</code>. On Windows, Git can sometimes be configured to treat files as executable via <code>git update-index --chmod=+x .git/hooks/pre-commit</code>. (2) <strong>Wrong filename</strong> — the file must be named exactly <code>pre-commit</code> (no extension). A file named <code>pre-commit.sh</code> will not run. Check with <code>ls -la .git/hooks/</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How does Husky work with npm workspaces or monorepos? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Husky works at the Git repository root level. In a monorepo, install Husky in the root <code>package.json</code> with the <code>prepare</code> script. Your hook scripts can then selectively run lint/test commands for only the affected packages — tools like <code>lint-staged</code> are commonly combined with Husky to run commands only on staged files, which is much faster than linting the entire monorepo on every commit.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/advanced/git-bisect.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">git bisect &amp; git blame</span>
+          </a>
+          <a href="/git/workflows/gitflow.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Git Flow</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

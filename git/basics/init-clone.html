@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>git init &amp; git clone – Starting a Repository | ylearner</title>
+  <meta name="description" content="Learn how to start a Git repository with git init and copy an existing repo with git clone. Understand the .git folder structure and avoid common setup errors.">
+  <meta name="keywords" content="git init, git clone, start a git repository, git init tutorial, git clone SSH HTTPS, .git folder, git for beginners">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/git/basics/init-clone.html">
+  <meta property="og:title" content="git init &amp; git clone – Starting a Repository | ylearner">
+  <meta property="og:description" content="Learn how to start a Git repository with git init and copy an existing repo with git clone. Understand the .git folder structure and avoid common setup errors.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/git/basics/init-clone.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"git init & git clone – Starting a Repository","description":"Learn how to start a Git repository with git init and copy an existing repo with git clone. Covers the .git folder structure and common errors.","educationalLevel":"Beginner","keywords":"git init, git clone, git repository, .git folder","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <span>Basics</span><span class="separator">›</span>
+          <span class="current">git init &amp; git clone</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Getting Started</div>
+          <h1>git init &amp; git clone – Starting a Repository</h1>
+          <p class="lesson-intro">Every Git story begins in one of two ways: you either <strong>start fresh</strong> with <code>git init</code>, or you <strong>copy an existing repository</strong> with <code>git clone</code>. This lesson covers both commands in depth — including what the hidden <code>.git/</code> folder contains and how to avoid the most common setup mistakes.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="git-init">git init – Creating a New Repository</h2>
+          <p>The <code>git init</code> command turns any ordinary directory on your machine into a Git-tracked repository. It creates the hidden <code>.git/</code> folder that stores all version history, configuration, and metadata. Nothing else in your directory is changed — your files stay exactly as they are.</p>
+
+          <h3>Initialize the current directory</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Navigate to your project folder first
+cd my-project
+
+# Initialize a new Git repository here
+git init</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Output</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Initialized empty Git repository in /home/user/my-project/.git/</code></pre>
+          </div>
+
+          <p>Git confirms that a new empty repository was created. The <code>.git/</code> folder now exists inside <code>my-project/</code>. Your existing files are not staged or committed yet — that's the next step.</p>
+
+          <h3>Create and initialize a named directory in one step</h3>
+          <p>If you pass a name to <code>git init</code>, Git creates that directory and initializes the repository inside it — saving you a separate <code>mkdir</code> step.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Creates the folder "myproject" and initializes Git inside it
+git init myproject
+
+# Then enter the directory
+cd myproject</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Default branch name</strong>
+              <p>On modern Git (2.28+) you can configure the initial branch name. Many teams use <code>main</code> instead of the legacy <code>master</code>. Run <code>git init -b main</code> or set a global default with <code>git config --global init.defaultBranch main</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="git-clone">git clone – Copying an Existing Repository</h2>
+          <p><code>git clone</code> downloads a complete copy of an existing repository — all commits, all branches, all history — to your local machine. You typically use it to get a project from GitHub, GitLab, Bitbucket, or any other remote host.</p>
+
+          <h3>Clone using HTTPS (easiest to start with)</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># General form
+git clone https://github.com/username/repository.git
+
+# Real example
+git clone https://github.com/torvalds/linux.git</code></pre>
+          </div>
+
+          <p>Git creates a folder named after the repository (e.g. <code>linux/</code>), downloads everything, and automatically sets up the remote named <code>origin</code> pointing back to the URL you cloned from.</p>
+
+          <h3>Clone using SSH (recommended once you've set up SSH keys)</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># SSH form — no password prompts after keys are configured
+git clone git@github.com:username/repository.git
+
+# Real example
+git clone git@github.com:torvalds/linux.git</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>HTTPS vs SSH</strong>
+              <p>HTTPS is simpler to start with — it works immediately with a username and password (or personal access token). SSH requires a one-time key setup but is more convenient for daily use because it does not require re-entering credentials. The <strong>SSH Keys</strong> lesson in the Remotes section explains the setup.</p>
+            </div>
+          </div>
+
+          <h3>Clone into a custom folder name</h3>
+          <p>By default, Git names the local folder after the repository. Pass a second argument to use a different name:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Clone into a folder called "my-linux" instead of "linux"
+git clone https://github.com/torvalds/linux.git my-linux
+
+# Clone into the current directory (note the trailing dot)
+git clone https://github.com/username/repo.git .</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="repo-structure">What a Repository Looks Like After Cloning</h2>
+          <p>After cloning a typical project, your directory structure will look like this:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Directory structure</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">my-project/
+  .git/          ← Git's internal database (hidden)
+  src/
+    main.py
+    utils.py
+  tests/
+    test_main.py
+  README.md
+  .gitignore</code></pre>
+          </div>
+
+          <p>Your project files are visible and editable as normal. The <code>.git/</code> folder is hidden (its name starts with a dot) and you should almost never need to touch it directly.</p>
+
+          <h2 id="dot-git-folder">What's Inside the .git/ Folder</h2>
+          <p>The <code>.git/</code> directory is the entire repository — it is the reason Git is a "distributed" version control system. Every developer who clones a project gets this complete database. Here are the key items inside:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Item</th><th>What it contains</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>HEAD</code></td>
+                  <td>A pointer to the currently checked-out branch (e.g. <code>ref: refs/heads/main</code>). This tells Git "you are on the <em>main</em> branch right now."</td>
+                </tr>
+                <tr>
+                  <td><code>config</code></td>
+                  <td>Repository-level configuration: remote URLs, branch tracking, user overrides. Edited by <code>git config</code> or manually.</td>
+                </tr>
+                <tr>
+                  <td><code>objects/</code></td>
+                  <td>Git's content-addressable storage. Every file snapshot, commit, and directory tree is stored here as a compressed binary object, named by its SHA-1 hash.</td>
+                </tr>
+                <tr>
+                  <td><code>refs/</code></td>
+                  <td>Pointers (references) to commits. <code>refs/heads/</code> stores branch tips; <code>refs/tags/</code> stores tags; <code>refs/remotes/</code> stores last-known remote branch positions.</td>
+                </tr>
+                <tr>
+                  <td><code>index</code></td>
+                  <td>The staging area. A binary file that records which changes are staged for the next commit.</td>
+                </tr>
+                <tr>
+                  <td><code>COMMIT_EDITMSG</code></td>
+                  <td>The message from the most recent commit. Used when you run <code>git commit --amend</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Never manually edit the .git/ folder</strong>
+              <p>Everything inside <code>.git/</code> is managed by Git. Manually deleting or editing files inside it can corrupt your repository beyond recovery. If you want to delete the entire repository and start over, delete the whole project folder — or just the <code>.git/</code> folder to "un-Git" the directory while keeping your files.</p>
+            </div>
+          </div>
+
+          <h3>Verify your repository is set up correctly</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Check the status of your new or cloned repo
+git status
+
+# See where the remote "origin" points (only for cloned repos)
+git remote -v</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Output (cloned repo)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">origin  https://github.com/username/repository.git (fetch)
+origin  https://github.com/username/repository.git (push)</code></pre>
+          </div>
+
+          <h3>Common errors and how to fix them</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Error message</th><th>Cause</th><th>Fix</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>fatal: not a git repository</code></td>
+                  <td>You ran a git command outside of an initialized repo</td>
+                  <td>Run <code>git init</code> in the right directory, or <code>cd</code> into your project folder</td>
+                </tr>
+                <tr>
+                  <td><code>Reinitialized existing Git repository</code></td>
+                  <td>You ran <code>git init</code> in a folder that was already a repo</td>
+                  <td>This is harmless — Git just resets config to defaults. No history is lost.</td>
+                </tr>
+                <tr>
+                  <td><code>Repository not found</code></td>
+                  <td>Wrong URL, typo in username/repo, or the repo is private</td>
+                  <td>Double-check the URL; for private repos you need correct credentials or SSH key access</td>
+                </tr>
+                <tr>
+                  <td><code>destination path already exists</code></td>
+                  <td>A folder with the clone's target name already exists</td>
+                  <td>Delete the folder first, or clone into a different name with a second argument</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>git init</strong> — creates a new empty repository in the current directory; a <code>.git/</code> folder is created and nothing else changes.</li>
+              <li><strong>git init myproject</strong> — creates the folder <em>and</em> initializes the repo in one step.</li>
+              <li><strong>git clone &lt;url&gt;</strong> — downloads a full copy of an existing repository including all history; sets up <code>origin</code> remote automatically.</li>
+              <li><strong>SSH vs HTTPS</strong> — HTTPS works immediately; SSH is more convenient after a one-time key setup.</li>
+              <li>The <strong>.git/ folder</strong> is Git's entire database — <code>HEAD</code>, <code>config</code>, <code>objects/</code>, <code>refs/</code>, and the staging <code>index</code>. Never edit it manually.</li>
+              <li>Common errors: <code>not a git repository</code> means you forgot <code>init</code>; <code>Reinitialized</code> is harmless.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/git/git-mental-model.html" class="topic-tag git-topic-tag">🔀 How Git Thinks</a>
+            <a href="/git/basics/staging-committing.html" class="topic-tag git-topic-tag">🔀 Staging &amp; Committing</a>
+            <a href="/git/remotes/ssh-keys.html" class="topic-tag git-topic-tag">🔀 SSH Keys</a>
+            <a href="/git/basics/status-log.html" class="topic-tag git-topic-tag">🔀 git status &amp; git log</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between git init and git clone? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>git init</code> creates a brand-new, empty repository from scratch — there is no prior history. <code>git clone</code> copies an existing repository (from a remote URL) to your machine, including all commits, branches, and tags. Use <code>git init</code> when starting a project from zero; use <code>git clone</code> when joining an existing project or working with a repository hosted on GitHub/GitLab.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I clone a private repository? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — you just need the right credentials. For HTTPS cloning of a private repo, GitHub and GitLab require a <strong>Personal Access Token (PAT)</strong> instead of your password (password authentication was deprecated in 2021). For SSH cloning, you need an SSH key added to your account. If you have collaborator access to the repository, both methods work once authentication is set up.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens if I delete the .git folder? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Deleting <code>.git/</code> removes all Git history, branches, remotes, and configuration from that directory. Your working files remain intact, but the directory is no longer a Git repository — it becomes a plain folder. This is sometimes done intentionally to "detach" a project from Git. To restore version control, you would need to run <code>git init</code> again and recommit everything (or re-clone from the remote if one exists).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I have nested Git repositories? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, but it is generally discouraged for beginners — it leads to confusion. Git will treat the inner repository as an "untracked directory" from the outer repo's perspective. The proper tool for managing a project that contains other Git repositories is <strong>git submodules</strong> or <strong>git subtree</strong>, both of which are advanced topics covered later in this course.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/git-mental-model.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">How Git Thinks</span>
+          </a>
+          <a href="/git/basics/staging-committing.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Staging &amp; Committing</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

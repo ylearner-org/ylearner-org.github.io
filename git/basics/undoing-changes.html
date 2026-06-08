@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Undoing Changes in Git – restore, reset, revert | ylearner</title>
+  <meta name="description" content="Learn how to undo changes in Git using git restore, git reset, and git revert. Understand when each command is safe to use and when it's destructive.">
+  <meta name="keywords" content="git restore, git reset, git revert, undo git commit, git reset hard soft mixed, undoing changes git, git discard changes">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/git/basics/undoing-changes.html">
+  <meta property="og:title" content="Undoing Changes in Git – restore, reset, revert | ylearner">
+  <meta property="og:description" content="Learn how to undo changes in Git using git restore, git reset, and git revert. Understand when each is safe and when it's destructive.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/git/basics/undoing-changes.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Undoing Changes in Git – restore, reset, revert","description":"Learn how to safely undo changes in Git using git restore, git reset --soft/mixed/hard, and git revert.","educationalLevel":"Beginner","keywords":"git restore, git reset, git revert, undo commits","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <span>Basics</span><span class="separator">›</span>
+          <span class="current">Undoing Changes</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Getting Started</div>
+          <h1>Undoing Changes in Git – restore, reset, revert</h1>
+          <p class="lesson-intro">One of Git's most powerful promises is that you can <em>always go back</em>. But "going back" means different things depending on the situation — did you edit a file and want to discard it? Did you stage a file by accident? Did you commit something you shouldn't have? Each scenario has the right tool: <code>git restore</code>, <code>git reset</code>, or <code>git revert</code>. This lesson explains all three — and critically, when each one is <strong>safe</strong> vs <strong>destructive</strong>.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="when-to-undo">Three Scenarios for Undoing Changes</h2>
+          <p>Before reaching for an undo command, identify which scenario you're in:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Scenario</th><th>Where is the change?</th><th>Right command</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Discard edits to a file (not staged)</td>
+                  <td>Working directory only</td>
+                  <td><code>git restore &lt;file&gt;</code></td>
+                </tr>
+                <tr>
+                  <td>Unstage a file (keep the edits)</td>
+                  <td>Staging area</td>
+                  <td><code>git restore --staged &lt;file&gt;</code></td>
+                </tr>
+                <tr>
+                  <td>Undo a commit (local, not pushed)</td>
+                  <td>Repository history</td>
+                  <td><code>git reset HEAD~1</code></td>
+                </tr>
+                <tr>
+                  <td>Undo a commit (already pushed / shared)</td>
+                  <td>Repository history</td>
+                  <td><code>git revert &lt;commit&gt;</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="git-restore">git restore – Discard Working Directory Changes</h2>
+          <p><code>git restore</code> overwrites your working directory file with the version from the last commit (or from the staging area). It is the modern replacement for the old <code>git checkout -- &lt;file&gt;</code> command.</p>
+
+          <h3>Discard changes to a specific file</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Discard all uncommitted changes to README.md
+git restore README.md
+
+# Discard changes to a file in a subdirectory
+git restore src/utils.py</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>git restore is DESTRUCTIVE — there is no undo</strong>
+              <p>When you run <code>git restore &lt;file&gt;</code>, your uncommitted changes to that file are <strong>permanently lost</strong>. Git has no way to recover them because they were never committed. Double-check with <code>git diff</code> before running this command if you're not sure what you're discarding.</p>
+            </div>
+          </div>
+
+          <h3>Discard ALL unstaged changes in the working directory</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Restore ALL modified tracked files to their last committed state
+git restore .
+
+# This does NOT delete untracked files (new files you haven't added yet)
+# To also remove untracked files, use: git clean -fd</code></pre>
+          </div>
+
+          <h2 id="unstage">Unstaging Files with git restore --staged</h2>
+          <p>If you staged a file with <code>git add</code> but changed your mind, use <code>--staged</code> to move it back to the working directory without discarding your changes.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Unstage a specific file (keeps your edits in the working directory)
+git restore --staged config.py
+
+# Unstage all staged files
+git restore --staged .</code></pre>
+          </div>
+
+          <p>This is the safe version of undoing a <code>git add</code> — your changes are preserved; they just move from "staged" back to "modified but not staged".</p>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="git-reset">git reset – Undo a Commit</h2>
+          <p><code>git reset</code> moves the current branch pointer backward in history, effectively "uncommitting" one or more commits. It comes in three modes, from safest to most destructive:</p>
+
+          <h3>--soft: undo the commit, keep changes staged</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Undo the last commit — changes go back to the staging area
+git reset HEAD~1 --soft
+
+# HEAD~1 means "one commit before HEAD"
+# HEAD~2 would undo the last two commits</code></pre>
+          </div>
+          <p>Use <code>--soft</code> when you want to re-commit with a different message or combine it with other staged changes.</p>
+
+          <h3>--mixed (default): undo the commit, unstage changes</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Undo the last commit — changes go back to the working directory (not staged)
+git reset HEAD~1
+# Same as:
+git reset HEAD~1 --mixed</code></pre>
+          </div>
+          <p>Use <code>--mixed</code> (the default) when you want to rework your changes before committing again. Your files are untouched; only the staging area and commit history are rolled back.</p>
+
+          <h3>--hard: undo the commit AND discard all changes</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># DANGER: Undo the last commit AND permanently discard all its changes
+git reset HEAD~1 --hard</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Never use git reset --hard on shared or pushed commits</strong>
+              <p><code>--hard</code> discards commits and changes <strong>permanently</strong> from your local repository. If you've already pushed those commits to a remote branch that others are using, running <code>git reset --hard</code> followed by a force push will rewrite shared history — causing severe conflicts for your teammates. Reserve <code>--hard</code> for private, local-only branches. For shared branches, use <code>git revert</code> instead.</p>
+            </div>
+          </div>
+
+          <h2 id="git-revert">git revert – The Safe Way to Undo a Pushed Commit</h2>
+          <p><code>git revert</code> does not remove commits from history. Instead, it creates a <strong>brand-new commit</strong> that applies the exact opposite of the changes in the specified commit. The original commit remains in history — it's simply counteracted. This is the safe method for undoing changes on shared branches.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Revert the most recent commit
+git revert HEAD
+
+# Revert a specific commit by hash
+git revert a3f8c2d
+
+# Revert without automatically opening the commit message editor
+git revert a3f8c2d --no-edit</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Output</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">[main f9e8d7c] Revert "Add input validation to calculate function"
+ 1 file changed, 3 deletions(-)</code></pre>
+          </div>
+
+          <p>A new commit appears on top of history with the message "Revert '...'". The original commit is still there — the history is preserved, and your teammates' work is unaffected.</p>
+
+          <div class="callout callout-success">
+            <span class="callout-icon">✅</span>
+            <div class="callout-content">
+              <strong>Use git revert on main/shared branches</strong>
+              <p>Any time you need to undo something on <code>main</code>, <code>develop</code>, or any branch that other people have pulled from, use <code>git revert</code>. It's the professional, non-destructive approach to fixing mistakes in shared history.</p>
+            </div>
+          </div>
+
+          <h2 id="comparison-table">Comparison: restore vs reset vs revert</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Command</th><th>What it undoes</th><th>Destructive?</th><th>Safe on shared branch?</th><th>Reversible?</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>git restore &lt;file&gt;</code></td>
+                  <td>Unstaged working dir changes</td>
+                  <td>Yes — changes lost</td>
+                  <td>N/A (local only)</td>
+                  <td>No</td>
+                </tr>
+                <tr>
+                  <td><code>git restore --staged &lt;file&gt;</code></td>
+                  <td>Staged changes (unstages them)</td>
+                  <td>No — changes kept</td>
+                  <td>N/A (local only)</td>
+                  <td>Yes (re-add)</td>
+                </tr>
+                <tr>
+                  <td><code>git reset --soft</code></td>
+                  <td>Last commit (keeps staged)</td>
+                  <td>No</td>
+                  <td>No — rewrites history</td>
+                  <td>Yes (recommit)</td>
+                </tr>
+                <tr>
+                  <td><code>git reset --mixed</code></td>
+                  <td>Last commit (unstages changes)</td>
+                  <td>No</td>
+                  <td>No — rewrites history</td>
+                  <td>Yes (re-add &amp; commit)</td>
+                </tr>
+                <tr>
+                  <td><code>git reset --hard</code></td>
+                  <td>Last commit + all its changes</td>
+                  <td>Yes — changes lost</td>
+                  <td>No — rewrites history</td>
+                  <td>Only via reflog</td>
+                </tr>
+                <tr>
+                  <td><code>git revert</code></td>
+                  <td>A commit (via new counter-commit)</td>
+                  <td>No</td>
+                  <td>Yes — adds to history</td>
+                  <td>Yes (revert the revert)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Last resort: git reflog</strong>
+              <p>Even after <code>git reset --hard</code>, Git keeps a local reference log (<code>git reflog</code>) for about 90 days. If you accidentally nuked something important, run <code>git reflog</code> to find the commit hash, then use <code>git reset --hard &lt;hash&gt;</code> to restore it. This only works on your local machine before Git's garbage collector runs.</p>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>git restore &lt;file&gt;</strong> — discard unstaged working directory changes (destructive, no recovery).</li>
+              <li><strong>git restore .</strong> — discard ALL unstaged changes in the whole project.</li>
+              <li><strong>git restore --staged &lt;file&gt;</strong> — unstage a file without discarding changes (safe).</li>
+              <li><strong>git reset HEAD~1 --soft</strong> — undo the last commit, keep changes staged.</li>
+              <li><strong>git reset HEAD~1 --mixed</strong> (default) — undo the last commit, move changes back to working directory.</li>
+              <li><strong>git reset HEAD~1 --hard</strong> — undo the last commit AND discard all its changes (destructive).</li>
+              <li><strong>git revert &lt;commit&gt;</strong> — creates a new commit that reverses a past commit; safe for shared/pushed branches.</li>
+              <li>If you accidentally used <code>--hard</code>, check <code>git reflog</code> within 90 days to attempt recovery.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/git/basics/status-log.html" class="topic-tag git-topic-tag">🔀 git status &amp; git log</a>
+            <a href="/git/basics/staging-committing.html" class="topic-tag git-topic-tag">🔀 Staging &amp; Committing</a>
+            <a href="/git/basics/viewing-diffs.html" class="topic-tag git-topic-tag">🔀 Viewing Diffs</a>
+            <a href="/git/advanced/cherry-pick.html" class="topic-tag git-topic-tag">🔀 Cherry-Pick</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between git reset and git revert? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>git reset</code> moves the branch pointer backward, effectively removing commits from the current branch's history. It rewrites history — which is why it's unsafe on shared branches. <code>git revert</code> adds a new commit that undoes the changes from a past commit without touching the existing history. The original commit remains. For anything that has been pushed or shared with others, always prefer <code>git revert</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I undo multiple commits at once with git reset? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — <code>HEAD~N</code> moves back N commits. For example, <code>git reset HEAD~3 --soft</code> undoes the last 3 commits and puts all their changes back into the staging area. You can then re-commit them as one combined commit. You can also reset to a specific commit hash: <code>git reset a3f8c2d --mixed</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">I ran git restore and lost my changes. Can I get them back? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Unfortunately, <code>git restore</code> on unstaged changes has no recovery mechanism in Git itself — those changes were never committed, so Git has no snapshot of them. Your best hope is your editor's local undo history (Ctrl+Z) if you haven't closed the file. Some editors like VS Code also keep a local file history (Timeline view). For future protection, consider committing work-in-progress as a "WIP" commit before experimenting, then amend or squash it later.</p></div>
+          </div>
+            <div class="faq-item">
+              <div class="faq-question">Is there a way to undo changes to a specific part of a file? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — use <code>git restore -p &lt;file&gt;</code> (patch mode, same as <code>git add -p</code> but in reverse). Git walks through each changed hunk and asks if you want to discard it. This gives you fine-grained control, letting you keep some changes while discarding others within the same file.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/basics/status-log.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">git status &amp; git log</span>
+          </a>
+          <a href="/git/basics/viewing-diffs.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Viewing Diffs</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

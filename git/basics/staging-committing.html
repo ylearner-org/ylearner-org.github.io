@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>git add &amp; git commit – Staging and Committing Changes | ylearner</title>
+  <meta name="description" content="Master the Git staging area with git add and git commit. Learn interactive staging with git add -p, write great commit messages, and use git commit --amend safely.">
+  <meta name="keywords" content="git add, git commit, staging area, git add -p, git commit message, git amend, git commit --amend, git for beginners">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/git/basics/staging-committing.html">
+  <meta property="og:title" content="git add &amp; git commit – Staging and Committing Changes | ylearner">
+  <meta property="og:description" content="Master the Git staging area with git add and git commit. Learn interactive staging, write great commit messages, and use git commit --amend safely.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/git/basics/staging-committing.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"git add & git commit – Staging and Committing Changes","description":"Master the Git staging area. Learn git add, git add -p, git commit, good commit messages, and git commit --amend.","educationalLevel":"Beginner","keywords":"git add, git commit, staging area, commit messages","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <span>Basics</span><span class="separator">›</span>
+          <span class="current">Staging &amp; Committing</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Getting Started</div>
+          <h1>git add &amp; git commit – Staging and Committing Changes</h1>
+          <p class="lesson-intro">Git's <strong>staging area</strong> is what makes it unique among version control systems. Instead of committing every changed file at once, you first <em>stage</em> exactly what you want to include in the next snapshot. This gives you fine-grained control over your history. This lesson teaches you how to stage with <code>git add</code>, commit with <code>git commit</code>, and write commit messages that your future self will thank you for.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="the-staging-area">The Staging Area – Why It Exists</h2>
+          <p>Git tracks your files across three distinct zones:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Zone</th><th>Also called</th><th>What lives here</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Working directory</strong></td>
+                  <td>Working tree</td>
+                  <td>Your actual files on disk — edited freely</td>
+                </tr>
+                <tr>
+                  <td><strong>Staging area</strong></td>
+                  <td>Index, cache</td>
+                  <td>Changes you've explicitly selected for the next commit</td>
+                </tr>
+                <tr>
+                  <td><strong>Repository</strong></td>
+                  <td>.git database</td>
+                  <td>Permanent commit history, stored in <code>.git/objects/</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>The staging area lets you craft precise commits. Imagine you fixed a bug <em>and</em> reformatted some unrelated code. Without staging, you'd have to commit everything together. With staging, you can add only the bug-fix files and commit them separately from the reformatting — resulting in a cleaner, more reviewable history.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>What is a commit ID (SHA)?</strong>
+              <p>Every commit in Git gets a unique 40-character hexadecimal fingerprint called a <strong>SHA-1 hash</strong> (or commit ID), e.g. <code>a3f8c2d1...</code>. It is calculated from the commit's contents, author, timestamp, and parent commit — so it is effectively unique. You only need to type the first 7 characters when referencing a commit in commands.</p>
+            </div>
+          </div>
+
+          <h2 id="git-add">git add – Staging Changes</h2>
+          <p>The <code>git add</code> command moves changes from the working directory into the staging area. You can be as specific or as broad as you like.</p>
+
+          <h3>Stage a specific file</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Stage a single file
+git add README.md
+
+# Stage a file in a subdirectory
+git add src/main.py
+
+# Stage multiple specific files
+git add index.html style.css</code></pre>
+          </div>
+
+          <h3>Stage everything in the current directory</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Stage ALL changes (new files, modifications, deletions) recursively
+git add .
+
+# Alternative: stage everything from the repo root, regardless of where you are
+git add -A</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Use git add . with care</strong>
+              <p>Running <code>git add .</code> stages <em>everything</em> — including temporary files, build artifacts, and secrets you may not want in version control. Always check <code>git status</code> before committing and keep a good <code>.gitignore</code> file to exclude files you never want tracked.</p>
+            </div>
+          </div>
+
+          <h3>Stage changes interactively (patch mode)</h3>
+          <p><code>git add -p</code> is one of the most powerful staging tools. It walks through every changed <em>hunk</em> (a continuous block of changes) in your files and asks whether you want to stage it. This lets you split a single file's changes across multiple commits.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Launch interactive patch mode
+git add -p
+
+# Or for a specific file
+git add -p src/main.py</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Interactive prompt</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">@@ -10,7 +10,9 @@ def calculate():
+     result = a + b
++    # New: validate inputs
++    if a < 0 or b < 0:
++        raise ValueError("Inputs must be positive")
+     return result
+
+Stage this hunk [y,n,q,a,d,s,?]? </code></pre>
+          </div>
+
+          <p>Key responses: <code>y</code> stage this hunk, <code>n</code> skip it, <code>s</code> split into smaller hunks, <code>q</code> quit, <code>?</code> show help.</p>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="git-commit">git commit – Saving the Snapshot</h2>
+          <p>Once your changes are staged, <code>git commit</code> saves them as a permanent snapshot in the repository's history. Every commit records: what changed, who made the change, when, and a message explaining why.</p>
+
+          <h3>Commit with an inline message</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Commit staged changes with a short message
+git commit -m "Add input validation to calculate function"</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Output</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">[main a3f8c2d] Add input validation to calculate function
+ 1 file changed, 3 insertions(+)</code></pre>
+          </div>
+
+          <p>Git shows the branch name, the first 7 characters of the new commit's SHA, the message, and a summary of what changed.</p>
+
+          <h3>Commit with a multi-line message (opens your editor)</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Opens your configured editor (usually vim, nano, or VS Code)
+git commit
+
+# Configure VS Code as your commit editor
+git config --global core.editor "code --wait"</code></pre>
+          </div>
+
+          <h2 id="good-commits">Writing Good Commit Messages</h2>
+          <p>A good commit message is a gift to your teammates — and to your future self six months from now. The widely-adopted convention:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Commit message format</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Short summary in imperative mood (50 chars max)
+
+Optional longer body explaining WHY this change was made,
+what problem it solves, and any context reviewers need.
+Wrap lines at ~72 characters.
+
+Optionally reference issue numbers:
+Closes #123</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Bad message</th><th>Good message</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>fix</code></td><td><code>Fix null pointer crash when user has no profile photo</code></td></tr>
+                <tr><td><code>wip</code></td><td><code>Add skeleton for user authentication module</code></td></tr>
+                <tr><td><code>updated stuff</code></td><td><code>Update API base URL to use environment variable</code></td></tr>
+                <tr><td><code>fixing the thing</code></td><td><code>Correct off-by-one error in pagination calculation</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-success">
+            <span class="callout-icon">✅</span>
+            <div class="callout-content">
+              <strong>Use imperative mood: "Add", not "Added" or "Adding"</strong>
+              <p>Think of the subject line as completing the sentence: <em>"If applied, this commit will..."</em>. So: "If applied, this commit will <strong>Add input validation</strong>" — not "Added input validation".</p>
+            </div>
+          </div>
+
+          <h2 id="amend">git commit --amend – Editing the Last Commit</h2>
+          <p>Made a typo in your last commit message? Forgot to stage one file? <code>--amend</code> lets you rewrite the most recent commit.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Fix the last commit message only
+git commit --amend -m "Add input validation with proper error messages"
+
+# Add a forgotten file to the last commit
+git add forgotten-file.py
+git commit --amend --no-edit   # --no-edit keeps the original message</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Only amend commits that haven't been pushed</strong>
+              <p><code>--amend</code> rewrites the commit — it creates a brand-new commit with a different SHA and discards the old one. If you've already pushed to a shared branch and then amend, your local history diverges from the remote. Other team members who pulled the original commit will get conflicts. <strong>Rule of thumb: amend only your local, unpushed commits.</strong></p>
+            </div>
+          </div>
+
+          <h2 id="commit-history">Checking What You've Committed</h2>
+          <p>After committing, confirm everything looks right:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># See recent commits
+git log --oneline -5
+
+# Check current staging status
+git status</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Output</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">a3f8c2d (HEAD -> main) Add input validation to calculate function
+7b9e1a3 Initial project setup
+On branch main
+nothing to commit, working tree clean</code></pre>
+          </div>
+
+          <p>"Nothing to commit, working tree clean" is the green light — all changes are committed and the staging area is empty.</p>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Git has three zones: <strong>working directory</strong> (edited files), <strong>staging area</strong> (selected for next commit), and the <strong>repository</strong> (permanent history).</li>
+              <li><strong>git add &lt;file&gt;</strong> — stage a specific file; <code>git add .</code> stages everything (use carefully).</li>
+              <li><strong>git add -p</strong> — interactive patch mode; stage individual hunks within a file for precise commits.</li>
+              <li><strong>git commit -m "message"</strong> — create a commit with an inline message.</li>
+              <li>Good commit messages: imperative mood, 50-char subject, explain the <em>why</em> in the body.</li>
+              <li><strong>git commit --amend</strong> — rewrite the last commit (message or content); only safe before pushing.</li>
+              <li>Every commit gets a unique <strong>SHA hash</strong> — the first 7 characters are enough for most commands.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/git/basics/init-clone.html" class="topic-tag git-topic-tag">🔀 git init &amp; git clone</a>
+            <a href="/git/basics/status-log.html" class="topic-tag git-topic-tag">🔀 git status &amp; git log</a>
+            <a href="/git/basics/undoing-changes.html" class="topic-tag git-topic-tag">🔀 Undoing Changes</a>
+            <a href="/git/workflows/conventional-commits.html" class="topic-tag git-topic-tag">🔀 Conventional Commits</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What happens if I commit without staging anything? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Git will show the message <code>nothing to commit, working tree clean</code> (if no changes exist) or <code>nothing added to commit but untracked files present</code> (if you have new files but haven't staged them). No commit is created. You must run <code>git add</code> first to stage changes before <code>git commit</code> will do anything.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I stage and commit in a single command? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — for <strong>already-tracked files only</strong>: <code>git commit -a -m "message"</code> (or <code>git commit -am "message"</code>) stages all modifications to tracked files and commits them in one step. It does <em>not</em> stage new (untracked) files. While convenient, skipping the explicit <code>git add</code> step means you lose the ability to selectively stage changes, so use it only when you're sure you want to commit everything.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I unstage a file I accidentally added? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>git restore --staged &lt;file&gt;</code> (Git 2.23+) to unstage a file without discarding your changes — the file goes back to "modified but not staged". The older equivalent is <code>git reset HEAD &lt;file&gt;</code>. Your actual file content is untouched either way; only the staging area entry is removed.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How long should a commit message be? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The subject line should be 50 characters or fewer (GitHub truncates at 72). For simple changes, a one-liner is fine. For anything non-obvious — a complex bug fix, an architectural decision, a workaround — add a body after a blank line. The body should explain <em>why</em> the change was made, not just <em>what</em> changed (the diff already shows the what). There is no strict maximum for the body length.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/basics/init-clone.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">git init &amp; git clone</span>
+          </a>
+          <a href="/git/basics/status-log.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">git status &amp; git log</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

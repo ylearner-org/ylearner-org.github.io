@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merging Branches in Git – Fast-Forward and 3-Way Merge | ylearner</title>
+  <meta name="description" content="Learn how Git merging works — fast-forward merges, 3-way merges, merge commits, the --no-ff flag, and squash merging. Includes ASCII diagrams and real examples.">
+  <meta name="keywords" content="git merge, fast-forward merge, 3-way merge, git merge commit, git merge --no-ff, git merge --squash, merging branches git">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/git/branching/merging.html">
+  <meta property="og:title" content="Merging Branches in Git – Fast-Forward and 3-Way Merge | ylearner">
+  <meta property="og:description" content="Understand the two types of Git merges — fast-forward and 3-way — with ASCII diagrams. Learn when to use --no-ff and --squash for cleaner history.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/git/branching/merging.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Merging Branches in Git – Fast-Forward and 3-Way Merge","description":"Understand Git's two merge strategies — fast-forward and 3-way merge — with ASCII diagrams, command examples, and best practices.","educationalLevel":"Intermediate","keywords":"git merge, fast-forward merge, 3-way merge, git merge commit","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <a href="/git/branching/branches-overview.html">Branching &amp; Merging</a><span class="separator">›</span>
+          <span class="current">Merging Branches</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌿 Branching &amp; Merging</div>
+          <h1>Merging Branches in Git – Fast-Forward and 3-Way Merge</h1>
+          <p class="lesson-intro">Branching lets you work in isolation. Merging brings that work back together. Git has two merge strategies depending on whether the branches have diverged: the fast-forward merge (simple, no extra commit) and the 3-way merge (creates a merge commit). Understanding the difference helps you make deliberate choices about your project's history.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-merge">What Is Merging?</h2>
+          <p>Merging is the process of <strong>combining the changes from one branch into another</strong>. The typical flow is:</p>
+          <ol>
+            <li>Switch to the <em>target</em> branch (the branch you want to merge INTO, usually <code>main</code>).</li>
+            <li>Run <code>git merge &lt;source-branch&gt;</code>.</li>
+            <li>Git figures out the best strategy automatically.</li>
+          </ol>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Standard merge workflow
+git switch main                  # 1. switch to target branch
+git merge feature/login          # 2. merge source branch into it
+git branch -d feature/login      # 3. delete merged branch (optional but recommended)</code></pre>
+          </div>
+
+          <h2 id="fast-forward">Fast-Forward Merge</h2>
+          <p>A fast-forward merge happens when the target branch hasn't had any new commits since the feature branch was created. In other words, the feature branch's history <em>includes</em> all commits from the target branch — they haven't diverged.</p>
+          <p>Git doesn't need to create a new commit. It simply <strong>moves the target branch pointer forward</strong> to match the feature branch.</p>
+
+          <h3>Before merge</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">C1 ← C2 ← C3
+              ↑
+             main (HEAD)
+
+              ↖ C4 ← C5
+                       ↑
+               feature/login
+
+main has not moved since feature/login was created from C3.</code></pre>
+          </div>
+
+          <h3>After: git merge feature/login (fast-forward)</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">C1 ← C2 ← C3 ← C4 ← C5
+                       ↑
+                      main (HEAD)   ← pointer moved forward
+                       ↑
+               feature/login
+
+No new commit created. main just "fast-forwarded" to where feature/login was.</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">git switch main
+git merge feature/login
+# Output:
+# Updating a3f8c2d..b7e9f1a
+# Fast-forward
+#  login.html | 45 +++++++++++++++++++++
+#  1 file changed, 45 insertions(+)</code></pre>
+          </div>
+
+          <h2 id="three-way-merge">3-Way Merge</h2>
+          <p>A 3-way merge happens when <strong>both branches have new commits since they diverged</strong>. Neither branch's history is a superset of the other. Git needs to combine two diverged lines of development.</p>
+          <p>Git finds the <em>common ancestor</em> commit, then combines changes from both tips, creating a new <strong>merge commit</strong> with two parents.</p>
+
+          <h3>Before merge (diverged branches)</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">            C4 ← C5
+           /         ↑
+C1 ← C2 ← C3    feature/login
+           \
+            C6 ← C7
+                   ↑
+                  main (HEAD)
+
+Both branches have commits after their common ancestor C3.</code></pre>
+          </div>
+
+          <h3>After: git merge feature/login (3-way)</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">            C4 ← C5
+           /         \
+C1 ← C2 ← C3          M8
+           \          / ↑
+            C6 ← C7 ↗  main (HEAD)
+
+M8 is the merge commit. It has TWO parents: C5 and C7.
+The commit message is auto-generated: "Merge branch 'feature/login'"</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">git switch main
+git merge feature/login
+# Output:
+# Merge made by the 'ort' strategy.
+#  login.html | 45 +++++++++++++++++++++
+#  1 file changed, 45 insertions(+)
+
+# View the merge commit with its two parents
+git log --oneline --graph
+# *   b7e9f1a (HEAD -> main) Merge branch 'feature/login'
+# |\
+# | * a3f8c2d Add login validation
+# | * 9d7e6f5 Add login form
+# * | c1b2a3e Fix typo in header
+# |/
+# * f8e7d6c Initial commit</code></pre>
+          </div>
+
+          <h2 id="merge-commit">What Is a Merge Commit?</h2>
+          <p>A merge commit is a special commit that has <strong>two (or more) parent commits</strong>. It represents the point where two lines of history joined. The merge commit itself usually doesn't change any files — its purpose is to record the join point in history.</p>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="no-ff-flag">The --no-ff Flag (Always Create a Merge Commit)</h2>
+          <p>By default, if a fast-forward is possible, Git will do it (no merge commit). The <code>--no-ff</code> (no fast-forward) flag overrides this and <strong>always creates a merge commit</strong>, even when one isn't strictly necessary.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Force a merge commit even when fast-forward is possible
+git merge --no-ff feature/login
+# A text editor opens for the merge commit message
+# (or use -m to provide it inline)
+git merge --no-ff -m "Merge feature/login: add user authentication" feature/login</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Why use --no-ff?</strong>
+              <p>When you look at a project's history after many fast-forward merges, it appears as a single straight line — you can't tell where feature branches began and ended. With <code>--no-ff</code>, each feature branch leaves a visible "bump" in the history graph. Many teams enforce <code>--no-ff</code> on <code>main</code> so the history clearly shows when each feature was merged. GitHub's "Create a merge commit" option does this by default.</p>
+            </div>
+          </div>
+
+          <h2 id="merge-strategies">Squash Merge</h2>
+          <p><code>git merge --squash</code> combines all commits from the feature branch into a single staged change, then lets you commit it as one clean commit. The feature branch's individual commits don't appear in the target branch's history.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">git switch main
+git merge --squash feature/login
+# Git stages all changes but does NOT commit yet
+git commit -m "Add user login feature"
+# Now the 5 messy "WIP", "fix typo" commits from the feature branch
+# appear as ONE clean commit on main</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Strategy</th><th>Creates merge commit?</th><th>Feature branch commits visible?</th><th>Best for</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Fast-forward</td>
+                  <td>No</td>
+                  <td>Yes (inline)</td>
+                  <td>Solo work, simple linear history</td>
+                </tr>
+                <tr>
+                  <td>3-way merge (default)</td>
+                  <td>Yes (when diverged)</td>
+                  <td>Yes (in branch)</td>
+                  <td>Preserving full branch topology</td>
+                </tr>
+                <tr>
+                  <td>--no-ff</td>
+                  <td>Always</td>
+                  <td>Yes (in branch)</td>
+                  <td>Teams wanting visible branch history</td>
+                </tr>
+                <tr>
+                  <td>--squash</td>
+                  <td>No (you commit manually)</td>
+                  <td>No (squashed into one)</td>
+                  <td>Cleaning up messy WIP commits</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="after-merge">After a Successful Merge</h2>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Verify the merge succeeded
+git log --oneline --graph -5
+
+# Delete the now-merged feature branch (local)
+git branch -d feature/login
+
+# Delete the remote branch (if it was pushed)
+git push origin --delete feature/login
+
+# Check which branches have been merged into current branch
+git branch --merged
+# * main
+#   (feature/login is gone — deleted above)
+
+# Check which branches have NOT been merged yet
+git branch --no-merged</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Merge vs rebase</strong>
+              <p>Merging preserves the full branching topology — you can see exactly where branches diverged and joined. Rebasing rewrites history to create a linear sequence. Neither is universally better; they suit different workflows. See the <a href="/git/branching/rebase.html">Rebase lesson</a> for a full comparison.</p>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Merging</strong> combines changes from one branch into another. Always merge INTO the target branch: <code>git switch main</code> then <code>git merge feature/x</code>.</li>
+              <li><strong>Fast-forward merge</strong>: no divergence — branch pointer just moves forward. No new commit. Clean linear history.</li>
+              <li><strong>3-way merge</strong>: branches have diverged — Git creates a new <em>merge commit</em> with two parents.</li>
+              <li><code>git merge --no-ff</code> — always create a merge commit, even when fast-forward is possible. Preserves visible branch history.</li>
+              <li><code>git merge --squash</code> — squash all feature commits into a single staged change for one clean commit.</li>
+              <li>After merging, delete the feature branch: <code>git branch -d feature/x</code>.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/git/branching/creating-switching.html" class="topic-tag git-topic-tag">🔀 Creating &amp; Switching Branches</a>
+            <a href="/git/branching/merge-conflicts.html" class="topic-tag git-topic-tag">🔀 Merge Conflicts</a>
+            <a href="/git/branching/rebase.html" class="topic-tag git-topic-tag">🔀 Rebase</a>
+            <a href="/git/remotes/github-workflow.html" class="topic-tag git-topic-tag">🔀 GitHub Pull Request Workflow</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">How do I know if Git will do a fast-forward or 3-way merge? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>If the target branch hasn't moved since you created the feature branch (i.e., no new commits on main since you branched off), Git will fast-forward. If both branches have new commits since they diverged, Git will do a 3-way merge. You can check by running <code>git log --oneline --graph --all</code> — if the branch histories share a linear path, it's a fast-forward candidate.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I undo a merge? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. If you haven't pushed yet: <code>git reset --hard ORIG_HEAD</code> — Git saves the pre-merge HEAD in ORIG_HEAD automatically. If you have pushed: create a revert commit with <code>git revert -m 1 &lt;merge-commit-hash&gt;</code> (the <code>-m 1</code> flag specifies the first parent, i.e., the target branch). Avoid using <code>reset --hard</code> on commits that have been pushed to a shared branch.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What does "ort" mean in the merge output? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>"ort" (Ostensibly Recursive's Twin) is Git's default merge strategy since Git 2.34. It replaced the older "recursive" strategy with a faster, more correct implementation. You don't normally need to think about it — Git picks the right strategy automatically. The output "Merge made by the 'ort' strategy" just tells you which algorithm was used.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I prefer merge or squash merge for pull requests? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It depends on your team's preference. Squash merge (<code>--squash</code>) gives a cleaner main branch history — one logical commit per feature — which makes <code>git log</code> and <code>git bisect</code> easier to use. Regular merge (with <code>--no-ff</code>) preserves the full context of every commit from the feature branch. GitHub lets you configure the default per-repository. Many teams use squash for small features and regular merge for larger ones.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/branching/creating-switching.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Creating &amp; Switching Branches</span>
+          </a>
+          <a href="/git/branching/merge-conflicts.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Merge Conflicts</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>git diff – Viewing Changes in Git | ylearner</title>
+  <meta name="description" content="Learn how to read and use git diff to view unstaged, staged, and committed changes. Compare branches and commits, read diff output, and configure VS Code as a visual diff tool.">
+  <meta name="keywords" content="git diff, git diff staged, git diff HEAD, git diff branches, reading a diff, git difftool, VS Code git diff, git diff tutorial">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/git/basics/viewing-diffs.html">
+  <meta property="og:title" content="git diff – Viewing Changes in Git | ylearner">
+  <meta property="og:description" content="Learn how to read and use git diff to view unstaged, staged, and committed changes. Compare branches and configure VS Code as a visual diff tool.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/git/basics/viewing-diffs.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"git diff – Viewing Changes in Git","description":"Learn how to use git diff to view unstaged, staged, and committed changes, compare branches and commits, and configure GUI diff tools.","educationalLevel":"Beginner","keywords":"git diff, git diff staged, compare branches, git difftool","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <span>Basics</span><span class="separator">›</span>
+          <span class="current">Viewing Diffs</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Getting Started</div>
+          <h1>git diff – Viewing Changes in Git</h1>
+          <p class="lesson-intro"><code>git diff</code> answers the question: <em>"What exactly changed?"</em> It shows you the precise lines added, removed, or modified — in your working directory, in the staging area, between commits, or between branches. Once you can fluently read diff output, you'll catch bugs before committing and understand any change at a glance.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 12 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="reading-diffs">How to Read a Diff</h2>
+          <p>Before running any <code>git diff</code> command, learn to read the output format. Here is a real diff with annotations:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Diff output</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-diff">diff --git a/src/utils.py b/src/utils.py
+index 7b9e1a3..a3f8c2d 100644
+--- a/src/utils.py
++++ b/src/utils.py
+@@ -10,6 +10,9 @@ def calculate(a, b):
+     result = a + b
++    # New: validate inputs
++    if a &lt; 0 or b &lt; 0:
++        raise ValueError("Inputs must be positive")
+     return result</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Part of the diff</th><th>What it means</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>--- a/src/utils.py</code></td>
+                  <td>The "before" version of the file (prefixed with <code>a/</code>)</td>
+                </tr>
+                <tr>
+                  <td><code>+++ b/src/utils.py</code></td>
+                  <td>The "after" version of the file (prefixed with <code>b/</code>)</td>
+                </tr>
+                <tr>
+                  <td><code>@@ -10,6 +10,9 @@</code></td>
+                  <td>Hunk header: the <code>-</code> numbers show the before-range; the <code>+</code> numbers show the after-range. <code>-10,6</code> means starting at line 10, 6 lines shown; <code>+10,9</code> means starting at line 10, 9 lines shown (3 lines were added).</td>
+                </tr>
+                <tr>
+                  <td>Lines starting with <code>+</code></td>
+                  <td>Lines that were <strong>added</strong> (shown in green in most terminals)</td>
+                </tr>
+                <tr>
+                  <td>Lines starting with <code>-</code></td>
+                  <td>Lines that were <strong>removed</strong> (shown in red)</td>
+                </tr>
+                <tr>
+                  <td>Lines with no prefix</td>
+                  <td><strong>Context lines</strong> — unchanged, shown for orientation</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="git-diff-unstaged">git diff – Unstaged Changes</h2>
+          <p>Running <code>git diff</code> with no arguments shows changes in your working directory that have <strong>not yet been staged</strong> — i.e. what's different between your files and the staging area.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Show all unstaged changes
+git diff
+
+# Show unstaged changes for one specific file
+git diff src/utils.py</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>No output from git diff?</strong>
+              <p>If <code>git diff</code> produces no output, either nothing has changed, or all your changes have already been staged with <code>git add</code>. Use <code>git diff --staged</code> to see staged changes, or <code>git diff HEAD</code> to see everything at once.</p>
+            </div>
+          </div>
+
+          <h2 id="git-diff-staged">git diff --staged – Staged Changes</h2>
+          <p><code>git diff --staged</code> (also written as <code>git diff --cached</code> — they are identical) shows what will go into your next commit: the difference between the staging area and the last commit.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Show staged changes (what will be committed)
+git diff --staged
+
+# Equivalent alternative (older syntax)
+git diff --cached
+
+# Show staged changes for one file only
+git diff --staged src/utils.py</code></pre>
+          </div>
+
+          <p>Running <code>git diff --staged</code> right before <code>git commit</code> is a good habit — it lets you review exactly what's about to be committed.</p>
+
+          <div class="callout callout-success">
+            <span class="callout-icon">✅</span>
+            <div class="callout-content">
+              <strong>Pre-commit review habit</strong>
+              <p>Before every commit, run: <code>git status</code> to see what's staged, then <code>git diff --staged</code> to review the exact changes. This two-step check prevents accidentally committing debug code, credentials, or unfinished work.</p>
+            </div>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h3>git diff HEAD – All Changes vs Last Commit</h3>
+          <p><code>git diff HEAD</code> combines both: it shows all changes (staged + unstaged) compared to the last commit.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Show everything changed since the last commit (staged + unstaged)
+git diff HEAD</code></pre>
+          </div>
+
+          <h2 id="diff-between-commits">Comparing Commits</h2>
+          <p>You can diff any two commits by passing their hashes (or refs like branch names and <code>HEAD~N</code> syntax).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Diff between two specific commits
+git diff a3f8c2d 7b9e1a3
+
+# Diff between the last commit and the one before it
+git diff HEAD~1 HEAD
+
+# Diff between last commit and 3 commits ago
+git diff HEAD~3 HEAD
+
+# Show only the filenames that changed between two commits (no diff content)
+git diff --stat HEAD~5 HEAD</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Output of --stat</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text"> src/utils.py   |  3 +++
+ src/helpers.py | 12 ++++++++++++
+ README.md      |  5 ++---
+ 3 files changed, 17 insertions(+), 3 deletions(-)</code></pre>
+          </div>
+
+          <p>The <code>--stat</code> flag is great for a quick overview: it shows how many lines were inserted and deleted per file without printing the full diff content.</p>
+
+          <h2 id="diff-branches">Comparing Branches</h2>
+          <p>You can diff between branches to see what one branch has that the other doesn't — useful before merging or opening a pull request.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Show all changes in feature-branch that are NOT in main
+git diff main..feature-branch
+
+# Three-dot syntax: show changes since the branches diverged
+# (ignores commits on main that happened after the branch was created)
+git diff main...feature-branch
+
+# Summary: how many lines changed between branches
+git diff main..feature-branch --stat
+
+# Only list file names that differ between branches
+git diff main..feature-branch --name-only</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Two dots vs three dots</strong>
+              <p><code>main..feature</code> (two dots) shows all changes between the tips of both branches. <code>main...feature</code> (three dots) shows changes on <code>feature</code> since the two branches last shared a common ancestor — essentially, "what did feature add on top of main?" The three-dot form is usually what you want when reviewing a feature branch.</p>
+            </div>
+          </div>
+
+          <h2 id="diff-tools">GUI Diff Tools</h2>
+          <p>Terminal diffs are powerful but visual diff tools are often easier to read for large changes. Git supports any external tool via <code>git difftool</code>.</p>
+
+          <h3>Configure VS Code as your diff tool</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Set VS Code as the default diff tool globally
+git config --global diff.tool vscode
+git config --global difftool.vscode.cmd 'code --wait --diff $LOCAL $REMOTE'
+
+# Now use it like this:
+git difftool
+
+# Or diff a specific file in VS Code
+git difftool src/utils.py</code></pre>
+          </div>
+
+          <h3>Other popular diff tools</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># List all built-in supported tools
+git difftool --tool-help
+
+# Use vimdiff (built-in, no config needed)
+git difftool --tool=vimdiff
+
+# Use meld (Linux, free and excellent)
+git difftool --tool=meld</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Tool</th><th>Platform</th><th>Notes</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>VS Code</strong></td>
+                  <td>All</td>
+                  <td>Built-in diff view; Source Control panel shows diffs inline with syntax highlighting</td>
+                </tr>
+                <tr>
+                  <td><strong>vimdiff</strong></td>
+                  <td>All (terminal)</td>
+                  <td>Zero config needed; steep learning curve; perfect for remote SSH work</td>
+                </tr>
+                <tr>
+                  <td><strong>Meld</strong></td>
+                  <td>Linux / Windows</td>
+                  <td>Free, excellent 3-way merge view for conflict resolution</td>
+                </tr>
+                <tr>
+                  <td><strong>Beyond Compare</strong></td>
+                  <td>All</td>
+                  <td>Paid; professional-grade with folder comparison</td>
+                </tr>
+                <tr>
+                  <td><strong>GitHub / GitLab PR view</strong></td>
+                  <td>Web browser</td>
+                  <td>Most convenient for reviewing pull requests with inline comments</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Reading a diff:</strong> <code>+</code> lines are added, <code>-</code> lines are removed, plain lines are context. <code>@@</code> markers show the line range.</li>
+              <li><strong>git diff</strong> — unstaged changes vs the last commit (or staging area).</li>
+              <li><strong>git diff --staged</strong> (or <code>--cached</code>) — staged changes vs the last commit; review before every commit.</li>
+              <li><strong>git diff HEAD</strong> — all changes (staged + unstaged) vs the last commit.</li>
+              <li><strong>git diff &lt;commit1&gt; &lt;commit2&gt;</strong> — compare any two commits.</li>
+              <li><strong>git diff main..feature-branch</strong> — compare two branches; <code>...</code> compares from the common ancestor.</li>
+              <li><strong>git diff --stat</strong> — summary of files changed, insertions, and deletions (no line-by-line diff).</li>
+              <li>Configure <strong>VS Code as difftool</strong> with <code>git config --global diff.tool vscode</code> for a visual experience.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/git/basics/undoing-changes.html" class="topic-tag git-topic-tag">🔀 Undoing Changes</a>
+            <a href="/git/basics/staging-committing.html" class="topic-tag git-topic-tag">🔀 Staging &amp; Committing</a>
+            <a href="/git/branching/merging.html" class="topic-tag git-topic-tag">🔀 Merging</a>
+            <a href="/git/branching/merge-conflicts.html" class="topic-tag git-topic-tag">🔀 Merge Conflicts</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why does git diff show nothing even though I changed files? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The most common reason: all your changes have been staged with <code>git add</code>. <code>git diff</code> (no flags) only shows <em>unstaged</em> changes. Run <code>git diff --staged</code> to see staged changes, or <code>git diff HEAD</code> to see everything at once. Another possibility: the file is listed in <code>.gitignore</code>, so Git doesn't track it at all.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between git diff and git show? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>git diff</code> compares two states (working tree, staging area, or commits) and shows what changed between them. <code>git show &lt;commit&gt;</code> displays the metadata of a specific commit (author, date, message) <em>plus</em> the diff introduced by that commit compared to its parent. Think of <code>git show</code> as "what did this specific commit change?" and <code>git diff</code> as "what is the difference between these two things?"</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I diff a single function instead of the whole file? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not directly with standard <code>git diff</code>, but you can narrow the output. The <code>-U</code> flag controls context lines: <code>git diff -U0</code> shows only the changed lines with zero context. For language-aware function-level diffs, some languages are supported via <code>.gitattributes</code> configuration. Most developers find it easier to just use a visual diff tool like VS Code and navigate to the function they care about.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I see what changed between my local branch and the remote? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>After running <code>git fetch</code> (to update your local knowledge of the remote without merging), use <code>git diff main origin/main</code> to compare your local <code>main</code> with the remote <code>origin/main</code>. The <code>origin/</code> prefix refers to the last-fetched remote branch. If you haven't fetched yet, your local view of the remote may be stale — always <code>git fetch</code> first for an accurate comparison.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/basics/undoing-changes.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Undoing Changes</span>
+          </a>
+          <a href="/git/branching/branches-overview.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Branches Overview</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git Remotes – origin, upstream, and Remote Management | ylearner</title>
+  <meta name="description" content="Learn what Git remotes are, how origin and upstream work, how to add and manage remote repositories, and what tracking branches are.">
+  <meta name="keywords" content="git remote, git origin, git upstream, git remote add, git remote -v, tracking branches, remote repository git">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/git/remotes/remotes-overview.html">
+  <meta property="og:title" content="Git Remotes – origin, upstream, and Remote Management | ylearner">
+  <meta property="og:description" content="Understand what a Git remote is, what origin and upstream mean by convention, and how to add, rename, remove, and list remotes.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/git/remotes/remotes-overview.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Git Remotes – origin, upstream, and Remote Management","description":"Learn what Git remotes are, the conventions behind origin and upstream, how to manage remotes, and what tracking branches mean.","educationalLevel":"Beginner","keywords":"git remote, origin, upstream, tracking branches, remote repository","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <a href="/git/remotes/remotes-overview.html">Remote Repositories</a><span class="separator">›</span>
+          <span class="current">Remotes Overview</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 Remote Repositories</div>
+          <h1>Git Remotes – origin, upstream, and Remote Management</h1>
+          <p class="lesson-intro">Up to now, Git has been entirely local — your commits exist only on your machine. Remotes connect your local repo to copies hosted elsewhere: GitHub, GitLab, Bitbucket, or your own server. Understanding how remotes work — what "origin" means, what "tracking branches" are — is the bridge between local Git and collaborative development.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-remote">What Is a Git Remote?</h2>
+          <p>A remote is simply <strong>a named URL pointing to another copy of the repository</strong>. That copy might be on GitHub, GitLab, Bitbucket, a company server, or even another folder on your own machine.</p>
+          <p>Git stores remotes as name-URL pairs in <code>.git/config</code>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text"># Inside .git/config
+[remote "origin"]
+    url = https://github.com/username/my-repo.git
+    fetch = +refs/heads/*:refs/remotes/origin/*
+
+[remote "upstream"]
+    url = https://github.com/original-author/my-repo.git
+    fetch = +refs/heads/*:refs/remotes/upstream/*</code></pre>
+          </div>
+
+          <p>Remotes let you <strong>push</strong> (upload) your commits to the remote, and <strong>fetch/pull</strong> (download) commits others have pushed. The remote repo doesn't need to be online for you to work locally — Git only contacts it when you explicitly push, fetch, or pull.</p>
+
+          <h2 id="origin">What Is "origin"?</h2>
+          <p><code>origin</code> is just a <strong>conventional name</strong> — nothing more. When you run <code>git clone &lt;url&gt;</code>, Git automatically creates a remote called <code>origin</code> pointing to the URL you cloned from. You could rename it to anything, but <code>origin</code> is the universal convention that every tool and tutorial expects.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># git clone automatically creates the "origin" remote
+git clone https://github.com/username/my-repo.git
+cd my-repo
+
+git remote -v
+# origin  https://github.com/username/my-repo.git (fetch)
+# origin  https://github.com/username/my-repo.git (push)</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Why "origin"?</strong>
+              <p>When you fork a repo and clone your fork, "origin" refers to YOUR fork (because that's what you cloned). The <em>original</em> repository you forked from is conventionally named "upstream". This two-remote setup is standard for open-source contribution workflows.</p>
+            </div>
+          </div>
+
+          <h2 id="add-remote">Adding Remotes</h2>
+          <p>If you initialised a repo with <code>git init</code> (rather than cloning), there's no remote yet. You add one manually:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Add the primary remote (your repo on GitHub)
+git remote add origin https://github.com/username/my-repo.git
+
+# Add upstream (the original repo you forked from)
+git remote add upstream https://github.com/original-author/my-repo.git
+
+# Verify remotes were added
+git remote -v
+# origin    https://github.com/username/my-repo.git (fetch)
+# origin    https://github.com/username/my-repo.git (push)
+# upstream  https://github.com/original-author/my-repo.git (fetch)
+# upstream  https://github.com/original-author/my-repo.git (push)</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="list-remotes">Listing Remotes</h2>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># List remote names only
+git remote
+# origin
+# upstream
+
+# List remotes with their URLs (fetch and push URLs)
+git remote -v
+# origin    git@github.com:username/my-repo.git (fetch)
+# origin    git@github.com:username/my-repo.git (push)
+# upstream  git@github.com:original/my-repo.git (fetch)
+# upstream  git@github.com:original/my-repo.git (push)
+
+# Detailed info about a specific remote
+git remote show origin
+# * remote origin
+#   Fetch URL: git@github.com:username/my-repo.git
+#   Push  URL: git@github.com:username/my-repo.git
+#   HEAD branch: main
+#   Remote branches:
+#     main tracked
+#     feature/login tracked
+#   Local branch configured for 'git pull':
+#     main merges with remote main</code></pre>
+          </div>
+
+          <h2 id="rename-remove">Renaming and Removing Remotes</h2>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Rename a remote
+git remote rename origin backup
+git remote rename backup origin   # rename back
+
+# Remove a remote (just removes the local reference — doesn't delete anything on GitHub)
+git remote remove upstream
+
+# Change a remote's URL (e.g., switching from HTTPS to SSH)
+git remote set-url origin git@github.com:username/my-repo.git</code></pre>
+          </div>
+
+          <h2 id="tracking-branches">Tracking Branches</h2>
+          <p>When you fetch from a remote, Git creates <strong>remote-tracking branches</strong> — local read-only copies that record what each remote branch looked like the last time you fetched. They're named <code>&lt;remote&gt;/&lt;branch&gt;</code>: for example, <code>origin/main</code> or <code>origin/feature/login</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># After git fetch, list all branches including remote-tracking
+git branch -a
+# * main
+#   remotes/origin/main
+#   remotes/origin/feature/login
+
+# See how far ahead/behind your local branch is from the remote
+git status
+# On branch main
+# Your branch is behind 'origin/main' by 2 commits, and can be fast-forwarded.
+
+# Compare local main to origin/main
+git log main..origin/main --oneline
+# Shows commits on origin/main that you don't have locally</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>origin/main is a snapshot, not live</strong>
+              <p><code>origin/main</code> only updates when you explicitly run <code>git fetch</code> or <code>git pull</code>. If a teammate pushed new commits to GitHub 5 minutes ago, your local <code>origin/main</code> doesn't know about them until you fetch. This is intentional — Git never contacts the network without your permission.</p>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Remote name</th><th>Convention</th><th>Set by</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>origin</code></td>
+                  <td>Your primary remote (the repo you cloned or your fork)</td>
+                  <td>Auto-set by <code>git clone</code></td>
+                </tr>
+                <tr>
+                  <td><code>upstream</code></td>
+                  <td>The original repo you forked from</td>
+                  <td>Added manually: <code>git remote add upstream &lt;url&gt;</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A remote is a <strong>named URL</strong> pointing to another copy of the repository — stored in <code>.git/config</code>.</li>
+              <li><code>origin</code> is the conventional name for the default remote, automatically set by <code>git clone</code>.</li>
+              <li><code>upstream</code> is the convention for the original repo when you've forked.</li>
+              <li><code>git remote -v</code> — list all remotes with URLs.</li>
+              <li><code>git remote add &lt;name&gt; &lt;url&gt;</code> — add a new remote.</li>
+              <li><code>git remote rename</code> and <code>git remote remove</code> — manage existing remotes.</li>
+              <li><strong>Tracking branches</strong> (e.g., <code>origin/main</code>) are local snapshots of the remote branch's state at last fetch.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/git/remotes/push-pull-fetch.html" class="topic-tag git-topic-tag">🔀 Push, Pull &amp; Fetch</a>
+            <a href="/git/remotes/github-workflow.html" class="topic-tag git-topic-tag">🔀 GitHub PR Workflow</a>
+            <a href="/git/remotes/ssh-keys.html" class="topic-tag git-topic-tag">🔀 SSH Keys</a>
+            <a href="/git/branching/rebase.html" class="topic-tag git-topic-tag">🔀 Rebase</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can a repository have multiple remotes? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — and it's common. The typical open-source setup has two: <code>origin</code> (your fork) and <code>upstream</code> (the original repo). Some teams push to multiple hosting services simultaneously (GitHub + an internal GitLab server). Each remote is independent — you can fetch from upstream and push to origin without any conflict.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What's the difference between a remote branch and a remote-tracking branch? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A remote branch is a branch that lives on the remote server (e.g., <code>main</code> on GitHub). A remote-tracking branch is a local reference (e.g., <code>origin/main</code>) that mirrors what that remote branch looked like the last time you fetched. You can't commit directly to a remote-tracking branch — it's read-only and only updated by fetch/pull operations.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">If I remove a remote, does it delete the repository on GitHub? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. <code>git remote remove</code> only removes the local reference (the name-URL entry in <code>.git/config</code>). The remote repository on GitHub is completely unaffected. You can re-add the remote at any time with <code>git remote add</code>. To actually delete a GitHub repository, you'd do that through the GitHub web interface.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does git remote -v show both "(fetch)" and "(push)" for the same URL? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Git allows different URLs for fetch and push on the same remote — a rarely-used but valid configuration. For example, you might fetch over HTTPS (no credentials needed for public repos) but push over SSH. In most cases they're the same URL, so Git shows both to make the configuration transparent. You can set them separately with <code>git remote set-url --push origin &lt;url&gt;</code>.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/branching/rebase.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Rebase</span>
+          </a>
+          <a href="/git/remotes/push-pull-fetch.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Push, Pull &amp; Fetch</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
