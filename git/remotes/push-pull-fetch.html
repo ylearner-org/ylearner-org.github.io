@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>git push, pull &amp; fetch – Syncing with Remote Repositories | ylearner</title>
+  <meta name="description" content="Master git fetch, git pull, and git push to sync your local repository with remote servers. Learn tracking, force push safely, and the recommended sync workflow.">
+  <meta name="keywords" content="git push, git pull, git fetch, git push --force-with-lease, git pull --rebase, sync remote repository, git tracking branch">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/git/remotes/push-pull-fetch.html">
+  <meta property="og:title" content="git push, pull &amp; fetch – Syncing with Remote Repositories | ylearner">
+  <meta property="og:description" content="Learn how git fetch, pull, and push work to sync with remote repos. Covers tracking branches, force-push safely, and the recommended fetch-then-merge workflow.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/git/remotes/push-pull-fetch.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"git push, pull & fetch – Syncing with Remote Repositories","description":"Master git fetch, pull, and push to sync your local repository with remote servers, including safe force-push and recommended workflows.","educationalLevel":"Beginner","keywords":"git push, git pull, git fetch, force push, tracking branch","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <a href="/git/remotes/remotes-overview.html">Remote Repositories</a><span class="separator">›</span>
+          <span class="current">Push, Pull &amp; Fetch</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 Remote Repositories</div>
+          <h1>git push, pull &amp; fetch – Syncing with Remote Repositories</h1>
+          <p class="lesson-intro">Three commands handle all communication between your local repository and remotes: <code>git fetch</code> downloads changes safely without touching your working tree, <code>git pull</code> downloads and integrates them, and <code>git push</code> uploads your commits. Understanding the difference — especially between fetch and pull — gives you precise control over when and how your repo stays in sync.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="git-fetch">git fetch – Safe Download</h2>
+          <p><code>git fetch</code> downloads commits, branches, and tags from the remote but <strong>does not modify your working directory or current branch</strong>. It updates only the remote-tracking branches (e.g., <code>origin/main</code>). This makes it completely safe — you can always fetch without risk.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Fetch ALL branches from all remotes
+git fetch
+
+# Fetch from a specific remote
+git fetch origin
+
+# Fetch a specific branch
+git fetch origin feature/login
+
+# After fetching, see what changed
+git log main..origin/main --oneline
+# Shows commits on origin/main that you haven't merged yet
+
+# Check what branches were updated
+git remote show origin</code></pre>
+          </div>
+
+          <div class="callout callout-success">
+            <span class="callout-icon">✅</span>
+            <div class="callout-content">
+              <strong>Fetch first, then decide</strong>
+              <p>Many experienced developers prefer <code>git fetch</code> over <code>git pull</code> because it separates two concerns: downloading remote changes (always safe) and integrating them (requires a decision). After fetching, you can review what changed with <code>git log</code> or <code>git diff</code> before deciding whether to merge or rebase.</p>
+            </div>
+          </div>
+
+          <h2 id="git-pull">git pull – Fetch + Integrate</h2>
+          <p><code>git pull</code> is shorthand for <code>git fetch</code> followed by either <code>git merge</code> or <code>git rebase</code>. It downloads remote changes AND immediately integrates them into your current branch.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Pull from the tracked remote branch (most common usage)
+git pull
+
+# Pull from a specific remote and branch
+git pull origin main
+
+# Pull with rebase instead of merge (cleaner history — no merge commits)
+git pull --rebase
+git pull --rebase origin main
+
+# Set rebase as the default pull strategy (recommended by many teams)
+git config --global pull.rebase true</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Command</th><th>What it does</th><th>Creates merge commit?</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>git pull</code></td>
+                  <td>fetch + merge</td>
+                  <td>Yes (if branches have diverged)</td>
+                </tr>
+                <tr>
+                  <td><code>git pull --rebase</code></td>
+                  <td>fetch + rebase</td>
+                  <td>No — linear history</td>
+                </tr>
+                <tr>
+                  <td><code>git fetch</code> + manual merge/rebase</td>
+                  <td>Download, then you decide</td>
+                  <td>You control it</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="git-push">git push – Upload Your Commits</h2>
+          <p><code>git push</code> uploads your local commits to the remote repository, making them available to others.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Push current branch to the tracked remote branch
+git push
+
+# Push a specific branch to origin
+git push origin feature/login
+
+# Push with -u flag (--set-upstream): sets tracking relationship
+# After this, plain "git push" works for this branch
+git push -u origin feature/login
+
+# Push all local branches to origin
+git push origin --all
+
+# Push tags
+git push origin --tags</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>The -u flag (--set-upstream)</strong>
+              <p>The first time you push a new branch, use <code>git push -u origin branch-name</code>. This creates the branch on the remote AND sets up tracking so future <code>git push</code> and <code>git pull</code> commands on this branch work without specifying the remote and branch name each time. After the initial <code>-u</code> push, plain <code>git push</code> is sufficient.</p>
+            </div>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="tracking">Tracking (Upstream) Branches</h2>
+          <p>A tracking branch is the connection between a local branch and its corresponding remote branch. Once set, Git knows where to push and pull without you specifying the remote and branch name every time.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># See tracking info for all local branches
+git branch -vv
+# * main           a1b2c3d [origin/main] Fix navbar
+#   feature/login  9f8e7d6 [origin/feature/login: ahead 2] Add form
+
+# "ahead 2" means 2 local commits not yet pushed
+# "behind 3" would mean 3 remote commits not yet pulled
+
+# Set tracking for an existing branch
+git branch --set-upstream-to=origin/main main
+
+# Check full remote tracking status
+git status
+# On branch main
+# Your branch is ahead of 'origin/main' by 1 commit.</code></pre>
+          </div>
+
+          <h2 id="force-push">Force Push – When and How (Safely)</h2>
+          <p>Normally, Git refuses to push if the remote has commits your local branch doesn't (a "non-fast-forward" push). This protects against accidentally overwriting others' work. Force push overrides this protection.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># SAFE force push: checks that no new commits appeared on remote since your last fetch
+git push --force-with-lease origin feature/login
+
+# DANGEROUS: overwrites remote blindly — can destroy teammates' work
+# git push --force origin main   ← NEVER do this on shared branches</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Never force push to main/master or any shared branch</strong>
+              <p><code>git push --force</code> on a shared branch overwrites the remote's history. Anyone who has already pulled those commits now has a diverged history that's very hard to reconcile. Force pushing is only appropriate on your own feature branches after rebasing (and only when you're certain no one else is working on that branch). Always prefer <code>--force-with-lease</code> over <code>--force</code> — it at least checks that the remote hasn't changed since your last fetch.</p>
+            </div>
+          </div>
+
+          <h2 id="sync-workflow">Recommended Sync Workflow</h2>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Morning routine: start by fetching latest changes
+git fetch origin
+
+# See what's new on main
+git log main..origin/main --oneline
+
+# Update your local main
+git switch main
+git merge origin/main        # or: git pull
+
+# Update your feature branch with latest main
+git switch feature/my-work
+git rebase main              # or: git merge main
+
+# Work, commit, then push
+git push origin feature/my-work   # first push: git push -u origin feature/my-work</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>git fetch</code> — downloads remote changes to tracking branches ONLY. Safe — doesn't touch your working tree.</li>
+              <li><code>git pull</code> — fetch + merge (or fetch + rebase with <code>--rebase</code>). Integrates remote changes into your current branch.</li>
+              <li><code>git push origin &lt;branch&gt;</code> — upload your commits to the remote. Use <code>-u</code> on first push to set tracking.</li>
+              <li><code>git pull --rebase</code> — preferred by many teams for cleaner history (no merge commits on pull).</li>
+              <li><code>git push --force-with-lease</code> — safe force push (only after rebasing your own feature branch).</li>
+              <li><strong>Never</strong> <code>git push --force</code> on <code>main</code> or any shared branch — it overwrites teammates' work.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/git/remotes/remotes-overview.html" class="topic-tag git-topic-tag">🔀 Remotes Overview</a>
+            <a href="/git/remotes/github-workflow.html" class="topic-tag git-topic-tag">🔀 GitHub PR Workflow</a>
+            <a href="/git/remotes/ssh-keys.html" class="topic-tag git-topic-tag">🔀 SSH Keys</a>
+            <a href="/git/branching/rebase.html" class="topic-tag git-topic-tag">🔀 Rebase</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What's the difference between git fetch and git pull? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>git fetch</code> downloads remote changes but doesn't touch your working tree or current branch — it only updates remote-tracking branches like <code>origin/main</code>. <code>git pull</code> fetches AND immediately merges (or rebases) those changes into your current branch. Fetch is safe and non-destructive; pull immediately changes your branch. The best practice for careful developers is to fetch, review the changes, then manually merge or rebase.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">git push says "rejected" — what do I do? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A rejection usually means the remote has commits your local branch doesn't have. Git refuses to push because it would overwrite the remote's history. Solution: first <code>git pull</code> (or <code>git fetch</code> + <code>git rebase</code>) to bring in the remote changes, resolve any conflicts, then <code>git push</code> again. The rejection is Git protecting you — it's a feature, not a bug.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I use git pull or git pull --rebase? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Many experienced developers prefer <code>git pull --rebase</code> because it avoids creating "noise" merge commits like "Merge branch 'main' into feature/x". This keeps the history linear and easier to read. You can set it as default with <code>git config --global pull.rebase true</code>. However, if you're new to Git or working on a team that expects merge commits, stick with the default. Both produce the same end result — just different history shapes.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What does "Your branch is ahead of 'origin/main' by 3 commits" mean? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It means your local branch has 3 commits that haven't been pushed to the remote yet. The fix is <code>git push</code>. If you see "behind N commits", run <code>git pull</code>. If you see both "ahead X and behind Y", you and the remote have diverged — run <code>git pull</code> (or <code>git pull --rebase</code>) to reconcile, then push.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/remotes/remotes-overview.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Remotes Overview</span>
+          </a>
+          <a href="/git/remotes/github-workflow.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">GitHub Pull Request Workflow</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
