@@ -682,7 +682,7 @@ registry.category("actions").add("my_module.sales_dashboard", Dashboard);</code>
         </article>
 
         <div class="summary-box">
-          <h3>What You Learned</h3>
+          <h3>📋 Summary</h3>
           <ul>
             <li><strong>onWillStart + onMounted + onWillUnmount</strong>: complete async data lifecycle with cleanup</li>
             <li><strong>AbortController</strong>: cancel previous requests when period changes or component unmounts</li>
@@ -695,18 +695,17 @@ registry.category("actions").add("my_module.sales_dashboard", Dashboard);</code>
         </div>
 
         <div class="related-topics">
-          <span class="owl-topic-tag">onWillStart</span>
-          <span class="owl-topic-tag">onMounted</span>
-          <span class="owl-topic-tag">onPatched</span>
-          <span class="owl-topic-tag">AbortController</span>
-          <span class="owl-topic-tag">useRef</span>
-          <span class="owl-topic-tag">readGroup</span>
-          <span class="owl-topic-tag">Client Action</span>
-          <span class="owl-topic-tag">Chart.js</span>
+          <a href="/owljs/lifecycle/will-start.html" class="topic-tag owl-topic-tag">🦉 onWillStart</a>
+          <a href="/owljs/lifecycle/setup-mounted.html" class="topic-tag owl-topic-tag">🦉 onMounted</a>
+          <a href="/owljs/lifecycle/patch-hooks.html" class="topic-tag owl-topic-tag">🦉 onPatched</a>
+          <a href="/owljs/advanced/concurrency.html" class="topic-tag owl-topic-tag">🦉 AbortController</a>
+          <a href="/owljs/templates/refs.html" class="topic-tag owl-topic-tag">🦉 useRef</a>
+          <a href="/owljs/odoo/rpc-calls.html" class="topic-tag owl-topic-tag">🦉 readGroup</a>
+          <a href="/owljs/odoo/owl-in-odoo.html" class="topic-tag owl-topic-tag">🦉 Client Action</a>
         </div>
 
         <div class="exercise-box">
-          <h3>Extend the Project</h3>
+          <h3>🏋️ Exercise</h3>
           <ol>
             <li>Add a product breakdown doughnut chart (top 5 products by revenue) using Chart.js and a second <code>readGroup</code> call grouped by <code>product_id</code>.</li>
             <li>Add a "Compare to previous period" toggle that fetches data for both periods and shows a side-by-side grouped bar chart.</li>
@@ -716,28 +715,34 @@ registry.category("actions").add("my_module.sales_dashboard", Dashboard);</code>
         </div>
 
         <section class="faq-section">
-          <h2>FAQ</h2>
-          <details>
-            <summary>Why use readGroup instead of searchRead for KPI data?</summary>
-            <p><code>readGroup</code> runs aggregation (SUM, COUNT, AVG) on the database server side and returns one row per group. For KPI cards you need total revenue across all orders — fetching every order with <code>searchRead</code> and summing in JavaScript would be slow for large datasets and would hit pagination limits. Always push aggregation to the server.</p>
-          </details>
-          <details>
-            <summary>Can I use onWillStart to load data instead of onMounted?</summary>
-            <p>Yes — and for the initial load you should use <code>onWillStart</code> because it blocks rendering until the promise resolves, preventing a flash of empty state. However, you cannot access DOM refs in <code>onWillStart</code>, so Chart.js initialisation must stay in <code>onMounted</code>. The recommended pattern: load data in <code>onWillStart</code>, initialise DOM libraries in <code>onMounted</code>.</p>
-          </details>
-          <details>
-            <summary>How do I show a spinner during reload (not just initial load)?</summary>
-            <p>Set a separate <code>state.reloading</code> flag distinct from <code>state.loading</code>. <code>loading</code> is true only on first render (show skeleton). <code>reloading</code> is true on any subsequent fetch (show a small spinner overlay instead of replacing the entire UI). Reset <code>loading</code> after first successful fetch and never set it to true again.</p>
-          </details>
-          <details>
-            <summary>Does the AbortController actually cancel the ORM request?</summary>
-            <p>In OWL's ORM service layer, <code>AbortController</code> signals can be passed to the underlying <code>fetch</code> if the rpc layer supports it. In current Odoo web, the ORM service does not expose an abort signal parameter on most methods. The pattern here guards on <code>signal.aborted</code> after each await — meaning the request completes but the result is discarded and state is not updated. True network cancellation requires passing the signal through a custom <code>rpc</code> call using the lower-level <code>fetch</code> API.</p>
-          </details>
+          <h2 id="faq">Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <div class="faq-question">Why use readGroup instead of searchRead for KPI data? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p><code>readGroup</code> runs aggregation (SUM, COUNT, AVG) on the database server side and returns one row per group. For KPI cards you need total revenue across all orders — fetching every order with <code>searchRead</code> and summing in JavaScript would be slow for large datasets and would hit pagination limits. Always push aggregation to the server.</p></div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">Can I use onWillStart to load data instead of onMounted? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>Yes — and for the initial load you should use <code>onWillStart</code> because it blocks rendering until the promise resolves, preventing a flash of empty state. However, you cannot access DOM refs in <code>onWillStart</code>, so Chart.js initialisation must stay in <code>onMounted</code>. The recommended pattern: load data in <code>onWillStart</code>, initialise DOM libraries in <code>onMounted</code>.</p></div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">How do I show a spinner during reload (not just initial load)? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>Set a separate <code>state.reloading</code> flag distinct from <code>state.loading</code>. <code>loading</code> is true only on first render (show skeleton). <code>reloading</code> is true on any subsequent fetch (show a small spinner overlay instead of replacing the entire UI). Reset <code>loading</code> after first successful fetch and never set it to true again.</p></div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">Does the AbortController actually cancel the ORM request? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>In OWL's ORM service layer, <code>AbortController</code> signals can be passed to the underlying <code>fetch</code> if the rpc layer supports it. In current Odoo web, the ORM service does not expose an abort signal parameter on most methods. The pattern here guards on <code>signal.aborted</code> after each await — meaning the request completes but the result is discarded and state is not updated. True network cancellation requires passing the signal through a custom <code>rpc</code> call using the lower-level <code>fetch</code> API.</p></div>
+          </div>
         </section>
 
-        <nav class="lesson-nav">
-          <a class="prev-lesson" href="/owljs/projects/form-validation.html">← Form Validation</a>
-          <a class="next-lesson" href="/owljs/what-is-owl.html">Back to Course Start →</a>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/projects/form-validation.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Form with Validation</span>
+          </a>
+          <a href="/owljs/what-is-owl.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Back to Course Start</span>
+          </a>
         </nav>
 
         <div class="ad-container ad-footer">Ad – 728×90</div>

@@ -580,7 +580,7 @@ registry.category("actions").add("my_module.todo_app", TodoApp);</code></pre>
         </article>
 
         <div class="summary-box">
-          <h3>What You Learned</h3>
+          <h3>📋 Summary</h3>
           <ul>
             <li><strong>4-stage build</strong>: skeleton → state/CRUD → child component extraction → persistence</li>
             <li><strong>useState array mutations</strong>: push/splice on reactive array trigger re-render</li>
@@ -592,17 +592,17 @@ registry.category("actions").add("my_module.todo_app", TodoApp);</code></pre>
         </div>
 
         <div class="related-topics">
-          <span class="owl-topic-tag">useState</span>
-          <span class="owl-topic-tag">t-foreach</span>
-          <span class="owl-topic-tag">t-model</span>
-          <span class="owl-topic-tag">onMounted</span>
-          <span class="owl-topic-tag">onPatched</span>
-          <span class="owl-topic-tag">Child Components</span>
-          <span class="owl-topic-tag">ORM Integration</span>
+          <a href="/owljs/core/state.html" class="topic-tag owl-topic-tag">🦉 useState</a>
+          <a href="/owljs/templates/list-rendering.html" class="topic-tag owl-topic-tag">🦉 t-foreach</a>
+          <a href="/owljs/templates/input-binding.html" class="topic-tag owl-topic-tag">🦉 t-model</a>
+          <a href="/owljs/lifecycle/setup-mounted.html" class="topic-tag owl-topic-tag">🦉 onMounted</a>
+          <a href="/owljs/lifecycle/patch-hooks.html" class="topic-tag owl-topic-tag">🦉 onPatched</a>
+          <a href="/owljs/advanced/sub-components.html" class="topic-tag owl-topic-tag">🦉 Child Components</a>
+          <a href="/owljs/odoo/services.html" class="topic-tag owl-topic-tag">🦉 ORM Integration</a>
         </div>
 
         <div class="exercise-box">
-          <h3>Extend the Project</h3>
+          <h3>🏋️ Exercise</h3>
           <ol>
             <li>Add drag-and-drop reordering using the HTML5 drag API and <code>t-on-dragstart</code> / <code>t-on-drop</code>.</li>
             <li>Add inline editing: double-click a todo text to switch it to an <code>&lt;input&gt;</code>, save on blur or Enter.</li>
@@ -612,28 +612,34 @@ registry.category("actions").add("my_module.todo_app", TodoApp);</code></pre>
         </div>
 
         <section class="faq-section">
-          <h2>FAQ</h2>
-          <details>
-            <summary>Why use push/splice instead of replacing the array?</summary>
-            <p>OWL's Proxy watches mutations on existing objects. <code>this.state.todos.push(item)</code> mutates the proxied array and triggers re-render. Assigning a new array (<code>this.state.todos = [...]</code>) also works because the proxy intercepts property assignments on the parent state object. Both are valid; mutation is slightly more performant for large lists.</p>
-          </details>
-          <details>
-            <summary>Can I use onWillStart instead of onMounted for localStorage?</summary>
-            <p>Yes. <code>onWillStart</code> runs before the first render so the loaded data is available immediately — no flash of empty state. Use <code>onWillStart</code> when loading is async (ORM, fetch). Use <code>onMounted</code> when you need access to the DOM or when synchronous (localStorage.getItem is synchronous).</p>
-          </details>
-          <details>
-            <summary>How do I share todo state between sibling components?</summary>
-            <p>Lift state to the common parent and pass it down as props + callback props. For app-wide state, create a custom service registered in the Odoo service registry and access it via <code>useService</code>. Avoid global variables or module-level state.</p>
-          </details>
-          <details>
-            <summary>The Odoo stage_id is hard-coded — how do I make it dynamic?</summary>
-            <p>Load available stages in <code>onWillStart</code> using <code>orm.searchRead("project.task.type", [], ["id","name"])</code>. Store them in state and let the user pick a stage when creating a task. Map "done" to the stage whose sequence is highest or whose name contains "Done".</p>
-          </details>
+          <h2 id="faq">Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <div class="faq-question">Why use push/splice instead of replacing the array? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>OWL's Proxy watches mutations on existing objects. <code>this.state.todos.push(item)</code> mutates the proxied array and triggers re-render. Assigning a new array (<code>this.state.todos = [...]</code>) also works because the proxy intercepts property assignments on the parent state object. Both are valid; mutation is slightly more performant for large lists.</p></div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">Can I use onWillStart instead of onMounted for localStorage? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>Yes. <code>onWillStart</code> runs before the first render so the loaded data is available immediately — no flash of empty state. Use <code>onWillStart</code> when loading is async (ORM, fetch). Use <code>onMounted</code> when you need access to the DOM or when synchronous (localStorage.getItem is synchronous).</p></div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">How do I share todo state between sibling components? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>Lift state to the common parent and pass it down as props + callback props. For app-wide state, create a custom service registered in the Odoo service registry and access it via <code>useService</code>. Avoid global variables or module-level state.</p></div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">The Odoo stage_id is hard-coded — how do I make it dynamic? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>Load available stages in <code>onWillStart</code> using <code>orm.searchRead("project.task.type", [], ["id","name"])</code>. Store them in state and let the user pick a stage when creating a task. Map "done" to the stage whose sequence is highest or whose name contains "Done".</p></div>
+          </div>
         </section>
 
-        <nav class="lesson-nav">
-          <a class="prev-lesson" href="/owljs/interview/exercises.html">← Practical Exercises</a>
-          <a class="next-lesson" href="/owljs/projects/counter.html">Counter Widget →</a>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/interview/exercises.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Practical Exercises</span>
+          </a>
+          <a href="/owljs/projects/counter.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Counter Widget</span>
+          </a>
         </nav>
 
         <div class="ad-container ad-footer">Ad – 728×90</div>
