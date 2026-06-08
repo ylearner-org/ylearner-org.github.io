@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conventional Commits – Writing Structured Commit Messages | ylearner</title>
+  <meta name="description" content="Learn Conventional Commits: the standard format for structured Git commit messages that enables automated changelogs, semantic versioning, and readable project history.">
+  <meta name="keywords" content="conventional commits, commit message format, semantic versioning commits, commitlint, commitizen, feat fix docs commit types, breaking change commit">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/git/workflows/conventional-commits.html">
+  <meta property="og:title" content="Conventional Commits – Writing Structured Commit Messages | ylearner">
+  <meta property="og:description" content="Learn the Conventional Commits specification: type(scope): description format, commit types, breaking changes, and tooling for automated changelogs.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/git/workflows/conventional-commits.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Conventional Commits – Writing Structured Commit Messages","description":"Learn Conventional Commits: the structured commit message format for automated changelogs, semantic versioning, and readable Git history.","educationalLevel":"Beginner","keywords":"conventional commits, commit message format, commitlint","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <span>Workflows</span><span class="separator">›</span>
+          <span class="current">Conventional Commits</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔀 Workflows</div>
+          <h1>Conventional Commits – Writing Structured Commit Messages</h1>
+          <p class="lesson-intro">Bad commit messages like "fix stuff" or "WIP" make your Git history useless for future debugging and code archaeology. <strong>Conventional Commits</strong> is a simple specification that structures commit messages so machines can parse them (for automated changelogs and version bumps) and humans can scan them quickly. It takes two minutes to learn and pays dividends for the entire life of a project.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="why-conventional">Why Structured Commit Messages?</h2>
+          <p>Conventional Commits enables three key things:</p>
+          <ol>
+            <li><strong>Automated changelogs</strong> — tools like <code>conventional-changelog</code> and <code>semantic-release</code> can generate <code>CHANGELOG.md</code> automatically by parsing commit messages</li>
+            <li><strong>Semantic version bumps</strong> — <code>feat</code> commits trigger a minor bump, <code>fix</code> triggers a patch bump, <code>BREAKING CHANGE</code> triggers a major bump — no more manual version decisions</li>
+            <li><strong>Readable history</strong> — a developer reading <code>git log --oneline</code> immediately understands what type of change each commit was</li>
+          </ol>
+
+          <h2 id="format">The Format</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Commit message format</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">&lt;type&gt;(&lt;scope&gt;): &lt;description&gt;
+
+[optional body]
+
+[optional footer(s)]</code></pre>
+          </div>
+
+          <ul>
+            <li><strong>type</strong> — required. What kind of change is this? (see table below)</li>
+            <li><strong>scope</strong> — optional. What part of the codebase? (<code>auth</code>, <code>api</code>, <code>ui</code>, <code>docs</code>)</li>
+            <li><strong>description</strong> — required. Imperative mood, present tense, no capital first letter, no period at end. Max ~72 chars.</li>
+            <li><strong>body</strong> — optional. Explain <em>what</em> and <em>why</em> (not how). Separate from subject with blank line.</li>
+            <li><strong>footer</strong> — optional. Breaking changes, issue references.</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Examples</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">feat(auth): add OAuth2 login with GitHub
+
+fix(api): handle null response from user endpoint
+
+docs(readme): update installation instructions for Node 20
+
+feat!: remove support for Node 14
+
+refactor(dashboard): extract chart logic into separate component
+
+perf(images): lazy-load images below the fold</code></pre>
+          </div>
+
+          <h2 id="types">Commit Types Reference</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Type</th><th>When to use</th><th>SemVer impact</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>feat</code></td><td>A new feature for the user</td><td>MINOR bump</td></tr>
+                <tr><td><code>fix</code></td><td>A bug fix for the user</td><td>PATCH bump</td></tr>
+                <tr><td><code>docs</code></td><td>Documentation only changes</td><td>No bump</td></tr>
+                <tr><td><code>style</code></td><td>Formatting, whitespace (no logic change)</td><td>No bump</td></tr>
+                <tr><td><code>refactor</code></td><td>Code restructure (not a fix or feature)</td><td>No bump</td></tr>
+                <tr><td><code>perf</code></td><td>Performance improvement</td><td>PATCH bump</td></tr>
+                <tr><td><code>test</code></td><td>Adding or fixing tests</td><td>No bump</td></tr>
+                <tr><td><code>chore</code></td><td>Build process, dependency updates, tools</td><td>No bump</td></tr>
+                <tr><td><code>ci</code></td><td>CI/CD configuration changes</td><td>No bump</td></tr>
+                <tr><td><code>build</code></td><td>Changes affecting build system or dependencies</td><td>No bump</td></tr>
+                <tr><td><code>revert</code></td><td>Reverts a previous commit</td><td>Depends</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="breaking-changes">Breaking Changes</h2>
+          <p>A breaking change is any change that requires users of your library/API to update their code. Mark it with:</p>
+          <ul>
+            <li><strong>! after the type</strong>: <code>feat!: rename API endpoint</code> — triggers MAJOR bump</li>
+            <li><strong>BREAKING CHANGE footer</strong>: detailed explanation of what broke and how to migrate</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">git commit -m "feat!: migrate authentication to JWT tokens
+
+BREAKING CHANGE: The /api/login endpoint now returns a JWT token
+instead of a session cookie. Update your API client to store the
+token and send it as a Bearer header:
+
+  Authorization: Bearer &lt;token&gt;
+
+Old behavior (sessions) is no longer supported.
+
+Closes #142"</code></pre>
+          </div>
+
+          <h2 id="examples">Real-World Examples</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Commit message</th><th>What it communicates</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>feat(cart): add quantity selector to cart items</code></td><td>New feature in the cart module</td></tr>
+                <tr><td><code>fix(auth): prevent redirect loop on expired token</code></td><td>Bug fix in auth, will be in next patch release</td></tr>
+                <tr><td><code>chore(deps): upgrade react from 18.2 to 18.3</code></td><td>Dependency update, no user-visible change</td></tr>
+                <tr><td><code>docs(api): add examples to user endpoint docs</code></td><td>Documentation only, no code change</td></tr>
+                <tr><td><code>perf(db): add index on users.email column</code></td><td>Performance improvement</td></tr>
+                <tr><td><code>test(checkout): add integration tests for payment flow</code></td><td>Tests added, no production code change</td></tr>
+                <tr><td><code>refactor(utils): extract date formatting to shared helper</code></td><td>Code quality improvement, no behavior change</td></tr>
+                <tr><td><code>feat!: remove deprecated v1 API endpoints</code></td><td>Breaking change — MAJOR version bump required</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="tooling">Tooling</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># commitlint: Validates commit messages against Conventional Commits
+npm install --save-dev @commitlint/cli @commitlint/config-conventional
+
+# commitlint.config.js
+echo "module.exports = { extends: ['@commitlint/config-conventional'] };" > commitlint.config.js
+
+# Add to Husky pre-commit
+echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg
+
+# commitizen: Interactive CLI commit helper
+npm install --save-dev commitizen
+npx commitizen init cz-conventional-changelog --save-dev --save-exact
+
+# Now use: git cz  instead of git commit
+# It prompts you through type, scope, description, body, footer
+
+# semantic-release: Fully automated version management
+npm install --save-dev semantic-release
+# On every push to main, it:
+# 1. Analyzes commits since last release
+# 2. Determines the next version number
+# 3. Generates CHANGELOG.md
+# 4. Creates a GitHub release + git tag
+# 5. Publishes to npm (if configured)</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Team tip: squash and rewrite at PR merge time</strong>
+              <p>Not every developer writes perfect conventional commits on their feature branch — and that's okay. Many teams allow free-form commits during development and only require a conventional commit message for the squash commit when merging the PR. Configure GitHub to default to "Squash and merge" and set the PR title to be a conventional commit message.</p>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Format: <strong>type(scope): description</strong> — e.g., <code>feat(auth): add OAuth2 login</code></li>
+              <li>Core types: <strong>feat</strong> (MINOR), <strong>fix</strong> (PATCH), <strong>docs/style/refactor/test/chore</strong> (no bump)</li>
+              <li>Breaking change: add <strong>!</strong> after type or <strong>BREAKING CHANGE:</strong> footer — triggers MAJOR bump</li>
+              <li>Description: imperative mood, present tense, lowercase start, no trailing period, max ~72 chars</li>
+              <li><strong>commitlint</strong> validates format; <strong>commitizen</strong> provides interactive CLI; <strong>semantic-release</strong> automates versioning</li>
+              <li>Practical team approach: require conventional format for squash commit at PR merge, not for every WIP commit</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/git/workflows/feature-branch-workflow.html" class="topic-tag git-topic-tag">🔀 Feature Branch Workflow</a>
+            <a href="/git/advanced/git-hooks.html" class="topic-tag git-topic-tag">⚙️ Git Hooks</a>
+            <a href="/git/advanced/tags-releases.html" class="topic-tag git-topic-tag">⚙️ Tags &amp; Releases</a>
+            <a href="/git/workflows/gitignore.html" class="topic-tag git-topic-tag">🔀 .gitignore</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Is the scope required in Conventional Commits? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. The scope is optional but recommended for projects with multiple subsystems. Without scope: <code>feat: add dark mode</code>. With scope: <code>feat(ui): add dark mode toggle</code>. The scope should be consistent across the team — agree on a set of scopes in your CONTRIBUTING.md (e.g., <code>auth</code>, <code>api</code>, <code>ui</code>, <code>db</code>, <code>docs</code>) rather than having each developer invent their own.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What's the difference between fix and refactor? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>fix</code> corrects behavior that was wrong — a user-visible bug. <code>refactor</code> changes the code's internal structure without changing its external behavior. If a test was failing and now passes, that's a <code>fix</code>. If you extracted a function and all tests still pass identically, that's a <code>refactor</code>. The distinction matters for semantic versioning: <code>fix</code> triggers a PATCH version bump while <code>refactor</code> does not.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What if I need to update both code and docs in the same commit? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use the type that best represents the primary change. If you added a feature and documented it in the same commit, use <code>feat</code> — the documentation is secondary. However, it's generally better practice to make separate commits: one <code>feat</code> commit for the code and one <code>docs</code> commit for the documentation. Atomic commits (one logical change per commit) make history cleaner and easier to revert if needed.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I use Conventional Commits for personal projects? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — even for solo projects. The discipline of writing good commit messages forces you to think about what each commit actually does. Six months later when you're debugging an old project, a well-written git log is incredibly valuable. It also builds the muscle memory so it becomes second nature when you join a team or contribute to open source. Start with just <code>feat</code>, <code>fix</code>, and <code>chore</code> — you don't need all 11 types immediately.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/workflows/feature-branch-workflow.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Feature Branch Workflow</span>
+          </a>
+          <a href="/git/workflows/gitignore.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">.gitignore &amp; .gitattributes</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSH Keys for Git – Passwordless GitHub Authentication | ylearner</title>
+  <meta name="description" content="Set up SSH keys for Git and GitHub to push without entering your password every time. Covers key generation, adding to GitHub, testing, and handling multiple accounts.">
+  <meta name="keywords" content="ssh keys git, github ssh setup, git ssh authentication, ssh-keygen ed25519, passwordless git push, multiple github accounts ssh">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/git/remotes/ssh-keys.html">
+  <meta property="og:title" content="SSH Keys for Git – Passwordless GitHub Authentication | ylearner">
+  <meta property="og:description" content="Generate an SSH key, add it to GitHub, and push code without passwords. Covers ed25519 keys, SSH config for multiple accounts, and SSH vs HTTPS comparison.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/git/remotes/ssh-keys.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SSH Keys for Git – Passwordless GitHub Authentication","description":"Learn to generate SSH keys, add them to GitHub, and authenticate securely without passwords. Covers ed25519 keys, testing, and multiple account SSH config.","educationalLevel":"Beginner","keywords":"ssh keys git, github ssh setup, ssh-keygen ed25519, passwordless git push","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <a href="/git/remotes/remotes-overview.html">Remote Repositories</a><span class="separator">›</span>
+          <span class="current">SSH Keys</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 Remote Repositories</div>
+          <h1>SSH Keys for Git – Passwordless GitHub Authentication</h1>
+          <p class="lesson-intro">Typing your GitHub password every time you push is annoying and — since GitHub removed password authentication for Git operations in 2021 — no longer possible. SSH keys solve this elegantly: a cryptographic key pair proves your identity automatically. Set it up once and you'll never be prompted for credentials again.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="why-ssh">Why SSH?</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Feature</th><th>SSH</th><th>HTTPS with token</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Password required each push</td>
+                  <td>No (key-based auth)</td>
+                  <td>No (token cached by credential manager)</td>
+                </tr>
+                <tr>
+                  <td>Security</td>
+                  <td>Very high (cryptographic key pair)</td>
+                  <td>High (token-based)</td>
+                </tr>
+                <tr>
+                  <td>Setup complexity</td>
+                  <td>5–10 minutes, once</td>
+                  <td>Token generation + credential manager setup</td>
+                </tr>
+                <tr>
+                  <td>URL format</td>
+                  <td><code>git@github.com:user/repo.git</code></td>
+                  <td><code>https://github.com/user/repo.git</code></td>
+                </tr>
+                <tr>
+                  <td>Multiple accounts</td>
+                  <td>Easy via SSH config file</td>
+                  <td>Complex with credential manager</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>GitHub no longer accepts passwords</strong>
+              <p>Since August 2021, GitHub requires token-based or SSH authentication for all Git operations. If you try to push over HTTPS with your GitHub password, you'll get a "Support for password authentication was removed" error. The two supported options are Personal Access Tokens (HTTPS) or SSH keys. SSH is generally simpler for daily Git use.</p>
+            </div>
+          </div>
+
+          <h2 id="generate-key">Generating an SSH Key</h2>
+          <p>Use <code>ed25519</code> — it's more secure and produces shorter keys than the older <code>rsa</code> algorithm. Replace the email with your GitHub email address.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Generate an ed25519 SSH key (recommended)
+ssh-keygen -t ed25519 -C "your@email.com"
+
+# Prompts:
+# Enter file in which to save the key (~/.ssh/id_ed25519): [press Enter for default]
+# Enter passphrase: [optional but recommended for security; press Enter to skip]
+# Enter same passphrase again: [repeat passphrase]
+
+# Output confirms two files were created:
+# Your identification has been saved in /home/you/.ssh/id_ed25519
+# Your public key has been saved in /home/you/.ssh/id_ed25519.pub</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Private key vs public key</strong>
+              <p><code>id_ed25519</code> is your <strong>private key</strong> — keep it secret, never share it, never commit it. <code>id_ed25519.pub</code> is your <strong>public key</strong> — this is what you give to GitHub. The math behind public-key cryptography guarantees that only someone who holds the matching private key can produce the authentication signature.</p>
+            </div>
+          </div>
+
+          <h3>View your public key</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Print your public key to the terminal (copy this entire output)
+cat ~/.ssh/id_ed25519.pub
+# ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAbCdEfGhIjKlMnOpQrStUvWxYzAbCdEfGhIjKlMnOp your@email.com</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="add-to-github">Adding Your Key to GitHub</h2>
+          <ol>
+            <li>Go to <strong>github.com → Settings → SSH and GPG keys</strong></li>
+            <li>Click <strong>New SSH key</strong></li>
+            <li>Title: give it a descriptive name (e.g., "Work MacBook 2026")</li>
+            <li>Key type: <strong>Authentication Key</strong></li>
+            <li>Key: paste the entire content of <code>id_ed25519.pub</code></li>
+            <li>Click <strong>Add SSH key</strong>, confirm with your GitHub password</li>
+          </ol>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Start the SSH agent (if not already running)
+eval "$(ssh-agent -s)"
+# Agent pid 12345
+
+# Add your private key to the agent
+# (so you only enter the passphrase once per session, if you set one)
+ssh-add ~/.ssh/id_ed25519</code></pre>
+          </div>
+
+          <h2 id="test-connection">Testing the Connection</h2>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">ssh -T git@github.com
+
+# Expected output (success):
+# Hi your-username! You've successfully authenticated,
+# but GitHub does not provide shell access.
+
+# If you see a fingerprint verification prompt, type "yes" to continue.
+# It only appears once and adds github.com to your known_hosts file.</code></pre>
+          </div>
+
+          <h3>Using SSH URLs</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Clone using SSH URL (note the git@ format — no https://)
+git clone git@github.com:username/repo.git
+
+# Change an existing remote from HTTPS to SSH
+git remote set-url origin git@github.com:username/repo.git
+
+# Verify the change
+git remote -v
+# origin  git@github.com:username/repo.git (fetch)
+# origin  git@github.com:username/repo.git (push)</code></pre>
+          </div>
+
+          <h2 id="multiple-accounts">Multiple GitHub Accounts</h2>
+          <p>If you have two GitHub accounts (personal + work), you need separate SSH keys and an SSH config file to route each to the correct key.</p>
+
+          <h3>Step 1: Generate two separate keys</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Personal account key
+ssh-keygen -t ed25519 -C "personal@email.com" -f ~/.ssh/id_ed25519_personal
+
+# Work account key
+ssh-keygen -t ed25519 -C "work@company.com" -f ~/.ssh/id_ed25519_work</code></pre>
+          </div>
+
+          <h3>Step 2: Add both public keys to their respective GitHub accounts</h3>
+          <p>Go to each GitHub account's Settings → SSH keys and add the corresponding <code>.pub</code> file content.</p>
+
+          <h3>Step 3: Create an SSH config file</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text"># ~/.ssh/config
+
+# Personal GitHub account
+Host github-personal
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_personal
+
+# Work GitHub account
+Host github-work
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_work</code></pre>
+          </div>
+
+          <h3>Step 4: Use the custom host alias in repo URLs</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Clone personal repo using the "github-personal" host alias
+git clone git@github-personal:personal-username/my-project.git
+
+# Clone work repo using the "github-work" alias
+git clone git@github-work:company-org/work-project.git
+
+# Update existing remote for a repo to use the right identity
+git remote set-url origin git@github-work:company-org/work-project.git
+
+# Test each connection
+ssh -T git@github-personal   # → "Hi personal-username!"
+ssh -T git@github-work       # → "Hi work-username!"</code></pre>
+          </div>
+
+          <h2 id="ssh-vs-https">SSH vs HTTPS Summary</h2>
+          <div class="callout callout-success">
+            <span class="callout-icon">✅</span>
+            <div class="callout-content">
+              <strong>Recommendation: use SSH for daily development</strong>
+              <p>SSH is the preferred choice for developers who push to GitHub regularly. Set it up once, add your key to GitHub, and every subsequent push/pull/fetch happens silently without any prompts. HTTPS with a Personal Access Token is also fine, especially in environments where SSH port 22 is blocked (some corporate networks). Many developers use SSH at home and HTTPS in restricted corporate environments.</p>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>SSH keys eliminate password prompts for every push. GitHub requires token or SSH auth — plain passwords no longer work.</li>
+              <li>Generate with <code>ssh-keygen -t ed25519 -C "your@email.com"</code>. Prefer <strong>ed25519</strong> over rsa.</li>
+              <li>View public key: <code>cat ~/.ssh/id_ed25519.pub</code> — paste this into GitHub Settings → SSH keys.</li>
+              <li>Test: <code>ssh -T git@github.com</code> → "Hi username! You've successfully authenticated."</li>
+              <li>SSH URL format: <code>git@github.com:username/repo.git</code> (vs HTTPS: <code>https://github.com/...</code>).</li>
+              <li>Switch existing remote: <code>git remote set-url origin git@github.com:username/repo.git</code>.</li>
+              <li>Multiple GitHub accounts: use <code>~/.ssh/config</code> with custom <code>Host</code> aliases, one per account.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/git/remotes/remotes-overview.html" class="topic-tag git-topic-tag">🔀 Remotes Overview</a>
+            <a href="/git/remotes/push-pull-fetch.html" class="topic-tag git-topic-tag">🔀 Push, Pull &amp; Fetch</a>
+            <a href="/git/remotes/github-workflow.html" class="topic-tag git-topic-tag">🔀 GitHub PR Workflow</a>
+            <a href="/git/advanced/stashing.html" class="topic-tag git-topic-tag">🔀 Stashing Changes</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Should I use a passphrase for my SSH key? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, if security is important — which it always is. A passphrase encrypts your private key file, so even if someone gets the file, they can't use it without the passphrase. The convenience cost is minimal: add your key to <code>ssh-agent</code> once per session (<code>ssh-add ~/.ssh/id_ed25519</code>) and you won't be prompted for the passphrase again until you restart. On macOS, Keychain remembers it across reboots automatically.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">My ssh -T git@github.com returns "Permission denied (publickey)". What's wrong? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Several possible causes: (1) The public key wasn't added to GitHub — double-check Settings → SSH keys. (2) The private key isn't loaded — run <code>ssh-add ~/.ssh/id_ed25519</code>. (3) You have multiple keys and SSH is trying the wrong one — create a <code>~/.ssh/config</code> file specifying <code>IdentityFile ~/.ssh/id_ed25519</code> for <code>github.com</code>. (4) Permissions issue — private key must be mode 600: <code>chmod 600 ~/.ssh/id_ed25519</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use the same SSH key on multiple computers? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Technically yes, but best practice is to generate a separate key for each device. This way, if one device is lost or compromised, you can revoke just that key from GitHub without affecting your other machines. GitHub allows you to add multiple SSH keys to a single account — one per device is the recommended approach.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What's the difference between ed25519 and RSA keys? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Ed25519 uses elliptic-curve cryptography and is modern (2011), faster, more secure, and produces much shorter key strings (~68 characters vs ~800 characters for RSA-4096). RSA is the older standard (1977) but is widely supported everywhere. GitHub supports both. Unless you're working with very old systems that don't support ed25519, always use ed25519 for new keys.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/remotes/github-workflow.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">GitHub PR Workflow</span>
+          </a>
+          <a href="/git/advanced/stashing.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Stashing Changes</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
