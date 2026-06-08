@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Commerce Schema – SQL Project with Joins &amp; Aggregation | ylearner</title>
+  <meta name="description" content="Build a complete e-commerce database schema in SQL. Design users, products, categories, orders, and order_items tables, then write complex JOIN and aggregation queries.">
+  <meta name="keywords" content="SQL ecommerce project, ecommerce database schema, SQL project intermediate, products orders SQL, SQL join project, SQL aggregation project, monthly sales SQL">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/projects/ecommerce-schema.html">
+  <meta property="og:title" content="E-Commerce Schema – SQL Project with Joins &amp; Aggregation | ylearner">
+  <meta property="og:description" content="Intermediate SQL project: design an e-commerce database with users, products, categories, orders, and order_items. Write top-selling, revenue, and customer analytics queries.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/projects/ecommerce-schema.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"E-Commerce Schema SQL Project","description":"Build an e-commerce database schema and write complex JOIN and aggregation queries.","educationalLevel":"Intermediate","keywords":"SQL ecommerce project, JOIN, aggregation, schema design","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <span>Projects</span><span class="separator">›</span>
+          <span class="current">E-Commerce Schema</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🛠️ Projects</div>
+          <h1>E-Commerce Schema – SQL Project with Joins &amp; Aggregation</h1>
+          <p class="lesson-intro">In this intermediate project you'll design and build a realistic e-commerce database — users, products, categories, orders, and order line items — then write real analytical queries: top-selling products, revenue by category, customers with multiple orders, average order value, and monthly sales trends. This schema is also used in the follow-up Analytics Queries project.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 60 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="project-overview">Project Overview</h2>
+          <p>An e-commerce platform needs to track:</p>
+          <ul>
+            <li><strong>Users</strong> — registered customers with email and signup date.</li>
+            <li><strong>Categories</strong> — product taxonomy (Electronics, Books, Clothing, etc.).</li>
+            <li><strong>Products</strong> — items for sale with price, category, and stock.</li>
+            <li><strong>Orders</strong> — a customer's checkout event with a total and status.</li>
+            <li><strong>Order Items</strong> — the individual lines within an order (product, quantity, unit price at time of purchase).</li>
+          </ul>
+
+          <h2 id="schema-design">Schema Design</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Table</th><th>PK</th><th>Key Columns</th><th>Foreign Keys</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>categories</strong></td><td>id</td><td>name, parent_id (self-referential)</td><td>parent_id → categories</td></tr>
+                <tr><td><strong>users</strong></td><td>id</td><td>email, name, created_at</td><td>—</td></tr>
+                <tr><td><strong>products</strong></td><td>id</td><td>name, price, category_id, stock</td><td>category_id → categories</td></tr>
+                <tr><td><strong>orders</strong></td><td>id</td><td>user_id, status, total, created_at</td><td>user_id → users</td></tr>
+                <tr><td><strong>order_items</strong></td><td>(order_id, product_id)</td><td>quantity, unit_price</td><td>order_id → orders, product_id → products</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="create-tables">Create Tables</h2>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – DDL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">CREATE TABLE categories (
+  id        INT PRIMARY KEY,
+  name      VARCHAR(100) NOT NULL,
+  parent_id INT,
+  FOREIGN KEY (parent_id) REFERENCES categories(id)
+);
+
+CREATE TABLE users (
+  id         INT PRIMARY KEY,
+  name       VARCHAR(100) NOT NULL,
+  email      VARCHAR(150) UNIQUE NOT NULL,
+  created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE products (
+  id          INT PRIMARY KEY,
+  name        VARCHAR(200)  NOT NULL,
+  category_id INT           NOT NULL,
+  price       DECIMAL(10,2) NOT NULL,
+  stock       INT           NOT NULL DEFAULT 0,
+  created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (category_id) REFERENCES categories(id),
+  CHECK (price >= 0),
+  CHECK (stock >= 0)
+);
+
+CREATE TABLE orders (
+  id         INT PRIMARY KEY,
+  user_id    INT           NOT NULL,
+  status     VARCHAR(20)   NOT NULL DEFAULT 'pending',
+  total      DECIMAL(10,2) NOT NULL DEFAULT 0,
+  created_at TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  CHECK (status IN ('pending','processing','shipped','delivered','cancelled'))
+);
+
+CREATE TABLE order_items (
+  order_id   INT           NOT NULL,
+  product_id INT           NOT NULL,
+  quantity   INT           NOT NULL,
+  unit_price DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (order_id, product_id),
+  FOREIGN KEY (order_id)   REFERENCES orders(id)   ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT,
+  CHECK (quantity > 0)
+);
+
+-- Index FK columns for JOIN performance
+CREATE INDEX idx_products_category ON products(category_id);
+CREATE INDEX idx_orders_user       ON orders(user_id);
+CREATE INDEX idx_orders_created    ON orders(created_at);
+CREATE INDEX idx_items_product     ON order_items(product_id);</code></pre>
+          </div>
+
+          <h2 id="sample-data">Sample Data</h2>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – INSERT</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">INSERT INTO categories (id, name, parent_id) VALUES
+  (1, 'Electronics', NULL),
+  (2, 'Laptops',     1),
+  (3, 'Phones',      1),
+  (4, 'Books',       NULL),
+  (5, 'Clothing',    NULL);
+
+INSERT INTO users (id, name, email, created_at) VALUES
+  (1, 'Alice',   'alice@example.com',  '2023-01-10 09:00:00'),
+  (2, 'Bob',     'bob@example.com',    '2023-03-22 14:30:00'),
+  (3, 'Carol',   'carol@example.com',  '2023-06-15 11:00:00'),
+  (4, 'Dave',    'dave@example.com',   '2023-09-01 08:00:00'),
+  (5, 'Eve',     'eve@example.com',    '2024-01-05 16:00:00');
+
+INSERT INTO products (id, name, category_id, price, stock) VALUES
+  (1,  'MacBook Pro 16"',    2, 2499.00, 15),
+  (2,  'Dell XPS 15',        2, 1899.00, 20),
+  (3,  'iPhone 15 Pro',      3,  999.00, 50),
+  (4,  'Samsung Galaxy S24', 3,  849.00, 45),
+  (5,  'Clean Code (book)',  4,   35.00, 100),
+  (6,  'Dune (book)',        4,   18.00, 80),
+  (7,  'T-Shirt (Medium)',   5,   25.00, 200),
+  (8,  'Jeans (32x32)',      5,   65.00, 150),
+  (9,  'iPad Pro 12.9"',     1,  1099.00, 30),
+  (10, 'Wireless Keyboard',  1,   129.00, 75);
+
+INSERT INTO orders (id, user_id, status, total, created_at) VALUES
+  (1, 1, 'delivered',  2534.00, '2024-01-15 10:00:00'),
+  (2, 1, 'delivered',  1899.00, '2024-02-20 11:00:00'),
+  (3, 2, 'delivered',  1048.00, '2024-01-25 09:30:00'),
+  (4, 2, 'shipped',     107.00, '2024-03-05 14:00:00'),
+  (5, 3, 'delivered',  2499.00, '2024-02-10 08:00:00'),
+  (6, 3, 'processing',  194.00, '2024-03-18 15:00:00'),
+  (7, 4, 'delivered',   848.00, '2024-03-01 12:00:00'),
+  (8, 5, 'pending',    1228.00, '2024-03-20 16:30:00');
+
+INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES
+  (1,  1, 1, 2499.00), (1, 10, 1,  129.00),  -- Alice: MacBook + Keyboard
+  (2,  2, 1, 1899.00),                        -- Alice: Dell XPS
+  (3,  3, 1,  999.00), (3,  5, 1,   35.00), (3, 7, 1, 14.00),
+  (4,  6, 2,   18.00), (4,  7, 2,   25.00), (4, 10, 1, 21.00),
+  (5,  1, 1, 2499.00),                        -- Carol: MacBook
+  (6,  5, 2,   35.00), (6,  6, 2,   18.00), (6, 8, 1, 65.00), (6, 7, 1, 25.00),
+  (7,  4, 1,  849.00),
+  (8,  9, 1, 1099.00), (8,  5, 2,   35.00), (8, 7, 2, 25.00), (8, 6, 1, 9.00);</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="join-queries">JOIN Queries</h2>
+
+          <h3>Full order details with line items</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT
+  o.id                           AS order_id,
+  u.name                         AS customer,
+  p.name                         AS product,
+  c.name                         AS category,
+  oi.quantity,
+  oi.unit_price,
+  oi.quantity * oi.unit_price    AS line_total,
+  o.status,
+  o.created_at
+FROM orders o
+JOIN users       u  ON u.id  = o.user_id
+JOIN order_items oi ON oi.order_id = o.id
+JOIN products    p  ON p.id  = oi.product_id
+JOIN categories  c  ON c.id  = p.category_id
+ORDER BY o.id, p.name;</code></pre>
+          </div>
+
+          <h3>Customers with more than one order</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT
+  u.name,
+  u.email,
+  COUNT(o.id)      AS order_count,
+  SUM(o.total)     AS lifetime_value
+FROM users u
+JOIN orders o ON o.user_id = u.id
+GROUP BY u.id, u.name, u.email
+HAVING COUNT(o.id) > 1
+ORDER BY lifetime_value DESC;</code></pre>
+          </div>
+
+          <h2 id="analytics-queries">Analytics Queries</h2>
+
+          <h3>Top-selling products by revenue</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT
+  p.name                                         AS product,
+  c.name                                         AS category,
+  SUM(oi.quantity)                               AS units_sold,
+  SUM(oi.quantity * oi.unit_price)               AS total_revenue,
+  RANK() OVER (ORDER BY SUM(oi.quantity * oi.unit_price) DESC) AS revenue_rank
+FROM order_items oi
+JOIN products   p ON p.id = oi.product_id
+JOIN categories c ON c.id = p.category_id
+JOIN orders     o ON o.id = oi.order_id
+WHERE o.status != 'cancelled'
+GROUP BY p.id, p.name, c.name
+ORDER BY total_revenue DESC;</code></pre>
+          </div>
+
+          <h3>Revenue by category</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT
+  c.name                                   AS category,
+  COUNT(DISTINCT o.id)                     AS order_count,
+  SUM(oi.quantity * oi.unit_price)         AS revenue,
+  ROUND(
+    100.0 * SUM(oi.quantity * oi.unit_price) /
+    SUM(SUM(oi.quantity * oi.unit_price)) OVER (), 2
+  ) AS pct_of_total
+FROM order_items oi
+JOIN products   p ON p.id = oi.product_id
+JOIN categories c ON c.id = p.category_id
+JOIN orders     o ON o.id = oi.order_id
+WHERE o.status != 'cancelled'
+GROUP BY c.id, c.name
+ORDER BY revenue DESC;</code></pre>
+          </div>
+
+          <h3>Average order value and order frequency per customer</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT
+  u.name,
+  COUNT(o.id)                AS total_orders,
+  ROUND(AVG(o.total), 2)    AS avg_order_value,
+  ROUND(SUM(o.total), 2)    AS total_spent,
+  MIN(o.created_at::DATE)   AS first_order,
+  MAX(o.created_at::DATE)   AS last_order
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.id AND o.status != 'cancelled'
+GROUP BY u.id, u.name
+ORDER BY total_spent DESC NULLS LAST;</code></pre>
+          </div>
+
+          <h3>Monthly sales trend</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – PostgreSQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT
+  DATE_TRUNC('month', o.created_at)   AS month,
+  COUNT(DISTINCT o.id)                AS orders,
+  COUNT(DISTINCT o.user_id)           AS unique_customers,
+  SUM(o.total)                        AS revenue,
+  ROUND(AVG(o.total), 2)             AS avg_order_value
+FROM orders o
+WHERE o.status != 'cancelled'
+GROUP BY 1
+ORDER BY 1;</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Designed a 5-table normalized e-commerce schema: categories, users, products, orders, order_items.</li>
+              <li>Used composite PK on order_items, CHECK constraints on status/price/stock, ON DELETE CASCADE for items.</li>
+              <li>Indexed all FK columns and the orders.created_at column for time-series queries.</li>
+              <li>Wrote 4-table JOINs to produce full order detail reports.</li>
+              <li>Analytical queries: top-selling products with window RANK, revenue by category with percentage share, monthly trend with DATE_TRUNC.</li>
+              <li>This dataset is used as-is in the next project: <a href="/sql/projects/analytics-queries.html">Analytics Queries</a>.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/projects/library-database.html" class="topic-tag sql-topic-tag">🗄️ Library Database</a>
+            <a href="/sql/projects/analytics-queries.html" class="topic-tag sql-topic-tag">🗄️ Analytics Queries</a>
+            <a href="/sql/advanced/normalization.html" class="topic-tag sql-topic-tag">🗄️ Normalization</a>
+            <a href="/sql/advanced/indexes.html" class="topic-tag sql-topic-tag">🗄️ Indexes</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why store unit_price in order_items instead of using products.price? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Product prices change over time. If you look up the current price from the products table when querying historical orders, the order total will appear wrong after any price update. Storing <code>unit_price</code> in order_items captures the price at the moment of purchase — this is a standard e-commerce schema pattern. The products table price is used only for the current listing price; the order_items price is the historical record.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How does ON DELETE CASCADE on order_items work? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>If you delete a row from orders, all related rows in order_items are automatically deleted. This is appropriate here because order items have no meaning without the parent order. The opposite direction (products) uses ON DELETE RESTRICT — you cannot delete a product that has been ordered, preserving the historical record. Always think carefully about which direction CASCADE is appropriate.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the purpose of the parent_id column in categories? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>parent_id</code> creates a self-referential hierarchy in the categories table. "Laptops" (parent_id = 1) and "Phones" (parent_id = 1) are subcategories of "Electronics" (parent_id = NULL). This allows multiple levels of categorization without creating separate tables for each level. To query the full category hierarchy, use a recursive CTE — the same pattern as the employee hierarchy in the Exercises page.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How should I handle currency in a real system? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For a production system: (1) Store all amounts as integers in the smallest currency unit (cents/pence) to avoid floating-point rounding errors — $9.99 stored as 999. (2) Add a currency column or a global currency setting. (3) DECIMAL(10,2) is acceptable for learning projects and small-scale apps, but be aware of rounding at scale. Never use FLOAT for money in any production system — floating-point precision issues will eventually cause calculation errors.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/projects/library-database.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Library Database</span>
+          </a>
+          <a href="/sql/projects/analytics-queries.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Analytics Queries</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

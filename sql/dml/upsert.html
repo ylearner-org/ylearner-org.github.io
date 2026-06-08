@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL UPSERT – INSERT or UPDATE on Conflict | ylearner</title>
+  <meta name="description" content="Learn SQL UPSERT: insert a row if it doesn't exist, or update it if it does. Covers PostgreSQL ON CONFLICT, MySQL ON DUPLICATE KEY UPDATE, and SQLite INSERT OR REPLACE.">
+  <meta name="keywords" content="SQL UPSERT, ON CONFLICT, ON DUPLICATE KEY UPDATE, INSERT OR REPLACE, SQL merge rows, SQL idempotent insert, SQL insert update">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/dml/upsert.html">
+  <meta property="og:title" content="SQL UPSERT – INSERT or UPDATE on Conflict | ylearner">
+  <meta property="og:description" content="Master SQL UPSERT across databases: PostgreSQL ON CONFLICT DO UPDATE, MySQL ON DUPLICATE KEY UPDATE, SQLite INSERT OR REPLACE, and real use cases.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/dml/upsert.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL UPSERT","description":"SQL UPSERT patterns: PostgreSQL ON CONFLICT, MySQL ON DUPLICATE KEY UPDATE, SQLite INSERT OR REPLACE. Use cases include syncing, counters, and last-seen timestamps.","educationalLevel":"Intermediate","keywords":"SQL UPSERT, ON CONFLICT, ON DUPLICATE KEY UPDATE, INSERT OR REPLACE","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/dml/upsert.html">DML</a><span class="separator">›</span>
+          <span class="current">UPSERT</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">✏️ Data Modification</div>
+          <h1>SQL UPSERT – INSERT or UPDATE on Conflict</h1>
+          <p class="lesson-intro">UPSERT combines INSERT and UPDATE into a single atomic operation: if the row does not exist, insert it; if it already exists (based on a unique key), update it. This is a common requirement for data synchronisation, counters, and idempotent data pipelines.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-upsert">What Is UPSERT?</h2>
+          <p>Without UPSERT, you would need to check for existence first, then branch to INSERT or UPDATE. This is a race condition waiting to happen in concurrent applications:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- The unsafe manual approach (race condition between SELECT and INSERT)
+SELECT id FROM user_settings WHERE user_id = 42;
+-- If row exists: UPDATE ...
+-- If not: INSERT ...
+
+-- UPSERT solves this atomically in one statement</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>UPSERT is not standard SQL</strong>
+              <p>The SQL standard defines a MERGE statement (covered below) but every major database has its own UPSERT syntax. PostgreSQL, MySQL, and SQLite all use different keywords. Choose the syntax for your target database.</p>
+            </div>
+          </div>
+
+          <h2 id="postgresql-syntax">PostgreSQL: ON CONFLICT</h2>
+          <p>PostgreSQL's UPSERT uses <code>ON CONFLICT (unique_column) DO UPDATE SET</code>. The special <code>EXCLUDED</code> pseudo-table holds the values from the attempted insert:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Upsert a user setting: insert if not present, update if exists
+INSERT INTO user_settings (user_id, theme, notifications)
+VALUES (42, 'dark', true)
+ON CONFLICT (user_id)
+DO UPDATE SET
+    theme         = EXCLUDED.theme,
+    notifications = EXCLUDED.notifications,
+    updated_at    = NOW();
+-- EXCLUDED.theme refers to the 'dark' value from the attempted INSERT</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Increment a page view counter (insert on first visit, increment on subsequent)
+INSERT INTO page_views (page_slug, view_count)
+VALUES ('/home', 1)
+ON CONFLICT (page_slug)
+DO UPDATE SET
+    view_count = page_views.view_count + 1,
+    last_viewed = NOW();
+
+-- Do nothing on conflict (idempotent insert)
+INSERT INTO events (event_id, event_type, payload)
+VALUES ('evt_001', 'signup', '{"email":"a@b.com"}')
+ON CONFLICT (event_id)
+DO NOTHING;   -- silently skip if event_id already exists</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="mysql-syntax">MySQL: ON DUPLICATE KEY UPDATE</h2>
+          <p>MySQL triggers UPSERT when a unique or primary key constraint is violated:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- MySQL UPSERT: ON DUPLICATE KEY UPDATE
+INSERT INTO user_settings (user_id, theme, notifications)
+VALUES (42, 'dark', 1)
+ON DUPLICATE KEY UPDATE
+    theme         = VALUES(theme),
+    notifications = VALUES(notifications),
+    updated_at    = NOW();
+-- VALUES(col) refers to the value from the INSERT clause
+
+-- MySQL 8.0.20+ alias syntax (VALUES() is deprecated in newer versions):
+INSERT INTO user_settings (user_id, theme)
+VALUES (42, 'dark') AS new_row
+ON DUPLICATE KEY UPDATE
+    theme = new_row.theme;
+
+-- Increment counter with MySQL UPSERT
+INSERT INTO page_views (page_slug, view_count)
+VALUES ('/home', 1)
+ON DUPLICATE KEY UPDATE
+    view_count  = view_count + 1,
+    last_viewed = NOW();</code></pre>
+          </div>
+
+          <h2 id="sqlite-syntax">SQLite: INSERT OR REPLACE and ON CONFLICT</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- SQLite: INSERT OR REPLACE (deletes the old row, inserts a new one)
+-- ⚠️ This resets ALL columns and auto-increment ID — use with care
+INSERT OR REPLACE INTO user_settings (user_id, theme, notifications)
+VALUES (42, 'dark', 1);
+
+-- SQLite 3.24+: supports PostgreSQL-style ON CONFLICT syntax
+INSERT INTO user_settings (user_id, theme, notifications)
+VALUES (42, 'dark', 1)
+ON CONFLICT (user_id)
+DO UPDATE SET
+    theme         = excluded.theme,
+    notifications = excluded.notifications;
+
+-- SQLite: INSERT OR IGNORE (like ON CONFLICT DO NOTHING)
+INSERT OR IGNORE INTO events (event_id, payload)
+VALUES ('evt_001', '{}');</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>INSERT OR REPLACE vs ON CONFLICT DO UPDATE</strong>
+              <p>REPLACE (MySQL) and INSERT OR REPLACE (SQLite) delete the conflicting row first, then insert a new one. This: (1) changes the row's primary key / auto-increment ID; (2) resets any columns not in the INSERT to their defaults; (3) fires DELETE triggers then INSERT triggers. Use ON CONFLICT DO UPDATE / ON DUPLICATE KEY UPDATE to modify only specific columns in place.</p>
+            </div>
+          </div>
+
+          <h2 id="use-cases">Common Use Cases</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Use Case</th><th>Pattern</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Sync external data</td>
+                  <td>Upsert every row from a CSV/API — inserts new records, updates changed ones.</td>
+                </tr>
+                <tr>
+                  <td>Page / event counters</td>
+                  <td>Insert with count=1 on first occurrence, increment on subsequent.</td>
+                </tr>
+                <tr>
+                  <td>Last-seen timestamps</td>
+                  <td>Insert user + last_seen on first activity, update last_seen on subsequent.</td>
+                </tr>
+                <tr>
+                  <td>Idempotent pipelines</td>
+                  <td>ON CONFLICT DO NOTHING ensures re-running a job does not create duplicates.</td>
+                </tr>
+                <tr>
+                  <td>Feature flags / settings</td>
+                  <td>Insert default settings for new users, update specific keys for existing users.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Sync product catalogue from an external feed (PostgreSQL)
+INSERT INTO products (sku, name, price, stock, updated_at)
+SELECT sku, name, price, stock, NOW()
+FROM   staging_products           -- temporary staging table
+ON CONFLICT (sku)
+DO UPDATE SET
+    name       = EXCLUDED.name,
+    price      = EXCLUDED.price,
+    stock      = EXCLUDED.stock,
+    updated_at = EXCLUDED.updated_at
+WHERE  products.price   != EXCLUDED.price
+    OR products.stock   != EXCLUDED.stock
+    OR products.name    != EXCLUDED.name;
+-- The WHERE clause makes it a no-op if nothing changed (saves write I/O)</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>UPSERT</strong> atomically inserts a row if it does not exist, or updates it if it does — no race conditions.</li>
+              <li><strong>PostgreSQL</strong>: <code>INSERT ... ON CONFLICT (col) DO UPDATE SET col = EXCLUDED.col</code>.</li>
+              <li><strong>MySQL</strong>: <code>INSERT ... ON DUPLICATE KEY UPDATE col = VALUES(col)</code>.</li>
+              <li><strong>SQLite</strong>: <code>INSERT OR REPLACE</code> (full row replace) or <code>INSERT ... ON CONFLICT DO UPDATE</code> (3.24+).</li>
+              <li><code>ON CONFLICT DO NOTHING</code> / <code>INSERT OR IGNORE</code> silently skips duplicates — useful for idempotent inserts.</li>
+              <li>Use cases: data sync, counters, last-seen timestamps, idempotent pipelines.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/dml/insert-data.html" class="topic-tag sql-topic-tag">🗄️ INSERT Data</a>
+            <a href="/sql/dml/update-data.html" class="topic-tag sql-topic-tag">🗄️ UPDATE Data</a>
+            <a href="/sql/dml/transactions.html" class="topic-tag sql-topic-tag">🗄️ Transactions</a>
+            <a href="/sql/advanced/indexes.html" class="topic-tag sql-topic-tag">🗄️ Indexes</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the SQL MERGE statement and how does it differ from UPSERT? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>MERGE (SQL:2003 standard) is a more powerful version of UPSERT. It can INSERT, UPDATE, and DELETE in a single statement based on whether source rows match the target: <code>MERGE INTO target USING source ON condition WHEN MATCHED THEN UPDATE ... WHEN NOT MATCHED THEN INSERT ...</code>. Supported by SQL Server, Oracle, and PostgreSQL 15+. MySQL does not support MERGE. For simple insert-or-update, the database-specific UPSERT syntax is simpler and more readable.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can ON CONFLICT detect conflicts on multiple columns? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. PostgreSQL allows <code>ON CONFLICT (col1, col2)</code> to match a composite unique constraint. The conflict must be on a column or combination of columns covered by a UNIQUE or PRIMARY KEY constraint. You can also use <code>ON CONFLICT ON CONSTRAINT constraint_name</code> to reference a named constraint directly.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is UPSERT atomic? Could two concurrent UPSERTs create duplicate rows? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, UPSERT is atomic in all major databases. The conflict detection and the insert/update operation are a single atomic unit — concurrent UPSERTs on the same unique key will not create duplicates. This is the entire point of UPSERT vs the manual SELECT → INSERT/UPDATE pattern, which has a race condition window between the SELECT and the subsequent write.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/dml/transactions.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Transactions</span>
+          </a>
+          <a href="/sql/advanced/indexes.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Indexes</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
