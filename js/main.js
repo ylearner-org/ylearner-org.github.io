@@ -673,6 +673,127 @@
     },
   ];
 
+  // ========================
+  // SQL Navigation Data
+  // ========================
+  const SQL_NAV_DATA = [
+    {
+      title: '🗄️ Introduction',
+      items: [
+        { title: 'What is SQL?', url: '/sql/what-is-sql.html' },
+        { title: 'Why Learn SQL?', url: '/sql/why-learn-sql.html' },
+        { title: 'SQL vs NoSQL', url: '/sql/sql-vs-nosql.html' },
+        { title: 'Database Concepts', url: '/sql/database-concepts.html' },
+        { title: 'SQL Installation & Setup', url: '/sql/sql-installation.html' },
+      ]
+    },
+    {
+      title: '🚀 SQL Basics',
+      items: [
+        { title: 'SELECT Statement', url: '/sql/basics/select-statement.html' },
+        { title: 'WHERE Clause', url: '/sql/basics/where-clause.html' },
+        { title: 'ORDER BY', url: '/sql/basics/order-by.html' },
+        { title: 'LIMIT & OFFSET', url: '/sql/basics/limit-offset.html' },
+        { title: 'DISTINCT', url: '/sql/basics/distinct.html' },
+        { title: 'Aliases (AS)', url: '/sql/basics/aliases.html' },
+      ]
+    },
+    {
+      title: '🏗️ Tables & Schema',
+      items: [
+        { title: 'SQL Data Types', url: '/sql/tables/data-types.html' },
+        { title: 'CREATE TABLE', url: '/sql/tables/create-table.html' },
+        { title: 'ALTER TABLE', url: '/sql/tables/alter-table.html' },
+        { title: 'DROP TABLE', url: '/sql/tables/drop-table.html' },
+        { title: 'Constraints', url: '/sql/tables/constraints.html' },
+      ]
+    },
+    {
+      title: '🔍 Filtering',
+      items: [
+        { title: 'Comparison Operators', url: '/sql/filtering/comparison-operators.html' },
+        { title: 'Logical Operators (AND, OR, NOT)', url: '/sql/filtering/logical-operators.html' },
+        { title: 'LIKE & Pattern Matching', url: '/sql/filtering/like-pattern.html' },
+        { title: 'BETWEEN & IN', url: '/sql/filtering/between-in.html' },
+      ]
+    },
+    {
+      title: '⚙️ SQL Functions',
+      items: [
+        { title: 'String Functions', url: '/sql/functions/string-functions.html' },
+        { title: 'Numeric Functions', url: '/sql/functions/numeric-functions.html' },
+        { title: 'Date & Time Functions', url: '/sql/functions/date-functions.html' },
+        { title: 'Aggregate Functions', url: '/sql/functions/aggregate-functions.html' },
+        { title: 'NULL Handling', url: '/sql/functions/null-functions.html' },
+        { title: 'CASE Expression', url: '/sql/functions/case-expression.html' },
+      ]
+    },
+    {
+      title: '🔗 Joins',
+      items: [
+        { title: 'Joins Overview', url: '/sql/joins/joins-overview.html' },
+        { title: 'INNER JOIN', url: '/sql/joins/inner-join.html' },
+        { title: 'LEFT & RIGHT JOIN', url: '/sql/joins/left-right-join.html' },
+        { title: 'FULL OUTER JOIN', url: '/sql/joins/full-outer-join.html' },
+        { title: 'Self Join', url: '/sql/joins/self-join.html' },
+        { title: 'CROSS JOIN', url: '/sql/joins/cross-join.html' },
+      ]
+    },
+    {
+      title: '📊 Grouping & Aggregation',
+      items: [
+        { title: 'GROUP BY', url: '/sql/grouping/group-by.html' },
+        { title: 'HAVING Clause', url: '/sql/grouping/having-clause.html' },
+        { title: 'ROLLUP & CUBE', url: '/sql/grouping/rollup-cube.html' },
+        { title: 'Window Functions', url: '/sql/grouping/window-functions.html', badge: 'hot' },
+      ]
+    },
+    {
+      title: '🪆 Subqueries',
+      items: [
+        { title: 'Subqueries Intro', url: '/sql/subqueries/subqueries-intro.html' },
+        { title: 'Correlated Subqueries', url: '/sql/subqueries/correlated-subqueries.html' },
+        { title: 'EXISTS & IN', url: '/sql/subqueries/exists-in.html' },
+        { title: 'CTEs (WITH clause)', url: '/sql/subqueries/cte-with.html' },
+      ]
+    },
+    {
+      title: '✏️ Data Modification',
+      items: [
+        { title: 'INSERT Data', url: '/sql/dml/insert-data.html' },
+        { title: 'UPDATE Data', url: '/sql/dml/update-data.html' },
+        { title: 'DELETE Data', url: '/sql/dml/delete-data.html' },
+        { title: 'Transactions', url: '/sql/dml/transactions.html' },
+        { title: 'UPSERT (ON CONFLICT)', url: '/sql/dml/upsert.html' },
+      ]
+    },
+    {
+      title: '🔧 Advanced SQL',
+      items: [
+        { title: 'Indexes', url: '/sql/advanced/indexes.html' },
+        { title: 'Views', url: '/sql/advanced/views.html' },
+        { title: 'Stored Procedures', url: '/sql/advanced/stored-procedures.html' },
+        { title: 'Triggers', url: '/sql/advanced/triggers.html' },
+        { title: 'Normalization', url: '/sql/advanced/normalization.html' },
+      ]
+    },
+    {
+      title: '🎯 Interview Prep',
+      items: [
+        { title: 'SQL Interview Questions', url: '/sql/interview/questions.html', badge: 'hot' },
+        { title: 'SQL Exercises', url: '/sql/interview/exercises.html' },
+      ]
+    },
+    {
+      title: '🛠️ Projects',
+      items: [
+        { title: 'Library Database', url: '/sql/projects/library-database.html' },
+        { title: 'E-Commerce Schema', url: '/sql/projects/ecommerce-schema.html' },
+        { title: 'Analytics Queries', url: '/sql/projects/analytics-queries.html' },
+      ]
+    },
+  ];
+
   function getNavData() {
     const path = window.location.pathname;
     if (path.includes('/javascript/')) return JS_NAV_DATA;
@@ -680,6 +801,7 @@
     if (path.includes('/html/')) return HTML_NAV_DATA;
     if (path.includes('/csslessons/')) return CSS_NAV_DATA;
     if (path.includes('/git/')) return GIT_NAV_DATA;
+    if (path.includes('/sql/')) return SQL_NAV_DATA;
     return NAV_DATA;
   }
 
@@ -690,11 +812,12 @@
     if (url.includes('/html/'))       return 'HTML';
     if (url.includes('/csslessons/')) return 'CSS';
     if (url.includes('/git/'))        return 'Git';
+    if (url.includes('/sql/'))        return 'SQL';
     return '';
   }
 
   // Search index (with BASE-prefixed URLs for file:// searches)
-  const SEARCH_INDEX = [...NAV_DATA, ...JS_NAV_DATA, ...OWL_NAV_DATA, ...HTML_NAV_DATA, ...CSS_NAV_DATA, ...GIT_NAV_DATA].flatMap(section =>
+  const SEARCH_INDEX = [...NAV_DATA, ...JS_NAV_DATA, ...OWL_NAV_DATA, ...HTML_NAV_DATA, ...CSS_NAV_DATA, ...GIT_NAV_DATA, ...SQL_NAV_DATA].flatMap(section =>
     section.items.map(item => {
       const course = courseFromUrl(item.url);
       const sectionName = section.title.replace(/^.{2}\s/, '');
