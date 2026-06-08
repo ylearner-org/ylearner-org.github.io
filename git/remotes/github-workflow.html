@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Pull Request Workflow – Fork, Clone, Branch, PR | ylearner</title>
+  <meta name="description" content="Learn the complete GitHub pull request workflow: fork a repository, clone it, create a branch, push your changes, open a PR, respond to code review, and sync your fork.">
+  <meta name="keywords" content="github pull request workflow, fork clone branch PR, open source contribution, github fork tutorial, git pull request, code review github">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/git/remotes/github-workflow.html">
+  <meta property="og:title" content="GitHub Pull Request Workflow – Fork, Clone, Branch, PR | ylearner">
+  <meta property="og:description" content="Master the complete GitHub collaboration workflow: fork, clone, branch, push, open a pull request, handle code review, and keep your fork in sync with upstream.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/git/remotes/github-workflow.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"GitHub Pull Request Workflow – Fork, Clone, Branch, PR","description":"Step-by-step guide to the complete GitHub pull request workflow for open-source contribution: fork, clone, branch, push, PR, code review, and fork sync.","educationalLevel":"Beginner","keywords":"github pull request, fork clone branch PR, open source contribution","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <a href="/git/remotes/remotes-overview.html">Remote Repositories</a><span class="separator">›</span>
+          <span class="current">GitHub PR Workflow</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 Remote Repositories</div>
+          <h1>GitHub Pull Request Workflow – Fork, Clone, Branch, PR</h1>
+          <p class="lesson-intro">The pull request workflow is how the entire open-source ecosystem collaborates. Whether you're contributing to a popular library, a company project, or a friend's side project, the same pattern applies: fork, clone, branch, push, open PR. This lesson walks through every step so you can make your first real contribution with confidence.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="fork-vs-clone">Fork vs Clone</h2>
+          <p>These two terms are often confused because they sound similar but serve different purposes:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th></th><th>Fork</th><th>Clone</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>What</strong></td>
+                  <td>Creates YOUR copy of the repo on GitHub's servers</td>
+                  <td>Downloads a repo (or fork) to your local machine</td>
+                </tr>
+                <tr>
+                  <td><strong>Where</strong></td>
+                  <td>GitHub web interface (one click)</td>
+                  <td>Your terminal (<code>git clone &lt;url&gt;</code>)</td>
+                </tr>
+                <tr>
+                  <td><strong>Why</strong></td>
+                  <td>So you have a place to push changes without write access to the original</td>
+                  <td>So you can work on the code locally</td>
+                </tr>
+                <tr>
+                  <td><strong>Result</strong></td>
+                  <td>A new repo at <code>github.com/YOUR-USERNAME/repo-name</code></td>
+                  <td>A local copy in a folder on your computer</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>When do you need to fork?</strong>
+              <p>If you have write access to the repository (e.g., it's your own repo, or a team repo where you're a collaborator), you don't need to fork — clone directly and push branches. Forking is specifically for contributing to repos where you don't have write access.</p>
+            </div>
+          </div>
+
+          <h2 id="full-workflow">The Complete Open-Source Contribution Workflow</h2>
+          <p>Here's the full workflow from zero to merged PR:</p>
+
+          <h3>Step 1: Fork the repository on GitHub</h3>
+          <p>Go to the repo on GitHub and click the <strong>Fork</strong> button (top-right). GitHub creates a copy at <code>github.com/YOUR-USERNAME/repo-name</code>. This is now yours to push to.</p>
+
+          <h3>Step 2: Clone YOUR fork to your local machine</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Clone YOUR fork (not the original)
+git clone https://github.com/YOUR-USERNAME/repo-name.git
+cd repo-name
+
+# "origin" now points to YOUR fork
+git remote -v
+# origin  https://github.com/YOUR-USERNAME/repo-name.git (fetch)
+# origin  https://github.com/YOUR-USERNAME/repo-name.git (push)</code></pre>
+          </div>
+
+          <h3>Step 3: Add the original repo as "upstream"</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">git remote add upstream https://github.com/ORIGINAL-AUTHOR/repo-name.git
+
+git remote -v
+# origin    https://github.com/YOUR-USERNAME/repo-name.git (fetch)
+# origin    https://github.com/YOUR-USERNAME/repo-name.git (push)
+# upstream  https://github.com/ORIGINAL-AUTHOR/repo-name.git (fetch)
+# upstream  https://github.com/ORIGINAL-AUTHOR/repo-name.git (push)</code></pre>
+          </div>
+
+          <h3>Step 4: Create a feature branch</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Always branch off main (or the default branch)
+git switch main
+git switch -c fix/typo-in-readme</code></pre>
+          </div>
+
+          <h3>Step 5: Make your changes and commit</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Edit files, then stage and commit
+git add README.md
+git commit -m "fix: correct spelling of 'repository' in README"</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h3>Step 6: Push your branch to YOUR fork</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">git push -u origin fix/typo-in-readme
+# Counting objects: 3, done.
+# Branch 'fix/typo-in-readme' set up to track remote branch 'fix/typo-in-readme' from 'origin'.</code></pre>
+          </div>
+
+          <h3>Step 7: Open a Pull Request on GitHub</h3>
+          <p>Go to GitHub. You'll see a yellow banner: <em>"Your recently pushed branch: fix/typo-in-readme — Compare &amp; pull request"</em>. Click it.</p>
+          <ul>
+            <li><strong>Base repository</strong>: ORIGINAL-AUTHOR/repo-name, branch: main</li>
+            <li><strong>Head repository</strong>: YOUR-USERNAME/repo-name, branch: fix/typo-in-readme</li>
+          </ul>
+
+          <h2 id="creating-pr">Writing a Good PR Description</h2>
+          <p>A clear PR description helps reviewers understand your change quickly:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">## What does this PR do?
+Fixes a typo in README.md: "repositry" → "repository".
+
+## Why?
+Incorrect spelling in the getting-started section.
+
+## How to test?
+1. Open README.md
+2. Search for "repository" — should be spelled correctly throughout.
+
+## Checklist
+- [x] Typo fixed
+- [x] No other changes in this PR</code></pre>
+          </div>
+
+          <h2 id="code-review">Handling Code Review</h2>
+          <p>Reviewers may leave comments requesting changes. You <strong>don't need to close and reopen the PR</strong> — just push more commits to the same branch. The PR updates automatically.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Make the requested change
+git add README.md
+git commit -m "fix: also correct spelling in contributing guide per review"
+git push   # pushes to the same branch — PR updates automatically
+
+# If asked to squash commits before merging, use interactive rebase:
+git rebase -i main
+# Squash to one clean commit, force-push your branch:
+git push --force-with-lease</code></pre>
+          </div>
+
+          <h2 id="sync-fork">Keeping Your Fork in Sync with Upstream</h2>
+          <p>While your PR is being reviewed, the original repo may get new commits. Keep your fork up to date:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Fetch latest from the original repo
+git fetch upstream
+
+# Update your local main
+git switch main
+git merge upstream/main   # fast-forward if you haven't committed to main directly
+
+# Push the updated main to YOUR fork on GitHub
+git push origin main
+
+# Update your feature branch if needed
+git switch fix/typo-in-readme
+git rebase main   # rebase onto updated main</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>GitHub's "Sync fork" button</strong>
+              <p>GitHub also provides a "Sync fork" button on your fork's main page that updates your fork's default branch to match upstream. This is convenient but only updates the remote. You still need to run <code>git pull</code> locally to get those changes on your machine.</p>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Fork</strong> = your copy of someone else's repo on GitHub (needed when you don't have write access).</li>
+              <li><strong>Clone</strong> = download a repo to your local machine.</li>
+              <li>Complete workflow: Fork → Clone → <code>git remote add upstream</code> → <code>git switch -c branch</code> → commit → <code>git push -u origin branch</code> → open PR.</li>
+              <li>A PR is opened from <em>your fork's branch</em> to <em>upstream's main</em>. GitHub shows the diff clearly.</li>
+              <li>To respond to review: push more commits to the same branch — the PR updates automatically.</li>
+              <li>Sync fork: <code>git fetch upstream</code> + <code>git merge upstream/main</code> on your local main, then push to origin.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/git/remotes/push-pull-fetch.html" class="topic-tag git-topic-tag">🔀 Push, Pull &amp; Fetch</a>
+            <a href="/git/remotes/ssh-keys.html" class="topic-tag git-topic-tag">🔀 SSH Keys</a>
+            <a href="/git/workflows/feature-branch-workflow.html" class="topic-tag git-topic-tag">🔀 Feature Branch Workflow</a>
+            <a href="/git/projects/open-source-contribution.html" class="topic-tag git-topic-tag">🔀 Open Source Contribution Project</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Do I always need to fork before contributing? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — only when you don't have write access to the repository. If you're a collaborator on a team repo, you can clone directly and push branches without forking. Forking is the mechanism that allows anyone to contribute to any public repo on GitHub without needing special permissions from the repo owner.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I have multiple open PRs from the same fork? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — each PR is tied to a specific branch, not the fork as a whole. You can have one branch for a bug fix and another for a new feature, each with its own open PR simultaneously. Just make sure each branch is based off the latest main and they don't modify the same files in conflicting ways.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">After my PR is merged, should I delete my fork? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not necessarily. Keeping your fork is useful if you plan to contribute again. Delete the feature branch (<code>git branch -d fix/typo-in-readme</code> locally, and on GitHub via the PR page's "Delete branch" button). Sync your fork's main with upstream so it's ready for your next contribution. Only delete the fork entirely if you're done contributing to that project.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What's the difference between a PR and a merge request? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>They're the same concept with different names. GitHub calls it a "Pull Request" (PR). GitLab calls it a "Merge Request" (MR). Bitbucket also uses "Pull Request". The workflow is identical: you're requesting that someone pull/merge your branch into their branch. The terminology difference is purely platform convention.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/remotes/push-pull-fetch.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Push, Pull &amp; Fetch</span>
+          </a>
+          <a href="/git/remotes/ssh-keys.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">SSH Keys</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -23,6 +23,7 @@
     .form-group textarea { resize: vertical; min-height: 140px; }
   </style>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -96,6 +97,9 @@
       <div id="successMsg" style="display:none;margin-top:1rem;padding:1rem;background:var(--bg-success);border:1px solid #22c55e;border-radius:8px;color:#16a34a;font-weight:600;">
         ✅ Thank you! Your message has been received. We'll get back to you soon.
       </div>
+      <div id="errorMsg" style="display:none;margin-top:1rem;padding:1rem;background:#fef2f2;border:1px solid #f87171;border-radius:8px;color:#dc2626;font-weight:600;">
+        ❌ Something went wrong. Please try again or email us directly.
+      </div>
     </div>
 
     <div style="margin-top:3rem;padding-top:2rem;border-top:1px solid var(--border-color);">
@@ -113,10 +117,27 @@
 
   <script src="js/main.js"></script>
   <script>
+    emailjs.init('EaQ03qGgwHrtCQWfQ');
+
     function handleSubmit(e) {
       e.preventDefault();
-      document.getElementById('contactForm').style.display = 'none';
-      document.getElementById('successMsg').style.display = 'block';
+
+      const btn = e.target.querySelector('button[type="submit"]');
+      const errorEl = document.getElementById('errorMsg');
+
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      errorEl.style.display = 'none';
+
+      emailjs.sendForm('service_lg3k028', 'template_w2s6l6g', e.target)
+        .then(function () {
+          e.target.style.display = 'none';
+          document.getElementById('successMsg').style.display = 'block';
+        }, function () {
+          btn.disabled = false;
+          btn.textContent = 'Send Message';
+          errorEl.style.display = 'block';
+        });
     }
   </script>
 </body>

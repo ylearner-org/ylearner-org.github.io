@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feature Branch Workflow – The Standard Team Git Workflow | ylearner</title>
+  <meta name="description" content="Learn the Feature Branch Workflow: the most widely used team Git workflow. Every feature gets its own branch, merged to main via pull request. Covers naming, PR process, and trunk-based development.">
+  <meta name="keywords" content="feature branch workflow, git feature branch, pull request workflow, branch naming conventions, trunk based development, github flow, team git workflow">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/git/workflows/feature-branch-workflow.html">
+  <meta property="og:title" content="Feature Branch Workflow – The Standard Team Git Workflow | ylearner">
+  <meta property="og:description" content="Master the Feature Branch Workflow: branch per feature, pull requests, code review, and CI checks before merging to a always-deployable main branch.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/git/workflows/feature-branch-workflow.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Feature Branch Workflow – The Standard Team Git Workflow","description":"Learn the Feature Branch Workflow: every feature gets its own branch, merged to main via pull request with code review and CI checks.","educationalLevel":"Intermediate","keywords":"feature branch workflow, pull request workflow, git branching","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <span>Workflows</span><span class="separator">›</span>
+          <span class="current">Feature Branch Workflow</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔀 Workflows</div>
+          <h1>Feature Branch Workflow – The Standard Team Git Workflow</h1>
+          <p class="lesson-intro">The Feature Branch Workflow (also called GitHub Flow) is the most widely adopted team Git workflow in 2026. The core idea is simple: <code>main</code> is always deployable, and all work — features, bug fixes, documentation — happens in dedicated branches merged via pull requests. If you're working on a team or contributing to open source, this is the workflow you need to master.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-fbw">What Is the Feature Branch Workflow?</h2>
+          <p>The workflow has three non-negotiable rules:</p>
+          <ol>
+            <li><strong>main is always deployable</strong> — every commit on main could theoretically be deployed to production right now</li>
+            <li><strong>No direct commits to main</strong> — all changes go through a branch and a pull request</li>
+            <li><strong>PRs require code review and CI checks</strong> before merging</li>
+          </ol>
+
+          <p>Everything else — how you name branches, how many reviewers a PR needs, squash vs merge commits — is team convention built on top of these three rules.</p>
+
+          <h2 id="core-rules">Core Rules Explained</h2>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Why "main is always deployable" matters</strong>
+              <p>When main is always deployable, you can respond to a production outage at any time. You don't need to find a "safe" point in history to roll back to — main IS the safe point. This discipline also catches integration problems early: when your feature branch is merged, any breakage is immediately visible and attributed to that specific merge.</p>
+            </div>
+          </div>
+
+          <h2 id="workflow-steps">Step-by-Step Workflow</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Step 1: Start from the latest main
+git switch main
+git pull origin main
+
+# Step 2: Create a descriptive feature branch
+git switch -c feature/user-profile-page
+
+# Step 3: Work on the feature — commit early and often
+git add src/pages/UserProfile.js
+git commit -m "feat(profile): add user profile page skeleton"
+
+git add src/pages/UserProfile.js src/api/users.js
+git commit -m "feat(profile): connect profile page to users API"
+
+git add src/pages/UserProfile.css
+git commit -m "style(profile): add responsive layout for profile page"
+
+# Step 4: Keep your branch up to date with main to avoid big conflicts
+git fetch origin
+git rebase origin/main  # or: git merge origin/main
+
+# Step 5: Push your branch to the remote
+git push -u origin feature/user-profile-page
+# -u sets the upstream — future pushes only need: git push
+
+# Step 6: Open a Pull Request on GitHub/GitLab
+# - Write a clear PR title and description
+# - Link to the related issue (#42)
+# - Request reviewers
+# CI/CD automatically runs tests on your branch
+
+# Step 7: Address review comments
+git add src/pages/UserProfile.js
+git commit -m "fix(profile): address code review feedback"
+git push
+
+# Step 8: After PR is approved and CI passes — merge!
+# (Done via GitHub/GitLab UI — squash merge or regular merge)
+
+# Step 9: Clean up — delete the feature branch
+git switch main
+git pull origin main
+git branch -d feature/user-profile-page</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="naming-conventions">Branch Naming Conventions</h2>
+          <p>Consistent branch naming helps the whole team understand what's being worked on at a glance:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Prefix</th><th>Used for</th><th>Example</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>feature/</code></td><td>New features</td><td><code>feature/user-authentication</code></td></tr>
+                <tr><td><code>bugfix/</code></td><td>Bug fixes in development</td><td><code>bugfix/login-null-pointer</code></td></tr>
+                <tr><td><code>hotfix/</code></td><td>Urgent production fixes</td><td><code>hotfix/payment-crash-v2.1</code></td></tr>
+                <tr><td><code>chore/</code></td><td>Maintenance, config, tooling</td><td><code>chore/upgrade-dependencies</code></td></tr>
+                <tr><td><code>docs/</code></td><td>Documentation only changes</td><td><code>docs/update-api-readme</code></td></tr>
+                <tr><td><code>refactor/</code></td><td>Code refactoring</td><td><code>refactor/extract-auth-service</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Include the issue number in your branch name</strong>
+              <p>Many teams include the issue/ticket number: <code>feature/GH-42-user-profile</code> or <code>bugfix/JIRA-1234-fix-payment</code>. This creates an instant link between the branch and the requirements/bug report, and GitHub automatically links commits to issues when the branch name contains the issue number.</p>
+            </div>
+          </div>
+
+          <h2 id="pr-process">The Pull Request Process</h2>
+          <p>A good pull request makes the reviewer's job easy:</p>
+          <ul>
+            <li><strong>Title</strong>: short, imperative mood — "Add user profile page" (not "Added" or "Adding")</li>
+            <li><strong>Description</strong>: what changed, why, how to test it, screenshots for UI changes</li>
+            <li><strong>Link to issue</strong>: "Closes #42" in the description auto-closes the issue on merge</li>
+            <li><strong>Small scope</strong>: a PR should do one thing — a 500-line PR is hard to review; ten 50-line PRs are much better</li>
+            <li><strong>CI/CD must pass</strong>: never merge a red PR</li>
+          </ul>
+
+          <h2 id="trunk-based">Trunk-Based Development — The Even Simpler Version</h2>
+          <p>Trunk-based development is a variation where feature branches are extremely short-lived (less than a day) or developers commit directly to main using <strong>feature flags</strong> to hide incomplete features from users:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-javascript">// Feature flag pattern — incomplete feature is in main but hidden
+if (featureFlags.isEnabled('new-dashboard')) {
+  return &lt;NewDashboard /&gt;;
+}
+return &lt;OldDashboard /&gt;;</code></pre>
+          </div>
+
+          <h2 id="comparison">Workflow Comparison</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Aspect</th><th>Git Flow</th><th>Feature Branch (GitHub Flow)</th><th>Trunk-Based</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Permanent branches</td><td>main + develop</td><td>main only</td><td>main only</td></tr>
+                <tr><td>Branch lifespan</td><td>Days to weeks</td><td>Hours to days</td><td>Hours or none</td></tr>
+                <tr><td>Release cadence</td><td>Versioned releases</td><td>Continuous</td><td>Continuous (multiple/day)</td></tr>
+                <tr><td>Complexity</td><td>High</td><td>Medium</td><td>Low</td></tr>
+                <tr><td>Best for</td><td>Versioned software</td><td>Most web teams</td><td>Elite DevOps teams</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>The three non-negotiable rules: <strong>main is always deployable</strong>, no direct commits to main, PRs require review + CI.</li>
+              <li>Workflow: pull main → create branch → work → push → open PR → review → merge → delete branch.</li>
+              <li>Use <strong>git push -u origin branch-name</strong> on first push to set upstream tracking.</li>
+              <li>Branch naming: use prefixes like <code>feature/</code>, <code>bugfix/</code>, <code>hotfix/</code>, <code>chore/</code>, <code>docs/</code>.</li>
+              <li>Good PRs: clear title, description, linked issue, small scope, passing CI.</li>
+              <li><strong>Trunk-based development</strong>: same idea but with very short-lived branches + feature flags.</li>
+              <li>Feature Branch Workflow is the right default for most teams in 2026.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/git/workflows/gitflow.html" class="topic-tag git-topic-tag">🔀 Git Flow</a>
+            <a href="/git/workflows/conventional-commits.html" class="topic-tag git-topic-tag">🔀 Conventional Commits</a>
+            <a href="/git/remotes/github-workflow.html" class="topic-tag git-topic-tag">🔀 GitHub Workflow</a>
+            <a href="/git/projects/team-workflow.html" class="topic-tag git-topic-tag">🛠️ Team Workflow Project</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Should I squash, merge, or rebase when merging a PR? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><strong>Squash merge</strong>: all commits on the feature branch are squashed into one clean commit on main. Best for keeping main history linear and readable — especially when individual commits on the branch are messy WIP commits. <strong>Merge commit</strong>: preserves the full branch history with a merge commit. Useful when commits are well-crafted and you want to keep the context. <strong>Rebase</strong>: replays branch commits on top of main with no merge commit — cleanest history but rewrites commit hashes. Most teams default to squash merge for PRs, using the PR title as the commit message.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I keep my feature branch up to date with main? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Two options: <strong>merge</strong> (<code>git merge origin/main</code>) — adds a merge commit to your branch preserving its history; or <strong>rebase</strong> (<code>git rebase origin/main</code>) — replays your commits on top of the latest main, resulting in a linear history. Rebase is generally preferred for feature branches to keep history clean, but it rewrites commit hashes which requires a force-push if you've already pushed the branch. For solo branches (only you), rebasing is usually the better choice.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What if my feature takes 2 weeks and main has moved a lot? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Long-lived branches are a sign that the feature is too large. Consider breaking it into smaller pieces (each merged via a separate PR). If the feature must be long-lived, rebase onto main frequently (daily) to catch conflicts early while they're still small. Some teams use feature flags to merge incomplete features: the code is in main but hidden behind a flag, and the flag is enabled when the feature is done.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is "draft pull request" and when should I use it? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A draft PR on GitHub signals "I'm still working on this, not ready for review yet." It's useful for: getting early feedback on your approach, running CI on a work-in-progress, making your work visible to the team without triggering a review request. Convert the draft to a regular PR when it's ready for review by clicking "Ready for review". Draft PRs are a great habit — they increase team visibility and enable collaboration earlier in the development process.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/workflows/gitflow.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Git Flow</span>
+          </a>
+          <a href="/git/workflows/conventional-commits.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Conventional Commits</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
