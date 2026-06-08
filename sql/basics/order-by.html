@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL ORDER BY – Sorting Query Results | ylearner</title>
+  <meta name="description" content="Learn the SQL ORDER BY clause: sort results ascending or descending, order by multiple columns, sort by expressions, and handle NULL ordering. Beginner-friendly with practical examples.">
+  <meta name="keywords" content="SQL ORDER BY, SQL sort results, ORDER BY ASC DESC, SQL sort multiple columns, SQL NULL ordering, ORDER BY expression, SQL basics">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/basics/order-by.html">
+  <meta property="og:title" content="SQL ORDER BY – Sorting Query Results | ylearner">
+  <meta property="og:description" content="Master the SQL ORDER BY clause — sort results ASC or DESC, order by multiple columns and expressions, and understand NULL ordering behaviour.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/basics/order-by.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL ORDER BY – Sorting Query Results","description":"Master the SQL ORDER BY clause: ASC/DESC sorting, multiple-column ordering, expression sorting, and NULL handling.","educationalLevel":"Beginner","keywords":"SQL ORDER BY, sort results, ASC DESC, NULL ordering","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/basics/select-statement.html">SQL Basics</a><span class="separator">›</span>
+          <span class="current">ORDER BY</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 SQL Basics</div>
+          <h1>SQL ORDER BY – Sorting Query Results</h1>
+          <p class="lesson-intro">Without an <code>ORDER BY</code> clause, the order of rows returned by a SQL query is <strong>undefined</strong> — the database may return them in any order it finds convenient, and that order can change between runs. Whenever a specific sort order matters — top salaries, newest orders, alphabetical lists — you need <code>ORDER BY</code>. This lesson covers ascending and descending sorts, multi-column ordering, sorting by expressions, and how different databases handle NULLs in sorted results.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 12 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="order-by-syntax">ORDER BY Syntax</h2>
+          <p><code>ORDER BY</code> is placed at the <strong>end</strong> of a SELECT statement, after WHERE (if present). You specify the column to sort by, followed by the direction.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT column1, column2
+FROM table_name
+WHERE condition          -- optional
+ORDER BY sort_column [ASC | DESC];</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>ORDER BY runs AFTER WHERE and SELECT</strong>
+              <p>In the logical execution order, ORDER BY is the last clause to run. This means you <em>can</em> use column aliases defined in SELECT inside ORDER BY — because by that point, the aliases have already been established. This is the opposite of WHERE, which runs before SELECT.</p>
+            </div>
+          </div>
+
+          <h2 id="asc-desc">ASC and DESC</h2>
+          <p>The two sort directions are:</p>
+          <ul>
+            <li><strong>ASC</strong> (ascending) — smallest to largest, A to Z, oldest to newest. This is the <strong>default</strong> — you can omit it.</li>
+            <li><strong>DESC</strong> (descending) — largest to smallest, Z to A, newest to oldest.</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Sort by salary ascending (lowest first) — ASC is the default
+SELECT first_name, salary
+FROM employees
+ORDER BY salary;
+
+-- Same query, ASC explicit
+SELECT first_name, salary
+FROM employees
+ORDER BY salary ASC;
+
+-- Sort by salary descending (highest first)
+SELECT first_name, salary
+FROM employees
+ORDER BY salary DESC;
+
+-- Sort alphabetically by first name (A → Z)
+SELECT first_name, department
+FROM employees
+ORDER BY first_name ASC;
+
+-- Get the 5 most recent orders
+SELECT id, order_date, total
+FROM orders
+ORDER BY order_date DESC;</code></pre>
+          </div>
+
+          <h2 id="multiple-columns">Ordering by Multiple Columns</h2>
+          <p>You can sort by more than one column, separated by commas. The database sorts by the first column first; rows that have the same value in the first column are then sorted by the second column, and so on.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Sort by department A→Z, then by salary high→low within each department
+SELECT first_name, department, salary
+FROM employees
+ORDER BY department ASC, salary DESC;
+
+-- Result order: Engineering employees (Carol 91k, Alice 85k, Eve 77k),
+--               then Marketing employees (Bob 62k, David 58k)
+
+-- Sort by last name, then first name (tie-breaker)
+SELECT first_name, last_name
+FROM customers
+ORDER BY last_name ASC, first_name ASC;
+
+-- Each column can have its own direction
+SELECT product_name, category, price
+FROM products
+ORDER BY category ASC, price DESC;</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="order-by-expression">Sorting by Expressions</h2>
+          <p>You can sort by any expression — arithmetic, string functions, or even a column alias defined in SELECT.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Sort by a calculated expression (annual salary)
+SELECT first_name, salary, salary * 12 AS annual_salary
+FROM employees
+ORDER BY salary * 12 DESC;
+
+-- Sort using the column alias (works in ORDER BY because it runs after SELECT)
+SELECT first_name, salary * 12 AS annual_salary
+FROM employees
+ORDER BY annual_salary DESC;
+
+-- Sort by string length (shortest name first)
+SELECT first_name
+FROM employees
+ORDER BY LENGTH(first_name) ASC;
+
+-- Sort by year and month extracted from a date
+SELECT id, order_date
+FROM orders
+ORDER BY YEAR(order_date) DESC, MONTH(order_date) DESC;</code></pre>
+          </div>
+
+          <h2 id="null-ordering">NULL Ordering</h2>
+          <p>What happens to NULL values when you sort? Different databases handle this differently:</p>
+          <ul>
+            <li><strong>Most databases (PostgreSQL, SQLite, SQL Server)</strong>: NULLs sort as if they are <em>smaller</em> than any non-NULL value — so NULLs come <strong>first in ASC</strong> and <strong>last in DESC</strong>.</li>
+            <li><strong>MySQL and MariaDB</strong>: NULLs also sort first in ASC (treated as less than any value), last in DESC.</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- In most databases: NULLs appear first when sorting ASC
+SELECT first_name, manager_id
+FROM employees
+ORDER BY manager_id ASC;
+-- Alice (NULL) appears first, then Bob (1), Carol (1), David (2), Eve (3)
+
+-- PostgreSQL: control NULL position with NULLS FIRST / NULLS LAST
+SELECT first_name, manager_id
+FROM employees
+ORDER BY manager_id ASC NULLS LAST;   -- push NULLs to the end
+
+SELECT first_name, manager_id
+FROM employees
+ORDER BY manager_id DESC NULLS FIRST; -- keep NULLs at the top
+
+-- MySQL workaround: use ISNULL() to push NULLs to the end
+SELECT first_name, manager_id
+FROM employees
+ORDER BY ISNULL(manager_id) ASC, manager_id ASC;</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always test NULL sorting in your specific database</strong>
+              <p><code>NULLS FIRST</code> and <code>NULLS LAST</code> are part of the SQL standard and supported by PostgreSQL and SQLite. MySQL does not support this syntax — use the <code>ISNULL(column)</code> workaround shown above. When NULL ordering matters to your application, test it explicitly rather than relying on default behaviour.</p>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Without <code>ORDER BY</code>, row order is <strong>undefined</strong> and unreliable — always sort when order matters.</li>
+              <li><code>ORDER BY column ASC</code> sorts smallest to largest (default). <code>ORDER BY column DESC</code> sorts largest to smallest.</li>
+              <li>Sort by <strong>multiple columns</strong> by separating them with commas — later columns act as tie-breakers.</li>
+              <li>You can sort by <strong>expressions</strong> and <strong>column aliases</strong> defined in SELECT (ORDER BY runs after SELECT).</li>
+              <li>NULLs sort first in ASC in most databases. Use <code>NULLS FIRST</code> / <code>NULLS LAST</code> (PostgreSQL/SQLite) or the <code>ISNULL()</code> workaround (MySQL) to control NULL position.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/basics/where-clause.html" class="topic-tag sql-topic-tag">🗄️ WHERE Clause</a>
+            <a href="/sql/basics/limit-offset.html" class="topic-tag sql-topic-tag">🗄️ LIMIT &amp; OFFSET</a>
+            <a href="/sql/basics/distinct.html" class="topic-tag sql-topic-tag">🗄️ DISTINCT</a>
+            <a href="/sql/basics/aliases.html" class="topic-tag sql-topic-tag">🗄️ SQL Aliases</a>
+            <a href="/sql/grouping/group-by.html" class="topic-tag sql-topic-tag">🗄️ GROUP BY</a>
+            <a href="/sql/grouping/window-functions.html" class="topic-tag sql-topic-tag">🗄️ Window Functions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does ORDER BY affect query performance? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — sorting requires work. For small result sets (a few thousand rows) the overhead is negligible. For large result sets, sorting can be expensive because the database must process all filtered rows and sort them before returning the first result. If you have a covering index on the sort column, the database can sometimes use the index order directly and avoid an explicit sort step. For most typical queries, ORDER BY is fine — just be aware of performance on very large unsorted result sets.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use ORDER BY with a column number instead of a name? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — <code>ORDER BY 2 DESC</code> sorts by the second column in the SELECT list. This syntax is supported by all major databases. It is convenient for quick queries in a database client, but it is a bad practice in application code because if you change the column order in SELECT, the sort column silently changes too. Always use column names in code that you maintain long-term.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is the result order guaranteed without ORDER BY? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — without ORDER BY, the SQL standard explicitly states that row order is <em>undefined</em>. In practice, databases often return rows in the order they were inserted or in index scan order, which can look predictable during development. But this is an implementation detail that can change with query plan changes, data distribution, or database upgrades. Never rely on implicit ordering in production code — if order matters, always use ORDER BY.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use ORDER BY with GROUP BY? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. ORDER BY runs after GROUP BY. You can sort by any column that appears in the GROUP BY clause or by an aggregate expression in the SELECT list. For example: <code>SELECT department, AVG(salary) AS avg_salary FROM employees GROUP BY department ORDER BY avg_salary DESC;</code> groups by department, calculates the average salary per group, then sorts the groups from highest to lowest average salary.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/basics/where-clause.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">WHERE Clause</span>
+          </a>
+          <a href="/sql/basics/limit-offset.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">LIMIT &amp; OFFSET</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

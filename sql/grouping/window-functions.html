@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Window Functions – ROW_NUMBER, RANK, LAG, SUM OVER | ylearner</title>
+  <meta name="description" content="Master SQL window functions: OVER, PARTITION BY, ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD, and running totals with SUM OVER. Full tutorial with examples.">
+  <meta name="keywords" content="SQL window functions, ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD, PARTITION BY, OVER clause, SQL running total, SQL analytics functions">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/grouping/window-functions.html">
+  <meta property="og:title" content="SQL Window Functions – ROW_NUMBER, RANK, LAG, SUM OVER | ylearner">
+  <meta property="og:description" content="Learn SQL window functions: compute rankings, running totals, and lead/lag comparisons across related rows without collapsing them like GROUP BY.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/grouping/window-functions.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Window Functions","description":"SQL window functions compute across related rows using OVER, PARTITION BY, and ORDER BY without collapsing rows. Covers ROW_NUMBER, RANK, LAG, LEAD, and running totals.","educationalLevel":"Advanced","keywords":"SQL window functions, ROW_NUMBER, RANK, LAG, LEAD, PARTITION BY","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/grouping/window-functions.html">Grouping</a><span class="separator">›</span>
+          <span class="current">Window Functions</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📊 Grouping &amp; Aggregation</div>
+          <h1>SQL Window Functions – ROW_NUMBER, RANK, LAG, SUM OVER</h1>
+          <p class="lesson-intro">Window functions are one of the most powerful features in modern SQL. Unlike GROUP BY which collapses rows, window functions compute a value for each row based on a related set of rows (the "window") — all without reducing the number of output rows. They unlock rankings, running totals, moving averages, and lead/lag comparisons in a single query.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-are-window-functions">What Are Window Functions?</h2>
+          <p>A window function computes a value for the current row by looking at a "window" of related rows defined by the OVER clause. All rows remain in the output — nothing is collapsed.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Feature</th><th>GROUP BY</th><th>Window Functions</th></tr></thead>
+              <tbody>
+                <tr><td>Output rows</td><td>One per group</td><td>Same as input</td></tr>
+                <tr><td>Access to individual rows?</td><td>No (collapsed)</td><td>Yes</td></tr>
+                <tr><td>Aggregate per partition?</td><td>Yes</td><td>Yes (via OVER)</td></tr>
+                <tr><td>Ranking, lead/lag?</td><td>No</td><td>Yes</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="over-clause">The OVER Clause</h2>
+          <p>Every window function requires an OVER clause. An empty OVER means "the entire result set is the window":</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">SELECT
+    name,
+    salary,
+    AVG(salary) OVER ()   AS company_avg_salary  -- window = all rows
+FROM employees;</code></pre>
+          </div>
+
+          <h2 id="partition-by">PARTITION BY</h2>
+          <p>PARTITION BY divides the rows into partitions (like GROUP BY, but rows are not collapsed). The window function resets and runs independently for each partition:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">SELECT
+    name,
+    department,
+    salary,
+    AVG(salary) OVER (PARTITION BY department) AS dept_avg_salary,
+    salary - AVG(salary) OVER (PARTITION BY department) AS diff_from_avg
+FROM employees
+ORDER BY department, salary DESC;</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Result (each row keeps its own salary AND sees the dept average)</div>
+            Alice | Engineering | 90000 | dept_avg=87500 | diff=+2500<br>
+            Bob   | Engineering | 85000 | dept_avg=87500 | diff=-2500<br>
+            Carol | Marketing   | 72000 | dept_avg=70000 | diff=+2000<br>
+            Dave  | Marketing   | 68000 | dept_avg=70000 | diff=-2000
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="order-by-in-window">ORDER BY Inside OVER</h2>
+          <p>Adding ORDER BY inside OVER defines the order within each partition. This is required for ranking functions and changes the frame for aggregate functions (from full partition to cumulative up-to-current-row):</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">SELECT
+    name,
+    department,
+    salary,
+    -- Cumulative sum within each department, ordered by salary desc
+    SUM(salary) OVER (
+        PARTITION BY department
+        ORDER BY salary DESC
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS cumulative_salary
+FROM employees;</code></pre>
+          </div>
+
+          <h2 id="row-number">ROW_NUMBER()</h2>
+          <p>Assigns a unique sequential integer to each row within its partition, with no gaps or ties:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Assign row numbers within each department, ordered by salary desc
+SELECT
+    name,
+    department,
+    salary,
+    ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS rn
+FROM employees;
+
+-- Get the top earner per department
+SELECT * FROM (
+    SELECT
+        name, department, salary,
+        ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS rn
+    FROM employees
+) ranked
+WHERE rn = 1;</code></pre>
+          </div>
+
+          <h2 id="rank-dense-rank">RANK() and DENSE_RANK()</h2>
+          <p>Both assign a rank based on ORDER BY. They differ in how they handle ties:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">SELECT
+    name,
+    salary,
+    RANK()       OVER (ORDER BY salary DESC) AS rank_with_gaps,
+    DENSE_RANK() OVER (ORDER BY salary DESC) AS rank_no_gaps
+FROM employees;</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Function</th><th>Ties?</th><th>Next rank after tie?</th><th>Example (two employees tied at #2)</th></tr></thead>
+              <tbody>
+                <tr><td>RANK()</td><td>Same rank</td><td>Skips (3 becomes 4)</td><td>1, 2, 2, 4</td></tr>
+                <tr><td>DENSE_RANK()</td><td>Same rank</td><td>Continues (no skip)</td><td>1, 2, 2, 3</td></tr>
+                <tr><td>ROW_NUMBER()</td><td>No ties (arbitrary)</td><td>N/A</td><td>1, 2, 3, 4</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="lag-lead">LAG() and LEAD()</h2>
+          <p>LAG and LEAD access values from previous or next rows within the partition, enabling row-over-row comparisons without self-joins:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Month-over-month revenue comparison
+SELECT
+    month,
+    revenue,
+    LAG(revenue, 1, 0)  OVER (ORDER BY month) AS prev_month_revenue,
+    revenue - LAG(revenue, 1, 0) OVER (ORDER BY month) AS mom_change,
+    LEAD(revenue, 1)    OVER (ORDER BY month) AS next_month_revenue
+FROM monthly_sales
+ORDER BY month;
+-- LAG(col, offset, default): offset=rows back, default=value if no previous row</code></pre>
+          </div>
+
+          <h2 id="running-total">Running Total with SUM OVER</h2>
+          <p>A running (cumulative) total is one of the most common window function use cases:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">SELECT
+    order_date,
+    department,
+    amount,
+    SUM(amount) OVER (
+        PARTITION BY department
+        ORDER BY order_date
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS running_total
+FROM orders
+ORDER BY department, order_date;</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Common window frame options</strong>
+              <p><code>ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code> — cumulative total from first row to current.<br>
+              <code>ROWS BETWEEN 2 PRECEDING AND CURRENT ROW</code> — 3-row moving average.<br>
+              <code>ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING</code> — full partition (same as no frame clause).</p>
+            </div>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Window functions</strong> compute across related rows using <code>OVER()</code> without collapsing rows — unlike GROUP BY.</li>
+              <li><strong>PARTITION BY</strong> divides rows into groups; the function resets per partition.</li>
+              <li><strong>ORDER BY</strong> inside OVER defines row ordering within a partition, required for ranking and cumulative functions.</li>
+              <li><strong>ROW_NUMBER()</strong> assigns unique sequential numbers; <strong>RANK()</strong> has gaps on ties; <strong>DENSE_RANK()</strong> has no gaps.</li>
+              <li><strong>LAG(col, n)</strong> accesses the value n rows before; <strong>LEAD(col, n)</strong> accesses n rows ahead.</li>
+              <li><strong>SUM OVER</strong> with an ORDER BY inside OVER computes running totals.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/grouping/group-by.html" class="topic-tag sql-topic-tag">🗄️ GROUP BY</a>
+            <a href="/sql/grouping/rollup-cube.html" class="topic-tag sql-topic-tag">🗄️ ROLLUP &amp; CUBE</a>
+            <a href="/sql/subqueries/subqueries-intro.html" class="topic-tag sql-topic-tag">🗄️ Subqueries</a>
+            <a href="/sql/subqueries/cte-with.html" class="topic-tag sql-topic-tag">🗄️ CTEs (WITH)</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I use window functions in a WHERE clause? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Window functions are evaluated after WHERE and GROUP BY (at the SELECT step), so you cannot reference them in WHERE or HAVING. To filter on a window function result, wrap the query in a subquery or CTE: <code>SELECT * FROM (SELECT ..., ROW_NUMBER() OVER (...) AS rn FROM ...) t WHERE t.rn = 1</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I combine GROUP BY with window functions? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. You can use window functions on top of a grouped result. First apply GROUP BY to aggregate the data, then apply a window function to the aggregated rows. Example: group by month to get monthly totals, then use SUM OVER to compute a cumulative total across months.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Are window functions available in all databases? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>All major databases support window functions: PostgreSQL 8.4+, MySQL 8.0+, SQL Server 2008+, Oracle 8i+, SQLite 3.25+. If you are on MySQL 5.x or an older SQLite version, window functions are not available — consider upgrading or rewriting as correlated subqueries.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between NTILE and PERCENT_RANK? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>NTILE(n) divides rows into n roughly equal buckets and assigns a bucket number (1 to n) — useful for quartile/decile analysis. PERCENT_RANK() computes a value between 0 and 1 representing a row's relative position within its partition. Neither function is covered in this lesson, but both use the same OVER syntax as RANK and DENSE_RANK.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/grouping/rollup-cube.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">ROLLUP &amp; CUBE</span>
+          </a>
+          <a href="/sql/subqueries/subqueries-intro.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Subqueries</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

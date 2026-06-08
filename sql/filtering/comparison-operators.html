@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Comparison Operators – =, &lt;&gt;, &gt;, &lt;, &gt;=, &lt;= | ylearner</title>
+  <meta name="description" content="Master all SQL comparison operators — =, &lt;&gt;, &gt;, &lt;, &gt;=, &lt;= — with examples on numbers, strings, and dates. Learn why NULL comparisons require IS NULL, not =.">
+  <meta name="keywords" content="SQL comparison operators, SQL equals, SQL not equal, SQL greater than, SQL less than, SQL IS NULL, SQL WHERE clause, SQL three-valued logic">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/filtering/comparison-operators.html">
+  <meta property="og:title" content="SQL Comparison Operators – =, &lt;&gt;, &gt;, &lt;, &gt;=, &lt;= | ylearner">
+  <meta property="og:description" content="Learn all SQL comparison operators with practical examples. Covers numeric, string, and date comparisons, and the critical NULL comparison rules.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/filtering/comparison-operators.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Comparison Operators – =, <>, >, <, >=, <=","description":"Learn all SQL comparison operators with examples on numbers, strings, and dates. Understand why NULL requires IS NULL instead of = NULL.","educationalLevel":"Beginner","keywords":"SQL comparison operators, SQL =, SQL <>, SQL IS NULL, SQL WHERE, three-valued logic","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/filtering/comparison-operators.html">Filtering</a><span class="separator">›</span>
+          <span class="current">Comparison Operators</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔍 Filtering</div>
+          <h1>SQL Comparison Operators – =, &lt;&gt;, &gt;, &lt;, &gt;=, &lt;=</h1>
+          <p class="lesson-intro">Comparison operators are the building blocks of every <code>WHERE</code> clause. They let you filter rows by checking whether a column's value equals, exceeds, or falls below a given threshold. SQL has six standard comparison operators, a critical special case for <code>NULL</code> values, and a MySQL-specific NULL-safe equality operator. This lesson covers them all with practical examples.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 12 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="equals-operator">The = (Equals) Operator</h2>
+          <p>The <code>=</code> operator returns rows where the column value exactly matches the given value. Works with numbers, strings, and dates.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Numeric equality
+SELECT * FROM employees WHERE department_id = 5;
+
+-- String equality (case-insensitive in MySQL by default)
+SELECT * FROM users WHERE country = 'US';
+
+-- Date equality
+SELECT * FROM orders WHERE order_date = '2026-06-08';
+
+-- Combined with AND
+SELECT * FROM products
+WHERE category = 'Electronics' AND is_active = 1;</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>String comparisons in SQL</strong>
+              <p>In MySQL with the default <code>utf8mb4_general_ci</code> collation, <code>WHERE name = 'alice'</code> also matches <code>'Alice'</code> and <code>'ALICE'</code> — string comparisons are case-insensitive. In PostgreSQL, string comparisons are <strong>case-sensitive</strong> by default: <code>'alice' &lt;&gt; 'Alice'</code>. Be aware of your database's collation settings when filtering on string columns.</p>
+            </div>
+          </div>
+
+          <h2 id="not-equal">&lt;&gt; and != (Not Equal) Operators</h2>
+          <p>Both <code>&lt;&gt;</code> and <code>!=</code> mean "not equal." <code>&lt;&gt;</code> is the SQL standard; <code>!=</code> is widely supported but technically non-standard. They are interchangeable in MySQL, PostgreSQL, and SQLite.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Exclude a specific department
+SELECT * FROM employees WHERE department_id <> 3;
+
+-- Using != (same result)
+SELECT * FROM employees WHERE department_id != 3;
+
+-- Exclude a status
+SELECT * FROM orders WHERE status <> 'cancelled';
+
+-- Strings: exclude a specific country
+SELECT * FROM users WHERE country <> 'US';</code></pre>
+          </div>
+
+          <h2 id="greater-less">&gt;, &lt;, &gt;=, &lt;= (Comparison Range Operators)</h2>
+          <p>These operators compare values on a number line (for numerics) or alphabetically (for strings).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Numeric comparisons
+SELECT * FROM products  WHERE price > 100;          -- more than 100
+SELECT * FROM products  WHERE price < 50;           -- less than 50
+SELECT * FROM employees WHERE salary >= 60000;      -- 60000 or more
+SELECT * FROM employees WHERE age <= 30;            -- 30 or younger
+
+-- Date comparisons work the same way (later date = greater value)
+SELECT * FROM orders WHERE created_at >= '2026-01-01';
+SELECT * FROM events  WHERE event_date < CURRENT_DATE;
+
+-- String comparisons use lexicographic (alphabetical) order
+-- 'B' > 'A', 'Z' > 'M', 'b' > 'B' (in case-sensitive collations)
+SELECT * FROM products WHERE name > 'M';  -- names starting with N-Z
+
+-- Combining range operators
+SELECT * FROM employees
+WHERE salary >= 50000 AND salary <= 100000;
+-- Tip: this is equivalent to: salary BETWEEN 50000 AND 100000</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="null-comparison">NULL Comparisons – IS NULL / IS NOT NULL</h2>
+          <p>This is one of the most important rules in SQL: <strong>you cannot use = to compare NULL values</strong>. NULL represents "unknown" — comparing it to anything (including another NULL) always yields <code>UNKNOWN</code>, which counts as false in a <code>WHERE</code> filter.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- WRONG: these never return rows, even if manager_id is NULL
+SELECT * FROM employees WHERE manager_id = NULL;   -- always empty!
+SELECT * FROM employees WHERE manager_id != NULL;  -- also always empty!
+
+-- CORRECT: use IS NULL and IS NOT NULL
+SELECT * FROM employees WHERE manager_id IS NULL;      -- top-level managers
+SELECT * FROM employees WHERE manager_id IS NOT NULL;  -- everyone else
+
+-- NULL in expressions also propagates as UNKNOWN
+SELECT NULL = NULL;   -- returns NULL (not TRUE)
+SELECT NULL + 5;      -- returns NULL</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>SQL uses three-valued logic: TRUE, FALSE, and UNKNOWN</strong>
+              <p>In most programming languages, a comparison returns either true or false. In SQL, any comparison involving <code>NULL</code> returns a third value: <code>UNKNOWN</code>. The <code>WHERE</code> clause only passes rows where the condition is <code>TRUE</code> — rows that evaluate to <code>UNKNOWN</code> are filtered out, just like <code>FALSE</code>. This is why <code>WHERE col = NULL</code> silently returns no rows even when NULLs are present. Always use <code>IS NULL</code> or <code>IS NOT NULL</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="operator-table">Complete Operator Reference Table</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Operator</th><th>Meaning</th><th>Example</th><th>Returns rows when…</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>=</code></td><td>Equal to</td><td><code>salary = 50000</code></td><td>salary is exactly 50000</td></tr>
+                <tr><td><code>&lt;&gt;</code></td><td>Not equal to (standard)</td><td><code>status &lt;&gt; 'cancelled'</code></td><td>status is not 'cancelled'</td></tr>
+                <tr><td><code>!=</code></td><td>Not equal to (alternate)</td><td><code>status != 'cancelled'</code></td><td>same as &lt;&gt;</td></tr>
+                <tr><td><code>&gt;</code></td><td>Greater than</td><td><code>price &gt; 100</code></td><td>price is more than 100</td></tr>
+                <tr><td><code>&lt;</code></td><td>Less than</td><td><code>age &lt; 18</code></td><td>age is less than 18</td></tr>
+                <tr><td><code>&gt;=</code></td><td>Greater than or equal</td><td><code>score &gt;= 90</code></td><td>score is 90 or above</td></tr>
+                <tr><td><code>&lt;=</code></td><td>Less than or equal</td><td><code>qty &lt;= 10</code></td><td>qty is 10 or less</td></tr>
+                <tr><td><code>IS NULL</code></td><td>Is NULL (unknown)</td><td><code>manager_id IS NULL</code></td><td>manager_id is NULL</td></tr>
+                <tr><td><code>IS NOT NULL</code></td><td>Is not NULL</td><td><code>email IS NOT NULL</code></td><td>email has a value</td></tr>
+                <tr><td><code>&lt;=&gt;</code></td><td>NULL-safe equal (MySQL only)</td><td><code>manager_id &lt;=&gt; NULL</code></td><td>manager_id is NULL (returns TRUE, not UNKNOWN)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>SQL has six standard comparison operators: <code>=</code>, <code>&lt;&gt;</code> (or <code>!=</code>), <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>.</li>
+              <li>String comparisons are <strong>case-insensitive in MySQL</strong> (default collation) and <strong>case-sensitive in PostgreSQL</strong> by default.</li>
+              <li><strong>Never use <code>= NULL</code></strong> — it always returns UNKNOWN and filters out all rows. Use <code>IS NULL</code> / <code>IS NOT NULL</code> instead.</li>
+              <li>SQL uses <strong>three-valued logic</strong>: TRUE, FALSE, and UNKNOWN. WHERE passes only TRUE rows.</li>
+              <li>MySQL's <code>&lt;=&gt;</code> is a NULL-safe equality operator that returns TRUE when both sides are NULL.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/filtering/logical-operators.html" class="topic-tag sql-topic-tag">🔍 Logical Operators</a>
+            <a href="/sql/filtering/between-in.html" class="topic-tag sql-topic-tag">🔍 BETWEEN &amp; IN</a>
+            <a href="/sql/filtering/like-pattern.html" class="topic-tag sql-topic-tag">🔍 LIKE Pattern Matching</a>
+            <a href="/sql/tables/constraints.html" class="topic-tag sql-topic-tag">🗄️ Constraints</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why does WHERE col = NULL return no rows even if col has NULL values? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Because <code>NULL</code> represents "unknown" in SQL. Any comparison with NULL — including <code>NULL = NULL</code> — evaluates to <code>UNKNOWN</code>, not TRUE. The <code>WHERE</code> clause only keeps rows where the condition evaluates to TRUE. Rows with UNKNOWN are treated like FALSE and filtered out. This is why you must use the special <code>IS NULL</code> predicate, which tests specifically for the absence of a value rather than comparing values.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between &lt;&gt; and !=? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>They are functionally identical in every major SQL database — both mean "not equal to." The difference is only in their origin: <code>&lt;&gt;</code> is the SQL standard (ISO/ANSI), while <code>!=</code> is borrowed from programming languages like C and Python. MySQL, PostgreSQL, SQLite, and SQL Server all support both. Best practice is to use <code>&lt;&gt;</code> for SQL standard compliance, especially in code that may need to run on multiple databases.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do string comparisons work with &gt; and &lt;? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Strings are compared lexicographically (dictionary order) based on the column's collation. <code>'apple' &lt; 'banana'</code> because 'a' comes before 'b'. <code>'Zoo' &lt; 'apple'</code> in case-sensitive collations because uppercase letters have lower code points than lowercase. In MySQL's default case-insensitive collation, <code>'Zoo' &lt; 'apple'</code> would be false. Practical use: <code>WHERE last_name &gt; 'M'</code> returns last names starting with N through Z. Always be aware of your collation when using &gt;/&lt; on strings.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When would I use MySQL's &lt;=&gt; NULL-safe operator? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The <code>&lt;=&gt;</code> operator is useful when you want to compare two values that might both be NULL and treat <code>NULL = NULL</code> as TRUE. For example, in an UPDATE or a JOIN condition where you want NULL values on both sides to match: <code>WHERE old_value &lt;=&gt; new_value</code> would match rows where both are NULL (meaning no change) without special IS NULL handling. It is a MySQL-only extension not available in standard SQL or PostgreSQL. In most practical queries, <code>IS NULL</code> and <code>IS NOT NULL</code> are sufficient.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/tables/constraints.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Constraints</span>
+          </a>
+          <a href="/sql/filtering/logical-operators.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Logical Operators</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

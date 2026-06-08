@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Aliases (AS) – Renaming Columns and Tables | ylearner</title>
+  <meta name="description" content="Learn SQL aliases with AS: rename columns for readable output, use table aliases to shorten queries and resolve ambiguity in joins. Covers alias rules and common pitfalls.">
+  <meta name="keywords" content="SQL aliases, SQL AS keyword, column alias SQL, table alias SQL, SQL rename column, SQL join aliases, SQL basics, alias in ORDER BY">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/basics/aliases.html">
+  <meta property="og:title" content="SQL Aliases (AS) – Renaming Columns and Tables | ylearner">
+  <meta property="og:description" content="Master SQL aliases — rename columns for cleaner output and use table aliases to write shorter, unambiguous queries especially in JOINs.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/basics/aliases.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Aliases (AS) – Renaming Columns and Tables","description":"Learn SQL column and table aliases using AS — rename output columns, shorten table names in queries, and resolve ambiguity in joins.","educationalLevel":"Beginner","keywords":"SQL aliases, AS keyword, column alias, table alias, SQL joins","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/basics/select-statement.html">SQL Basics</a><span class="separator">›</span>
+          <span class="current">SQL Aliases</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 SQL Basics</div>
+          <h1>SQL Aliases (AS) – Renaming Columns and Tables</h1>
+          <p class="lesson-intro">SQL <strong>aliases</strong> give a table or column a temporary name within a query. Column aliases make your output more readable — instead of seeing <code>salary * 12</code> as the column header, you see <code>annual_salary</code>. Table aliases are essential in joins and self-joins where the same column name appears in multiple tables and you need to tell the database exactly which one you mean. This lesson covers column aliases, table aliases, how aliases work in joins, and the rules about where you can and cannot use them.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 12 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="column-alias">Column Aliases</h2>
+          <p>A column alias renames the column header in the result set. It has no effect on the underlying data — it only changes what label appears at the top of that column when the query result is displayed.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Without alias: the column header is 'salary * 12' (ugly)
+SELECT first_name, salary * 12
+FROM employees;
+
+-- With alias: the column header is 'annual_salary' (readable)
+SELECT first_name, salary * 12 AS annual_salary
+FROM employees;
+
+-- AS is optional — this works too (but AS is recommended for clarity)
+SELECT first_name, salary * 12 annual_salary
+FROM employees;
+
+-- Rename an existing column in the output
+SELECT first_name AS name, department AS dept
+FROM employees;</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Result</div>
+            name &nbsp;&nbsp;&nbsp; dept &nbsp;&nbsp;&nbsp; annual_salary<br>
+            Alice &nbsp;&nbsp; Engineering &nbsp;&nbsp; 1020000<br>
+            Bob &nbsp;&nbsp;&nbsp;&nbsp; Marketing &nbsp;&nbsp;&nbsp;&nbsp; 744000
+          </div>
+
+          <h3>Multi-word Aliases</h3>
+          <p>If your alias contains spaces, wrap it in double quotes (standard SQL and PostgreSQL) or backticks (MySQL):</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Standard SQL / PostgreSQL: use double quotes for multi-word aliases
+SELECT salary AS "Monthly Pay", salary * 12 AS "Annual Salary"
+FROM employees;
+
+-- MySQL: backticks also work
+SELECT salary AS `Monthly Pay`, salary * 12 AS `Annual Salary`
+FROM employees;
+
+-- Best practice: use underscore_names to avoid quoting entirely
+SELECT salary AS monthly_pay, salary * 12 AS annual_salary
+FROM employees;</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Use snake_case aliases — avoid spaces</strong>
+              <p>Multi-word aliases with spaces require quoting every time you reference them, both in SQL and in your application code. Stick to <code>snake_case</code> (underscores) for aliases to keep queries readable without any quoting. Reserve quoted aliases for reports and dashboards where the column header is shown to end users.</p>
+            </div>
+          </div>
+
+          <h2 id="table-alias">Table Aliases</h2>
+          <p>A table alias gives a table a shorter name within the query. This is purely for convenience in simple queries, but becomes essential in joins where you need to prefix column names with the table name to avoid ambiguity.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Without table alias (verbose)
+SELECT employees.first_name, employees.salary
+FROM employees;
+
+-- With table alias — 'e' is the alias for employees
+SELECT e.first_name, e.salary
+FROM employees e;
+
+-- AS is optional for table aliases too
+SELECT e.first_name, e.salary
+FROM employees AS e;
+
+-- Useful for long table names
+SELECT o.id, o.total, o.order_date
+FROM customer_orders AS o
+WHERE o.total > 100;</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="alias-in-joins">Aliases in Joins – Resolving Ambiguity</h2>
+          <p>Table aliases are not just convenient in joins — they are often <strong>required</strong>. When two tables have a column with the same name (e.g. both have an <code>id</code> column), the database cannot tell which table you mean without a table prefix. Aliases make this explicit and keep JOIN queries readable.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Without aliases: ambiguous — which 'id' is which?
+SELECT id, name, total
+FROM orders
+JOIN customers ON orders.customer_id = customers.id;
+-- Error: column 'id' is ambiguous (both tables have it)
+
+-- With aliases: clear and unambiguous
+SELECT o.id   AS order_id,
+       c.name AS customer_name,
+       o.total
+FROM orders    AS o
+JOIN customers AS c ON o.customer_id = c.id;
+
+-- Three-table join — aliases keep it manageable
+SELECT
+    o.id         AS order_id,
+    c.name       AS customer_name,
+    p.name       AS product_name,
+    oi.quantity,
+    oi.unit_price
+FROM orders       AS o
+JOIN customers    AS c  ON o.customer_id  = c.id
+JOIN order_items  AS oi ON oi.order_id    = o.id
+JOIN products     AS p  ON oi.product_id  = p.id
+WHERE o.total > 500;</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Convention: single-letter or short aliases for tables</strong>
+              <p>In simple queries, single-letter aliases (<code>e</code> for employees, <code>o</code> for orders, <code>c</code> for customers) are widely used. For complex queries with many joins, slightly longer abbreviations (<code>emp</code>, <code>ord</code>, <code>cust</code>) can be clearer. Avoid overly long aliases — they defeat the purpose of shortening the code.</p>
+            </div>
+          </div>
+
+          <h2 id="alias-rules">Alias Scope Rules</h2>
+          <p>Column aliases defined in SELECT can only be used in certain clauses — not everywhere. Understanding this prevents a common category of SQL errors:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Clause</th><th>Can use column alias?</th><th>Reason</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>WHERE</strong></td><td>No</td><td>WHERE runs before SELECT — alias not yet defined</td></tr>
+                <tr><td><strong>GROUP BY</strong></td><td>Sometimes (MySQL yes, PostgreSQL no)</td><td>Varies by database dialect</td></tr>
+                <tr><td><strong>HAVING</strong></td><td>Sometimes (MySQL yes, PostgreSQL no)</td><td>Varies by database dialect</td></tr>
+                <tr><td><strong>ORDER BY</strong></td><td>Yes — all databases</td><td>ORDER BY runs after SELECT</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- WRONG: cannot use alias in WHERE (runs before SELECT)
+SELECT salary * 12 AS annual_salary
+FROM employees
+WHERE annual_salary > 900000;   -- Error in PostgreSQL / SQL Server
+
+-- CORRECT: repeat the expression in WHERE
+SELECT salary * 12 AS annual_salary
+FROM employees
+WHERE salary * 12 > 900000;
+
+-- CORRECT: use a subquery or CTE to reference alias in WHERE
+SELECT *
+FROM (
+    SELECT first_name, salary * 12 AS annual_salary
+    FROM employees
+) AS derived
+WHERE annual_salary > 900000;
+
+-- CORRECT: alias IS usable in ORDER BY (all databases)
+SELECT first_name, salary * 12 AS annual_salary
+FROM employees
+ORDER BY annual_salary DESC;  -- works everywhere</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Column alias</strong>: <code>SELECT expression AS alias_name</code> — renames the column header in the output. <code>AS</code> is optional but recommended.</li>
+              <li>Use <strong>double quotes</strong> (PostgreSQL) or <strong>backticks</strong> (MySQL) for multi-word aliases. Prefer <code>snake_case</code> to avoid quoting.</li>
+              <li><strong>Table alias</strong>: <code>FROM table_name AS t</code> — shortens the table reference within the query.</li>
+              <li>Table aliases are <strong>essential in joins</strong> to resolve ambiguous column names (e.g. both tables have an <code>id</code> column).</li>
+              <li>Column aliases are available in <strong>ORDER BY</strong> but <strong>not in WHERE</strong> (WHERE runs before SELECT). Repeat the expression in WHERE, or use a subquery.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/basics/distinct.html" class="topic-tag sql-topic-tag">🗄️ DISTINCT</a>
+            <a href="/sql/basics/select-statement.html" class="topic-tag sql-topic-tag">🗄️ SELECT Statement</a>
+            <a href="/sql/basics/order-by.html" class="topic-tag sql-topic-tag">🗄️ ORDER BY</a>
+            <a href="/sql/joins/joins-overview.html" class="topic-tag sql-topic-tag">🗄️ JOINs Overview</a>
+            <a href="/sql/joins/inner-join.html" class="topic-tag sql-topic-tag">🗄️ INNER JOIN</a>
+            <a href="/sql/tables/data-types.html" class="topic-tag sql-topic-tag">🗄️ SQL Data Types</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Is AS required for aliases? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — <code>AS</code> is optional in both column and table aliases. <code>SELECT salary * 12 annual_salary</code> and <code>SELECT salary * 12 AS annual_salary</code> are identical. However, always using <code>AS</code> is strongly recommended for readability. It makes the alias explicit and prevents confusion between a missing comma and an accidental alias (e.g. <code>SELECT first_name last_name</code> selects only <code>first_name</code> and aliases it <code>last_name</code>, rather than selecting two columns — a subtle bug).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I reuse an alias in the same SELECT list? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — you cannot reference a column alias defined earlier in the same SELECT list. Each expression in SELECT is evaluated independently. For example, <code>SELECT salary * 12 AS annual, annual / 12 AS monthly</code> will fail because <code>annual</code> is not yet a known column when <code>annual / 12</code> is evaluated. Repeat the expression: <code>SELECT salary * 12 AS annual, salary AS monthly</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Do aliases affect the actual table or column names? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — aliases are temporary and exist only within the scope of the single query. The underlying table and column names are completely unchanged. An alias defined in one query has no effect on any other query, and it is never stored in the database. It is purely a presentation-layer label applied to the result set.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use a column alias in GROUP BY? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It depends on the database. MySQL and MariaDB allow using column aliases in GROUP BY. PostgreSQL and SQL Server do not — they require you to repeat the expression. Standard SQL (and the safest portable approach) is to repeat the expression: <code>SELECT YEAR(order_date) AS year, COUNT(*) FROM orders GROUP BY YEAR(order_date)</code>. Alternatively, wrap the query in a subquery and GROUP BY the alias in the outer query.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/basics/distinct.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">DISTINCT</span>
+          </a>
+          <a href="/sql/tables/data-types.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">SQL Data Types</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL DISTINCT – Removing Duplicate Rows | ylearner</title>
+  <meta name="description" content="Learn SQL DISTINCT: remove duplicate rows from query results, use DISTINCT with multiple columns, COUNT DISTINCT, and understand the difference between DISTINCT and GROUP BY.">
+  <meta name="keywords" content="SQL DISTINCT, remove duplicates SQL, SELECT DISTINCT, COUNT DISTINCT, DISTINCT vs GROUP BY, SQL unique values, SQL basics">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/basics/distinct.html">
+  <meta property="og:title" content="SQL DISTINCT – Removing Duplicate Rows | ylearner">
+  <meta property="og:description" content="Master SQL DISTINCT — deduplicate query results, use it with multiple columns and COUNT, and know when to choose DISTINCT over GROUP BY.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/basics/distinct.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL DISTINCT – Removing Duplicate Rows","description":"Learn SQL DISTINCT — deduplicate results, multi-column DISTINCT, COUNT DISTINCT, and DISTINCT vs GROUP BY comparison.","educationalLevel":"Beginner","keywords":"SQL DISTINCT, remove duplicates, COUNT DISTINCT, DISTINCT vs GROUP BY","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/basics/select-statement.html">SQL Basics</a><span class="separator">›</span>
+          <span class="current">DISTINCT</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 SQL Basics</div>
+          <h1>SQL DISTINCT – Removing Duplicate Rows</h1>
+          <p class="lesson-intro">By default, a SQL query returns every row that matches its conditions — including duplicates. If you want to see only the <em>unique</em> values in a column (e.g. "what departments exist?", "which countries do our customers come from?"), use <strong>DISTINCT</strong>. It filters out duplicate rows from the result set before returning data. This lesson covers single-column DISTINCT, multi-column DISTINCT, <code>COUNT(DISTINCT ...)</code>, and when to choose DISTINCT over GROUP BY.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 10 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="distinct-syntax">DISTINCT Syntax</h2>
+          <p>Place <code>DISTINCT</code> immediately after the <code>SELECT</code> keyword. It applies to the entire SELECT list — all columns together are used to determine uniqueness.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Without DISTINCT: returns every row (may include duplicates)
+SELECT department FROM employees;
+-- Returns: Engineering, Marketing, Engineering, Marketing, Engineering
+-- (one row per employee, repeated departments)
+
+-- With DISTINCT: returns each unique department once
+SELECT DISTINCT department FROM employees;
+-- Returns: Engineering, Marketing</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Without DISTINCT</th><th>With DISTINCT</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Engineering</td><td>Engineering</td></tr>
+                <tr><td>Marketing</td><td>Marketing</td></tr>
+                <tr><td>Engineering</td><td></td></tr>
+                <tr><td>Marketing</td><td></td></tr>
+                <tr><td>Engineering</td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Common use cases for DISTINCT</strong>
+              <p>DISTINCT is useful for data exploration: "what unique values exist in this column?" It answers questions like: "what departments do we have?", "which countries have placed orders?", "what product categories exist in the database?". It is also used in joins to collapse repeated rows that result from one-to-many relationships.</p>
+            </div>
+          </div>
+
+          <h2 id="multi-column-distinct">DISTINCT with Multiple Columns</h2>
+          <p>When you list multiple columns after <code>SELECT DISTINCT</code>, DISTINCT operates on the <strong>combination</strong> of all listed columns. A row is a duplicate only if <em>every</em> column value in the row matches another row.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Unique city-country combinations
+SELECT DISTINCT city, country
+FROM customers
+ORDER BY country, city;
+
+-- Example data:
+-- (Paris, France), (London, UK), (Paris, France) → removes second Paris/France
+-- Returns: (Paris, France), (London, UK)
+
+-- Unique department-role combinations
+SELECT DISTINCT department, job_title
+FROM employees
+ORDER BY department;
+-- Returns each unique pairing, even if the same department appears multiple times
+-- with different job titles</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>DISTINCT applies to the entire row</strong>
+              <p><code>SELECT DISTINCT city, country</code> does not mean "distinct city AND distinct country separately". It means "distinct combinations of (city, country) as a pair". Two rows with the same city but different countries are NOT duplicates and both appear in the result.</p>
+            </div>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="count-distinct">COUNT(DISTINCT column)</h2>
+          <p>A very common pattern is using DISTINCT inside the <code>COUNT()</code> aggregate function to count the number of unique values in a column:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- How many distinct departments exist?
+SELECT COUNT(DISTINCT department) AS num_departments
+FROM employees;
+-- Returns: 2 (Engineering, Marketing)
+
+-- How many unique customers have placed at least one order?
+SELECT COUNT(DISTINCT customer_id) AS active_customers
+FROM orders;
+
+-- How many unique products have been sold?
+SELECT COUNT(DISTINCT product_id) AS products_sold
+FROM order_items;
+
+-- Compare: total rows vs distinct values
+SELECT
+    COUNT(*)                AS total_employees,
+    COUNT(DISTINCT department) AS distinct_departments
+FROM employees;
+-- total_employees: 5, distinct_departments: 2</code></pre>
+          </div>
+
+          <h2 id="vs-group-by">DISTINCT vs GROUP BY</h2>
+          <p>For simple deduplication, <code>DISTINCT</code> and <code>GROUP BY</code> on the same columns produce identical results. The choice comes down to intent and whether you need aggregations:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- These two queries return the same result:
+SELECT DISTINCT department FROM employees ORDER BY department;
+
+SELECT department FROM employees GROUP BY department ORDER BY department;
+
+-- But GROUP BY is more powerful — it can aggregate:
+SELECT department, COUNT(*) AS headcount, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department
+ORDER BY headcount DESC;
+
+-- DISTINCT cannot do this — DISTINCT alone cannot produce aggregates</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Aspect</th><th>DISTINCT</th><th>GROUP BY</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Removes duplicates</td><td>Yes</td><td>Yes</td></tr>
+                <tr><td>Can aggregate (SUM, COUNT, AVG)</td><td>No</td><td>Yes</td></tr>
+                <tr><td>Can filter groups (HAVING)</td><td>No</td><td>Yes</td></tr>
+                <tr><td>Syntax simplicity</td><td>Simpler</td><td>More explicit</td></tr>
+                <tr><td>Best for</td><td>Simple deduplication only</td><td>Grouping with aggregation</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Performance: DISTINCT requires a sort or hash</strong>
+              <p>To find unique values, the database must either sort all rows and remove adjacent duplicates, or build a hash table of seen values. Both operations can be expensive on large tables. If you need deduplication frequently on the same column, ensure that column is indexed. For tables with millions of rows, test whether DISTINCT or GROUP BY performs better in your specific database and query plan.</p>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>SELECT DISTINCT column</code> — returns only unique values; duplicate rows are removed from the result.</li>
+              <li>With multiple columns, DISTINCT operates on the <strong>combination</strong> of all columns — a row is a duplicate only if every value matches.</li>
+              <li><code>COUNT(DISTINCT column)</code> — counts the number of unique values in a column. A common pattern for analytics.</li>
+              <li>DISTINCT and GROUP BY produce the same result for simple deduplication, but GROUP BY is more flexible — it enables aggregation, HAVING filters, and complex grouping.</li>
+              <li>DISTINCT requires a sort or hash operation — it can be slow on large tables with many unique values. Use indexes and test performance.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/basics/limit-offset.html" class="topic-tag sql-topic-tag">🗄️ LIMIT &amp; OFFSET</a>
+            <a href="/sql/basics/aliases.html" class="topic-tag sql-topic-tag">🗄️ SQL Aliases</a>
+            <a href="/sql/grouping/group-by.html" class="topic-tag sql-topic-tag">🗄️ GROUP BY</a>
+            <a href="/sql/grouping/having-clause.html" class="topic-tag sql-topic-tag">🗄️ HAVING Clause</a>
+            <a href="/sql/functions/aggregate-functions.html" class="topic-tag sql-topic-tag">🗄️ Aggregate Functions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I use DISTINCT with SELECT *? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — <code>SELECT DISTINCT *</code> removes rows where every single column value is identical. In practice, if a table has a primary key (which is unique by definition), <code>SELECT DISTINCT *</code> will never remove any rows because no two rows can be identical when a unique ID column exists. DISTINCT with * is only useful on tables without a unique key, or on result sets derived from joins that produce repeated rows.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How does DISTINCT handle NULL values? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>DISTINCT treats all NULLs as equal to each other. If a column has multiple NULL values, <code>SELECT DISTINCT column</code> returns exactly one NULL in the result. This is an exception to the normal rule that NULL is not equal to NULL in comparison expressions — for DISTINCT deduplication purposes, NULLs are considered duplicates of each other.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use DISTINCT on only one column when selecting multiple? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Standard SQL does not allow <code>SELECT DISTINCT(col1), col2</code> to mean "distinct col1 only while also selecting col2". The DISTINCT keyword applies to the entire SELECT list. However, some databases (like MySQL) support <code>GROUP_CONCAT(DISTINCT col)</code> or window functions like <code>ROW_NUMBER() OVER (PARTITION BY col ORDER BY ...)</code> for more nuanced deduplication patterns. For "first row per group" queries, window functions (covered later in this course) are the proper tool.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When should I prefer DISTINCT over GROUP BY? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use DISTINCT when your only goal is deduplication and you do not need any aggregation. <code>SELECT DISTINCT department FROM employees</code> is more readable and communicates intent more clearly than <code>SELECT department FROM employees GROUP BY department</code> when you just want the list of unique departments. Use GROUP BY when you need counts, sums, averages, or other aggregate calculations alongside the grouped column.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/basics/limit-offset.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">LIMIT &amp; OFFSET</span>
+          </a>
+          <a href="/sql/basics/aliases.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">SQL Aliases</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

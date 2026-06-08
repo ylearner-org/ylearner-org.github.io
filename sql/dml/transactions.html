@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Transactions – COMMIT, ROLLBACK, ACID | ylearner</title>
+  <meta name="description" content="Learn SQL transactions: ACID properties, BEGIN/COMMIT/ROLLBACK, SAVEPOINT, autocommit, and isolation levels. Full tutorial with bank transfer examples.">
+  <meta name="keywords" content="SQL transactions, ACID properties, SQL COMMIT, SQL ROLLBACK, SQL BEGIN, SAVEPOINT, SQL isolation levels, SQL autocommit, database transactions">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/dml/transactions.html">
+  <meta property="og:title" content="SQL Transactions – COMMIT, ROLLBACK, ACID | ylearner">
+  <meta property="og:description" content="Master SQL transactions: ACID guarantees, BEGIN/COMMIT/ROLLBACK workflow, savepoints for partial rollback, and transaction isolation levels explained.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/dml/transactions.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Transactions","description":"SQL transactions with ACID properties, BEGIN/COMMIT/ROLLBACK, SAVEPOINTs, and isolation levels. Bank transfer example included.","educationalLevel":"Intermediate","keywords":"SQL transactions, ACID, COMMIT, ROLLBACK, SAVEPOINT, isolation levels","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/dml/transactions.html">DML</a><span class="separator">›</span>
+          <span class="current">Transactions</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">✏️ Data Modification</div>
+          <h1>SQL Transactions – COMMIT, ROLLBACK, ACID</h1>
+          <p class="lesson-intro">A transaction is a group of SQL statements that are treated as a single unit of work. Either all statements succeed and are committed, or all are rolled back as if nothing happened. Transactions are the foundation of data integrity in relational databases.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-transaction">What Is a Transaction?</h2>
+          <p>Consider a bank transfer: you debit account A and credit account B. If the debit succeeds but the credit fails (due to a crash), money disappears. A transaction wraps both operations so they either both complete or neither does:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">BEGIN;   -- or START TRANSACTION in MySQL
+
+UPDATE accounts SET balance = balance - 500 WHERE id = 1;  -- debit Alice
+UPDATE accounts SET balance = balance + 500 WHERE id = 2;  -- credit Bob
+
+COMMIT;  -- make both changes permanent</code></pre>
+          </div>
+
+          <p>If anything goes wrong between BEGIN and COMMIT, a ROLLBACK undoes everything:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">BEGIN;
+UPDATE accounts SET balance = balance - 500 WHERE id = 1;
+-- An error occurs here (e.g., account 2 not found)
+ROLLBACK;  -- balance of account 1 is restored, no money lost</code></pre>
+          </div>
+
+          <h2 id="acid-properties">ACID Properties</h2>
+          <p>ACID is the set of guarantees that a transactional database provides:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Property</th><th>Meaning</th><th>Example</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Atomicity</strong></td>
+                  <td>All or nothing — every operation in the transaction succeeds or all are rolled back.</td>
+                  <td>Both debit and credit happen, or neither does.</td>
+                </tr>
+                <tr>
+                  <td><strong>Consistency</strong></td>
+                  <td>The database moves from one valid state to another — constraints are never violated.</td>
+                  <td>Total money in all accounts stays the same after a transfer.</td>
+                </tr>
+                <tr>
+                  <td><strong>Isolation</strong></td>
+                  <td>Concurrent transactions do not see each other's uncommitted changes.</td>
+                  <td>Another session reading mid-transfer sees either the old or new balances, not a partial state.</td>
+                </tr>
+                <tr>
+                  <td><strong>Durability</strong></td>
+                  <td>Once committed, data survives crashes — written to persistent storage.</td>
+                  <td>A committed transfer is not lost if the server loses power immediately after.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="begin-commit-rollback">BEGIN, COMMIT, ROLLBACK</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Full transaction workflow with error handling
+BEGIN;
+
+-- Multiple DML statements grouped together
+INSERT INTO orders (customer_id, total)        VALUES (42, 299.99);
+INSERT INTO order_items (order_id, product_id) VALUES (LASTVAL(), 7);
+UPDATE inventory SET stock = stock - 1         WHERE product_id = 7;
+
+-- Check the stock is still valid before committing
+-- (In application code you would check rows affected here)
+COMMIT;
+
+-- To undo everything:
+ROLLBACK;</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Syntax variation by database</strong>
+              <p>PostgreSQL/SQLite: <code>BEGIN</code> or <code>BEGIN TRANSACTION</code>.<br>
+              MySQL: <code>START TRANSACTION</code> (BEGIN also works).<br>
+              SQL Server: <code>BEGIN TRANSACTION</code>.<br>
+              Oracle: transactions start automatically with the first DML — no explicit BEGIN needed; just COMMIT or ROLLBACK.</p>
+            </div>
+          </div>
+
+          <h2 id="savepoints">SAVEPOINTs</h2>
+          <p>SAVEPOINT lets you create a checkpoint within a transaction. You can roll back to a savepoint without abandoning the entire transaction:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">BEGIN;
+
+INSERT INTO orders (customer_id, total) VALUES (42, 100);
+SAVEPOINT after_order;        -- checkpoint created
+
+INSERT INTO order_items (order_id, product_id) VALUES (1, 99);
+-- Suppose product 99 is out of stock — roll back only the items insert
+ROLLBACK TO SAVEPOINT after_order;
+-- The order insert is still alive; only the items insert was undone
+
+INSERT INTO order_items (order_id, product_id) VALUES (1, 15);
+COMMIT;  -- commits the order + the fallback item insert</code></pre>
+          </div>
+
+          <h2 id="autocommit">Autocommit</h2>
+          <p>Most databases run in autocommit mode by default: each SQL statement is automatically committed when it succeeds. To use explicit transactions, you must either disable autocommit or use BEGIN explicitly:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- MySQL: disable autocommit for the session
+SET autocommit = 0;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+COMMIT;   -- required now that autocommit is off
+
+-- MySQL: or just use START TRANSACTION (disables autocommit temporarily)
+START TRANSACTION;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+COMMIT;
+
+-- PostgreSQL: BEGIN explicitly starts a transaction (autocommit applies to statements outside BEGIN/COMMIT)
+BEGIN;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+COMMIT;</code></pre>
+          </div>
+
+          <h2 id="isolation-levels">Transaction Isolation Levels</h2>
+          <p>Isolation levels control what uncommitted data one transaction can see from another concurrent transaction:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Level</th><th>Dirty Read</th><th>Non-repeatable Read</th><th>Phantom Read</th></tr></thead>
+              <tbody>
+                <tr><td><strong>READ UNCOMMITTED</strong></td><td>Possible</td><td>Possible</td><td>Possible</td></tr>
+                <tr><td><strong>READ COMMITTED</strong></td><td>Not possible</td><td>Possible</td><td>Possible</td></tr>
+                <tr><td><strong>REPEATABLE READ</strong></td><td>Not possible</td><td>Not possible</td><td>Possible (MySQL: No)</td></tr>
+                <tr><td><strong>SERIALIZABLE</strong></td><td>Not possible</td><td>Not possible</td><td>Not possible</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Set isolation level (PostgreSQL / MySQL)
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+BEGIN;
+-- ... your statements
+COMMIT;</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Default isolation levels</strong>
+              <p>PostgreSQL: READ COMMITTED. MySQL (InnoDB): REPEATABLE READ. SQL Server: READ COMMITTED. Most applications work correctly with READ COMMITTED; SERIALIZABLE provides the strongest guarantees but reduces throughput due to increased locking.</p>
+            </div>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A <strong>transaction</strong> groups SQL statements so they all succeed or all fail together.</li>
+              <li><strong>ACID</strong>: Atomicity (all or nothing), Consistency (valid state), Isolation (concurrent safety), Durability (survives crash).</li>
+              <li><code>BEGIN → statements → COMMIT</code> commits the transaction; <code>ROLLBACK</code> undoes it.</li>
+              <li><strong>SAVEPOINT</strong> creates a partial rollback point inside a transaction.</li>
+              <li>Most databases run in <strong>autocommit</strong> mode by default — each statement commits automatically.</li>
+              <li><strong>Isolation levels</strong> trade consistency for concurrency performance; READ COMMITTED is the typical default.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/dml/insert-data.html" class="topic-tag sql-topic-tag">🗄️ INSERT Data</a>
+            <a href="/sql/dml/update-data.html" class="topic-tag sql-topic-tag">🗄️ UPDATE Data</a>
+            <a href="/sql/dml/delete-data.html" class="topic-tag sql-topic-tag">🗄️ DELETE Data</a>
+            <a href="/sql/dml/upsert.html" class="topic-tag sql-topic-tag">🗄️ UPSERT</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What happens if a database crashes inside a transaction? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The database's write-ahead log (WAL) records all changes before they are applied to disk. On restart, the database replays committed transactions from the WAL and rolls back any transactions that had not reached COMMIT. This ensures Durability (committed data is not lost) and Atomicity (incomplete transactions are cleaned up automatically).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can DDL statements (CREATE TABLE, ALTER TABLE) be inside a transaction? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It depends on the database. PostgreSQL supports transactional DDL — you can roll back a CREATE TABLE or ALTER TABLE. MySQL does not support transactional DDL; a DDL statement implicitly commits any open transaction before executing. SQL Server supports most DDL inside transactions. This matters for database migration scripts.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is a deadlock and how do I prevent it? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A deadlock occurs when two transactions each hold a lock the other needs: Transaction A holds lock on row 1 and wants row 2; Transaction B holds row 2 and wants row 1. The database detects this and kills one transaction (the victim). Prevention: always acquire locks in the same order across transactions; keep transactions short; use the appropriate isolation level; consider optimistic locking for high-concurrency workloads.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/dml/delete-data.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">DELETE Data</span>
+          </a>
+          <a href="/sql/dml/upsert.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">UPSERT</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Subqueries – Nesting Queries Inside Queries | ylearner</title>
+  <meta name="description" content="Learn SQL subqueries: scalar, row, and table subqueries in WHERE, FROM, and SELECT clauses. Includes derived tables and practical nesting examples.">
+  <meta name="keywords" content="SQL subqueries, nested queries, SQL scalar subquery, derived table SQL, SQL subquery in WHERE, SQL subquery in FROM, subquery tutorial">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/subqueries/subqueries-intro.html">
+  <meta property="og:title" content="SQL Subqueries – Nesting Queries Inside Queries | ylearner">
+  <meta property="og:description" content="Master SQL subqueries: scalar, row, and table subqueries used in WHERE, FROM, and SELECT. Learn derived tables and when to use subqueries vs JOINs.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/subqueries/subqueries-intro.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Subqueries Introduction","description":"SQL subqueries explained: scalar, row, and table subqueries in WHERE, FROM, and SELECT clauses with practical examples.","educationalLevel":"Intermediate","keywords":"SQL subqueries, nested queries, derived table, scalar subquery","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/subqueries/subqueries-intro.html">Subqueries</a><span class="separator">›</span>
+          <span class="current">Subqueries Intro</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🪆 Subqueries</div>
+          <h1>SQL Subqueries – Nesting Queries Inside Queries</h1>
+          <p class="lesson-intro">A subquery is a SELECT statement nested inside another SQL statement, always wrapped in parentheses. Subqueries can return a single value, a single row, or a full table — each type is used in different parts of the outer query.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-subquery">What Is a Subquery?</h2>
+          <p>A subquery (also called an inner query or nested query) is a complete SELECT statement enclosed in parentheses that is embedded within another SQL statement. The outer statement uses the result of the subquery as part of its own logic.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Outer query
+SELECT name, salary
+FROM employees
+WHERE salary > (
+    -- Subquery: computes the average salary
+    SELECT AVG(salary)
+    FROM employees
+);</code></pre>
+          </div>
+
+          <p>The database evaluates the inner query first to get the average salary, then uses that single value in the outer WHERE condition. This is a scalar subquery.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Subquery types by what they return</strong>
+              <p><strong>Scalar</strong> — returns exactly one value (one row, one column).<br>
+              <strong>Row</strong> — returns exactly one row with multiple columns.<br>
+              <strong>Table (multi-row)</strong> — returns multiple rows, used like a table.</p>
+            </div>
+          </div>
+
+          <h2 id="scalar-subquery">Scalar Subqueries</h2>
+          <p>A scalar subquery returns a single value and can be used anywhere a literal value is valid: in WHERE, SELECT, or HAVING.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Compare each employee salary to company average
+SELECT
+    name,
+    department,
+    salary,
+    (SELECT AVG(salary) FROM employees) AS company_avg,
+    salary - (SELECT AVG(salary) FROM employees) AS diff
+FROM employees
+ORDER BY diff DESC;</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Scalar subquery must return exactly one row</strong>
+              <p>If a scalar subquery returns more than one row, most databases raise an error. Always use aggregate functions (AVG, MAX, MIN, COUNT) or ensure the subquery is guaranteed to produce a single row.</p>
+            </div>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="row-subquery">Row Subqueries</h2>
+          <p>A row subquery returns exactly one row with multiple columns. It is used with row comparison operators:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Find the employee with the same (department, job_title) as employee id 42
+SELECT name, department, job_title
+FROM employees
+WHERE (department, job_title) = (
+    SELECT department, job_title
+    FROM employees
+    WHERE id = 42
+)
+AND id != 42;</code></pre>
+          </div>
+
+          <h2 id="table-subquery">Table Subqueries (Multi-Row)</h2>
+          <p>A table subquery returns multiple rows and is typically used with IN, NOT IN, ANY, ALL, or EXISTS:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Find employees in departments located in NYC
+SELECT name, department
+FROM employees
+WHERE dept_id IN (
+    SELECT id
+    FROM departments
+    WHERE location = 'NYC'
+);</code></pre>
+          </div>
+
+          <h2 id="in-where">Subqueries in the WHERE Clause</h2>
+          <p>The most common position. Use with comparison operators or IN/EXISTS:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Employees earning more than the maximum salary in Marketing
+SELECT name, salary
+FROM employees
+WHERE salary > (
+    SELECT MAX(salary)
+    FROM employees
+    WHERE department = 'Marketing'
+);</code></pre>
+          </div>
+
+          <h2 id="in-from">Subqueries in the FROM Clause (Derived Tables)</h2>
+          <p>A subquery in FROM acts as a temporary table, often called a derived table. It must be given an alias:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Find departments whose average salary is above 50000
+SELECT dept, avg_sal
+FROM (
+    SELECT department AS dept, AVG(salary) AS avg_sal
+    FROM employees
+    GROUP BY department
+) dept_summary                        -- alias is required
+WHERE avg_sal > 50000
+ORDER BY avg_sal DESC;</code></pre>
+          </div>
+
+          <h2 id="in-select">Subqueries in the SELECT Clause</h2>
+          <p>A scalar subquery in SELECT computes a derived column for each row:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Show each order with the customer's total order count
+SELECT
+    o.id         AS order_id,
+    o.customer_id,
+    o.amount,
+    (SELECT COUNT(*)
+     FROM orders o2
+     WHERE o2.customer_id = o.customer_id) AS customer_order_count
+FROM orders o
+ORDER BY customer_order_count DESC;</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A <strong>subquery</strong> is a SELECT inside another SQL statement, always in parentheses.</li>
+              <li><strong>Scalar subqueries</strong> return one value — used in WHERE, SELECT, HAVING.</li>
+              <li><strong>Row subqueries</strong> return one row — used with row comparison operators.</li>
+              <li><strong>Table subqueries</strong> return multiple rows — used with IN, NOT IN, EXISTS, or in FROM.</li>
+              <li><strong>Derived tables</strong> (subqueries in FROM) must have an alias and act like temporary tables.</li>
+              <li>Subqueries in SELECT compute a value per row — must return exactly one row.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/subqueries/correlated-subqueries.html" class="topic-tag sql-topic-tag">🗄️ Correlated Subqueries</a>
+            <a href="/sql/subqueries/exists-in.html" class="topic-tag sql-topic-tag">🗄️ EXISTS &amp; IN</a>
+            <a href="/sql/subqueries/cte-with.html" class="topic-tag sql-topic-tag">🗄️ CTEs (WITH)</a>
+            <a href="/sql/grouping/window-functions.html" class="topic-tag sql-topic-tag">🗄️ Window Functions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can subqueries be nested multiple levels deep? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — SQL allows subqueries within subqueries to any depth. However, deeply nested subqueries become very hard to read and debug. If you find yourself nesting three or more levels, rewrite using CTEs (WITH clause) which give each subquery a name and make the logic step-by-step readable.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When should I use a subquery vs a JOIN? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>JOINs are generally faster for combining data from multiple tables because the query optimiser can use index-based join algorithms. Use subqueries when: (1) you need to compare against an aggregate; (2) you need EXISTS/NOT EXISTS semantics; (3) you need a derived table for an intermediate aggregation. Modern optimisers often rewrite subqueries as JOINs internally, so the performance difference is smaller than it used to be.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Does a subquery in FROM require an alias in all databases? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — standard SQL and every major database (MySQL, PostgreSQL, SQL Server, Oracle, SQLite) require a derived table alias. Without the alias the query will fail with a syntax error. Always add <code>AS alias_name</code> or just <code>alias_name</code> after the closing parenthesis of the subquery.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/grouping/window-functions.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Window Functions</span>
+          </a>
+          <a href="/sql/subqueries/correlated-subqueries.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Correlated Subqueries</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

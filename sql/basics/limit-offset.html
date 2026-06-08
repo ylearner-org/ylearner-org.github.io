@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL LIMIT &amp; OFFSET – Pagination | ylearner</title>
+  <meta name="description" content="Learn SQL LIMIT and OFFSET for pagination: limit result rows, skip rows, implement page-by-page navigation, TOP N patterns, and understand performance implications of large OFFSETs.">
+  <meta name="keywords" content="SQL LIMIT, SQL OFFSET, SQL pagination, LIMIT OFFSET SQL, TOP N SQL, SQL Server FETCH FIRST, cursor pagination SQL, SQL basics">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/basics/limit-offset.html">
+  <meta property="og:title" content="SQL LIMIT &amp; OFFSET – Pagination | ylearner">
+  <meta property="og:description" content="Master SQL LIMIT and OFFSET — control how many rows are returned, implement pagination, and understand when large OFFSETs hurt performance.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/basics/limit-offset.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL LIMIT & OFFSET – Pagination","description":"Learn SQL LIMIT and OFFSET for row-count control and pagination — including TOP N patterns, SQL Server syntax, and cursor-based pagination for performance.","educationalLevel":"Beginner","keywords":"SQL LIMIT, SQL OFFSET, SQL pagination, TOP N","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/basics/select-statement.html">SQL Basics</a><span class="separator">›</span>
+          <span class="current">LIMIT &amp; OFFSET</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 SQL Basics</div>
+          <h1>SQL LIMIT &amp; OFFSET – Pagination</h1>
+          <p class="lesson-intro">When a query matches thousands of rows, you rarely want to return all of them at once. <strong>LIMIT</strong> caps how many rows the database returns. <strong>OFFSET</strong> skips a number of rows from the beginning of the result set — together they enable the classic page-by-page navigation pattern used in every list view and search results page. This lesson covers LIMIT syntax, the OFFSET pagination formula, the "Top N" pattern, alternative syntax in SQL Server and Oracle, and why large OFFSETs can be slow on big tables.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 12 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="limit-syntax">LIMIT Syntax</h2>
+          <p><code>LIMIT n</code> tells the database to return <em>at most</em> <code>n</code> rows. It is placed at the very end of a SELECT statement — after ORDER BY. Without ORDER BY, LIMIT returns an arbitrary subset of matching rows.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Return the 5 highest-paid employees
+SELECT first_name, salary
+FROM employees
+ORDER BY salary DESC
+LIMIT 5;
+
+-- Return any 10 rows from the products table (unspecified order)
+SELECT * FROM products LIMIT 10;
+
+-- LIMIT with WHERE: first 3 Engineering employees alphabetically
+SELECT first_name, department
+FROM employees
+WHERE department = 'Engineering'
+ORDER BY first_name ASC
+LIMIT 3;</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Always pair LIMIT with ORDER BY for meaningful results</strong>
+              <p>Without ORDER BY, the rows returned by LIMIT are non-deterministic — the database picks whichever rows it processes first, which can change between query runs. When you want the "top 10 by salary" or "latest 5 orders", always specify ORDER BY to make the selection meaningful and reproducible.</p>
+            </div>
+          </div>
+
+          <h2 id="offset-pagination">OFFSET – Skipping Rows for Pagination</h2>
+          <p><code>OFFSET n</code> skips the first <code>n</code> rows of the result set before applying LIMIT. Used together, LIMIT and OFFSET divide a large result set into pages.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Page 1: rows 1-10 (skip 0, take 10)
+SELECT id, title, price
+FROM products
+ORDER BY id ASC
+LIMIT 10 OFFSET 0;
+
+-- Page 2: rows 11-20 (skip 10, take 10)
+SELECT id, title, price
+FROM products
+ORDER BY id ASC
+LIMIT 10 OFFSET 10;
+
+-- Page 3: rows 21-30 (skip 20, take 10)
+SELECT id, title, price
+FROM products
+ORDER BY id ASC
+LIMIT 10 OFFSET 20;</code></pre>
+          </div>
+
+          <p>The general pagination formula:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Pagination formula</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- OFFSET = (page_number - 1) * page_size
+-- page_number starts at 1
+
+-- Page 5 of 10 items per page:
+-- OFFSET = (5 - 1) * 10 = 40
+SELECT * FROM products ORDER BY id LIMIT 10 OFFSET 40;
+
+-- In your application code (Python example):
+-- page = 5
+-- page_size = 10
+-- offset = (page - 1) * page_size  → 40
+-- query = f"SELECT * FROM products ORDER BY id LIMIT {page_size} OFFSET {offset}"</code></pre>
+          </div>
+
+          <h2 id="top-n-pattern">Top-N Pattern</h2>
+          <p>LIMIT combined with ORDER BY is the standard SQL pattern for retrieving the "top N" rows by any metric — highest salaries, most recent orders, bestselling products:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Top 3 highest-paid employees
+SELECT first_name, salary
+FROM employees
+ORDER BY salary DESC
+LIMIT 3;
+
+-- 5 most recently placed orders
+SELECT id, customer_id, total, order_date
+FROM orders
+ORDER BY order_date DESC
+LIMIT 5;
+
+-- Cheapest product in the Electronics category
+SELECT name, price
+FROM products
+WHERE category = 'Electronics'
+ORDER BY price ASC
+LIMIT 1;
+
+-- 10 best-reviewed products (by average rating)
+SELECT product_id, AVG(rating) AS avg_rating
+FROM reviews
+GROUP BY product_id
+ORDER BY avg_rating DESC
+LIMIT 10;</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="sql-server-syntax">SQL Server and Oracle Syntax</h2>
+          <p>MySQL, PostgreSQL, and SQLite use <code>LIMIT</code> / <code>OFFSET</code>. SQL Server uses <code>TOP</code> for simple limits and the SQL standard <code>FETCH FIRST</code> syntax for pagination. Oracle uses <code>FETCH FIRST</code> or the legacy <code>ROWNUM</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – SQL Server (T-SQL)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- SQL Server: TOP N (simple limit — no offset)
+SELECT TOP 5 first_name, salary
+FROM employees
+ORDER BY salary DESC;
+
+-- SQL Server: FETCH FIRST (standard SQL:2008 — supports pagination)
+SELECT first_name, salary
+FROM employees
+ORDER BY salary DESC
+OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY;  -- page 2 of 10 rows</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – PostgreSQL / standard SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- PostgreSQL supports both LIMIT/OFFSET and the standard FETCH FIRST
+SELECT first_name, salary
+FROM employees
+ORDER BY salary DESC
+FETCH FIRST 5 ROWS ONLY;          -- equivalent to LIMIT 5
+
+-- With offset (standard SQL)
+SELECT first_name, salary
+FROM employees
+ORDER BY salary DESC
+OFFSET 10 ROWS FETCH NEXT 5 ROWS ONLY;  -- skip 10, take 5</code></pre>
+          </div>
+
+          <h2 id="performance-note">Performance Note: Large OFFSET Is Slow</h2>
+          <p>A critical performance fact: <code>OFFSET n</code> does <strong>not</strong> skip rows efficiently — the database must still read and discard the first <code>n</code> rows before returning the requested page. <code>OFFSET 100000</code> forces the database to read 100,000 rows just to throw them away.</p>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Large OFFSET degrades linearly</strong>
+              <p>Page 1 (OFFSET 0) is instant. Page 100 (OFFSET 990 with 10 rows/page) is fast. Page 10,000 (OFFSET 99,990) requires the database to scan 100,000 rows every time. For user-facing pagination on large tables, switch to <strong>cursor-based pagination</strong> instead.</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Cursor-based pagination (fast)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Offset-based (slow on large tables):
+SELECT id, title FROM articles ORDER BY id DESC LIMIT 10 OFFSET 100000;
+
+-- Cursor-based (fast even on millions of rows):
+-- First page:
+SELECT id, title FROM articles ORDER BY id DESC LIMIT 10;
+-- Subsequent pages: pass the last seen id as the cursor
+-- If last page ended at id = 4532:
+SELECT id, title
+FROM articles
+WHERE id < 4532          -- cursor: start after the last seen row
+ORDER BY id DESC
+LIMIT 10;</code></pre>
+          </div>
+
+          <p>Cursor-based pagination uses a WHERE condition on an indexed column instead of OFFSET — the database uses the index to jump directly to the starting point. This runs in constant time regardless of how deep into the result set you are.</p>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>LIMIT n</code> — return at most <code>n</code> rows. Always pair with <code>ORDER BY</code> for deterministic results.</li>
+              <li><code>LIMIT n OFFSET m</code> — skip <code>m</code> rows then return <code>n</code>. Pagination formula: <code>OFFSET = (page - 1) × page_size</code>.</li>
+              <li>The <strong>Top-N pattern</strong> uses <code>ORDER BY column DESC LIMIT n</code> to retrieve the highest-ranked rows efficiently.</li>
+              <li>SQL Server uses <code>TOP n</code> for simple limits and <code>OFFSET n ROWS FETCH NEXT n ROWS ONLY</code> for pagination.</li>
+              <li>Large OFFSETs are slow — the database must read and discard all skipped rows. Use <strong>cursor-based pagination</strong> (keyset pagination) on large tables for constant-time page fetches.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/basics/order-by.html" class="topic-tag sql-topic-tag">🗄️ ORDER BY</a>
+            <a href="/sql/basics/where-clause.html" class="topic-tag sql-topic-tag">🗄️ WHERE Clause</a>
+            <a href="/sql/basics/distinct.html" class="topic-tag sql-topic-tag">🗄️ DISTINCT</a>
+            <a href="/sql/grouping/window-functions.html" class="topic-tag sql-topic-tag">🗄️ Window Functions</a>
+            <a href="/sql/advanced/indexes.html" class="topic-tag sql-topic-tag">🗄️ Indexes</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What happens if LIMIT is larger than the number of matching rows? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The database simply returns all matching rows — there is no error. If you say <code>LIMIT 100</code> but only 42 rows match, you get 42 rows. LIMIT is a maximum, not a requirement.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is LIMIT supported by all databases? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>LIMIT is supported by MySQL, PostgreSQL, SQLite, and MariaDB. SQL Server and older Oracle versions use different syntax: <code>TOP n</code> (SQL Server), <code>ROWNUM &lt;= n</code> (Oracle pre-12c), or the standard <code>FETCH FIRST n ROWS ONLY</code> (SQL Server 2012+, Oracle 12c+, PostgreSQL). If you are writing portable SQL that must run on SQL Server, use the FETCH FIRST syntax since it is standard SQL.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I count the total number of pages for pagination? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Run a separate COUNT query before or alongside your paginated query: <code>SELECT COUNT(*) FROM products WHERE category = 'Electronics';</code>. Then divide by page_size and round up: <code>total_pages = CEIL(total_rows / page_size)</code>. In most application frameworks, this count query is run once and cached to avoid running it on every page navigation.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use LIMIT without OFFSET? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — LIMIT and OFFSET are independent. <code>LIMIT 5</code> without OFFSET returns the first 5 rows (OFFSET defaults to 0). OFFSET without LIMIT is also valid — it skips rows but returns all remaining rows. In practice, LIMIT without OFFSET is the common case for Top-N queries. OFFSET without LIMIT is rarely used — the main use case is skipping a fixed number of header rows in certain reporting queries.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/basics/order-by.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">ORDER BY</span>
+          </a>
+          <a href="/sql/basics/distinct.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">DISTINCT</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

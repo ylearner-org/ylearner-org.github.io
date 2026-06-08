@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL ROLLUP &amp; CUBE – Subtotals and Cross-Tabulations | ylearner</title>
+  <meta name="description" content="Learn SQL ROLLUP and CUBE extensions to GROUP BY for generating subtotals, grand totals, and cross-tabulations. Includes the GROUPING() function and real reporting examples.">
+  <meta name="keywords" content="SQL ROLLUP, SQL CUBE, GROUP BY ROLLUP, SQL subtotals, SQL grand total, GROUPING function, SQL cross-tabulation, SQL reporting">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/grouping/rollup-cube.html">
+  <meta property="og:title" content="SQL ROLLUP &amp; CUBE – Subtotals and Cross-Tabulations | ylearner">
+  <meta property="og:description" content="Master SQL ROLLUP and CUBE for hierarchical subtotals and all-combination summaries. Use the GROUPING() function to identify rolled-up rows.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/grouping/rollup-cube.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL ROLLUP and CUBE","description":"ROLLUP generates hierarchical subtotals; CUBE generates all combinations of subtotals. Covers GROUPING() function and reporting use cases.","educationalLevel":"Advanced","keywords":"SQL ROLLUP, SQL CUBE, GROUPING function, SQL subtotals","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/grouping/rollup-cube.html">Grouping</a><span class="separator">›</span>
+          <span class="current">ROLLUP &amp; CUBE</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📊 Grouping &amp; Aggregation</div>
+          <h1>SQL ROLLUP &amp; CUBE – Subtotals and Cross-Tabulations</h1>
+          <p class="lesson-intro">ROLLUP and CUBE are extensions to GROUP BY that automatically generate subtotal and grand total rows — work that would otherwise require multiple UNION ALL queries. ROLLUP creates hierarchical subtotals; CUBE creates subtotals for every possible combination of grouping columns.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="rollup-syntax">ROLLUP Syntax</h2>
+          <p>ROLLUP is specified inside the GROUP BY clause:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Standard SQL syntax (supported by PostgreSQL, MySQL 8+, SQL Server, Oracle)
+SELECT column1, column2, aggregate_function(column3)
+FROM   table_name
+GROUP BY ROLLUP(column1, column2);</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>ROLLUP order matters</strong>
+              <p>The column order inside ROLLUP defines the grouping hierarchy. <code>ROLLUP(dept, job)</code> gives dept+job rows, dept subtotals, and a grand total — rolling up from right to left. Changing the order changes which subtotals are generated.</p>
+            </div>
+          </div>
+
+          <h2 id="rollup-example">ROLLUP Example</h2>
+          <p>Sales data grouped by department and job title with department subtotals and a grand total:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">SELECT
+    department,
+    job_title,
+    SUM(salary)  AS total_salary,
+    COUNT(*)     AS headcount
+FROM employees
+GROUP BY ROLLUP(department, job_title)
+ORDER BY department, job_title;</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Rows produced by ROLLUP</div>
+            Engineering | Senior Eng  | 180000 | 2   ← detail row<br>
+            Engineering | Junior Eng  |  85000 | 1   ← detail row<br>
+            Engineering | NULL        | 265000 | 3   ← dept subtotal (job_title rolled up)<br>
+            Marketing   | Manager     |  72000 | 1   ← detail row<br>
+            Marketing   | NULL        |  72000 | 1   ← dept subtotal<br>
+            NULL        | NULL        | 337000 | 4   ← grand total (both rolled up)
+          </div>
+
+          <p>Notice that the subtotal rows use NULL to indicate "all values" for the rolled-up column. The GROUPING() function (below) helps distinguish these NULLs from actual NULL data.</p>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="cube-syntax">CUBE Syntax and Example</h2>
+          <p>CUBE generates subtotals for every possible combination of the listed columns:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">SELECT
+    department,
+    region,
+    SUM(sales_amount) AS total_sales
+FROM sales
+GROUP BY CUBE(department, region)
+ORDER BY department, region;</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Groups produced by CUBE(department, region)</div>
+            (department, region)  ← detail rows<br>
+            (department, NULL)    ← subtotal per department across all regions<br>
+            (NULL, region)        ← subtotal per region across all departments<br>
+            (NULL, NULL)          ← grand total
+          </div>
+
+          <p>For N columns, CUBE generates 2^N grouping combinations. With 3 columns that is 8 combinations. CUBE is ideal for multi-dimensional analysis (e.g., pivot tables).</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Feature</th><th>ROLLUP</th><th>CUBE</th></tr></thead>
+              <tbody>
+                <tr><td>Groups generated</td><td>N+1 (hierarchical)</td><td>2^N (all combinations)</td></tr>
+                <tr><td>Best for</td><td>Hierarchical reports (year › month › day)</td><td>Multi-dimensional analysis (pivot-style)</td></tr>
+                <tr><td>Column order matters?</td><td>Yes</td><td>No</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="grouping-function">The GROUPING() Function</h2>
+          <p>ROLLUP and CUBE use NULL to mark rolled-up positions. But what if your real data also contains NULLs? The <code>GROUPING()</code> function distinguishes them:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">SELECT
+    CASE WHEN GROUPING(department) = 1 THEN '** ALL DEPTS **'
+         ELSE department END             AS department,
+    CASE WHEN GROUPING(job_title) = 1  THEN '** ALL JOBS **'
+         ELSE job_title END              AS job_title,
+    SUM(salary)  AS total_salary,
+    COUNT(*)     AS headcount
+FROM employees
+GROUP BY ROLLUP(department, job_title)
+ORDER BY GROUPING(department), department, GROUPING(job_title), job_title;</code></pre>
+          </div>
+
+          <p><code>GROUPING(col)</code> returns <code>1</code> when the NULL in that column was added by ROLLUP/CUBE (i.e., it represents "all values"), and <code>0</code> for actual data rows (including real NULLs in the source data).</p>
+
+          <h2 id="use-cases">Use Cases</h2>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Where ROLLUP and CUBE shine</strong>
+              <p>Financial reports with subtotals by region, quarter, and product line; dashboards showing both detail and summary rows in a single query; data warehousing fact tables where BI tools expect pre-rolled-up data.</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Quarterly revenue report with yearly subtotals and grand total
+SELECT
+    CASE WHEN GROUPING(fiscal_year)    = 1 THEN 'ALL YEARS'
+         ELSE CAST(fiscal_year AS VARCHAR) END AS fiscal_year,
+    CASE WHEN GROUPING(fiscal_quarter) = 1 THEN 'ANNUAL TOTAL'
+         ELSE CONCAT('Q', fiscal_quarter) END  AS fiscal_quarter,
+    SUM(revenue)  AS total_revenue
+FROM quarterly_sales
+GROUP BY ROLLUP(fiscal_year, fiscal_quarter)
+ORDER BY fiscal_year, fiscal_quarter;</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>ROLLUP</strong> generates N+1 grouping levels rolling up from right to left — detail rows, subtotals per leading column(s), and a grand total.</li>
+              <li><strong>CUBE</strong> generates subtotals for every combination of grouped columns (2^N groups) — ideal for multi-dimensional analysis.</li>
+              <li>Both use <strong>NULL</strong> to represent "all values" in rolled-up positions.</li>
+              <li><strong>GROUPING(col)</strong> returns 1 for ROLLUP/CUBE-added NULLs and 0 for real data — use it with CASE to label summary rows.</li>
+              <li>Use ROLLUP for hierarchical (drill-down) reports; use CUBE for pivot-style cross-tabulations.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/grouping/group-by.html" class="topic-tag sql-topic-tag">🗄️ GROUP BY</a>
+            <a href="/sql/grouping/having-clause.html" class="topic-tag sql-topic-tag">🗄️ HAVING Clause</a>
+            <a href="/sql/grouping/window-functions.html" class="topic-tag sql-topic-tag">🗄️ Window Functions</a>
+            <a href="/sql/functions/aggregate-functions.html" class="topic-tag sql-topic-tag">🗄️ Aggregate Functions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Is ROLLUP supported in all major databases? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. ROLLUP is part of the SQL:1999 standard and is supported by PostgreSQL, MySQL 8+, SQL Server, Oracle, and SQLite (partial). MySQL 5.x used a non-standard syntax <code>GROUP BY col1, col2 WITH ROLLUP</code> — if targeting MySQL, verify your version supports the standard syntax.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use HAVING with ROLLUP? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. HAVING filters groups after ROLLUP/CUBE generates them. Be careful: HAVING may remove grand total or subtotal rows if they do not meet the condition. Use <code>HAVING GROUPING(col) = 1 OR aggregate_condition</code> if you want to keep summary rows regardless.</p></div>
+          </div>
+            <div class="faq-item">
+              <div class="faq-question">What is GROUPING SETS and how does it relate to ROLLUP and CUBE? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>GROUPING SETS lets you specify exactly which grouping combinations to compute — it is the most general form. ROLLUP and CUBE are shorthand for specific patterns of GROUPING SETS. For example, <code>ROLLUP(a, b)</code> is equivalent to <code>GROUPING SETS((a,b), (a), ())</code>. Use GROUPING SETS when you need a custom combination that is neither a pure ROLLUP nor CUBE.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/grouping/having-clause.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">HAVING Clause</span>
+          </a>
+          <a href="/sql/grouping/window-functions.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Window Functions</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

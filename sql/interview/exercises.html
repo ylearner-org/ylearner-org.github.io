@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Practical Exercises – Hands-On SQL Challenges | ylearner</title>
+  <meta name="description" content="Practice SQL with 15 hands-on exercises at beginner, intermediate, and advanced levels. Includes scenarios, table structures, tasks, expected output, and hints.">
+  <meta name="keywords" content="SQL exercises, SQL practice problems, SQL challenges, SQL hands-on, SQL coding exercises, SQL window functions exercises, SQL CTE exercises, SQL advanced queries">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/interview/exercises.html">
+  <meta property="og:title" content="SQL Practical Exercises – Hands-On SQL Challenges | ylearner">
+  <meta property="og:description" content="15 SQL exercises from beginner to advanced — subqueries, window functions, CTEs, recursive queries, pivot tables, duplicate removal, and more.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/interview/exercises.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Practical Exercises","description":"15 hands-on SQL exercises at beginner, intermediate, and advanced levels.","educationalLevel":"All Levels","keywords":"SQL exercises, SQL practice, SQL challenges","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <span>Interview Prep</span><span class="separator">›</span>
+          <span class="current">Practical Exercises</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🎯 Interview Prep</div>
+          <h1>SQL Practical Exercises – Hands-On SQL Challenges</h1>
+          <p class="lesson-intro">The best way to prepare for SQL interviews is to write real SQL. This page contains 15 progressive exercises — 5 beginner, 5 intermediate, and 5 advanced — each with a scenario, table structure, task, expected output, and a hint. Work through them before looking at the solutions. Most can be run against a PostgreSQL or MySQL database you set up locally.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 60 min practice</span>
+            <span>🎯 All Levels</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <p>All exercises use this shared schema. Create it before you start:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Setup Schema</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">CREATE TABLE departments (
+  id   INT PRIMARY KEY,
+  name VARCHAR(50)
+);
+
+CREATE TABLE employees (
+  id            INT PRIMARY KEY,
+  name          VARCHAR(100),
+  department_id INT REFERENCES departments(id),
+  salary        DECIMAL(10,2),
+  hire_date     DATE,
+  job_title     VARCHAR(100),
+  manager_id    INT REFERENCES employees(id)
+);
+
+CREATE TABLE customers (
+  id    INT PRIMARY KEY,
+  name  VARCHAR(100),
+  email VARCHAR(100)
+);
+
+CREATE TABLE orders (
+  id          INT PRIMARY KEY,
+  customer_id INT REFERENCES customers(id),
+  total       DECIMAL(10,2),
+  created_at  DATE
+);
+
+-- Sample inserts
+INSERT INTO departments VALUES (1,'Engineering'),(2,'Sales'),(3,'HR'),(4,'Marketing');
+INSERT INTO employees VALUES
+  (1,'Alice',1,120000,'2020-03-15','Senior Engineer',NULL),
+  (2,'Bob',1,95000,'2021-07-01','Engineer',1),
+  (3,'Carol',2,80000,'2019-11-01','Sales Rep',NULL),
+  (4,'Dave',2,85000,'2023-02-20','Sales Rep',3),
+  (5,'Eve',2,90000,'2022-05-10','Sales Lead',3),
+  (6,'Frank',3,70000,'2021-01-05','HR Manager',NULL),
+  (7,'Grace',1,105000,'2022-09-01','Engineer',1),
+  (8,'Henry',4,75000,'2023-01-10','Marketing Exec',NULL),
+  (9,'Iris',2,78000,'2022-04-15','Sales Rep',5),
+  (10,'Jack',1,88000,'2023-08-01','Junior Engineer',2);</code></pre>
+          </div>
+
+          <h2 id="beginner-exercises">Beginner Exercises</h2>
+
+          <h3>Exercise 1 – Employees in Engineering</h3>
+          <p><strong>Task:</strong> Select all employees in the Engineering department. Show their name, salary, and hire date.</p>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Hint</strong>
+              <p>JOIN the employees table to departments, then filter with WHERE.</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Solution</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT e.name, e.salary, e.hire_date
+FROM employees e
+JOIN departments d ON d.id = e.department_id
+WHERE d.name = 'Engineering'
+ORDER BY e.salary DESC;</code></pre>
+          </div>
+
+          <h3>Exercise 2 – Top 5 Highest-Paid Employees</h3>
+          <p><strong>Task:</strong> Find the top 5 highest-paid employees. Show name, department name, and salary.</p>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Hint</strong>
+              <p>ORDER BY salary DESC, then LIMIT 5.</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Solution</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT e.name, d.name AS department, e.salary
+FROM employees e
+JOIN departments d ON d.id = e.department_id
+ORDER BY e.salary DESC
+LIMIT 5;</code></pre>
+          </div>
+
+          <h3>Exercise 3 – Employee Count per Department</h3>
+          <p><strong>Task:</strong> Count the number of employees in each department. Show department name and headcount, sorted by headcount descending.</p>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Hint</strong>
+              <p>GROUP BY department_id after joining departments. Use COUNT(*).</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Solution</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT d.name AS department, COUNT(*) AS headcount
+FROM employees e
+JOIN departments d ON d.id = e.department_id
+GROUP BY d.name
+ORDER BY headcount DESC;</code></pre>
+          </div>
+
+          <h3>Exercise 4 – Employees Hired in 2023</h3>
+          <p><strong>Task:</strong> Find all employees hired in the year 2023. Show their name and hire date.</p>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Hint</strong>
+              <p>Use EXTRACT(YEAR FROM hire_date) = 2023 in PostgreSQL or YEAR(hire_date) = 2023 in MySQL.</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Solution</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- PostgreSQL
+SELECT name, hire_date FROM employees
+WHERE EXTRACT(YEAR FROM hire_date) = 2023
+ORDER BY hire_date;
+
+-- MySQL
+SELECT name, hire_date FROM employees
+WHERE YEAR(hire_date) = 2023
+ORDER BY hire_date;</code></pre>
+          </div>
+
+          <h3>Exercise 5 – Distinct Job Titles</h3>
+          <p><strong>Task:</strong> List all distinct job titles across the company, sorted alphabetically.</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Solution</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT DISTINCT job_title
+FROM employees
+ORDER BY job_title;</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="intermediate-exercises">Intermediate Exercises</h2>
+
+          <h3>Exercise 6 – Employees Earning Above Department Average</h3>
+          <p><strong>Task:</strong> Find employees whose salary is above the average salary of their own department. Show name, department, salary, and the department average.</p>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Hint</strong>
+              <p>Use a correlated subquery or a CTE that first calculates the average salary per department, then join it back to employees.</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Solution</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">WITH dept_avg AS (
+  SELECT department_id, AVG(salary) AS avg_salary
+  FROM employees
+  GROUP BY department_id
+)
+SELECT e.name, d.name AS department, e.salary,
+       ROUND(da.avg_salary, 2) AS dept_average
+FROM employees e
+JOIN departments d  ON d.id = e.department_id
+JOIN dept_avg da    ON da.department_id = e.department_id
+WHERE e.salary > da.avg_salary
+ORDER BY d.name, e.salary DESC;</code></pre>
+          </div>
+
+          <h3>Exercise 7 – Rank Employees by Salary Within Each Department</h3>
+          <p><strong>Task:</strong> Show each employee's name, department, salary, and their salary rank within their department (1 = highest paid). Use a window function.</p>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Hint</strong>
+              <p>Use RANK() or DENSE_RANK() with PARTITION BY department_id ORDER BY salary DESC.</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Solution</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT
+  e.name,
+  d.name        AS department,
+  e.salary,
+  RANK() OVER (PARTITION BY e.department_id ORDER BY e.salary DESC) AS salary_rank
+FROM employees e
+JOIN departments d ON d.id = e.department_id
+ORDER BY d.name, salary_rank;</code></pre>
+          </div>
+
+          <h3>Exercise 8 – Customers with No Orders</h3>
+          <p><strong>Task:</strong> Find all customers who have never placed an order. (For this exercise, populate the customers and orders tables with a few rows of sample data.)</p>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Hint</strong>
+              <p>Use a LEFT JOIN from customers to orders, then filter WHERE orders.id IS NULL.</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Solution</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT c.id, c.name, c.email
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+WHERE o.id IS NULL
+ORDER BY c.name;</code></pre>
+          </div>
+
+          <h3>Exercise 9 – Departments with More Than 3 Employees (using CTE)</h3>
+          <p><strong>Task:</strong> Write a CTE that counts employees per department, then SELECT from it to return only departments with more than 3 employees.</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Solution</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">WITH dept_counts AS (
+  SELECT department_id, COUNT(*) AS headcount
+  FROM employees
+  GROUP BY department_id
+)
+SELECT d.name AS department, dc.headcount
+FROM dept_counts dc
+JOIN departments d ON d.id = dc.department_id
+WHERE dc.headcount > 3
+ORDER BY dc.headcount DESC;</code></pre>
+          </div>
+
+          <h3>Exercise 10 – Give Sales a 10% Raise (Conditional UPDATE)</h3>
+          <p><strong>Task:</strong> Give all employees in the Sales department who were hired before 2022 a 10% salary raise.</p>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Hint</strong>
+              <p>Use UPDATE with a subquery or join to identify the correct employees. Always run a SELECT first to verify which rows will be affected.</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Solution</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Verify first
+SELECT e.name, e.salary, e.hire_date
+FROM employees e
+JOIN departments d ON d.id = e.department_id
+WHERE d.name = 'Sales' AND e.hire_date < '2022-01-01';
+
+-- Then update (MySQL syntax)
+UPDATE employees e
+JOIN departments d ON d.id = e.department_id
+SET e.salary = e.salary * 1.10
+WHERE d.name = 'Sales'
+  AND e.hire_date < '2022-01-01';
+
+-- PostgreSQL syntax
+UPDATE employees
+SET salary = salary * 1.10
+WHERE department_id = (SELECT id FROM departments WHERE name = 'Sales')
+  AND hire_date < '2022-01-01';</code></pre>
+          </div>
+
+          <h2 id="advanced-exercises">Advanced Exercises</h2>
+
+          <h3>Exercise 11 – Running Total of Monthly Revenue</h3>
+          <p><strong>Task:</strong> Using the orders table, compute the total revenue per month AND the running total of revenue up to and including that month. Show month, monthly revenue, and cumulative revenue.</p>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Hint</strong>
+              <p>First aggregate to month with DATE_TRUNC / DATE_FORMAT, then use SUM() OVER (ORDER BY month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW).</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Solution (PostgreSQL)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">WITH monthly AS (
+  SELECT
+    DATE_TRUNC('month', created_at) AS month,
+    SUM(total) AS monthly_revenue
+  FROM orders
+  GROUP BY 1
+)
+SELECT
+  month,
+  monthly_revenue,
+  SUM(monthly_revenue) OVER (
+    ORDER BY month
+    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  ) AS cumulative_revenue
+FROM monthly
+ORDER BY month;</code></pre>
+          </div>
+
+          <h3>Exercise 12 – Second-Highest Salary</h3>
+          <p><strong>Task:</strong> Find the second-highest salary in the employees table. Your solution should work even if there are duplicate salary values at the top.</p>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Hint</strong>
+              <p>Use DENSE_RANK() to assign ranks and then filter for rank = 2. Avoid LIMIT/OFFSET — it's unreliable with duplicates.</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Solution</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">WITH ranked AS (
+  SELECT name, salary,
+         DENSE_RANK() OVER (ORDER BY salary DESC) AS rnk
+  FROM employees
+)
+SELECT name, salary
+FROM ranked
+WHERE rnk = 2;</code></pre>
+          </div>
+
+          <h3>Exercise 13 – Recursive CTE: Employee Hierarchy</h3>
+          <p><strong>Task:</strong> Use a recursive CTE to build the full management hierarchy starting from the top-level manager (employees with no manager_id). Show each employee's name, their manager's name, and their depth in the hierarchy.</p>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Hint</strong>
+              <p>Anchor: WHERE manager_id IS NULL. Recursive part: JOIN employees on manager_id = previous level's id. Add a depth counter.</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Solution (PostgreSQL)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">WITH RECURSIVE org_chart AS (
+  -- Anchor: top-level managers
+  SELECT id, name, manager_id, 1 AS depth,
+         name::TEXT AS path
+  FROM employees
+  WHERE manager_id IS NULL
+
+  UNION ALL
+
+  -- Recursive: each employee under a manager
+  SELECT e.id, e.name, e.manager_id, oc.depth + 1,
+         oc.path || ' > ' || e.name
+  FROM employees e
+  JOIN org_chart oc ON oc.id = e.manager_id
+)
+SELECT
+  REPEAT('  ', depth - 1) || name AS employee,
+  depth,
+  path
+FROM org_chart
+ORDER BY path;</code></pre>
+          </div>
+
+          <h3>Exercise 14 – Pivot: Headcount by Department and Hire Year</h3>
+          <p><strong>Task:</strong> Create a pivot table showing employee headcount broken down by hire year (columns: 2019, 2020, 2021, 2022, 2023) with one row per department.</p>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Hint</strong>
+              <p>Use conditional aggregation: SUM(CASE WHEN EXTRACT(YEAR FROM hire_date) = 2020 THEN 1 ELSE 0 END) for each year column.</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Solution</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT
+  d.name AS department,
+  SUM(CASE WHEN EXTRACT(YEAR FROM e.hire_date) = 2019 THEN 1 ELSE 0 END) AS "2019",
+  SUM(CASE WHEN EXTRACT(YEAR FROM e.hire_date) = 2020 THEN 1 ELSE 0 END) AS "2020",
+  SUM(CASE WHEN EXTRACT(YEAR FROM e.hire_date) = 2021 THEN 1 ELSE 0 END) AS "2021",
+  SUM(CASE WHEN EXTRACT(YEAR FROM e.hire_date) = 2022 THEN 1 ELSE 0 END) AS "2022",
+  SUM(CASE WHEN EXTRACT(YEAR FROM e.hire_date) = 2023 THEN 1 ELSE 0 END) AS "2023"
+FROM employees e
+JOIN departments d ON d.id = e.department_id
+GROUP BY d.name
+ORDER BY d.name;</code></pre>
+          </div>
+
+          <h3>Exercise 15 – Find and Delete Duplicate Rows</h3>
+          <p><strong>Task:</strong> The employees table might have duplicate rows (same name and department_id). Find any duplicates, then delete all but the row with the lowest id.</p>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Hint</strong>
+              <p>Use ROW_NUMBER() OVER (PARTITION BY name, department_id ORDER BY id) to assign row numbers within each duplicate group. Delete rows where row_num &gt; 1.</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Solution (PostgreSQL)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Step 1: Identify duplicates
+WITH numbered AS (
+  SELECT id,
+         ROW_NUMBER() OVER (
+           PARTITION BY name, department_id
+           ORDER BY id
+         ) AS rn
+  FROM employees
+)
+SELECT id FROM numbered WHERE rn > 1;
+
+-- Step 2: Delete duplicates (keep the lowest id in each group)
+WITH numbered AS (
+  SELECT id,
+         ROW_NUMBER() OVER (
+           PARTITION BY name, department_id
+           ORDER BY id
+         ) AS rn
+  FROM employees
+)
+DELETE FROM employees
+WHERE id IN (SELECT id FROM numbered WHERE rn > 1);</code></pre>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Where can I run these exercises? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The easiest options: (1) <strong>db-fiddle.com</strong> — paste the schema and query, choose PostgreSQL or MySQL, run in browser. (2) <strong>sqlfiddle.com</strong> — similar browser-based SQL playground. (3) Install <strong>PostgreSQL</strong> locally (free, runs on Windows/Mac/Linux) and use pgAdmin or psql. (4) <strong>DBeaver</strong> is a free universal database client that connects to both PostgreSQL and MySQL — great for local practice.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Are recursive CTEs supported in MySQL? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — recursive CTEs using <code>WITH RECURSIVE</code> are supported from MySQL 8.0 onwards. Earlier versions (5.7 and below) do not support them. In MySQL 8.0+, the syntax is identical to PostgreSQL for basic cases. If you're on MySQL 5.7, you would need to use a stored procedure with a loop, or use a different approach like a closure table pattern for hierarchical data.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I know if my solution is correct? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Run the provided solution and compare output with yours. For exercises without a fixed expected row count (like the hierarchy or pivot exercises), verify the structure is correct: all rows are present, values match expectations. For UPDATE/DELETE exercises, always SELECT first with the same WHERE condition to see which rows would be affected before running the destructive statement.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What's the best way to practice SQL for interviews? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Practice writing SQL by hand — not copy-pasting. Read a question, think about the approach, write the query from scratch. Check it against the solution. Review the <a href="/sql/interview/questions.html">interview questions</a> page to understand the conceptual answers. Then do timed practice on platforms like LeetCode (SQL section), HackerRank (SQL challenges), or Mode Analytics' SQL tutorial. Focus on JOINs, aggregation + HAVING, window functions (ROW_NUMBER, RANK, LAG), and CTEs — these appear in almost every data/backend SQL interview.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/interview/questions.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Interview Questions</span>
+          </a>
+          <a href="/sql/projects/library-database.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Library Database Project</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

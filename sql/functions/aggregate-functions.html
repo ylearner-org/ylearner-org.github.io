@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Aggregate Functions – COUNT, SUM, AVG, MIN, MAX | ylearner</title>
+  <meta name="description" content="Master SQL aggregate functions: COUNT, SUM, AVG, MIN, MAX. Learn how they handle NULLs, how to use COUNT DISTINCT, and how to use aggregates without GROUP BY.">
+  <meta name="keywords" content="SQL aggregate functions, COUNT SQL, SUM SQL, AVG SQL, MIN MAX SQL, GROUP BY SQL, SQL tutorial, COUNT DISTINCT">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/functions/aggregate-functions.html">
+  <meta property="og:title" content="SQL Aggregate Functions – COUNT, SUM, AVG, MIN, MAX | ylearner">
+  <meta property="og:description" content="Learn SQL aggregate functions COUNT, SUM, AVG, MIN, MAX — how they handle NULLs, COUNT DISTINCT, and single-row summaries.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/functions/aggregate-functions.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Aggregate Functions","description":"Learn SQL aggregate functions: COUNT, SUM, AVG, MIN, MAX, COUNT DISTINCT. Understand NULL behavior and how to use aggregates with and without GROUP BY.","educationalLevel":"Beginner","keywords":"SQL aggregate functions, COUNT, SUM, AVG, MIN, MAX","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/functions/aggregate-functions.html">Functions</a><span class="separator">›</span>
+          <span class="current">Aggregate Functions</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ SQL Functions</div>
+          <h1>SQL Aggregate Functions – COUNT, SUM, AVG, MIN, MAX</h1>
+          <p class="lesson-intro">Aggregate functions collapse multiple rows of data into a single summary value. They are the foundation of analytical SQL — answering questions like "How many orders did we receive?" or "What is the average salary per department?" This lesson covers all five core aggregate functions with NULL behavior and practical usage patterns.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-are-aggregates">What Are Aggregate Functions?</h2>
+          <p>An aggregate function takes a set of rows as input and returns a single value. When used with <code>GROUP BY</code>, each group returns one row. When used without <code>GROUP BY</code>, the entire table is treated as one group.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Key rule</strong>
+              <p>You cannot mix aggregate functions with non-aggregated column references in SELECT unless all non-aggregate columns appear in the GROUP BY clause. Violating this is one of the most common SQL errors for beginners.</p>
+            </div>
+          </div>
+
+          <h2 id="count">COUNT()</h2>
+          <p><code>COUNT(*)</code> counts all rows in the result, including rows with NULLs. <code>COUNT(column)</code> counts only the non-NULL values in that column. The difference matters when columns contain NULLs.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Count all rows
+SELECT COUNT(*) FROM employees;              -- 150
+
+-- Count non-NULL values in a column
+SELECT COUNT(manager_id) FROM employees;     -- e.g. 145 (5 employees have no manager)
+
+-- With GROUP BY: count employees per department
+SELECT department_id, COUNT(*) AS employee_count
+FROM employees
+GROUP BY department_id
+ORDER BY employee_count DESC;
+
+-- Count with condition (conditional counting)
+SELECT
+  COUNT(*) AS total_orders,
+  COUNT(CASE WHEN status = 'completed' THEN 1 END) AS completed_orders
+FROM orders;</code></pre>
+          </div>
+
+          <h2 id="sum-avg">SUM() and AVG()</h2>
+          <p><code>SUM()</code> adds up all non-NULL values in a numeric column. <code>AVG()</code> returns the arithmetic mean of non-NULL values — it is equivalent to <code>SUM() / COUNT(column)</code> (not <code>COUNT(*)</code>).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT SUM(total_amount) FROM orders;     -- total revenue
+SELECT AVG(salary)       FROM employees;  -- average salary
+
+-- Per group
+SELECT
+  department_id,
+  SUM(salary)             AS total_payroll,
+  ROUND(AVG(salary), 2)   AS avg_salary
+FROM employees
+GROUP BY department_id;
+
+-- Running total with subquery
+SELECT
+  order_date,
+  total_amount,
+  (SELECT SUM(o2.total_amount)
+   FROM orders o2
+   WHERE o2.order_date <= o1.order_date) AS running_total
+FROM orders o1
+ORDER BY order_date;
+
+-- Careful: AVG with NULLs
+-- If 3 of 5 rows have a salary and 2 are NULL:
+-- AVG(salary) = sum_of_3 / 3  (NOT sum / 5)</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="min-max">MIN() and MAX()</h2>
+          <p><code>MIN()</code> and <code>MAX()</code> work on numbers, strings (alphabetical order), and dates. Both ignore NULLs.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT MIN(salary) FROM employees;   -- lowest salary
+SELECT MAX(salary) FROM employees;   -- highest salary
+
+-- On dates
+SELECT MIN(order_date) AS first_order,
+       MAX(order_date) AS latest_order
+FROM orders;
+
+-- On strings (alphabetical)
+SELECT MIN(last_name) AS first_alpha,
+       MAX(last_name) AS last_alpha
+FROM employees;
+
+-- Find the most expensive product per category
+SELECT category_id, MAX(price) AS max_price
+FROM products
+GROUP BY category_id;
+
+-- Combine all aggregates for a full summary
+SELECT
+  COUNT(*)             AS total_employees,
+  MIN(salary)          AS min_salary,
+  MAX(salary)          AS max_salary,
+  ROUND(AVG(salary),2) AS avg_salary,
+  SUM(salary)          AS total_payroll
+FROM employees;</code></pre>
+          </div>
+
+          <h2 id="count-distinct">COUNT(DISTINCT col)</h2>
+          <p><code>COUNT(DISTINCT column)</code> counts the number of unique non-NULL values. Use it to answer "how many unique customers placed an order?" rather than "how many orders were placed?"</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Unique customers who placed at least one order
+SELECT COUNT(DISTINCT customer_id) AS unique_customers
+FROM orders;
+
+-- Unique products ordered per month
+SELECT
+  YEAR(order_date)                    AS yr,
+  MONTH(order_date)                   AS mo,
+  COUNT(DISTINCT product_id)          AS unique_products,
+  COUNT(*)                            AS total_line_items
+FROM order_items
+GROUP BY yr, mo;
+
+-- Compare: COUNT(*) vs COUNT(col) vs COUNT(DISTINCT col)
+-- Given: orders with customer_ids [1, 2, 2, 3, NULL, NULL]
+SELECT
+  COUNT(*)                    AS total_rows,         -- 6
+  COUNT(customer_id)          AS non_null,           -- 4
+  COUNT(DISTINCT customer_id) AS unique_customers    -- 3
+FROM orders;</code></pre>
+          </div>
+
+          <h2 id="nulls-behavior">How Aggregates Handle NULLs</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Function</th><th>NULL rows</th><th>All NULLs</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>COUNT(*)</code></td><td>Included</td><td>Returns row count</td></tr>
+                <tr><td><code>COUNT(col)</code></td><td>Excluded</td><td>Returns 0</td></tr>
+                <tr><td><code>SUM(col)</code></td><td>Ignored</td><td>Returns NULL</td></tr>
+                <tr><td><code>AVG(col)</code></td><td>Ignored (denominator uses non-NULL count)</td><td>Returns NULL</td></tr>
+                <tr><td><code>MIN(col)</code></td><td>Ignored</td><td>Returns NULL</td></tr>
+                <tr><td><code>MAX(col)</code></td><td>Ignored</td><td>Returns NULL</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>SUM and AVG return NULL on empty sets</strong>
+              <p>If a GROUP BY group has no non-NULL values, SUM and AVG return NULL, not 0. Wrap with <code>COALESCE(SUM(col), 0)</code> to default to zero when that matters for your output.</p>
+            </div>
+          </div>
+
+          <h2 id="without-group-by">Using Aggregates Without GROUP BY</h2>
+          <p>When you omit GROUP BY, the entire result set is treated as one group and returns a single summary row. This is perfect for quick whole-table statistics.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Dashboard-style summary row
+SELECT
+  COUNT(*)                      AS total_orders,
+  COUNT(DISTINCT customer_id)   AS unique_customers,
+  SUM(total_amount)             AS gross_revenue,
+  ROUND(AVG(total_amount), 2)   AS avg_order_value,
+  MIN(order_date)               AS first_order,
+  MAX(order_date)               AS latest_order
+FROM orders
+WHERE YEAR(order_date) = 2026;
+
+-- Scalar subquery using an aggregate
+SELECT
+  product_name,
+  price,
+  price - (SELECT AVG(price) FROM products) AS diff_from_avg
+FROM products;</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>COUNT(*)</strong> — Counts all rows including NULLs. Use for total row count.</li>
+              <li><strong>COUNT(col)</strong> — Counts non-NULL values. Different from COUNT(*) when NULLs exist.</li>
+              <li><strong>COUNT(DISTINCT col)</strong> — Counts unique non-NULL values.</li>
+              <li><strong>SUM(col)</strong> — Totals non-NULL numeric values. Returns NULL if all are NULL.</li>
+              <li><strong>AVG(col)</strong> — Mean of non-NULL values. Denominator is non-NULL count, not row count.</li>
+              <li><strong>MIN(col) / MAX(col)</strong> — Work on numbers, strings, and dates. Both ignore NULLs.</li>
+              <li><strong>Without GROUP BY</strong> — Returns a single summary row for the whole result set.</li>
+              <li><strong>Wrap with COALESCE(SUM(col), 0)</strong> — Avoid NULL results on empty groups.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/grouping/group-by.html" class="topic-tag sql-topic-tag">🗄️ GROUP BY</a>
+            <a href="/sql/grouping/having-clause.html" class="topic-tag sql-topic-tag">🗄️ HAVING Clause</a>
+            <a href="/sql/functions/null-functions.html" class="topic-tag sql-topic-tag">🗄️ NULL Handling</a>
+            <a href="/sql/functions/date-functions.html" class="topic-tag sql-topic-tag">🗄️ Date Functions</a>
+            <a href="/sql/functions/case-expression.html" class="topic-tag sql-topic-tag">🗄️ CASE Expression</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between COUNT(*) and COUNT(column)?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>COUNT(*)</code> counts every row in the group, regardless of NULL values in any column. <code>COUNT(column)</code> counts only the rows where that specific column is not NULL. If a column has no NULLs, they return the same number. Always use <code>COUNT(*)</code> for row counts and <code>COUNT(col)</code> when you specifically want to count non-missing values in a column.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does AVG ignore NULLs — is that the right behavior?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It depends on your business logic. SQL's AVG divides by the count of non-NULL values. If you want NULL to mean "zero" (e.g. a customer placed 0 orders this month), use <code>AVG(COALESCE(col, 0))</code> to substitute 0 for NULL before averaging. If NULL genuinely means "unknown" or "not applicable", the default behavior (ignoring NULLs in the denominator) is usually correct.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use aggregate functions in a WHERE clause?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — aggregate functions cannot be used in WHERE because WHERE filters individual rows before aggregation happens. Use HAVING to filter on aggregate results: <code>HAVING COUNT(*) > 5</code>. The only way to use an aggregate in WHERE is inside a subquery: <code>WHERE salary > (SELECT AVG(salary) FROM employees)</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I find the second highest salary?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Common approaches: <code>SELECT MAX(salary) FROM employees WHERE salary &lt; (SELECT MAX(salary) FROM employees)</code>. Or using window functions (covered later): <code>SELECT salary FROM (SELECT salary, DENSE_RANK() OVER (ORDER BY salary DESC) AS rnk FROM employees) t WHERE rnk = 2</code>. The window function approach handles ties correctly.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/functions/date-functions.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Date & Time Functions</span>
+          </a>
+          <a href="/sql/functions/null-functions.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">NULL Handling</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

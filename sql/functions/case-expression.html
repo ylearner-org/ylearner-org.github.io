@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL CASE Expression – Conditional Logic in Queries | ylearner</title>
+  <meta name="description" content="Master the SQL CASE expression: simple CASE, searched CASE, using CASE in SELECT, ORDER BY, and aggregate functions. Includes pivoting and shorthand alternatives.">
+  <meta name="keywords" content="SQL CASE expression, SQL conditional logic, CASE WHEN SQL, searched CASE SQL, SQL pivot, SQL tutorial">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/functions/case-expression.html">
+  <meta property="og:title" content="SQL CASE Expression – Conditional Logic in Queries | ylearner">
+  <meta property="og:description" content="Learn the SQL CASE expression: simple and searched CASE, usage in SELECT, ORDER BY, and aggregate pivoting.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/functions/case-expression.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL CASE Expression","description":"Learn the SQL CASE expression for conditional logic: simple CASE, searched CASE, CASE in SELECT, ORDER BY, and aggregate functions for pivoting.","educationalLevel":"Intermediate","keywords":"SQL CASE expression, CASE WHEN, conditional SQL, SQL pivot","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/functions/case-expression.html">Functions</a><span class="separator">›</span>
+          <span class="current">CASE Expression</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ SQL Functions</div>
+          <h1>SQL CASE Expression – Conditional Logic in Queries</h1>
+          <p class="lesson-intro">The CASE expression brings if-else logic directly into SQL queries. You can use it in SELECT to create labels, in ORDER BY for custom sorting, and inside aggregate functions to pivot rows into columns — all without touching application code.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="case-syntax">CASE Expression Syntax</h2>
+          <p>There are two forms of the CASE expression. Both evaluate conditions top-to-bottom and return the result for the first matching branch. The <code>ELSE</code> clause is optional — if omitted and no branch matches, CASE returns NULL.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Simple CASE: compare one expression to multiple values
+CASE column_or_expression
+  WHEN value1 THEN result1
+  WHEN value2 THEN result2
+  ELSE default_result
+END
+
+-- Searched CASE: evaluate arbitrary boolean conditions
+CASE
+  WHEN condition1 THEN result1
+  WHEN condition2 THEN result2
+  ELSE default_result
+END</code></pre>
+          </div>
+
+          <h2 id="simple-case">Simple CASE</h2>
+          <p>Simple CASE compares a single expression to a list of values — like a switch/match statement in programming languages.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Map numeric status codes to readable labels
+SELECT
+  order_id,
+  CASE status
+    WHEN 1 THEN 'Pending'
+    WHEN 2 THEN 'Processing'
+    WHEN 3 THEN 'Shipped'
+    WHEN 4 THEN 'Delivered'
+    WHEN 5 THEN 'Cancelled'
+    ELSE 'Unknown'
+  END AS status_label
+FROM orders;
+
+-- Map country codes to regions
+SELECT
+  customer_id,
+  country_code,
+  CASE country_code
+    WHEN 'US' THEN 'North America'
+    WHEN 'CA' THEN 'North America'
+    WHEN 'GB' THEN 'Europe'
+    WHEN 'DE' THEN 'Europe'
+    WHEN 'JP' THEN 'Asia Pacific'
+    ELSE 'Other'
+  END AS region
+FROM customers;</code></pre>
+          </div>
+
+          <h2 id="searched-case">Searched CASE</h2>
+          <p>Searched CASE evaluates a full boolean condition for each branch. More powerful than Simple CASE — use it when you need ranges, multiple columns, or complex logic.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Assign salary bands
+SELECT
+  employee_id,
+  name,
+  salary,
+  CASE
+    WHEN salary < 30000  THEN 'Entry Level'
+    WHEN salary < 60000  THEN 'Mid Level'
+    WHEN salary < 100000 THEN 'Senior'
+    ELSE 'Executive'
+  END AS salary_band
+FROM employees;
+
+-- Classify orders by size
+SELECT
+  order_id,
+  total_amount,
+  CASE
+    WHEN total_amount < 50    THEN 'Small'
+    WHEN total_amount < 200   THEN 'Medium'
+    WHEN total_amount < 1000  THEN 'Large'
+    ELSE 'Enterprise'
+  END AS order_size
+FROM orders;</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="case-in-select">CASE in SELECT</h2>
+          <p>The most common use of CASE: create a computed column based on row values. The result can be used in WHERE, ORDER BY, or GROUP BY by referencing the alias or repeating the expression.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Add discount tiers inline
+SELECT
+  product_name,
+  price,
+  CASE
+    WHEN price > 500  THEN ROUND(price * 0.80, 2)
+    WHEN price > 100  THEN ROUND(price * 0.90, 2)
+    ELSE price
+  END AS discounted_price,
+  CASE
+    WHEN price > 500  THEN '20% off'
+    WHEN price > 100  THEN '10% off'
+    ELSE 'No discount'
+  END AS discount_label
+FROM products;
+
+-- Flag late orders
+SELECT
+  order_id,
+  order_date,
+  ship_date,
+  CASE
+    WHEN ship_date IS NULL                        THEN 'Not Shipped'
+    WHEN ship_date > order_date + INTERVAL 3 DAY  THEN 'Late'
+    ELSE 'On Time'
+  END AS shipping_status
+FROM orders;</code></pre>
+          </div>
+
+          <h2 id="case-in-order">CASE in ORDER BY</h2>
+          <p>CASE inside ORDER BY enables custom sort sequences that are impossible with plain column ordering.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Custom priority order: Critical → High → Medium → Low
+SELECT ticket_id, title, priority
+FROM support_tickets
+ORDER BY
+  CASE priority
+    WHEN 'Critical' THEN 1
+    WHEN 'High'     THEN 2
+    WHEN 'Medium'   THEN 3
+    WHEN 'Low'      THEN 4
+    ELSE 5
+  END;
+
+-- Put active records first, then sort by name
+SELECT customer_id, name, status
+FROM customers
+ORDER BY
+  CASE WHEN status = 'active' THEN 0 ELSE 1 END,
+  name;</code></pre>
+          </div>
+
+          <h2 id="case-in-aggregate">CASE in Aggregate Functions (Pivoting)</h2>
+          <p>Combining CASE with SUM or COUNT is the standard SQL technique for pivoting rows into columns — creating a cross-tabulation without a PIVOT keyword.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Count orders by status in separate columns (pivot)
+SELECT
+  COUNT(*)                                     AS total_orders,
+  SUM(CASE WHEN status = 'pending'   THEN 1 ELSE 0 END) AS pending,
+  SUM(CASE WHEN status = 'shipped'   THEN 1 ELSE 0 END) AS shipped,
+  SUM(CASE WHEN status = 'delivered' THEN 1 ELSE 0 END) AS delivered,
+  SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) AS cancelled
+FROM orders;
+
+-- Monthly revenue by category in one row per month
+SELECT
+  DATE_FORMAT(order_date, '%Y-%m') AS month,
+  SUM(CASE WHEN category = 'Electronics' THEN amount ELSE 0 END) AS electronics,
+  SUM(CASE WHEN category = 'Clothing'    THEN amount ELSE 0 END) AS clothing,
+  SUM(CASE WHEN category = 'Books'       THEN amount ELSE 0 END) AS books
+FROM order_items
+JOIN products USING (product_id)
+GROUP BY month
+ORDER BY month;
+
+-- Alternative: COUNT(CASE WHEN ...) returns 0 for no matches
+-- because COUNT only counts non-NULL, and the WHEN returns NULL when false
+SELECT
+  COUNT(CASE WHEN score >= 90 THEN 1 END) AS grade_a,
+  COUNT(CASE WHEN score >= 80 AND score < 90 THEN 1 END) AS grade_b,
+  COUNT(CASE WHEN score < 80 THEN 1 END)  AS grade_c
+FROM exam_results;</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Simple CASE</strong> — Compares one value to a list. Like a switch statement.</li>
+              <li><strong>Searched CASE</strong> — Evaluates conditions in order. Returns first TRUE match.</li>
+              <li><strong>ELSE is optional</strong> — Without ELSE, unmatched rows return NULL.</li>
+              <li><strong>CASE in SELECT</strong> — Compute labels, tiers, flags, or derived columns.</li>
+              <li><strong>CASE in ORDER BY</strong> — Create custom sort sequences for priorities or statuses.</li>
+              <li><strong>CASE in SUM/COUNT</strong> — Pivot rows to columns. The core technique for cross-tabulation.</li>
+              <li><strong>IIF() (SQL Server)</strong> — Shorthand: <code>IIF(condition, true_val, false_val)</code>.</li>
+              <li><strong>IF() (MySQL)</strong> — Shorthand: <code>IF(condition, true_val, false_val)</code>.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/functions/null-functions.html" class="topic-tag sql-topic-tag">🗄️ NULL Handling</a>
+            <a href="/sql/functions/aggregate-functions.html" class="topic-tag sql-topic-tag">🗄️ Aggregate Functions</a>
+            <a href="/sql/grouping/group-by.html" class="topic-tag sql-topic-tag">🗄️ GROUP BY</a>
+            <a href="/sql/joins/joins-overview.html" class="topic-tag sql-topic-tag">🗄️ Joins Overview</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does CASE short-circuit — does it stop evaluating after the first match?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, SQL CASE is guaranteed by the standard to evaluate conditions left-to-right and stop at the first TRUE condition. This matters when later conditions would cause errors — for example, <code>CASE WHEN col IS NOT NULL WHEN col > 0 THEN 'positive' END</code> safely avoids comparing NULL to 0.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I nest CASE expressions inside each other?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, CASE can be nested: <code>CASE WHEN x > 10 THEN CASE WHEN y > 5 THEN 'High-High' ELSE 'High-Low' END ELSE 'Low' END</code>. However, deeply nested CASE expressions become hard to read. Consider a flat searched CASE with compound conditions instead: <code>CASE WHEN x > 10 AND y > 5 THEN 'High-High' ...</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between Simple CASE and Searched CASE?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Simple CASE (<code>CASE col WHEN val THEN ...</code>) uses equality comparison only. Searched CASE (<code>CASE WHEN condition THEN ...</code>) evaluates any boolean expression — ranges, multiple columns, function calls, IS NULL. Simple CASE is more readable for exact value matching; Searched CASE is required for anything more complex.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use CASE in a WHERE clause?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes: <code>WHERE CASE WHEN col IS NULL THEN 'unknown' ELSE col END = 'active'</code>. However, this often prevents index usage. A more efficient alternative is usually: <code>WHERE (col = 'active' OR col IS NULL)</code>. Use CASE in WHERE when the logic genuinely cannot be expressed with standard boolean operators.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/functions/null-functions.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">NULL Handling</span>
+          </a>
+          <a href="/sql/joins/joins-overview.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Joins Overview</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

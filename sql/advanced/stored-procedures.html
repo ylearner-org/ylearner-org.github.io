@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Stored Procedures – Reusable Server-Side Logic | ylearner</title>
+  <meta name="description" content="Learn how to write SQL stored procedures with IN and OUT parameters, call them with CALL, and understand when to use procedures vs functions in MySQL and PostgreSQL.">
+  <meta name="keywords" content="SQL stored procedures, CREATE PROCEDURE, CALL procedure, stored procedure parameters, procedure vs function, PL/pgSQL, T-SQL, MySQL procedures">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/advanced/stored-procedures.html">
+  <meta property="og:title" content="SQL Stored Procedures – Reusable Server-Side Logic | ylearner">
+  <meta property="og:description" content="Master SQL stored procedures — CREATE PROCEDURE syntax, IN/OUT parameters, CALL, DROP, and when to use procedures vs functions in MySQL and PostgreSQL.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/advanced/stored-procedures.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Stored Procedures","description":"How to create and use SQL stored procedures with parameters in MySQL and PostgreSQL.","educationalLevel":"Advanced","keywords":"SQL stored procedures, CREATE PROCEDURE, PL/pgSQL, procedure parameters","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <span>Advanced SQL</span><span class="separator">›</span>
+          <span class="current">Stored Procedures</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Advanced SQL</div>
+          <h1>SQL Stored Procedures – Reusable Server-Side Logic</h1>
+          <p class="lesson-intro">A stored procedure is a named block of SQL — and optionally procedural code — stored inside the database and called by name. Procedures let you encapsulate complex multi-step logic, reduce round-trips between application and database, and enforce business rules at the data layer where they can't be bypassed.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-are-procedures">What Are Stored Procedures?</h2>
+          <p>A <strong>stored procedure</strong> is a precompiled, named unit of SQL code saved in the database catalog. Unlike a plain SQL query executed from application code, a stored procedure lives inside the database server and is called by name. The database parses and compiles it once; subsequent calls skip the parse step, which can improve performance for frequently executed logic.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Why use stored procedures?</strong>
+              <p>Stored procedures are useful when: (1) you need to perform multiple related SQL operations atomically, (2) you want to enforce business rules in the database layer regardless of which application calls it, (3) you want to reduce network round-trips by doing all the work server-side, or (4) you need conditional logic (IF/ELSE, loops) around SQL statements.</p>
+            </div>
+          </div>
+
+          <h2 id="create-procedure">Creating a Stored Procedure (MySQL)</h2>
+          <p>In MySQL, you must change the delimiter before defining a procedure so that semicolons inside the body are not treated as end-of-statement by the client.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – MySQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Change the delimiter so ; inside the body doesn't end the CREATE
+DELIMITER $$
+
+CREATE PROCEDURE give_raise(
+  IN  emp_id   INT,
+  IN  pct      DECIMAL(5,2),
+  OUT new_sal  DECIMAL(10,2)
+)
+BEGIN
+  -- Validate percentage
+  IF pct <= 0 OR pct > 100 THEN
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Raise percentage must be between 0 and 100';
+  END IF;
+
+  -- Apply the raise
+  UPDATE employees
+  SET salary = salary * (1 + pct / 100)
+  WHERE id = emp_id;
+
+  -- Return the new salary via OUT parameter
+  SELECT salary INTO new_sal
+  FROM employees
+  WHERE id = emp_id;
+END$$
+
+DELIMITER ;
+</code></pre>
+          </div>
+
+          <h3>A simpler example — logging an event</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – MySQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">DELIMITER $$
+
+CREATE PROCEDURE log_action(
+  IN  user_id   INT,
+  IN  action    VARCHAR(100),
+  IN  details   TEXT
+)
+BEGIN
+  INSERT INTO audit_log (user_id, action, details, created_at)
+  VALUES (user_id, action, details, NOW());
+END$$
+
+DELIMITER ;</code></pre>
+          </div>
+
+          <h2 id="parameters">Parameters: IN, OUT, INOUT</h2>
+          <p>MySQL (and most databases) support three parameter modes:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Mode</th><th>Description</th><th>Example Use</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>IN</strong></td><td>Value passed in from caller; procedure cannot modify the caller's variable</td><td>Filter criteria, IDs, amounts</td></tr>
+                <tr><td><strong>OUT</strong></td><td>Value returned to caller; starts as NULL inside the procedure</td><td>Returning a calculated result or new ID</td></tr>
+                <tr><td><strong>INOUT</strong></td><td>Caller passes a value in; procedure can modify it and return new value</td><td>Running totals, counters</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="calling-procedure">Calling a Stored Procedure</h2>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – MySQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Call a procedure with no OUT parameter
+CALL log_action(7, 'login', 'User logged in from 192.168.1.1');
+
+-- Call a procedure with an OUT parameter
+SET @new_salary = 0;
+CALL give_raise(42, 10.00, @new_salary);
+SELECT @new_salary AS updated_salary;
+
+-- Call inside a transaction
+START TRANSACTION;
+CALL give_raise(42, 10.00, @new_salary);
+CALL give_raise(55, 10.00, @new_salary);
+COMMIT;</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="drop-procedure">Dropping a Stored Procedure</h2>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Drop a procedure
+DROP PROCEDURE give_raise;
+
+-- Drop only if exists (no error if not found)
+DROP PROCEDURE IF EXISTS give_raise;
+
+-- List all stored procedures in MySQL
+SHOW PROCEDURE STATUS WHERE Db = 'my_database';
+
+-- View procedure source in MySQL
+SHOW CREATE PROCEDURE give_raise;</code></pre>
+          </div>
+
+          <h2 id="vs-functions">Stored Procedures vs Functions</h2>
+          <p>Procedures and functions look similar but serve different roles:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Feature</th><th>Stored Procedure</th><th>Function</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Returns a value</td><td>Via OUT parameter (optional)</td><td>Always returns exactly one value</td></tr>
+                <tr><td>Can be used in SELECT</td><td>No — called with CALL</td><td>Yes — <code>SELECT my_func(arg)</code></td></tr>
+                <tr><td>Side effects (INSERT/UPDATE)</td><td>Yes — fully supported</td><td>Restricted — pure functions should have none</td></tr>
+                <tr><td>Transactions</td><td>Can contain transaction control (COMMIT/ROLLBACK)</td><td>Cannot (in most databases)</td></tr>
+                <tr><td>Called with</td><td><code>CALL proc_name(...)</code></td><td><code>SELECT func_name(...)</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>PostgreSQL stored procedure (PL/pgSQL)</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – PostgreSQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- PostgreSQL uses PL/pgSQL and dollar-quoting
+CREATE OR REPLACE PROCEDURE transfer_funds(
+  sender_id   INT,
+  receiver_id INT,
+  amount      NUMERIC
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  -- Deduct from sender
+  UPDATE accounts SET balance = balance - amount WHERE id = sender_id;
+
+  -- Add to receiver
+  UPDATE accounts SET balance = balance + amount WHERE id = receiver_id;
+
+  -- Log the transfer
+  INSERT INTO transactions (sender_id, receiver_id, amount, transferred_at)
+  VALUES (sender_id, receiver_id, amount, NOW());
+
+  COMMIT;
+EXCEPTION WHEN OTHERS THEN
+  ROLLBACK;
+  RAISE;
+END;
+$$;
+
+-- Call in PostgreSQL
+CALL transfer_funds(1, 2, 500.00);</code></pre>
+          </div>
+
+          <h2 id="when-to-use">When to Use Stored Procedures</h2>
+          <ul>
+            <li><strong>Multi-step business logic</strong> — operations that require multiple INSERT/UPDATE/DELETE statements that must succeed or fail together.</li>
+            <li><strong>Batch operations</strong> — nightly jobs, bulk updates, data migrations that run inside the database without round-trips.</li>
+            <li><strong>Enforcing business rules at the DB layer</strong> — when you need guarantees that hold regardless of which application or user makes changes.</li>
+            <li><strong>Reducing network traffic</strong> — a single <code>CALL proc(...)</code> replaces dozens of individual queries sent over the network.</li>
+          </ul>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Stored procedures have trade-offs</strong>
+              <p>Logic in stored procedures is harder to version control, test, and deploy than application code. Over-reliance on procedures can create a "fat database" where business logic is split between the application and the DB, making both harder to maintain. Use them judiciously — not as a default for all logic.</p>
+            </div>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A stored procedure is a named, saved block of SQL stored in the database and called with <code>CALL</code>.</li>
+              <li>Parameters can be <code>IN</code> (input), <code>OUT</code> (output), or <code>INOUT</code> (both).</li>
+              <li>In MySQL use <code>DELIMITER $$</code> to prevent semicolons inside the body from terminating the CREATE statement prematurely.</li>
+              <li>Procedures can contain DML (INSERT/UPDATE/DELETE), conditional logic, and transaction control.</li>
+              <li>Functions return a single value and can be used in SELECT; procedures are called with CALL and communicate results via OUT parameters.</li>
+              <li>PostgreSQL uses PL/pgSQL with dollar-quoting (<code>$$...$$</code>); SQL Server uses T-SQL.</li>
+              <li>Best for: multi-step atomic operations, batch jobs, enforcing DB-level business rules.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/advanced/views.html" class="topic-tag sql-topic-tag">🗄️ Views</a>
+            <a href="/sql/advanced/triggers.html" class="topic-tag sql-topic-tag">🗄️ Triggers</a>
+            <a href="/sql/advanced/indexes.html" class="topic-tag sql-topic-tag">🗄️ Indexes</a>
+            <a href="/sql/interview/questions.html" class="topic-tag sql-topic-tag">🗄️ Interview Questions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Are stored procedures precompiled? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In MySQL, stored procedures are parsed and stored in compiled form. In PostgreSQL, PL/pgSQL procedures are compiled on first execution and the compiled plan is cached for the session. The performance benefit of "precompilation" is real but often overstated — the bigger benefit of stored procedures is usually reduced network round-trips and the ability to use procedural logic alongside SQL.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can stored procedures return a result set? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In MySQL, yes — a <code>SELECT</code> statement inside a procedure without <code>INTO</code> sends a result set back to the caller, just like a plain query. In PostgreSQL, procedures don't return result sets directly; you would use a function with <code>RETURNS TABLE</code> or <code>RETURNS SETOF</code> for that purpose. In SQL Server, SELECT inside a procedure also returns a result set to the caller.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I handle errors inside a stored procedure? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In MySQL, use <code>DECLARE ... HANDLER FOR SQLEXCEPTION</code> or <code>SIGNAL SQLSTATE</code> to raise errors. In PostgreSQL PL/pgSQL, use <code>EXCEPTION WHEN ... THEN</code> blocks (similar to try/catch). In SQL Server T-SQL, use <code>TRY...CATCH</code> blocks. Always pair error handling with transaction rollback to leave the database in a consistent state on failure.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between stored procedures in MySQL vs PostgreSQL? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>MySQL procedures use <code>DELIMITER $$</code> and a relatively simple procedural language. PostgreSQL uses PL/pgSQL with dollar-quoting, richer exception handling, and stricter typing. In PostgreSQL (before version 11), "stored procedures" were implemented as functions — true <code>CREATE PROCEDURE</code> with transaction control was added in PostgreSQL 11. PostgreSQL also supports other procedural languages: PL/Python, PL/Perl, and PL/v8 (JavaScript).</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/advanced/views.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Views</span>
+          </a>
+          <a href="/sql/advanced/triggers.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Triggers</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

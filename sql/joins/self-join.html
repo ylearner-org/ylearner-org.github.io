@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Self Join – Joining a Table with Itself | ylearner</title>
+  <meta name="description" content="Learn SQL self joins: joining a table to itself using different aliases. Classic examples include employee-manager hierarchies and finding related row pairs.">
+  <meta name="keywords" content="SQL self join, SQL self-referencing join, employee manager SQL, hierarchy SQL, finding pairs SQL, SQL join tutorial">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/joins/self-join.html">
+  <meta property="og:title" content="SQL Self Join – Joining a Table with Itself | ylearner">
+  <meta property="og:description" content="Learn SQL self join with employee-manager hierarchy examples and finding row pairs using the same table twice with different aliases.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/joins/self-join.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Self Join","description":"Learn SQL self join — joining a table to itself using different aliases. Examples include employee-manager hierarchies, finding pairs, and multi-level relationships.","educationalLevel":"Intermediate","keywords":"SQL self join, employee manager hierarchy, finding pairs SQL, self-referencing join","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/joins/joins-overview.html">Joins</a><span class="separator">›</span>
+          <span class="current">Self Join</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔗 Joins</div>
+          <h1>SQL Self Join – Joining a Table with Itself</h1>
+          <p class="lesson-intro">A self join joins a table to itself — the same physical table is referenced twice in the same query using different aliases. The most classic use case is an employee table that stores the manager's ID as a foreign key pointing back to the same table. Self joins unlock powerful hierarchical and comparative queries without needing a separate table.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-self-join">What Is a Self Join?</h2>
+          <p>A self join is not a special join keyword — it is simply a regular INNER JOIN or LEFT JOIN where both sides reference the same table. You must give each reference a different alias so the database can distinguish them.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Aliases are mandatory</strong>
+              <p>In a self join you must use aliases because SQL cannot tell which instance of the table each column refers to. The convention is to use descriptive aliases like <code>e</code> for employee and <code>m</code> for manager — or <code>a</code> and <code>b</code> for generic row pairs.</p>
+            </div>
+          </div>
+
+          <h2 id="self-join-syntax">Self Join Syntax</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Template: same table referenced twice with different aliases
+SELECT a.col1, b.col2
+FROM table_name a
+JOIN table_name b ON a.some_col = b.other_col;
+
+-- The join type (INNER, LEFT, etc.) depends on your need
+-- INNER JOIN: only rows where both sides match
+-- LEFT JOIN:  keep rows even when no match (e.g. employees with no manager)</code></pre>
+          </div>
+
+          <h2 id="manager-example">Employee–Manager Hierarchy</h2>
+          <p>The employees table has a <code>manager_id</code> column that references the <code>id</code> of another row in the same table. A self join lets you display the manager's name alongside each employee.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- employees table:
+-- id | name  | manager_id
+--  1 | Alice |       NULL  ← top-level (no manager)
+--  2 | Bob   |          1  ← reports to Alice
+--  3 | Carol |          1  ← reports to Alice
+--  4 | Dave  |          1  ← reports to Alice
+
+-- INNER JOIN: only employees WITH a manager
+SELECT
+  e.name         AS employee,
+  m.name         AS manager
+FROM employees e
+INNER JOIN employees m ON e.manager_id = m.id;
+-- Result:
+-- employee | manager
+-- Bob      | Alice
+-- Carol    | Alice
+-- Dave     | Alice
+-- (Alice is excluded — no manager match)
+
+-- LEFT JOIN: include ALL employees; NULL for top-level managers
+SELECT
+  e.name                              AS employee,
+  COALESCE(m.name, 'No Manager')      AS manager
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.id;
+-- Result:
+-- employee | manager
+-- Alice    | No Manager
+-- Bob      | Alice
+-- Carol    | Alice
+-- Dave     | Alice</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="hierarchy">Multi-Level Hierarchy</h2>
+          <p>Add additional self join levels to traverse multi-level reporting structures.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Three levels: employee → manager → director
+SELECT
+  e.name  AS employee,
+  m.name  AS manager,
+  d.name  AS director
+FROM employees e
+LEFT JOIN employees m ON e.manager_id     = m.id
+LEFT JOIN employees d ON m.manager_id     = d.id;
+
+-- Employees table extended sample:
+-- id | name    | manager_id
+--  1 | CEO     | NULL
+--  2 | Alice   |          1  ← reports to CEO
+--  3 | Bob     |          2  ← reports to Alice
+--  4 | Carol   |          2  ← reports to Alice
+
+-- Result:
+-- employee | manager | director
+-- CEO      | NULL    | NULL
+-- Alice    | CEO     | NULL
+-- Bob      | Alice   | CEO
+-- Carol    | Alice   | CEO</code></pre>
+          </div>
+
+          <h2 id="self-join-pairs">Finding Pairs: Employees in the Same Department</h2>
+          <p>Self joins are also used to find pairs of rows that share a common attribute. The <code>a.id &lt; b.id</code> condition prevents duplicate pairs (A-B and B-A) and a row being paired with itself.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- All pairs of employees in the same department
+SELECT
+  a.name AS employee_1,
+  b.name AS employee_2,
+  a.dept_id
+FROM employees a
+JOIN employees b ON a.dept_id = b.dept_id
+                AND a.id < b.id       -- avoids (Alice,Bob) AND (Bob,Alice) AND (Alice,Alice)
+ORDER BY a.dept_id;
+
+-- Find customers who share the same city
+SELECT
+  a.name AS customer_1,
+  b.name AS customer_2,
+  a.city
+FROM customers a
+JOIN customers b ON a.city = b.city
+               AND a.id < b.id;
+
+-- Find products with the same price (possible duplicate pricing)
+SELECT
+  a.product_name AS product_1,
+  b.product_name AS product_2,
+  a.price
+FROM products a
+JOIN products b ON a.price = b.price
+              AND a.id < b.id
+ORDER BY a.price;</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Self join</strong> — Join a table to itself using two different aliases. No special keyword required.</li>
+              <li><strong>Aliases are mandatory</strong> — Without them SQL cannot distinguish the two instances of the table.</li>
+              <li><strong>Employee–manager pattern</strong> — <code>manager_id</code> FK in the same table is the canonical self join example.</li>
+              <li><strong>LEFT JOIN for top-level rows</strong> — Use LEFT JOIN to include employees with no manager (NULL manager_id).</li>
+              <li><strong>Chain for depth</strong> — Add more self joins to traverse additional hierarchy levels.</li>
+              <li><strong>Finding pairs</strong> — Use <code>a.id &lt; b.id</code> to get each unique pair exactly once, excluding self-pairs.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/joins/full-outer-join.html" class="topic-tag sql-topic-tag">🗄️ FULL OUTER JOIN</a>
+            <a href="/sql/joins/cross-join.html" class="topic-tag sql-topic-tag">🗄️ CROSS JOIN</a>
+            <a href="/sql/joins/inner-join.html" class="topic-tag sql-topic-tag">🗄️ INNER JOIN</a>
+            <a href="/sql/joins/left-right-join.html" class="topic-tag sql-topic-tag">🗄️ LEFT & RIGHT JOIN</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does a self join affect performance?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A self join performs the same as any other join of similar tables — the database does not know it is the same physical table, it just joins two result sets. Performance depends on table size, indexes, and the join condition. Ensure the self-referencing column (e.g. <code>manager_id</code>) is indexed if the table is large. The optimizer may handle self joins efficiently since statistics for both sides are identical.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I handle unlimited hierarchy depth in SQL?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For arbitrary-depth hierarchies (trees, org charts, bill-of-materials), a recursive CTE (Common Table Expression) is the modern approach: <code>WITH RECURSIVE org_tree AS (SELECT id, name, manager_id, 0 AS level FROM employees WHERE manager_id IS NULL UNION ALL SELECT e.id, e.name, e.manager_id, t.level + 1 FROM employees e JOIN org_tree t ON e.manager_id = t.id) SELECT * FROM org_tree</code>. This handles any depth without knowing the maximum level in advance.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why use a.id &lt; b.id instead of a.id != b.id?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>a.id != b.id</code> prevents a row pairing with itself but still generates both (Alice, Bob) and (Bob, Alice) as separate rows — you get double the pairs. <code>a.id &lt; b.id</code> enforces strict ordering, ensuring each unique pair appears exactly once. Use <code>!=</code> when you need directed pairs (order matters), and <code>&lt;</code> when you need undirected pairs (order does not matter).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can a self join use columns other than the primary key?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — you can self join on any column. Common examples include joining on department_id (same-department pairs), zip_code (same-location customers), or product_category (same-category products). The only requirement is that you use different aliases for the two instances of the table and provide a meaningful join condition.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/joins/full-outer-join.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">FULL OUTER JOIN</span>
+          </a>
+          <a href="/sql/joins/cross-join.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">CROSS JOIN</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

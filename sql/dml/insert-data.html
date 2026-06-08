@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL INSERT – Adding Data to Tables | ylearner</title>
+  <meta name="description" content="Learn SQL INSERT INTO: single row, multiple rows, INSERT SELECT, default values, and the RETURNING clause. Full tutorial with syntax and practical examples.">
+  <meta name="keywords" content="SQL INSERT, INSERT INTO tutorial, SQL add rows, INSERT multiple rows, INSERT SELECT, SQL RETURNING, SQL default values, SQL DML">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/dml/insert-data.html">
+  <meta property="og:title" content="SQL INSERT – Adding Data to Tables | ylearner">
+  <meta property="og:description" content="Master SQL INSERT: add single rows, multiple rows at once, copy rows with INSERT SELECT, use default values, and retrieve inserted IDs with RETURNING.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/dml/insert-data.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL INSERT","description":"SQL INSERT INTO for adding data: single row, bulk insert, INSERT SELECT, defaults, and RETURNING clause.","educationalLevel":"Beginner","keywords":"SQL INSERT, INSERT INTO, INSERT multiple rows, INSERT SELECT, RETURNING","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/dml/insert-data.html">DML</a><span class="separator">›</span>
+          <span class="current">INSERT Data</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">✏️ Data Modification</div>
+          <h1>SQL INSERT – Adding Data to Tables</h1>
+          <p class="lesson-intro">INSERT INTO is the SQL statement for adding new rows to a table. You can insert a single row, multiple rows at once, or copy entire result sets from other tables. It is one of the three core DML (Data Manipulation Language) statements alongside UPDATE and DELETE.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="insert-syntax">Basic INSERT Syntax</h2>
+          <p>Always specify the column list explicitly — it makes your code resilient to schema changes:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Explicit column list (recommended)
+INSERT INTO users (name, email, created_at)
+VALUES ('Alice', 'alice@example.com', NOW());
+
+-- Omitting column list (NOT recommended — order-dependent)
+INSERT INTO users
+VALUES (DEFAULT, 'Bob', 'bob@example.com', NOW());
+-- If the table schema changes, column order may break your insert</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always specify the column list</strong>
+              <p>If you omit the column list, you must provide values in the exact order all columns are defined in the table, including auto-increment columns. A schema change (adding or reordering a column) will silently insert wrong data. Always name the columns you are inserting.</p>
+            </div>
+          </div>
+
+          <h2 id="insert-multiple">Inserting Multiple Rows</h2>
+          <p>Inserting multiple rows in a single statement is far more efficient than separate INSERT statements — one round-trip to the database instead of N:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">INSERT INTO products (name, category, price, stock)
+VALUES
+    ('Laptop Pro 15',  'Electronics', 1299.99, 50),
+    ('Wireless Mouse', 'Electronics',   29.99, 200),
+    ('USB-C Hub',      'Accessories',   49.99, 150),
+    ('Desk Lamp',      'Office',         24.99, 300);
+-- All four rows inserted in a single statement</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="insert-select">INSERT SELECT – Copying Data</h2>
+          <p>INSERT ... SELECT copies rows from one query result into a table. No VALUES clause is used:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Archive old orders to a separate archive table
+INSERT INTO orders_archive (id, customer_id, amount, order_date, archived_at)
+SELECT id, customer_id, amount, order_date, NOW()
+FROM orders
+WHERE order_date < '2023-01-01'
+  AND status = 'completed';
+
+-- Copy a subset of users into a leads table
+INSERT INTO leads (email, signup_date, source)
+SELECT email, created_at, 'organic'
+FROM users
+WHERE referral_source IS NULL
+  AND created_at >= '2025-01-01';</code></pre>
+          </div>
+
+          <h2 id="default-values">Default Values and NULL</h2>
+          <p>Omitting a column uses its DEFAULT value (if defined) or NULL (if the column allows NULL). You can also use the DEFAULT keyword explicitly:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Table definition (for context)
+CREATE TABLE orders (
+    id          SERIAL PRIMARY KEY,            -- auto-increment, do not insert
+    customer_id INT    NOT NULL,
+    status      VARCHAR(20) DEFAULT 'pending', -- default value
+    notes       TEXT,                          -- nullable, defaults to NULL
+    created_at  TIMESTAMP DEFAULT NOW()        -- default to current time
+);
+
+-- Insert: omit auto-increment and columns with defaults
+INSERT INTO orders (customer_id)
+VALUES (42);
+-- Result: status='pending', notes=NULL, created_at=NOW(), id auto-assigned
+
+-- Explicitly use DEFAULT keyword
+INSERT INTO orders (customer_id, status, created_at)
+VALUES (43, DEFAULT, DEFAULT);
+-- status='pending', created_at=NOW()</code></pre>
+          </div>
+
+          <h2 id="returning">RETURNING Clause (PostgreSQL)</h2>
+          <p>PostgreSQL's RETURNING clause lets you retrieve data from the inserted rows — including auto-generated IDs — without a separate SELECT query:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- PostgreSQL: insert and get the generated ID back
+INSERT INTO users (name, email)
+VALUES ('Carol', 'carol@example.com')
+RETURNING id, created_at;
+-- Returns: id=1042, created_at=2026-06-08 14:30:00
+
+-- Insert multiple rows and return all generated IDs
+INSERT INTO products (name, price)
+VALUES ('Widget A', 9.99), ('Widget B', 14.99)
+RETURNING id, name;
+-- Returns two rows with their new IDs
+
+-- MySQL equivalent: use LAST_INSERT_ID() after the insert
+INSERT INTO users (name, email) VALUES ('Dave', 'dave@example.com');
+SELECT LAST_INSERT_ID();  -- returns the last auto-increment ID</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Getting inserted IDs in different databases</strong>
+              <p>PostgreSQL: <code>RETURNING id</code>. MySQL: <code>LAST_INSERT_ID()</code>. SQL Server: <code>OUTPUT INSERTED.id</code>. SQLite: <code>last_insert_rowid()</code>. Each approach is database-specific; application frameworks (ORM libraries) abstract this for you.</p>
+            </div>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>INSERT INTO table (col1, col2) VALUES (...)</code> — always specify the column list.</li>
+              <li><strong>Multi-row insert</strong>: <code>VALUES (...), (...), (...)</code> — efficient for bulk inserts.</li>
+              <li><strong>INSERT SELECT</strong>: copies rows from a query result — no VALUES clause.</li>
+              <li>Omitting a column inserts its <strong>DEFAULT</strong> value or NULL.</li>
+              <li><strong>RETURNING</strong> (PostgreSQL) retrieves inserted row data (including auto-generated IDs) without an extra SELECT.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/dml/update-data.html" class="topic-tag sql-topic-tag">🗄️ UPDATE Data</a>
+            <a href="/sql/dml/delete-data.html" class="topic-tag sql-topic-tag">🗄️ DELETE Data</a>
+            <a href="/sql/dml/upsert.html" class="topic-tag sql-topic-tag">🗄️ UPSERT</a>
+            <a href="/sql/dml/transactions.html" class="topic-tag sql-topic-tag">🗄️ Transactions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What happens if I INSERT a duplicate primary key? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The database raises a unique constraint violation error and the insert fails — no row is inserted. To handle duplicates gracefully, use UPSERT syntax: <code>INSERT ... ON CONFLICT DO UPDATE</code> (PostgreSQL), <code>INSERT ... ON DUPLICATE KEY UPDATE</code> (MySQL), or <code>INSERT OR REPLACE</code> (SQLite). See the UPSERT lesson for full details.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can INSERT SELECT insert into the same table it selects from? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In most databases you can, but you must be careful about infinite loops or reading uncommitted inserts. MySQL requires an intermediate derived table: <code>INSERT INTO t SELECT * FROM (SELECT ... FROM t WHERE ...) AS tmp</code>. PostgreSQL and SQL Server handle same-table INSERT SELECT directly, reading a snapshot of the table before the insert begins.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is there a limit to how many rows I can insert in one statement? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>There is no SQL standard limit, but practical limits depend on the database's maximum statement/packet size. MySQL has a <code>max_allowed_packet</code> setting (default 64MB). For very large bulk inserts (millions of rows), use database-specific bulk load tools: PostgreSQL's <code>COPY FROM</code>, MySQL's <code>LOAD DATA INFILE</code>, or SQL Server's <code>BULK INSERT</code> — these are orders of magnitude faster than multi-row VALUES inserts.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/subqueries/cte-with.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">CTEs (WITH)</span>
+          </a>
+          <a href="/sql/dml/update-data.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">UPDATE Data</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

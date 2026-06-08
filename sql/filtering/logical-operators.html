@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Logical Operators – AND, OR, NOT | ylearner</title>
+  <meta name="description" content="Learn SQL logical operators AND, OR, and NOT — how to combine multiple conditions in WHERE clauses, operator precedence pitfalls, and three-valued logic truth tables.">
+  <meta name="keywords" content="SQL AND operator, SQL OR operator, SQL NOT operator, SQL logical operators, SQL WHERE clause, SQL operator precedence, SQL truth table">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/sql/filtering/logical-operators.html">
+  <meta property="og:title" content="SQL Logical Operators – AND, OR, NOT | ylearner">
+  <meta property="og:description" content="Master SQL logical operators AND, OR, NOT. Learn about operator precedence bugs, how to fix them with parentheses, and the three-valued logic truth table including NULL.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/sql/filtering/logical-operators.html">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Logical Operators – AND, OR, NOT","description":"Learn SQL logical operators AND, OR, NOT with precedence rules, real-world examples, and a three-valued logic truth table covering NULL behavior.","educationalLevel":"Beginner","keywords":"SQL AND, SQL OR, SQL NOT, SQL logical operators, SQL operator precedence, SQL three-valued logic","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/filtering/logical-operators.html">Filtering</a><span class="separator">›</span>
+          <span class="current">Logical Operators</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔍 Filtering</div>
+          <h1>SQL Logical Operators – AND, OR, NOT</h1>
+          <p class="lesson-intro">Logical operators let you combine multiple conditions in a <code>WHERE</code> clause to build precise, expressive filters. <code>AND</code> requires all conditions to be true, <code>OR</code> requires at least one to be true, and <code>NOT</code> inverts a condition. Understanding operator precedence — and a classic precedence bug — is essential to writing correct SQL queries.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="and-operator">AND – Both Conditions Must Be True</h2>
+          <p><code>AND</code> returns a row only when <strong>all</strong> conditions it connects evaluate to TRUE. You can chain multiple <code>AND</code>s in a single <code>WHERE</code> clause.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Both conditions must be true
+SELECT * FROM employees
+WHERE department = 'Engineering' AND salary > 80000;
+
+-- Three conditions chained
+SELECT * FROM products
+WHERE category = 'Electronics'
+  AND price < 500
+  AND is_active = 1;
+
+-- AND with date filtering
+SELECT * FROM orders
+WHERE status = 'shipped'
+  AND created_at >= '2026-01-01'
+  AND created_at < '2027-01-01';</code></pre>
+          </div>
+
+          <h2 id="or-operator">OR – At Least One Condition Must Be True</h2>
+          <p><code>OR</code> returns a row when <strong>at least one</strong> of the connected conditions is TRUE.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Either condition is sufficient
+SELECT * FROM employees
+WHERE department = 'Sales' OR department = 'Marketing';
+
+-- OR with different columns
+SELECT * FROM products
+WHERE price < 10 OR stock = 0;
+
+-- Combining multiple OR conditions
+-- (but see the IN operator for a cleaner version of this)
+SELECT * FROM users
+WHERE country = 'US' OR country = 'CA' OR country = 'GB';</code></pre>
+          </div>
+
+          <h2 id="not-operator">NOT – Negate a Condition</h2>
+          <p><code>NOT</code> inverts the boolean result of a condition. It is commonly used with <code>IN</code>, <code>LIKE</code>, <code>BETWEEN</code>, and <code>EXISTS</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- NOT with a comparison
+SELECT * FROM employees WHERE NOT department = 'HR';
+-- Equivalent: WHERE department <> 'HR'
+
+-- NOT with IN
+SELECT * FROM products WHERE NOT category IN ('Clothing', 'Shoes');
+-- Equivalent: WHERE category NOT IN ('Clothing', 'Shoes')
+
+-- NOT with LIKE
+SELECT * FROM users WHERE NOT email LIKE '%@test.com';
+-- Equivalent: WHERE email NOT LIKE '%@test.com'
+
+-- NOT with IS NULL
+SELECT * FROM employees WHERE NOT manager_id IS NULL;
+-- Equivalent: WHERE manager_id IS NOT NULL</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="precedence-bug">Operator Precedence – The Classic Bug</h2>
+          <p>SQL evaluates logical operators in this order: <strong>NOT</strong> first, then <strong>AND</strong>, then <strong>OR</strong>. This is the same as most programming languages. The bug happens when developers forget that AND binds tighter than OR.</p>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Classic precedence bug: AND binds before OR</strong>
+              <p>A very common mistake is writing a query that looks like it should filter one group OR another group, but the AND binds first and gives unexpected results.</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- INTENT: find Sales OR HR employees who earn over 50,000
+-- BUG: AND binds first, so this is actually:
+--   dept='Sales' OR (dept='HR' AND salary > 50000)
+-- This returns ALL Sales employees regardless of salary!
+SELECT * FROM employees
+WHERE dept = 'Sales' OR dept = 'HR' AND salary > 50000;
+
+-- HOW THE DATABASE READS IT (adding implicit parentheses):
+SELECT * FROM employees
+WHERE dept = 'Sales' OR (dept = 'HR' AND salary > 50000);
+
+-- CORRECT: parenthesise the OR conditions explicitly
+SELECT * FROM employees
+WHERE (dept = 'Sales' OR dept = 'HR') AND salary > 50000;
+-- Now: only employees in Sales OR HR who also earn over 50,000</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>When mixing AND and OR, always use parentheses</strong>
+              <p>Even when you know the precedence rules, explicit parentheses make your intent clear to future readers (including yourself). Never rely on precedence when you have a mix of <code>AND</code> and <code>OR</code> in the same <code>WHERE</code> clause — always parenthesise the OR groups.</p>
+            </div>
+          </div>
+
+          <h2 id="truth-table">Truth Table – Including NULL (Three-Valued Logic)</h2>
+          <p>SQL uses three-valued logic: TRUE, FALSE, and UNKNOWN. Any comparison with NULL yields UNKNOWN. The logical operators handle UNKNOWN in sometimes counterintuitive ways.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>A</th><th>B</th><th>A AND B</th><th>A OR B</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>TRUE</td><td>TRUE</td><td>TRUE</td><td>TRUE</td></tr>
+                <tr><td>TRUE</td><td>FALSE</td><td>FALSE</td><td>TRUE</td></tr>
+                <tr><td>TRUE</td><td>UNKNOWN</td><td>UNKNOWN</td><td>TRUE</td></tr>
+                <tr><td>FALSE</td><td>TRUE</td><td>FALSE</td><td>TRUE</td></tr>
+                <tr><td>FALSE</td><td>FALSE</td><td>FALSE</td><td>FALSE</td></tr>
+                <tr><td>FALSE</td><td>UNKNOWN</td><td>FALSE</td><td>UNKNOWN</td></tr>
+                <tr><td>UNKNOWN</td><td>TRUE</td><td>UNKNOWN</td><td>TRUE</td></tr>
+                <tr><td>UNKNOWN</td><td>FALSE</td><td>FALSE</td><td>UNKNOWN</td></tr>
+                <tr><td>UNKNOWN</td><td>UNKNOWN</td><td>UNKNOWN</td><td>UNKNOWN</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>A</th><th>NOT A</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>TRUE</td><td>FALSE</td></tr>
+                <tr><td>FALSE</td><td>TRUE</td></tr>
+                <tr><td>UNKNOWN</td><td>UNKNOWN</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- NULL propagation example
+-- Suppose bonus IS NULL for some employees:
+SELECT * FROM employees WHERE salary > 50000 AND bonus > 1000;
+-- Rows where bonus IS NULL: (TRUE AND UNKNOWN) = UNKNOWN → filtered out
+
+-- To include employees with no bonus:
+SELECT * FROM employees
+WHERE salary > 50000 AND (bonus > 1000 OR bonus IS NULL);</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>AND</strong>: both conditions must be TRUE for the row to be returned.</li>
+              <li><strong>OR</strong>: at least one condition must be TRUE.</li>
+              <li><strong>NOT</strong>: inverts the result. UNKNOWN stays UNKNOWN after NOT.</li>
+              <li>Precedence: <strong>NOT &gt; AND &gt; OR</strong>. AND binds tighter than OR — this is the source of common bugs.</li>
+              <li><strong>Always parenthesise OR conditions</strong> when mixing AND and OR: <code>(A OR B) AND C</code>.</li>
+              <li>SQL uses <strong>three-valued logic</strong>. Any comparison with NULL returns UNKNOWN, which is filtered out by WHERE just like FALSE.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/sql/filtering/comparison-operators.html" class="topic-tag sql-topic-tag">🔍 Comparison Operators</a>
+            <a href="/sql/filtering/like-pattern.html" class="topic-tag sql-topic-tag">🔍 LIKE Pattern Matching</a>
+            <a href="/sql/filtering/between-in.html" class="topic-tag sql-topic-tag">🔍 BETWEEN &amp; IN</a>
+            <a href="/sql/basics/select-statement.html" class="topic-tag sql-topic-tag">🗄️ SELECT Statement</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does NOT NULL mean the same as IS NOT NULL? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — and this is a common source of confusion. In a <code>WHERE</code> clause, <code>NOT column IS NULL</code> and <code>column IS NOT NULL</code> are equivalent and both correctly filter out rows where the column is NULL. However, <code>column NOT NULL</code> is not valid SQL syntax in a WHERE clause — <code>NOT NULL</code> without <code>IS</code> is only used as a column constraint in <code>CREATE TABLE</code>. Always use <code>IS NOT NULL</code> in WHERE clauses.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is there a performance difference between AND and OR? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — in general, <code>AND</code> conditions are more selective and easier for the query optimizer to use indexes on. With <code>OR</code>, the optimizer must consider multiple code paths, which can sometimes result in a full table scan instead of an index seek — especially if the OR conditions involve different columns. Modern query planners (MySQL, PostgreSQL) handle many OR cases well, but complex ORs on non-indexed columns can be slower. When an OR combines checks on the same column (<code>col = 'A' OR col = 'B'</code>), consider using <code>IN ('A', 'B')</code> which often optimizes better.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use AND/OR in HAVING, JOIN ON, and CASE WHEN? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — logical operators work in any SQL clause that accepts a boolean expression: <code>WHERE</code>, <code>HAVING</code>, <code>JOIN ... ON</code>, <code>CASE WHEN</code>, <code>CHECK</code> constraints, and filtered indexes. The same precedence rules (NOT &gt; AND &gt; OR) and three-valued logic apply everywhere. For example: <code>HAVING COUNT(*) &gt; 5 AND AVG(salary) &gt; 60000</code> — both conditions must be satisfied by the group.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does TRUE OR NULL return TRUE but FALSE OR NULL returns UNKNOWN? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>This follows from the semantics of three-valued logic. With OR, if either side is TRUE, the result is TRUE regardless of the other side (even if it is UNKNOWN) — because true OR anything-at-all is always true. But FALSE OR UNKNOWN is UNKNOWN — we know the first is false, but we don't know if the second is true or false (it's unknown), so the result is unknown. Similarly, with AND: FALSE AND UNKNOWN is FALSE (because false AND anything is always false), but TRUE AND UNKNOWN is UNKNOWN.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/filtering/comparison-operators.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Comparison Operators</span>
+          </a>
+          <a href="/sql/filtering/like-pattern.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">LIKE Pattern Matching</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
