@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PostgreSQL for Odoo – Database Concepts Every Odoo Developer Needs | ylearner</title>
+  <meta name="description" content="Learn how PostgreSQL maps to Odoo concepts: tables = models, columns = fields, foreign keys = Many2one. Covers ORM-to-SQL mapping, domain filters, psql commands, raw SQL, indexes, and transactions.">
+  <meta name="keywords" content="PostgreSQL Odoo, Odoo database, Odoo ORM SQL, Odoo psql, Odoo raw SQL, Odoo domain filters, PostgreSQL tutorial Odoo">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/postgresql-basics.html">
+  <meta property="og:title" content="PostgreSQL for Odoo – Database Concepts Every Odoo Developer Needs">
+  <meta property="og:description" content="How PostgreSQL maps to Odoo: ORM-to-SQL mapping, domain-to-WHERE translation, psql commands, raw SQL, indexes, and transactions.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/odoo/postgresql-basics.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PostgreSQL for Odoo – Database Concepts Every Odoo Developer Needs | ylearner">
+  <meta name="twitter:description" content="PostgreSQL for Odoo developers: ORM mapping, domains, psql commands, raw SQL with self.env.cr, indexes, and transactions.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "PostgreSQL for Odoo",
+    "description": "A complete guide to PostgreSQL concepts for Odoo developers: ORM-to-SQL mapping, domain filters, psql commands, raw SQL, indexes, and transactions.",
+    "educationalLevel": "Beginner",
+    "keywords": "PostgreSQL, Odoo ORM, domain filters, raw SQL, transactions, indexes",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">PostgreSQL for Odoo</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🐍 Introduction</div>
+          <h1>PostgreSQL for Odoo – What Every Developer Needs to Know</h1>
+          <p class="lesson-intro">Odoo uses PostgreSQL as its only supported database. While Odoo's ORM abstracts most SQL away, every Odoo developer needs to understand how PostgreSQL maps to Odoo concepts: tables = models, columns = fields, foreign keys = Many2one fields. This page covers PostgreSQL basics in the context of Odoo: the ORM-to-SQL mapping, domain-to-WHERE translation, how to query the Odoo database directly, and how to debug slow queries.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="orm-to-sql">How Odoo Maps to PostgreSQL</h2>
+          <p>Every Odoo model is a PostgreSQL table. Here is the complete mapping:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Odoo Concept</th><th>PostgreSQL Equivalent</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>models.Model</code> subclass</td><td>Table</td></tr>
+                <tr><td><code>fields.Char</code> / <code>fields.Integer</code> / <code>fields.Float</code></td><td>Column (VARCHAR, INTEGER, NUMERIC)</td></tr>
+                <tr><td><code>fields.Many2one('res.partner')</code></td><td>Foreign key column (INTEGER referencing res_partner.id)</td></tr>
+                <tr><td><code>fields.One2many</code></td><td>No column — reverse FK lookup on the related model</td></tr>
+                <tr><td><code>fields.Many2many</code></td><td>Junction table (e.g., <code>sale_order_tag_rel</code>)</td></tr>
+                <tr><td><code>fields.Binary</code></td><td>BYTEA column (or ir.attachment record)</td></tr>
+                <tr><td><code>active = fields.Boolean</code></td><td>Column + automatically added to WHERE active=true</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p><strong>Model name → table name</strong>: dots become underscores. <code>sale.order</code> → <code>sale_order</code>, <code>res.partner</code> → <code>res_partner</code>.</p>
+
+          <p>Here is the same model shown in both Python (Odoo) and the SQL table Odoo creates automatically:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># Odoo
+class SaleOrder(models.Model):
+    _name = 'sale.order'
+    name = fields.Char(required=True)
+    partner_id = fields.Many2one('res.partner')
+    amount_total = fields.Float()</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- PostgreSQL (what Odoo creates)
+CREATE TABLE sale_order (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    partner_id INTEGER REFERENCES res_partner(id),
+    amount_total NUMERIC,
+    active BOOLEAN DEFAULT TRUE,
+    create_date TIMESTAMP,
+    write_date TIMESTAMP,
+    create_uid INTEGER REFERENCES res_users(id),
+    write_uid INTEGER REFERENCES res_users(id)
+);</code></pre>
+          </div>
+
+          <p>Notice that Odoo automatically adds <code>id</code>, <code>active</code>, <code>create_date</code>, <code>write_date</code>, <code>create_uid</code>, and <code>write_uid</code> columns to every model — you never define these yourself.</p>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="domain-to-sql">Domain Filters → SQL WHERE Clauses</h2>
+          <p>Odoo domains are Python lists that the ORM compiles into SQL WHERE clauses automatically. Understanding this mapping helps you write efficient domains and debug performance problems.</p>
+
+          <p>Simple domain (AND by default):</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># Odoo domain
+[('state', '=', 'sale'), ('amount_total', '>', 1000)]
+# Compiles to:
+# WHERE state = 'sale' AND amount_total > 1000</code></pre>
+          </div>
+
+          <p>OR operator:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">['|', ('state', '=', 'sale'), ('state', '=', 'done')]
+# WHERE state = 'sale' OR state = 'done'</code></pre>
+          </div>
+
+          <p>Relational field traversal (triggers a SQL JOIN):</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">[('partner_id.country_id.code', '=', 'US')]
+# JOIN res_partner ON sale_order.partner_id = res_partner.id
+# JOIN res_country ON res_partner.country_id = res_country.id
+# WHERE res_country.code = 'US'</code></pre>
+          </div>
+
+          <p>Domain operators reference:</p>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Operator</th><th>SQL</th><th>Example</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>=</code></td><td><code>=</code></td><td><code>('state', '=', 'sale')</code></td></tr>
+                <tr><td><code>!=</code></td><td><code>!=</code></td><td><code>('active', '!=', False)</code></td></tr>
+                <tr><td><code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code></td><td>same</td><td><code>('amount', '&gt;', 100)</code></td></tr>
+                <tr><td><code>like</code></td><td><code>LIKE '%x%'</code></td><td><code>('name', 'like', 'Acme')</code></td></tr>
+                <tr><td><code>ilike</code></td><td><code>ILIKE '%x%'</code></td><td>case-insensitive match</td></tr>
+                <tr><td><code>in</code></td><td><code>IN (...)</code></td><td><code>('state', 'in', ['sale', 'done'])</code></td></tr>
+                <tr><td><code>not in</code></td><td><code>NOT IN</code></td><td><code>('state', 'not in', ['cancel'])</code></td></tr>
+                <tr><td><code>child_of</code></td><td>recursive CTE</td><td><code>('category_id', 'child_of', parent_id)</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="psql-basics">Essential PostgreSQL Commands</h2>
+          <p>As an Odoo developer, you will often need to inspect the database directly to debug issues, check table structures, or verify that records were created correctly.</p>
+
+          <p>Connecting to the Odoo database:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">psql -d your_odoo_database_name
+# or as postgres user:
+sudo -u postgres psql -d your_odoo_database_name</code></pre>
+          </div>
+
+          <p>Useful psql meta-commands:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">\dt                          -- list all tables
+\d sale_order                -- describe table structure
+\d+ res_partner              -- detailed structure with comments
+\l                           -- list databases
+\c database_name             -- connect to another database
+\q                           -- quit</code></pre>
+          </div>
+
+          <p>Common queries for Odoo development:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Find all Odoo models and their tables
+SELECT model, name FROM ir_model ORDER BY model;
+
+-- Find all fields of a model
+SELECT name, field_description, ttype
+FROM ir_model_fields
+WHERE model = 'sale.order'
+ORDER BY name;
+
+-- Check active users
+SELECT id, login, active FROM res_users WHERE active = true;
+
+-- Find records without using the ORM
+SELECT id, name, state, amount_total
+FROM sale_order
+WHERE state = 'sale'
+ORDER BY create_date DESC
+LIMIT 10;</code></pre>
+          </div>
+
+          <h2 id="raw-sql">Running Raw SQL in Odoo</h2>
+          <p>Sometimes the ORM is not the right tool — bulk operations, complex analytics, or performance-critical searches may require raw SQL. Odoo exposes the database cursor via <code>self.env.cr</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">def get_top_customers(self):
+    query = """
+        SELECT p.name, SUM(so.amount_total) AS total_sales
+        FROM sale_order so
+        JOIN res_partner p ON so.partner_id = p.id
+        WHERE so.state = 'sale'
+          AND so.company_id = %s
+        GROUP BY p.id, p.name
+        ORDER BY total_sales DESC
+        LIMIT 10
+    """
+    self.env.cr.execute(query, (self.env.company.id,))
+    results = self.env.cr.fetchall()
+    return results</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Always use parameterized queries</strong>
+              <p>Use <code>%s</code> placeholders and pass values as the second argument to <code>execute()</code>. Never format SQL strings with Python string interpolation or f-strings — this opens your code to SQL injection attacks.</p>
+            </div>
+          </div>
+
+          <ul>
+            <li><code>fetchall()</code> returns a list of tuples</li>
+            <li><code>dictfetchall()</code> (Odoo helper) returns a list of dicts — easier to work with by column name</li>
+            <li>Raw SQL <strong>bypasses Odoo's access control</strong> — you must check permissions manually when using raw queries for write operations</li>
+          </ul>
+
+          <h2 id="indexes">Indexes and Performance</h2>
+          <p>PostgreSQL uses indexes to speed up queries. Odoo auto-creates indexes on:</p>
+          <ul>
+            <li><code>id</code> column (primary key) on every table</li>
+            <li>Many2one FK columns (automatically indexed)</li>
+            <li>Fields declared with <code>index=True</code></li>
+          </ul>
+
+          <p>Adding an index to a field in Python:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">partner_id = fields.Many2one('res.partner', index=True)  # Odoo creates index
+reference = fields.Char(index=True)</code></pre>
+          </div>
+
+          <p>Check existing indexes and explain a slow query:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT indexname, indexdef
+FROM pg_indexes
+WHERE tablename = 'sale_order';
+
+EXPLAIN ANALYZE
+SELECT * FROM sale_order WHERE partner_id = 42;
+-- Look for: Seq Scan (bad on large tables), Index Scan (good)</code></pre>
+          </div>
+
+          <h2 id="transactions">Transactions in Odoo</h2>
+          <p>Every Odoo HTTP request runs inside a single PostgreSQL transaction:</p>
+          <ul>
+            <li>If the request succeeds → <code>COMMIT</code> (all changes persisted)</li>
+            <li>If an exception is raised → <code>ROLLBACK</code> (all changes discarded)</li>
+          </ul>
+          <p>You can use savepoints for partial rollback within a request:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">with self.env.cr.savepoint():
+    # If anything here raises an exception,
+    # only this block is rolled back, not the whole request
+    risky_operation()</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Never call <code>self.env.cr.commit()</code> in a module method</strong>
+              <p>Odoo manages the transaction lifecycle automatically. Manually committing inside a model method can cause inconsistent state, break the rollback mechanism, and lead to data integrity issues. Leave transaction management to Odoo.</p>
+            </div>
+          </div>
+
+          <div class="summary-box" id="summary">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li>Odoo model name → PostgreSQL table name: replace dots with underscores (<code>sale.order</code> → <code>sale_order</code>).</li>
+              <li>Odoo <strong>automatically adds</strong> <code>id</code>, <code>active</code>, <code>create_date</code>, <code>write_date</code>, <code>create_uid</code>, and <code>write_uid</code> to every table.</li>
+              <li>Domain filters compile to SQL WHERE clauses. Dot-traversal (<code>partner_id.country_id.code</code>) generates SQL JOINs.</li>
+              <li>Use <code>self.env.cr.execute(query, params)</code> for raw SQL — always with <code>%s</code> parameterized values to prevent SQL injection.</li>
+              <li>Add <code>index=True</code> to frequently searched fields to speed up queries on large tables.</li>
+              <li>Every request is a transaction. Use savepoints for partial rollbacks. Never call <code>cr.commit()</code> manually.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/odoo/what-is-odoo.html" class="topic-tag odoo-topic-tag">🐍 What is Odoo?</a>
+            <a href="/odoo/odoo-architecture.html" class="topic-tag odoo-topic-tag">🐍 Odoo Architecture</a>
+            <a href="/odoo/xml-basics.html" class="topic-tag odoo-topic-tag">🐍 XML Basics for Odoo</a>
+            <a href="/odoo/module/module-structure.html" class="topic-tag odoo-topic-tag">🐍 Module Structure</a>
+            <a href="/odoo/backend/computed-fields.html" class="topic-tag odoo-topic-tag">🐍 Computed Fields</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I use MySQL with Odoo? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Odoo only supports PostgreSQL. The ORM uses PostgreSQL-specific features including the <code>RETURNING</code> clause, <code>jsonb</code> columns, recursive CTEs, and advisory locks. These are not available in MySQL or SQLite. PostgreSQL support is a hard architectural requirement, not a preference.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I find which PostgreSQL table corresponds to an Odoo model? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Replace dots with underscores in the model name: <code>sale.order</code> → <code>sale_order</code>, <code>res.partner</code> → <code>res_partner</code>. You can also confirm by querying the Odoo meta-model: <code>SELECT model FROM ir_model WHERE model = 'sale.order';</code> — or from Python: <code>self.env['sale.order']._table</code> returns the table name.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is it safe to write to the Odoo database directly with SQL? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Direct SQL writes bypass the ORM's access rights checking, computed field recomputation, constraint validation, and chatter/audit trail. For read-only queries it is generally safe. For writes, always use the ORM unless you have a specific, well-understood performance reason — and when you do bypass the ORM, handle permissions, recomputation, and any dependent logic manually.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is <code>self.env.cr</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It is the database cursor — a <code>psycopg2</code> cursor object connected to the current PostgreSQL transaction. Use <code>self.env.cr.execute()</code> to run raw SQL queries, <code>self.env.cr.fetchall()</code> to retrieve results as tuples, and <code>self.env.cr.dictfetchall()</code> (Odoo helper) to retrieve results as dicts keyed by column name.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/xml-basics.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">XML Basics for Odoo</span>
+          </a>
+          <a href="/odoo/odoo-installation.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Installation & Setup</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>
