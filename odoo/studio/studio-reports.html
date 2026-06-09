@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creating PDF Reports with Odoo Studio | ylearner</title>
+  <meta name="description" content="Learn how to create custom PDF reports in Odoo Studio — choose a layout, add data fields, customize header/footer with company branding, preview, and attach reports to email templates.">
+  <meta name="keywords" content="Odoo Studio reports, Odoo PDF report builder, Odoo create report, Odoo QWeb report, Odoo report layout, Odoo report header footer, ir.actions.report Studio">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/studio/studio-reports.html">
+  <meta property="og:title" content="Creating PDF Reports with Odoo Studio">
+  <meta property="og:description" content="Learn how to create custom PDF reports in Odoo Studio — choose a layout, add data fields, customize header/footer with company branding, preview, and attach reports to email templates.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/studio/studio-reports.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Creating PDF Reports with Odoo Studio | ylearner">
+  <meta name="twitter:description" content="Learn how to create custom PDF reports in Odoo Studio — choose a layout, add data fields, customize header/footer with company branding, preview, and attach reports to email templates.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Creating PDF Reports with Odoo Studio",
+    "description": "Learn how to create custom PDF reports in Odoo Studio — choose a layout, add data fields, customize header/footer with company branding, preview, and attach reports to email templates.",
+    "educationalLevel": "Beginner",
+    "keywords": "Odoo Studio reports, PDF report, QWeb, header footer, ir.actions.report, email template",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/studio/what-is-studio.html">Odoo Studio</a><span class="separator">›</span>
+          <span class="current">Studio Reports</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🎨 Odoo Studio</div>
+          <h1>Creating PDF Reports with Odoo Studio</h1>
+          <p class="lesson-intro">Odoo's built-in reports (invoices, sale orders, delivery slips) are built with QWeb templates — Odoo's XML-based report engine. Studio provides a visual report builder that lets you create entirely new PDF reports or modify existing ones without writing QWeb XML. You choose a layout, pick your data columns, brand the header and footer, and download a pixel-perfect PDF — all through the browser.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="reports-in-odoo-studio">Reports in Odoo Studio</h2>
+          <p>Reports in Studio are stored as two linked records:</p>
+          <ul>
+            <li><strong><code>ir.actions.report</code></strong> — the action record that triggers PDF generation. This defines which model it runs on, the paper format, and the output filename.</li>
+            <li><strong>QWeb template</strong> (<code>ir.ui.view</code> with <code>type='qweb'</code>) — the HTML/XML template that defines the layout. Odoo renders it to PDF using wkhtmltopdf.</li>
+          </ul>
+          <p>Studio generates both records automatically when you create a new report. If you later export to a module, both are included in the export as XML.</p>
+
+          <h2 id="creating-a-new-report">Creating a New Report</h2>
+          <ol>
+            <li>Open Studio on the app you want to add a report to (e.g., open a Project Task record and click Studio).</li>
+            <li>In the left panel, click the <strong>Reports</strong> tab (document icon).</li>
+            <li>Click <strong>New Report</strong>.</li>
+            <li>Enter a <strong>Report name</strong> (e.g., "Task Summary Sheet").</li>
+            <li>Choose a <strong>Layout</strong> (see next section).</li>
+            <li>Click <strong>Create Report</strong>. Studio opens the report canvas in edit mode.</li>
+          </ol>
+          <p>After creating the report, it automatically appears in the <strong>Print</strong> menu of the corresponding model's records.</p>
+
+          <h2 id="report-layout-options">Report Layout Options</h2>
+          <p>Studio offers three starting layouts:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Layout</th><th>Structure</th><th>Best for</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Table</strong></td><td>Header, a data table with selectable columns, footer</td><td>Listing records — orders, invoices, inventory counts</td></tr>
+                <tr><td><strong>Grouped</strong></td><td>Records grouped by a field, with subtotals per group</td><td>Summary reports — sales by salesperson, tasks by project</td></tr>
+                <tr><td><strong>Blank</strong></td><td>An empty canvas with only header and footer</td><td>Custom-formatted documents — certificates, letters, labels</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Choosing the right layout</strong>
+              <p>For most business documents (packing slips, custom order sheets), start with <strong>Table</strong>. For management summaries, use <strong>Grouped</strong>. For anything that doesn't fit a table structure (e.g., a certificate of completion, a formal letter), start with <strong>Blank</strong> and add text and field placeholders manually.</p>
+            </div>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="adding-fields-to-report">Adding Fields to the Report</h2>
+          <p>In the report canvas:</p>
+          <ul>
+            <li>Click a column header in the table to select it, then open the <strong>Field</strong> dropdown in the right panel to choose which model field this column displays.</li>
+            <li>Add a new column by clicking the <strong>+</strong> button at the end of the table header row. Choose the field from the panel.</li>
+            <li>Remove a column by selecting it and clicking the trash icon.</li>
+            <li>Drag column headers to reorder columns.</li>
+          </ul>
+
+          <h3>Formatting numbers and dates</h3>
+          <p>After selecting a field column, the right panel shows formatting options:</p>
+          <ul>
+            <li><strong>Format</strong> for numeric fields: choose number of decimal places or percentage display.</li>
+            <li><strong>Format</strong> for date fields: choose short date, long date, or datetime.</li>
+            <li><strong>Label</strong>: change the column header text shown in the report.</li>
+          </ul>
+
+          <h2 id="header-and-footer-customization">Header and Footer Customization</h2>
+          <p>Click the header area at the top of the report canvas to edit it. The header typically contains:</p>
+          <ul>
+            <li><strong>Company logo</strong> — automatically pulled from <code>res.company.logo</code>. Toggle visibility in the header properties.</li>
+            <li><strong>Report title</strong> — the name you gave the report, editable directly on the canvas.</li>
+            <li><strong>Company name and address</strong> — auto-populated from the company record.</li>
+            <li><strong>Record reference</strong> — e.g., the order number or task ID.</li>
+          </ul>
+          <p>Click the footer area to edit it. Footer elements include:</p>
+          <ul>
+            <li><strong>Page numbers</strong> — "Page X of Y" — toggle on/off from the footer properties.</li>
+            <li><strong>Company tagline or website</strong> — add via a text field in the footer editor.</li>
+          </ul>
+
+          <h3>Paper format selection</h3>
+          <p>In the Report Properties panel (right panel, with no specific element selected), choose the <strong>Paper Format</strong>: A4, Letter, A3, or other standard sizes. You can also choose orientation: Portrait or Landscape.</p>
+
+          <h2 id="downloading-and-testing">Downloading and Testing</h2>
+          <p>Click the <strong>Preview</strong> button in the Studio report toolbar to generate a sample PDF from the most recently opened record. The PDF opens in a new browser tab so you can verify layout, formatting, and data accuracy before sharing.</p>
+          <p>To test from a real record:</p>
+          <ol>
+            <li>Exit Studio.</li>
+            <li>Open any record of the relevant model.</li>
+            <li>Click the <strong>Print</strong> button (or Actions → Print) in the record's header.</li>
+            <li>Your new report appears in the dropdown list alongside Odoo's built-in reports.</li>
+          </ol>
+
+          <h3>Attaching a report to an email template</h3>
+          <p>Studio reports can be automatically attached to outgoing emails:</p>
+          <ol>
+            <li>Go to <strong>Email Templates</strong> in Settings → Technical → Email → Templates (developer mode required).</li>
+            <li>Open the relevant email template (e.g., "Sales Order: Confirmation").</li>
+            <li>In the <strong>Attachments</strong> section, add a new report attachment and select your Studio report from the list.</li>
+          </ol>
+          <p>Now when that email template is sent (manually or via an automation), the PDF is attached automatically.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Under the hood</strong>
+              <p>All Studio reports are QWeb-based. When you export to a module, the report template is exported as a QWeb XML file that you can edit with full HTML/CSS control. This is useful when Studio's visual builder doesn't give you enough layout flexibility.</p>
+            </div>
+          </div>
+
+          <div class="summary-box" id="summary">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li>Studio reports are stored as <code>ir.actions.report</code> + QWeb template (<code>ir.ui.view</code>) records.</li>
+              <li>Three starting layouts: Table (column-based), Grouped (with subtotals), Blank (freeform).</li>
+              <li>Add, remove, and reorder columns from the report canvas; format numbers and dates in the right panel.</li>
+              <li>Header: company logo, report title, record reference — all auto-populated from company settings.</li>
+              <li>Footer: page numbers, tagline — toggle options in footer properties.</li>
+              <li>Choose paper format (A4, Letter) and orientation (portrait/landscape) from Report Properties.</li>
+              <li>Preview generates a sample PDF; reports appear under the Print button on each record.</li>
+              <li>Attach reports to email templates for automatic PDF delivery on outgoing emails.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/odoo/studio/what-is-studio.html" class="topic-tag odoo-topic-tag">🎨 What is Odoo Studio?</a>
+            <a href="/odoo/studio/studio-automations.html" class="topic-tag odoo-topic-tag">🎨 Studio Automations</a>
+            <a href="/odoo/studio/studio-vs-module.html" class="topic-tag odoo-topic-tag">🎨 Studio vs Module</a>
+            <a href="/odoo/studio/custom-fields.html" class="topic-tag odoo-topic-tag">🎨 Custom Fields</a>
+            <a href="/odoo/backend/qweb-reports.html" class="topic-tag odoo-topic-tag">🐍 QWeb Reports (Python)</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I include data from related models in a Studio report? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. When adding a field column to a Table layout, the field picker allows you to traverse Many2one relationships. For example, on a Sale Order report, you can include fields from the customer record (<code>partner_id.name</code>, <code>partner_id.phone</code>). For One2many lines (like order lines), you can add a sub-table section that iterates over the lines.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does my PDF look different from the preview? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Odoo uses wkhtmltopdf to render the QWeb HTML template to PDF. Some CSS properties that work in a browser may render differently via wkhtmltopdf (especially flexbox and certain CSS3 properties). If you see layout discrepancies, export the report to a module and refine the QWeb template HTML/CSS directly.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I set different paper formats for different reports? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Each report has its own <code>ir.actions.report</code> record which specifies the paper format (<code>paperformat_id</code>). In Studio, use the Report Properties panel to select the format per report. You can also create custom paper formats via <strong>Settings → Technical → Reporting → Paper Formats</strong>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can Studio reports show charts or graphs? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Studio's report builder is designed for tabular and text data. Charts and graphs in PDF reports require custom QWeb templates with embedded SVG or third-party charting libraries — this is beyond Studio's visual builder and requires code. Odoo's built-in Spreadsheet or dashboard views are better suited for data visualization.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/studio/studio-automations.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Studio Automations</span>
+          </a>
+          <a href="/odoo/studio/studio-vs-module.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Studio vs Module</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
