@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Security – Access Rights and Record Rules | ylearner</title>
+  <meta name="description" content="Master Odoo's two-layer security model: access rights (CRUD per group per model via CSV) and record rules (row-level domain filters). Includes user groups, field-level security, and sudo().">
+  <meta name="keywords" content="Odoo security, Odoo access rights, ir.model.access.csv, Odoo record rules, ir.rule, Odoo user groups, res.groups, field-level security, sudo Odoo, Odoo module development">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/module/security-access.html">
+  <meta property="og:title" content="Odoo Security – Access Rights and Record Rules">
+  <meta property="og:description" content="Master Odoo's two-layer security model: access rights (CRUD per group per model via CSV) and record rules (row-level domain filters). Includes user groups, field-level security, and sudo().">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/odoo/module/security-access.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Security – Access Rights and Record Rules | ylearner">
+  <meta name="twitter:description" content="Master Odoo's two-layer security model: access rights (CRUD per group per model via CSV) and record rules (row-level domain filters). Includes user groups, field-level security, and sudo().">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Security – Access Rights and Record Rules",
+    "description": "Master Odoo's two-layer security model: access rights (CRUD per group per model via CSV) and record rules (row-level domain filters). Includes user groups, field-level security, and sudo().",
+    "educationalLevel": "Beginner",
+    "keywords": "Odoo security, access rights, ir.model.access.csv, record rules, ir.rule, user groups, field-level security, sudo",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/module/module-structure.html">Module Development</a><span class="separator">›</span>
+          <span class="current">Security &amp; Access Rights</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Module Development</div>
+          <h1>Odoo Security – Access Rights, Groups, and Record Rules</h1>
+          <p class="lesson-intro">Odoo's security model has two layers: access rights (which user groups can perform CRUD operations on which models) and record rules (row-level filters that restrict which specific records a user can see or modify). Getting security right is one of the most important tasks in module development — an incorrectly configured module can expose data to users who shouldn't see it.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <!-- Section 1: Access Rights CSV -->
+          <h2 id="access-rights-csv">Access Rights (ir.model.access.csv)</h2>
+          <p>Access rights are defined in a CSV file — <code>security/ir.model.access.csv</code>. Each row grants or denies CRUD permissions for a user group on a model.</p>
+
+          <p>CSV format:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">CSV</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-plaintext">id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink</code></pre>
+          </div>
+
+          <p>Real example:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">CSV</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-plaintext">id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_library_book_user,library.book user,model_library_book,library_management.group_library_user,1,0,0,0
+access_library_book_librarian,library.book librarian,model_library_book,library_management.group_library_librarian,1,1,1,0
+access_library_book_manager,library.book manager,model_library_book,library_management.group_library_manager,1,1,1,1
+access_library_book_public,library.book public,model_library_book,base.group_public,1,0,0,0</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Column</th><th>Value</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr><td><code>id</code></td><td>XML ID</td><td>Unique identifier for this access rule</td></tr>
+                <tr><td><code>name</code></td><td>String</td><td>Human-readable description</td></tr>
+                <tr><td><code>model_id:id</code></td><td><code>model_</code> + model name (dots→underscores)</td><td>The model this rule applies to</td></tr>
+                <tr><td><code>group_id:id</code></td><td>XML ID of <code>res.groups</code> record</td><td>The user group; empty = all users</td></tr>
+                <tr><td><code>perm_read</code></td><td>1 or 0</td><td>Can read/search records</td></tr>
+                <tr><td><code>perm_write</code></td><td>1 or 0</td><td>Can update existing records</td></tr>
+                <tr><td><code>perm_create</code></td><td>1 or 0</td><td>Can create new records</td></tr>
+                <tr><td><code>perm_unlink</code></td><td>1 or 0</td><td>Can delete records</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Always load security before views</strong>
+              <p>The <code>ir.model.access.csv</code> file must be the FIRST item in your manifest's <code>data</code> list. If views load before security, Odoo may throw access errors during development.</p>
+            </div>
+          </div>
+
+          <!-- Section 2: User Groups -->
+          <h2 id="user-groups">Defining User Groups</h2>
+          <p>User groups (<code>res.groups</code>) define categories of users with different permission levels. Define them in an XML file under <code>security/</code>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;
+    &lt;data&gt;
+        &lt;!-- Base group — all users start here --&gt;
+        &lt;record id="group_library_user" model="res.groups"&gt;
+            &lt;field name="name"&gt;Library User&lt;/field&gt;
+            &lt;field name="category_id" ref="base.module_category_services_library"/&gt;
+            &lt;field name="users" eval="[(4, ref('base.user_demo'))]"/&gt;
+        &lt;/record&gt;
+
+        &lt;!-- Librarian group — inherits from user --&gt;
+        &lt;record id="group_library_librarian" model="res.groups"&gt;
+            &lt;field name="name"&gt;Librarian&lt;/field&gt;
+            &lt;field name="category_id" ref="base.module_category_services_library"/&gt;
+            &lt;field name="implied_ids" eval="[(4, ref('group_library_user'))]"/&gt;
+        &lt;/record&gt;
+
+        &lt;!-- Manager group — inherits from librarian --&gt;
+        &lt;record id="group_library_manager" model="res.groups"&gt;
+            &lt;field name="name"&gt;Library Manager&lt;/field&gt;
+            &lt;field name="category_id" ref="base.module_category_services_library"/&gt;
+            &lt;field name="implied_ids" eval="[(4, ref('group_library_librarian'))]"/&gt;
+        &lt;/record&gt;
+    &lt;/data&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <p><code>implied_ids</code> — a group that implies another group automatically grants all the implied group's permissions too. Manager implies Librarian implies User — a user in the Manager group has all three groups' permissions.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>XML ID</th><th>Who it represents</th></tr></thead>
+              <tbody>
+                <tr><td><code>base.group_public</code></td><td>Non-logged-in (anonymous) visitors</td></tr>
+                <tr><td><code>base.group_portal</code></td><td>Portal users (customers with login)</td></tr>
+                <tr><td><code>base.group_user</code></td><td>Internal users (all logged-in employees)</td></tr>
+                <tr><td><code>base.group_system</code></td><td>Settings administrators</td></tr>
+                <tr><td><code>base.group_erp_manager</code></td><td>Full ERP access</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- AD BLOCK -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <!-- Section 3: Record Rules -->
+          <h2 id="record-rules">Record Rules (ir.rule)</h2>
+          <p>Record rules are row-level security filters — they restrict which records a user can see or modify, applied as an automatic domain filter on every query.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;
+    &lt;data noupdate="1"&gt;
+
+        &lt;!-- Users can only see their own borrowings --&gt;
+        &lt;record id="rule_borrowing_user" model="ir.rule"&gt;
+            &lt;field name="name"&gt;Borrowings: see own only&lt;/field&gt;
+            &lt;field name="model_id" ref="model_library_borrowing"/&gt;
+            &lt;field name="groups" eval="[(4, ref('group_library_user'))]"/&gt;
+            &lt;field name="domain_force"&gt;[('borrower_id', '=', user.id)]&lt;/field&gt;
+            &lt;field name="perm_read"&gt;1&lt;/field&gt;
+            &lt;field name="perm_write"&gt;1&lt;/field&gt;
+            &lt;field name="perm_create"&gt;1&lt;/field&gt;
+            &lt;field name="perm_unlink"&gt;0&lt;/field&gt;
+        &lt;/record&gt;
+
+        &lt;!-- Librarians can see all borrowings in their branch --&gt;
+        &lt;record id="rule_borrowing_librarian" model="ir.rule"&gt;
+            &lt;field name="name"&gt;Borrowings: librarian sees branch&lt;/field&gt;
+            &lt;field name="model_id" ref="model_library_borrowing"/&gt;
+            &lt;field name="groups" eval="[(4, ref('group_library_librarian'))]"/&gt;
+            &lt;field name="domain_force"&gt;[('branch_id', 'in', user.branch_ids.ids)]&lt;/field&gt;
+        &lt;/record&gt;
+
+        &lt;!-- Global rule: never show deleted/archived records --&gt;
+        &lt;record id="rule_borrowing_global" model="ir.rule"&gt;
+            &lt;field name="name"&gt;Borrowings: active only (global)&lt;/field&gt;
+            &lt;field name="model_id" ref="model_library_borrowing"/&gt;
+            &lt;!-- No groups = global rule (applies to everyone) --&gt;
+            &lt;field name="domain_force"&gt;[('active', '=', True)]&lt;/field&gt;
+        &lt;/record&gt;
+
+    &lt;/data&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th></th><th>Access Rights</th><th>Record Rules</th></tr></thead>
+              <tbody>
+                <tr><td>Scope</td><td>All records of a model</td><td>Specific records matching a domain</td></tr>
+                <tr><td>Level</td><td>Model level</td><td>Row level</td></tr>
+                <tr><td>Defined in</td><td>CSV file</td><td>XML file</td></tr>
+                <tr><td>When applied</td><td>Every CRUD operation</td><td>As an additional WHERE clause on queries</td></tr>
+                <tr><td>Multiple rules</td><td>Combined with OR (any rule allows = access granted)</td><td>Combined with OR per group</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Section 4: Field-Level Security -->
+          <h2 id="field-level-security">Field-Level Security</h2>
+          <p>Restrict specific fields to certain groups using the <code>groups</code> attribute on the field definition:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">class LibraryBook(models.Model):
+    _name = 'library.book'
+
+    name = fields.Char(string='Title')
+    cost_price = fields.Float(
+        string='Cost Price',
+        groups='library_management.group_library_manager',  # only managers see this
+    )
+    internal_note = fields.Text(
+        string='Internal Notes',
+        groups='library_management.group_library_librarian',
+    )</code></pre>
+          </div>
+
+          <p>Fields with <code>groups</code> are invisible AND not sent in RPC responses to users outside the group — this is server-side security, not just UI hiding.</p>
+
+          <p>Or in view XML:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- Hide a field in the view for non-managers (client-side only — use Python groups for real security) --&gt;
+&lt;field name="cost_price" groups="library_management.group_library_manager"/&gt;</code></pre>
+          </div>
+
+          <!-- Section 5: sudo() -->
+          <h2 id="sudo">Using sudo() to Bypass Access Rights</h2>
+          <p><code>sudo()</code> gives a recordset superuser rights for a specific operation. Use carefully:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">def action_auto_confirm(self):
+    # This runs as the current user — may fail if user lacks write access
+    self.write({'state': 'confirmed'})
+
+def action_system_confirm(self):
+    # Run as superuser — bypasses all access checks
+    # Use only when the business logic requires it and you've manually checked permissions
+    self.sudo().write({'state': 'confirmed'})
+
+# sudo() with a specific user
+def action_confirm_as_admin(self):
+    admin = self.env.ref('base.user_admin')
+    self.sudo(admin).write({'state': 'confirmed'})</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Don't use sudo() to hide problems</strong>
+              <p>Never use <code>sudo()</code> to silently work around an access error you don't understand. Always fix the access rights properly. Reserve <code>sudo()</code> for intentional privilege elevation — background jobs, automated flows, or cases where the operation legitimately needs to run as a different user.</p>
+            </div>
+          </div>
+
+          <!-- Section 6: Checking and Debugging Access Rights -->
+          <h2 id="ir-model-access">Checking and Debugging Access Rights</h2>
+          <p>In developer mode, go to <strong>Settings → Technical → Security → Access Rights</strong> to see all loaded rules. To check rights programmatically:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># Check if current user can read a model
+self.env['library.book'].check_access_rights('read', raise_exception=False)
+# Returns True or False
+
+# Check access on specific records
+self.env['library.book'].browse([1, 2, 3]).check_access_rule('write')
+# Raises AccessError if any record is blocked
+
+# Useful for debugging — print current user's groups
+print(self.env.user.groups_id.mapped('full_name'))</code></pre>
+          </div>
+
+          <!-- Section 7: Summary -->
+          <div class="summary-box" id="summary">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li><code>ir.model.access.csv</code> defines CRUD permissions per model per group — load it FIRST in manifest</li>
+              <li><code>model_id:id</code> format: <code>model_</code> + model <code>_name</code> with dots→underscores</li>
+              <li>User groups (<code>res.groups</code>) define permission tiers; <code>implied_ids</code> creates inheritance</li>
+              <li>Record rules add row-level domain filters — applied automatically as WHERE clauses</li>
+              <li>Field-level security via <code>groups</code> attribute on field definitions (server-side, not just UI)</li>
+              <li><code>sudo()</code> bypasses access rights — use deliberately and sparingly</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/odoo/module/module-structure.html" class="topic-tag odoo-topic-tag">🐍 Module Structure</a>
+            <a href="/odoo/module/manifest-file.html" class="topic-tag odoo-topic-tag">🐍 Manifest File</a>
+            <a href="/odoo/module/models-fields.html" class="topic-tag odoo-topic-tag">🐍 Models &amp; Fields</a>
+            <a href="/odoo/module/menus-actions.html" class="topic-tag odoo-topic-tag">🐍 Menus &amp; Actions</a>
+            <a href="/odoo/module/basic-views.html" class="topic-tag odoo-topic-tag">🐍 Basic Views</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What happens if a user has no access rule for a model? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>They get an <code>AccessError</code> when trying to read, write, create, or delete records on that model. An empty CSV or missing access rule means no access at all — not full access. Security in Odoo is deny-by-default.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>groups</code> on a <code>&lt;field&gt;</code> in a view vs in the Python model? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In a view, <code>groups</code> hides the field from the UI — it's still sent in RPC if you know the field name. In the Python model definition, <code>groups</code> prevents the field value from being sent at all in RPC responses, and makes it invisible in all views automatically. Use Python-level <code>groups</code> for true security, view-level <code>groups</code> for UX.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can record rules apply to all users (not just a specific group)? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. A record rule with no <code>groups</code> field is a global rule — it applies to all users including administrators. Use global rules for fundamental data constraints like "never show archived records" or "multi-company isolation".</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What does the <code>(4, ref('base.group_user'))</code> syntax mean? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>This is an Odoo ORM command for Many2many fields. <code>4</code> means "link this record without removing existing links". Other commands: <code>3</code> = unlink (disconnect), <code>6, 0, [ids]</code> = replace all with these IDs. <code>eval="[(4, ref('base.group_user'))]"</code> links the <code>base.group_user</code> group to this record's Many2many field.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/module/menus-actions.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Menus &amp; Actions</span>
+          </a>
+          <a href="/odoo/backend/computed-fields.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Computed Fields</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
