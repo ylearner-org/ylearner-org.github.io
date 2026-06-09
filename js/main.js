@@ -800,6 +800,8 @@
       { title: 'Why Learn Odoo Dev?', url: '/odoo/why-learn-odoo.html' },
       { title: 'Odoo Architecture', url: '/odoo/odoo-architecture.html' },
       { title: 'Odoo Prerequisites', url: '/odoo/odoo-prerequisites.html' },
+      { title: 'XML Basics for Odoo', url: '/odoo/xml-basics.html' },
+      { title: 'PostgreSQL for Odoo', url: '/odoo/postgresql-basics.html' },
       { title: 'Installation & Setup', url: '/odoo/odoo-installation.html' },
     ]},
     { title: '⚙️ Module Development', items: [

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Architecture – How Odoo Works Under the Hood | ylearner</title>
+  <meta name="description" content="Understand Odoo's 3-tier architecture: PostgreSQL database, Python/Werkzeug server, and OWL JS browser client. Learn the module system, ORM, view engine, RPC layer, and request lifecycle.">
+  <meta name="keywords" content="Odoo architecture, Odoo stack, Odoo ORM, Odoo views, Odoo RPC, Odoo three tier, Odoo module system, Odoo Werkzeug, OWL JS Odoo">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/odoo-architecture.html">
+  <meta property="og:title" content="Odoo Architecture – How Odoo Works Under the Hood | ylearner">
+  <meta property="og:description" content="Odoo's 3-tier architecture: PostgreSQL, Python server (Werkzeug), and OWL JS browser client — with JSON-RPC gluing them together. Full beginner walkthrough.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/odoo/odoo-architecture.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Architecture – How Odoo Works Under the Hood | ylearner">
+  <meta name="twitter:description" content="A full walkthrough of Odoo's architecture: database, Python server, OWL JS client, module system, ORM, view engine, and request lifecycle.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Architecture – How Odoo Works Under the Hood",
+    "description": "A complete walkthrough of Odoo's architecture: 3-tier stack, module system, ORM layer, XML view engine, JSON-RPC layer, and request lifecycle.",
+    "educationalLevel": "Beginner",
+    "keywords": "Odoo architecture, ORM, views, RPC, module system, Werkzeug, OWL JS",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">Odoo Architecture</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🐍 Introduction</div>
+          <h1>Odoo Architecture – How the Stack Works</h1>
+          <p class="lesson-intro">Understanding Odoo's architecture is essential before writing your first module. Odoo uses a 3-tier architecture: a PostgreSQL database, a Python application server (built on Werkzeug), and a browser client (built on OWL JS). Everything communicates through a JSON-RPC API. This page walks through each layer, how a request flows through the system, and what role your custom code plays in each part.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="three-tier">Three-Tier Architecture</h2>
+          <p>Odoo's stack is divided into three distinct tiers, each with a clear responsibility:</p>
+          <ul>
+            <li><strong>Tier 1 — PostgreSQL</strong>: the data store. Every Odoo model maps to a database table. All persistent data lives here.</li>
+            <li><strong>Tier 2 — Python Server</strong>: the application server. Built on Werkzeug (a WSGI toolkit). Processes HTTP requests, runs the ORM, executes business logic, and returns responses.</li>
+            <li><strong>Tier 3 — Browser Client</strong>: the UI. Built on OWL JS. Renders views, handles user interaction, and communicates with the server via JSON-RPC.</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-plaintext">Browser (OWL JS + XML Views)
+      ↕  JSON-RPC / HTTP
+Odoo Server (Python + Werkzeug)
+      ↕  SQL (psycopg2)
+PostgreSQL Database</code></pre>
+          </div>
+
+          <p>Your custom Python code lives in the <strong>middle tier</strong>. Your XML view files define what the <strong>browser tier</strong> renders. Your data is stored and queried from the <strong>database tier</strong> via the ORM — you rarely interact with PostgreSQL directly.</p>
+
+          <h2 id="module-system">The Module System</h2>
+          <p>Every feature in Odoo is a <strong>module</strong> (also called an addon). Core Odoo features — base, web, mail, account, sale, stock — are all modules. Your custom code is also a module.</p>
+          <p>A module is a directory with a specific structure:</p>
+          <ul>
+            <li><code>__manifest__.py</code> — declares the module name, version, dependencies, and files to load</li>
+            <li><code>models/</code> — Python files defining models (database tables + business logic)</li>
+            <li><code>views/</code> — XML files defining UI: forms, lists, kanban boards, menus, actions</li>
+            <li><code>security/</code> — CSV/XML files defining access rights</li>
+            <li><code>data/</code> — XML/CSV files with default data loaded on install</li>
+            <li><code>static/</code> — JavaScript, CSS, images for frontend components</li>
+          </ul>
+          <p>Modules declare <strong>dependencies</strong> in their manifest. Odoo loads them in dependency order at startup. If your module depends on <code>sale</code>, Odoo ensures <code>sale</code> is loaded first.</p>
+
+          <h2 id="orm-layer">The ORM Layer</h2>
+          <p>Odoo's ORM (Object-Relational Mapper) is the core of the Python tier. Python classes extending <code>models.Model</code> map directly to PostgreSQL tables:</p>
+          <ul>
+            <li><code>fields.Char</code> → <code>VARCHAR</code> column</li>
+            <li><code>fields.Integer</code> → <code>INTEGER</code> column</li>
+            <li><code>fields.Many2one</code> → foreign key column</li>
+            <li><code>fields.One2many</code> → virtual (no column; traverses the FK from the other side)</li>
+            <li><code>fields.Many2many</code> → junction table</li>
+          </ul>
+          <p>You never write raw SQL for standard CRUD operations. The ORM handles it:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># Creating a record
+partner = self.env['res.partner'].create({
+    'name': 'Acme Corp',
+    'email': 'info@acme.com',
+})
+
+# Searching
+orders = self.env['sale.order'].search([
+    ('state', '=', 'sale'),
+    ('partner_id.country_id.code', '=', 'US'),
+])
+
+# Domain syntax: [('field', 'operator', 'value')]
+# Operators: =, !=, >, <, >=, <=, like, ilike, in, not in, child_of</code></pre>
+          </div>
+
+          <p><code>self.env</code> is the <strong>environment</strong> — it gives you access to the database cursor, the current user, the request context, and the model registry. It's the central object you interact with in all Odoo Python code.</p>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="view-engine">The View Engine (XML Views)</h2>
+          <p>Odoo's UI is not built with React, Vue, or Django templates. Instead, views are defined as <strong>XML records stored in the database</strong> (in the <code>ir.ui.view</code> model). When a user opens a form, the browser asks the server for the view definition, then OWL JS renders it.</p>
+          <p>View types: <strong>form</strong>, <strong>list</strong> (tree), <strong>kanban</strong>, <strong>search</strong>, <strong>graph</strong>, <strong>pivot</strong>, <strong>calendar</strong>, <strong>gantt</strong>.</p>
+          <p>You define views in XML files in your module's <code>views/</code> directory. Odoo loads them into the database on module install/update:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="view_library_book_form" model="ir.ui.view"&gt;
+    &lt;field name="name"&gt;library.book.form&lt;/field&gt;
+    &lt;field name="model"&gt;library.book&lt;/field&gt;
+    &lt;field name="arch" type="xml"&gt;
+        &lt;form&gt;
+            &lt;sheet&gt;
+                &lt;group&gt;
+                    &lt;field name="name"/&gt;
+                    &lt;field name="author_id"/&gt;
+                    &lt;field name="price"/&gt;
+                &lt;/group&gt;
+            &lt;/sheet&gt;
+        &lt;/form&gt;
+    &lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <p>This XML record, when loaded, creates a row in the <code>ir.ui.view</code> table. The browser fetches this definition via JSON-RPC and OWL renders it as a form in the UI.</p>
+
+          <h2 id="rpc-layer">The RPC Layer</h2>
+          <p>The browser client communicates with the Python server via <strong>JSON-RPC POST requests</strong>. The primary endpoint is <code>/web/dataset/call_kw</code>, which accepts a model name, method name, and arguments.</p>
+          <p>Additional endpoints: <code>/web/action/load</code> (load an action), <code>/web/menu/load_menus</code> (load navigation menus), and in Odoo 19+, a REST API at <code>/odoo/api/v1/</code> for external integrations.</p>
+          <p>In practice, you don't call these endpoints manually. OWL JS's built-in <code>rpc</code> service handles all communication. In Python, you write methods on your model — OWL calls them automatically when the user interacts with the UI.</p>
+
+          <h2 id="request-lifecycle">Request Lifecycle</h2>
+          <p>Here is what happens when a user clicks <strong>Save</strong> on a form:</p>
+          <ol>
+            <li>OWL JS collects all field values from the form DOM.</li>
+            <li>OWL makes a JSON-RPC POST to <code>/web/dataset/call_kw</code> with model name, <code>write</code> method, record ID, and the changed values.</li>
+            <li>Werkzeug receives the HTTP request and routes it to Odoo's JSON-RPC dispatcher.</li>
+            <li>Odoo's dispatcher finds the model class in the registry and calls its <code>write()</code> method.</li>
+            <li>The ORM validates the data, runs <code>@api.constrains</code> validators, and issues an <code>UPDATE</code> SQL statement via psycopg2.</li>
+            <li>The Python method returns the result. Odoo serialises it as JSON and sends the HTTP response.</li>
+            <li>OWL receives the response and re-renders the form to reflect the saved state.</li>
+          </ol>
+          <p>This lifecycle makes clear where <strong>your code hooks in</strong>: you override or extend Python model methods (<code>write</code>, <code>create</code>, <code>unlink</code>, custom methods) to add business logic. The browser and database tiers handle themselves.</p>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Odoo uses a <strong>3-tier architecture</strong>: PostgreSQL → Python/Werkzeug server → OWL JS browser client.</li>
+              <li>Every feature is a <strong>module (addon)</strong> with a defined directory structure: manifest, models, views, security, data.</li>
+              <li>The <strong>ORM</strong> maps Python classes to PostgreSQL tables — no raw SQL for CRUD. <code>self.env</code> is the central access point.</li>
+              <li>Views are <strong>XML records</strong> stored in <code>ir.ui.view</code>, loaded from module XML files, rendered by OWL JS.</li>
+              <li>Browser and server communicate via <strong>JSON-RPC</strong>. Your Python model methods are the main extension point.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/odoo/what-is-odoo.html" class="topic-tag odoo-topic-tag">🐍 What is Odoo?</a>
+            <a href="/odoo/why-learn-odoo.html" class="topic-tag odoo-topic-tag">🐍 Why Learn Odoo Dev?</a>
+            <a href="/odoo/odoo-prerequisites.html" class="topic-tag odoo-topic-tag">🐍 Odoo Prerequisites</a>
+            <a href="/odoo/odoo-installation.html" class="topic-tag odoo-topic-tag">🐍 Installation & Setup</a>
+            <a href="/odoo/module/module-structure.html" class="topic-tag odoo-topic-tag">🐍 Module Structure</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does Odoo use Django or Flask? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Neither. Odoo has its own WSGI server built on <strong>Werkzeug</strong> — a lower-level WSGI toolkit. Odoo's HTTP routing, session handling, and request processing are all custom-built within the Odoo codebase. It pre-dates and is separate from Django and Flask. If you know Django, you'll recognise some patterns (ORM, models, views) but the implementation is entirely different.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What database does Odoo use? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><strong>PostgreSQL only.</strong> MySQL and SQLite are not supported. Odoo relies on several PostgreSQL-specific features: advisory locks, materialised views, specific SQL functions, and the psycopg2 driver. This is a deliberate architectural decision — PostgreSQL is the only supported database engine for Odoo.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use Odoo's ORM without the rest of Odoo? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Odoo's ORM is tightly integrated with the module system, the environment (<code>self.env</code>), the model registry, the access control layer, and the server startup process. It is not a standalone library and cannot be extracted for use outside of an Odoo runtime.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is ir.model and ir.ui.view? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>They are <strong>Odoo meta-models</strong> — models that store information about other models and views. <code>ir.model</code> stores a record for every installed model (its name, description, fields). <code>ir.ui.view</code> stores every view definition as a database record. This is a core Odoo design principle: <em>everything is a record</em>. Menus, actions, access rights, email templates, scheduled actions — all are stored as database records, not static files.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/why-learn-odoo.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Why Learn Odoo Dev?</span>
+          </a>
+          <a href="/odoo/odoo-prerequisites.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Odoo Prerequisites</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>
