@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Onchange & Constraints – @api.onchange and @api.constrains | ylearner</title>
+  <meta name="description" content="Learn when to use @api.onchange for real-time UI feedback vs @api.constrains for server-side data integrity, plus SQL constraints in Odoo 19 module development.">
+  <meta name="keywords" content="Odoo onchange, api.constrains, ValidationError, _sql_constraints, Odoo 19, backend development, Odoo constraints, api.onchange">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/backend/onchange-constraints.html">
+  <meta property="og:title" content="Odoo Onchange & Constraints – @api.onchange and @api.constrains">
+  <meta property="og:description" content="Learn when to use @api.onchange for real-time UI feedback vs @api.constrains for server-side data integrity, plus SQL constraints in Odoo 19 module development.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/backend/onchange-constraints.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Onchange & Constraints – @api.onchange and @api.constrains | ylearner">
+  <meta name="twitter:description" content="Learn when to use @api.onchange for real-time UI feedback vs @api.constrains for server-side data integrity, plus SQL constraints in Odoo 19 module development.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Onchange & Constraints – @api.onchange and @api.constrains",
+    "description": "Learn when to use @api.onchange for real-time UI feedback vs @api.constrains for server-side data integrity, plus SQL constraints in Odoo 19 module development.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo onchange, api.constrains, ValidationError, _sql_constraints, Odoo backend",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">Backend Development</span><span class="separator">›</span>
+          <span class="current">Onchange &amp; Constraints</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Backend Development</div>
+          <h1>Odoo Onchange &amp; Constraints – @api.onchange and @api.constrains</h1>
+          <p class="lesson-intro">Odoo gives you three mechanisms to validate and react to field changes: <code>@api.onchange</code> for live UI feedback before saving, <code>@api.constrains</code> for server-side validation on save, and <code>_sql_constraints</code> for PostgreSQL-level uniqueness and check rules. Each has a different scope and guarantee — knowing when to use each is essential for building robust Odoo modules.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <h3>📋 What You Will Learn</h3>
+            <ul>
+              <li>The difference between onchange, constrains, and SQL constraints</li>
+              <li>How to write <code>@api.onchange</code> methods with warnings</li>
+              <li>How to raise <code>ValidationError</code> from <code>@api.constrains</code></li>
+              <li>Defining <code>_sql_constraints</code> for database-level uniqueness</li>
+              <li>Practical examples: ISBN uniqueness, price validation, quantity warnings</li>
+            </ul>
+          </div>
+
+          <!-- Section 1 -->
+          <h2 id="onchange-vs-constraints">Onchange vs Constraints — When to Use Each</h2>
+          <p>These three tools solve different problems in the validation layer:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th></th><th>@api.onchange</th><th>@api.constrains</th><th>_sql_constraints</th></tr></thead>
+              <tbody>
+                <tr><td>When it runs</td><td>Immediately in the browser when a field changes (before save)</td><td>On every create/write that touches the listed fields</td><td>On every INSERT/UPDATE at the database level</td></tr>
+                <tr><td>Runs in shell/xmlrpc</td><td>No — UI only</td><td>Yes</td><td>Yes</td></tr>
+                <tr><td>Can modify other fields</td><td>Yes — set self.field = value</td><td>No — read-only validation</td><td>No</td></tr>
+                <tr><td>Error shown as</td><td>Soft warning dialog (optional)</td><td>Hard error blocking save</td><td>Hard error blocking save</td></tr>
+                <tr><td>Best for</td><td>Auto-filling fields, UI hints</td><td>Business rule validation</td><td>Uniqueness, check constraints</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Section 2 -->
+          <h2 id="api-onchange">@api.onchange</h2>
+          <p><code>@api.onchange</code> methods run client-side (triggered by the browser) when the user changes a listed field on a form view. They modify <code>self</code> in-place — any changes to <code>self.field_name</code> are reflected immediately in the UI without saving.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">from odoo import models, fields, api
+
+class LibraryBook(models.Model):
+    _name = 'library.book'
+    _description = 'Library Book'
+
+    title = fields.Char(string='Title', required=True)
+    isbn = fields.Char(string='ISBN-13')
+    category_id = fields.Many2one('library.category', string='Category')
+    suggested_price = fields.Float(string='Suggested Price')
+    sale_price = fields.Float(string='Sale Price')
+    stock_quantity = fields.Integer(string='Stock Quantity', default=0)
+
+    @api.onchange('category_id')
+    def _onchange_category_id(self):
+        """Auto-suggest a price range when category changes."""
+        if self.category_id and self.category_id.default_price:
+            self.suggested_price = self.category_id.default_price
+            # Return a notification warning — soft, user can dismiss and continue
+            return {
+                'warning': {
+                    'title': 'Price Suggestion',
+                    'message': (
+                        f"Suggested price for category '{self.category_id.name}' "
+                        f"is {self.category_id.default_price:.2f}. "
+                        "You can override this if needed."
+                    ),
+                }
+            }
+
+    @api.onchange('stock_quantity')
+    def _onchange_stock_quantity(self):
+        """Warn when stock is critically low."""
+        if self.stock_quantity is not False and self.stock_quantity < 3:
+            return {
+                'warning': {
+                    'title': 'Low Stock Warning',
+                    'message': f"Only {self.stock_quantity} copies remain. Consider reordering.",
+                }
+            }
+
+    @api.onchange('isbn')
+    def _onchange_isbn(self):
+        """Format ISBN: remove spaces and dashes."""
+        if self.isbn:
+            # Strip formatting — store clean digits only
+            self.isbn = self.isbn.replace('-', '').replace(' ', '')</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Onchange only runs in the browser</strong>
+              <p><code>@api.onchange</code> is a UI-only mechanism. It is never called when you create or update records via Python code, shell, or the XML-RPC/JSON-RPC API. Never rely on onchange for data integrity — use <code>@api.constrains</code> or <code>_sql_constraints</code> for that.</p>
+            </div>
+          </div>
+
+          <h3 id="onchange-on-relational">Onchange on One2many Lines</h3>
+          <p>You can react to changes on One2many child lines by listening to the parent field that contains them. Changes to any subfield in the list trigger the onchange:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">class LibraryOrder(models.Model):
+    _name = 'library.order'
+
+    line_ids = fields.One2many('library.order.line', 'order_id', string='Order Lines')
+    total_amount = fields.Float(string='Total', compute='_compute_total', store=True)
+
+    @api.onchange('line_ids')
+    def _onchange_line_ids(self):
+        """Warn if order total exceeds budget."""
+        total = sum(line.subtotal for line in self.line_ids)
+        if total > 500:
+            return {
+                'warning': {
+                    'title': 'Budget Exceeded',
+                    'message': f"Order total {total:.2f} exceeds the 500 budget limit.",
+                }
+            }</code></pre>
+          </div>
+
+          <!-- AD BLOCK -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <!-- Section 3 -->
+          <h2 id="api-constrains">@api.constrains</h2>
+          <p><code>@api.constrains</code> runs on the server whenever a record is created or updated and any of the listed fields are included in the write operation. If the method raises <code>ValidationError</code>, the save is aborted and the error is shown to the user.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+
+class LibraryBook(models.Model):
+    _name = 'library.book'
+
+    isbn = fields.Char(string='ISBN-13')
+    sale_price = fields.Float(string='Sale Price')
+    due_date = fields.Date(string='Due Date')
+    borrow_date = fields.Date(string='Borrow Date')
+
+    @api.constrains('sale_price')
+    def _check_sale_price(self):
+        for book in self:
+            if book.sale_price < 0:
+                raise ValidationError(
+                    f"Sale price cannot be negative. Got: {book.sale_price:.2f} for '{book.title}'."
+                )
+
+    @api.constrains('isbn')
+    def _check_isbn_format(self):
+        for book in self:
+            if book.isbn:
+                clean = book.isbn.replace('-', '').replace(' ', '')
+                if len(clean) not in (10, 13):
+                    raise ValidationError(
+                        f"ISBN '{book.isbn}' is invalid. ISBN must be 10 or 13 digits."
+                    )
+
+    @api.constrains('borrow_date', 'due_date')
+    def _check_dates(self):
+        for loan in self:
+            if loan.borrow_date and loan.due_date:
+                if loan.due_date &lt; loan.borrow_date:
+                    raise ValidationError(
+                        "Due date cannot be earlier than the borrow date."
+                    )</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>constrains runs even from Python/API calls</strong>
+              <p>Unlike onchange, <code>@api.constrains</code> runs every time the listed fields are written — from the UI, from Python code, from XML-RPC, from shell. It is your reliable last line of defense before data hits the database.</p>
+            </div>
+          </div>
+
+          <!-- Section 4 -->
+          <h2 id="sql-constraints">SQL Constraints (_sql_constraints)</h2>
+          <p><code>_sql_constraints</code> is a class attribute (a list of tuples) that maps to real PostgreSQL constraints. They are the strongest form of constraint — enforced at the database level, even if Odoo ORM is bypassed.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">class LibraryBook(models.Model):
+    _name = 'library.book'
+
+    isbn = fields.Char(string='ISBN-13')
+    sale_price = fields.Float(string='Sale Price')
+    title = fields.Char(string='Title')
+    publisher_id = fields.Many2one('res.partner', string='Publisher')
+
+    _sql_constraints = [
+        # (constraint_name, sql_expression, error_message)
+        (
+            'isbn_unique',
+            'UNIQUE(isbn)',
+            'An ISBN must be unique. This ISBN already exists in the database.',
+        ),
+        (
+            'sale_price_positive',
+            'CHECK(sale_price >= 0)',
+            'Sale price must be zero or greater.',
+        ),
+        (
+            'title_publisher_unique',
+            'UNIQUE(title, publisher_id)',
+            'A publisher cannot have two books with the same title.',
+        ),
+    ]</code></pre>
+          </div>
+
+          <p>The constraint name becomes the PostgreSQL constraint name (prefixed with the table name). The SQL expression is any valid PostgreSQL constraint expression. The message is shown to the user when the constraint fires.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>SQL Constraint Type</th><th>Syntax</th><th>Use Case</th></tr></thead>
+              <tbody>
+                <tr><td>Unique single column</td><td><code>UNIQUE(column)</code></td><td>ISBN, email, reference number</td></tr>
+                <tr><td>Unique composite</td><td><code>UNIQUE(col1, col2)</code></td><td>Title + publisher, name + company_id</td></tr>
+                <tr><td>Check constraint</td><td><code>CHECK(expression)</code></td><td>Price &gt;= 0, percentage BETWEEN 0 AND 100</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>NULL values and UNIQUE constraints</strong>
+              <p>In PostgreSQL, <code>NULL != NULL</code>. A <code>UNIQUE</code> constraint allows multiple rows with <code>NULL</code> in the unique column. If you need to enforce uniqueness including among NULL values, you need a partial index or an additional <code>@api.constrains</code> check for the NULL case.</p>
+            </div>
+          </div>
+
+          <!-- Section 5 -->
+          <h2 id="combining-onchange-and-constraints">Combining Onchange and Constraints</h2>
+          <p>In practice, you often want both: onchange for instant feedback while the user types, and constrains as the authoritative enforcement when saving. Here is a complete example for an ISBN field:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+
+class LibraryBook(models.Model):
+    _name = 'library.book'
+    _description = 'Library Book'
+
+    title = fields.Char(string='Title', required=True)
+    isbn = fields.Char(string='ISBN-13')
+    price = fields.Float(string='Price')
+    stock_quantity = fields.Integer(string='Stock', default=0)
+
+    _sql_constraints = [
+        # Database-level uniqueness — strongest guarantee
+        ('isbn_unique', 'UNIQUE(isbn)', 'This ISBN already exists.'),
+        ('price_nonneg', 'CHECK(price >= 0)', 'Price must be non-negative.'),
+    ]
+
+    # Onchange: instant UI feedback while user types (runs before save)
+    @api.onchange('isbn')
+    def _onchange_isbn(self):
+        if self.isbn:
+            clean = self.isbn.replace('-', '').replace(' ', '')
+            self.isbn = clean  # normalize formatting
+            if len(clean) not in (10, 13):
+                return {
+                    'warning': {
+                        'title': 'Invalid ISBN',
+                        'message': 'ISBN should be 10 or 13 digits. Please check.',
+                    }
+                }
+
+    @api.onchange('stock_quantity')
+    def _onchange_stock_quantity(self):
+        if self.stock_quantity is not False and self.stock_quantity &lt; 0:
+            return {
+                'warning': {
+                    'title': 'Negative Stock',
+                    'message': 'Stock quantity cannot be negative.',
+                }
+            }
+
+    # Constrains: server-side enforcement (runs on create/write — even from API)
+    @api.constrains('isbn')
+    def _check_isbn(self):
+        for book in self:
+            if book.isbn:
+                clean = book.isbn.replace('-', '').replace(' ', '')
+                if len(clean) not in (10, 13) or not clean.isdigit():
+                    raise ValidationError(
+                        f"'{book.isbn}' is not a valid ISBN. "
+                        "An ISBN must contain exactly 10 or 13 numeric digits."
+                    )
+
+    @api.constrains('stock_quantity')
+    def _check_stock_quantity(self):
+        for book in self:
+            if book.stock_quantity &lt; 0:
+                raise ValidationError("Stock quantity cannot be negative.")</code></pre>
+          </div>
+
+          <!-- Section 6 -->
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li><code>@api.onchange</code> runs in the browser before save — use it to auto-fill fields and show soft warnings</li>
+              <li>Onchange is <strong>UI-only</strong> — never rely on it for data integrity</li>
+              <li><code>@api.constrains</code> runs on the server on every create/write — raise <code>ValidationError</code> to block the save</li>
+              <li><code>_sql_constraints</code> create real PostgreSQL constraints — the strongest guarantee, even against ORM bypass</li>
+              <li>Pair onchange (fast feedback) with constrains (hard enforcement) for a great user experience</li>
+              <li><code>UNIQUE</code> SQL constraints allow multiple <code>NULL</code> values by PostgreSQL design</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/odoo/backend/computed-fields.html" class="topic-tag odoo-topic-tag">🐍 Computed Fields</a>
+            <a href="/odoo/backend/model-inheritance.html" class="topic-tag odoo-topic-tag">🐍 Model Inheritance</a>
+            <a href="/odoo/module/models-fields.html" class="topic-tag odoo-topic-tag">🐍 Models &amp; Fields</a>
+            <a href="/odoo/module/security-access.html" class="topic-tag odoo-topic-tag">🐍 Security &amp; Access Rights</a>
+            <a href="/odoo/backend/wizards.html" class="topic-tag odoo-topic-tag">🐍 Wizards</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does @api.onchange run when importing records via a CSV import? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. CSV import uses the ORM create/write methods directly, bypassing the UI layer. Only <code>@api.constrains</code> and <code>_sql_constraints</code> run during imports. Any field auto-filling you did in onchange will not happen during import — make sure your import data is pre-processed or use <code>@api.model_create_multi</code> overrides for create-time defaults.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can @api.constrains access related model records? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. You can browse, search, or access any model from inside a constrains method. For example, to check global uniqueness of a field across all records you can call <code>self.env['my.model'].search_count([('field', '=', value)]) > 1</code>. However, be careful about performance — avoid expensive queries in constraints that fire on high-volume models.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I update an existing _sql_constraints definition? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Change the constraint definition in your Python code and update the module. Odoo will try to drop and recreate the PostgreSQL constraint. If existing data violates the new constraint, the update will fail with a database error. You must clean up violating data first (via a pre-migration script) before tightening a SQL constraint.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does my @api.constrains not fire when I write to the record? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The constraint only fires when one of its listed fields is included in the write. If you write <code>record.write({'other_field': value})</code> and <code>other_field</code> is not in the <code>@api.constrains</code> decorator, the method does not run. Make sure all fields you want to validate are listed in the decorator.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/backend/computed-fields.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Computed Fields</span>
+          </a>
+          <a href="/odoo/backend/model-inheritance.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Model Inheritance</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

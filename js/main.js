@@ -850,6 +850,15 @@
       { title: 'Dashboard Components', url: '/odoo/owl/dashboard-components.html' },
       { title: 'Action Managers', url: '/odoo/owl/action-managers.html' },
     ]},
+    { title: '🎨 Odoo Studio', items: [
+      { title: 'What is Odoo Studio?', url: '/odoo/studio/what-is-studio.html' },
+      { title: 'Customizing Views', url: '/odoo/studio/customizing-views.html' },
+      { title: 'Custom Fields', url: '/odoo/studio/custom-fields.html' },
+      { title: 'Custom Models & Apps', url: '/odoo/studio/custom-models.html' },
+      { title: 'Automations in Studio', url: '/odoo/studio/studio-automations.html' },
+      { title: 'Reports in Studio', url: '/odoo/studio/studio-reports.html' },
+      { title: 'Studio vs Custom Module', url: '/odoo/studio/studio-vs-module.html' },
+    ]},
     { title: '📊 Advanced Topics', items: [
       { title: 'Performance & Caching', url: '/odoo/advanced/performance-caching.html' },
       { title: 'Multi-company Setup', url: '/odoo/advanced/multi-company.html' },

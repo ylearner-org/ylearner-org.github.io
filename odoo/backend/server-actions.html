@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Server Actions – ir.actions.server Automation | ylearner</title>
+  <meta name="description" content="Master Odoo server actions and automated actions in Odoo 19: ir.actions.server with state=code, binding to models, ir.base.automation triggers, and chaining actions.">
+  <meta name="keywords" content="Odoo server actions, ir.actions.server, ir.base.automation, automated actions, state=code, Odoo 19, backend automation">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/backend/server-actions.html">
+  <meta property="og:title" content="Odoo Server Actions – ir.actions.server Automation">
+  <meta property="og:description" content="Master Odoo server actions and automated actions in Odoo 19: ir.actions.server with state=code, binding to models, ir.base.automation triggers, and chaining actions.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/backend/server-actions.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Server Actions – ir.actions.server Automation | ylearner">
+  <meta name="twitter:description" content="Master Odoo server actions and automated actions in Odoo 19: ir.actions.server with state=code, binding to models, ir.base.automation triggers, and chaining actions.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Server Actions – ir.actions.server Automation",
+    "description": "Master Odoo server actions and automated actions in Odoo 19: ir.actions.server with state=code, binding to models, ir.base.automation triggers, and chaining actions.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo server actions, ir.actions.server, ir.base.automation, automated actions, Odoo backend",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">Backend Development</span><span class="separator">›</span>
+          <span class="current">Server Actions</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Backend Development</div>
+          <h1>Odoo Server Actions – ir.actions.server Automation</h1>
+          <p class="lesson-intro">Server actions (<code>ir.actions.server</code>) are configurable actions that run Python code, create records, or update fields on a set of records — all without writing a Python method directly on a model. Combined with automated actions (<code>ir.base.automation</code>), they enable powerful event-driven workflows: automatically setting state when a record changes, sending emails on creation, or chaining multiple actions together. This page covers both mechanisms in Odoo 19.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <h3>📋 What You Will Learn</h3>
+            <ul>
+              <li>The different server action types (state values)</li>
+              <li>Defining a server action in XML that runs Python code</li>
+              <li>The variables available inside server action code (<code>env</code>, <code>record</code>, <code>records</code>)</li>
+              <li>Binding a server action to a model's Action menu</li>
+              <li>Creating automated actions with <code>ir.base.automation</code> triggers</li>
+              <li>Chaining multiple server actions with <code>state='multi'</code></li>
+            </ul>
+          </div>
+
+          <!-- Section 1 -->
+          <h2 id="what-are-server-actions">What are Server Actions?</h2>
+          <p>An <code>ir.actions.server</code> record encapsulates a piece of logic that can be triggered in several ways: manually from the Actions button in a list/form view, by an automated action (event-driven), by a scheduled action, or called from Python code. They are the "no-code" or "low-code" counterpart to writing full Python methods.</p>
+          <p>The key field on a server action is <code>state</code>, which determines what the action does:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>state value</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><code>code</code></td><td>Runs a snippet of Python code</td></tr>
+                <tr><td><code>object_write</code></td><td>Writes specific field values on the record(s)</td></tr>
+                <tr><td><code>object_create</code></td><td>Creates a new record of a specified model</td></tr>
+                <tr><td><code>multi</code></td><td>Runs multiple other server actions in sequence</td></tr>
+                <tr><td><code>followers</code></td><td>Adds followers to the record</td></tr>
+                <tr><td><code>next_activity</code></td><td>Schedules an activity on the record</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Section 2 -->
+          <h2 id="server-action-types">Server Action Types</h2>
+          <p>The <code>state='code'</code> type is the most flexible — it lets you write arbitrary Python logic. The other types are more constrained but easier to configure without programming knowledge, making them useful for allowing administrators to create automations from the UI.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;
+    &lt;!-- Type 1: code — runs Python snippet --&gt;
+    &lt;record id="action_server_mark_overdue" model="ir.actions.server"&gt;
+        &lt;field name="name"&gt;Mark as Overdue&lt;/field&gt;
+        &lt;field name="model_id" ref="model_library_loan"/&gt;
+        &lt;field name="binding_model_id" ref="model_library_loan"/&gt;
+        &lt;field name="state"&gt;code&lt;/field&gt;
+        &lt;field name="code"&gt;
+records.filtered(lambda l: l.state == 'active').write({'state': 'overdue'})
+        &lt;/field&gt;
+    &lt;/record&gt;
+
+    &lt;!-- Type 2: object_write — set specific fields --&gt;
+    &lt;record id="action_server_reset_stock" model="ir.actions.server"&gt;
+        &lt;field name="name"&gt;Reset Stock to Zero&lt;/field&gt;
+        &lt;field name="model_id" ref="model_library_book"/&gt;
+        &lt;field name="binding_model_id" ref="model_library_book"/&gt;
+        &lt;field name="state"&gt;object_write&lt;/field&gt;
+        &lt;field name="fields_lines" eval="[(0, 0, {
+            'col1': ref('library_management.field_library_book__stock_quantity'),
+            'value': '0',
+            'evaluation_type': 'value',
+        })]"/>
+    &lt;/record&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <!-- Section 3 -->
+          <h2 id="creating-in-xml">Creating in XML</h2>
+          <p>A complete server action definition with <code>state='code'</code> includes the model, the code snippet, and optionally a binding to make it appear in the Actions menu:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;
+    &lt;record id="action_server_send_overdue_notice" model="ir.actions.server"&gt;
+        &lt;field name="name"&gt;Send Overdue Notice Email&lt;/field&gt;
+
+        &lt;!-- The model this action operates on --&gt;
+        &lt;field name="model_id" ref="model_library_loan"/&gt;
+
+        &lt;!-- Binding: show this in the Actions dropdown on library.loan --&gt;
+        &lt;field name="binding_model_id" ref="model_library_loan"/&gt;
+        &lt;!-- Show in both list and form views --&gt;
+        &lt;field name="binding_view_types"&gt;list,form&lt;/field&gt;
+
+        &lt;field name="state"&gt;code&lt;/field&gt;
+        &lt;field name="code"&gt;
+template = env.ref('library_management.email_template_overdue_notice', raise_if_not_found=False)
+if template:
+    for loan in records:
+        if loan.state == 'overdue' and loan.borrower_id.email:
+            template.send_mail(loan.id, force_send=True)
+        &lt;/field&gt;
+    &lt;/record&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <!-- AD BLOCK -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <!-- Section 4 -->
+          <h2 id="execute-python-code">Execute Python Code</h2>
+          <p>Inside a <code>state='code'</code> server action, Odoo provides a set of pre-defined variables in the execution context:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Variable</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>env</code></td><td><code>odoo.api.Environment</code></td><td>Full ORM environment — access any model with <code>env['model.name']</code></td></tr>
+                <tr><td><code>model</code></td><td>Recordset (empty)</td><td>The model class — for calling <code>@api.model</code> methods</td></tr>
+                <tr><td><code>record</code></td><td>Single record</td><td>The single record this action was triggered on (if applicable)</td></tr>
+                <tr><td><code>records</code></td><td>Recordset</td><td>All records selected when the action was triggered</td></tr>
+                <tr><td><code>time</code>, <code>datetime</code>, <code>dateutil</code></td><td>Modules</td><td>Standard library modules for date/time operations</td></tr>
+                <tr><td><code>Warning</code></td><td>Class</td><td>Raise <code>Warning('message')</code> to show a warning to the user</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python (server action code field)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># Example: complex code inside a server action's code field
+# Variables available: env, record, records, model, time, datetime
+
+# Check permissions before acting
+if not env.user.has_group('library_management.group_library_librarian'):
+    raise Warning("Only librarians can use this action.")
+
+# Process selected records
+returned = 0
+today = datetime.date.today()
+for loan in records:
+    if loan.state in ('active', 'overdue'):
+        loan.write({
+            'state': 'returned',
+            'return_date': today,
+        })
+        returned += 1
+
+# Send a confirmation to the current user
+if returned:
+    env.user.notify_info(f"Marked {returned} loans as returned.")</code></pre>
+          </div>
+
+          <!-- Section 5 -->
+          <h2 id="trigger-on-record-create-update">Trigger on Record Create/Update</h2>
+          <p>Automated actions (<code>ir.base.automation</code>) connect server actions to model events — they fire automatically when records are created, written, deleted, or when a date condition is met:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;
+    &lt;!-- Server action that sets state to overdue --&gt;
+    &lt;record id="action_server_auto_overdue" model="ir.actions.server"&gt;
+        &lt;field name="name"&gt;Auto: Set Loan Overdue&lt;/field&gt;
+        &lt;field name="model_id" ref="model_library_loan"/&gt;
+        &lt;field name="state"&gt;code&lt;/field&gt;
+        &lt;field name="code"&gt;
+records.write({'state': 'overdue'})
+        &lt;/field&gt;
+    &lt;/record&gt;
+
+    &lt;!-- Automated action: trigger the server action when a condition is met --&gt;
+    &lt;record id="automation_loan_overdue" model="ir.base.automation"&gt;
+        &lt;field name="name"&gt;Library Loan: Auto Mark Overdue&lt;/field&gt;
+        &lt;field name="model_id" ref="model_library_loan"/&gt;
+
+        &lt;!-- Trigger options: on_create, on_write, on_create_or_write,
+             on_unlink, on_change, based_on_timed_condition --&gt;
+        &lt;field name="trigger"&gt;based_on_timed_condition&lt;/field&gt;
+
+        &lt;!-- For timed triggers: which date field + offset --&gt;
+        &lt;field name="date_field_name"&gt;due_date&lt;/field&gt;
+        &lt;field name="trg_date_range"&gt;0&lt;/field&gt;
+        &lt;field name="trg_date_range_type"&gt;day&lt;/field&gt;
+
+        &lt;!-- Only trigger on loans that are currently 'active' --&gt;
+        &lt;field name="filter_domain"&gt;[('state','=','active')]&lt;/field&gt;
+
+        &lt;field name="action_server_ids" eval="[(4, ref('action_server_auto_overdue'))]"/&gt;
+        &lt;field name="active"&gt;True&lt;/field&gt;
+    &lt;/record&gt;
+
+    &lt;!-- Second example: trigger on write — when state changes to 'returned' --&gt;
+    &lt;record id="automation_loan_returned_notify" model="ir.base.automation"&gt;
+        &lt;field name="name"&gt;Library Loan: Notify on Return&lt;/field&gt;
+        &lt;field name="model_id" ref="model_library_loan"/&gt;
+        &lt;field name="trigger"&gt;on_write&lt;/field&gt;
+        &lt;field name="filter_pre_domain"&gt;[('state','!=','returned')]&lt;/field&gt;
+        &lt;field name="filter_domain"&gt;[('state','=','returned')]&lt;/field&gt;
+        &lt;field name="action_server_ids" eval="[(4, ref('action_server_send_overdue_notice'))]"/&gt;
+        &lt;field name="active"&gt;True&lt;/field&gt;
+    &lt;/record&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Trigger</th><th>When it fires</th></tr></thead>
+              <tbody>
+                <tr><td><code>on_create</code></td><td>After a new record is created</td></tr>
+                <tr><td><code>on_write</code></td><td>After an existing record is updated</td></tr>
+                <tr><td><code>on_create_or_write</code></td><td>After create or update</td></tr>
+                <tr><td><code>on_unlink</code></td><td>Before a record is deleted</td></tr>
+                <tr><td><code>based_on_timed_condition</code></td><td>At a specific date/time relative to a date field on the record</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Section 6 -->
+          <h2 id="chaining-server-actions">Chaining Server Actions</h2>
+          <p>Use <code>state='multi'</code> to create a server action that runs multiple child actions in sequence. This lets you compose complex automation from simple reusable building blocks:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;
+    &lt;record id="action_server_full_overdue_workflow" model="ir.actions.server"&gt;
+        &lt;field name="name"&gt;Full Overdue Workflow&lt;/field&gt;
+        &lt;field name="model_id" ref="model_library_loan"/&gt;
+        &lt;field name="state"&gt;multi&lt;/field&gt;
+        &lt;!-- child_ids: the list of actions to run in sequence --&gt;
+        &lt;field name="child_ids" eval="[
+            (4, ref('action_server_mark_overdue')),
+            (4, ref('action_server_send_overdue_notice')),
+        ]"/&gt;
+    &lt;/record&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <!-- Section 7 -->
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li>Server actions (<code>ir.actions.server</code>) encapsulate logic that can be triggered from the UI, by automations, or from code</li>
+              <li><code>state='code'</code> runs Python with <code>env</code>, <code>record</code>, and <code>records</code> pre-defined</li>
+              <li>Bind to a model with <code>binding_model_id</code> to appear in the Actions dropdown</li>
+              <li>Automated actions (<code>ir.base.automation</code>) connect server actions to record lifecycle events</li>
+              <li>Use <code>filter_pre_domain</code> + <code>filter_domain</code> in automated actions to detect field value transitions</li>
+              <li><code>state='multi'</code> lets you chain multiple server actions into a single callable sequence</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/odoo/backend/scheduled-actions.html" class="topic-tag odoo-topic-tag">🐍 Scheduled Actions</a>
+            <a href="/odoo/backend/email-templates.html" class="topic-tag odoo-topic-tag">🐍 Email Templates</a>
+            <a href="/odoo/backend/wizards.html" class="topic-tag odoo-topic-tag">🐍 Wizards</a>
+            <a href="/odoo/module/menus-actions.html" class="topic-tag odoo-topic-tag">🐍 Menus &amp; Actions</a>
+            <a href="/odoo/backend/model-inheritance.html" class="topic-tag odoo-topic-tag">🐍 Model Inheritance</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between a server action and a scheduled action? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A server action (<code>ir.actions.server</code>) is a piece of logic triggered either manually by a user or by an automated action event (create/write/delete/time). A scheduled action (<code>ir.cron</code>) is triggered automatically by the Odoo scheduler on a time interval regardless of any record event. Server actions operate on specific records; cron jobs typically search for records themselves.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can automated actions (ir.base.automation) run without binding to a model event? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — the <code>based_on_timed_condition</code> trigger type doesn't require a record change event. It fires when a specified date/time field on existing records meets a configured condition (e.g. "on the due_date" or "7 days before the due_date"). Odoo's scheduler checks these conditions periodically, similar to cron jobs but scoped to individual records.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do filter_pre_domain and filter_domain work together in on_write triggers? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>filter_pre_domain</code> is evaluated against the record's state BEFORE the write operation (using old values). <code>filter_domain</code> is evaluated AFTER the write (new values). Together they detect transitions: a loan that was NOT returned before (<code>filter_pre_domain=[('state','!=','returned')]</code>) and IS returned after (<code>filter_domain=[('state','=','returned')]</code>) triggers exactly once at the moment of state change.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is it better to use ir.base.automation or override write() in Python? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Both approaches work. Use <code>ir.base.automation</code> for simple field updates, email sends, or activity creation — it keeps the logic in XML data and lets administrators see and modify it from the UI. Override <code>write()</code> in Python when the logic is complex, involves multiple steps, or needs to be unit-tested. For business-critical flows, Python overrides are more maintainable and debuggable.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/backend/scheduled-actions.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Scheduled Actions</span>
+          </a>
+          <a href="/odoo/backend/email-templates.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Email Templates</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

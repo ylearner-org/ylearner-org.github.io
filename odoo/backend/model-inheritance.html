@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Model Inheritance – Classical, Prototype, and Delegation | ylearner</title>
+  <meta name="description" content="Understand all three types of Odoo model inheritance: classical (_inherit), prototype (_inherit + _name), and delegation (_inherits). Includes super() patterns and mail.thread mixin.">
+  <meta name="keywords" content="Odoo model inheritance, _inherit, _inherits, prototype inheritance, delegation inheritance, mail.thread, super() Odoo, Odoo 19 backend">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/backend/model-inheritance.html">
+  <meta property="og:title" content="Odoo Model Inheritance – Classical, Prototype, and Delegation">
+  <meta property="og:description" content="Understand all three types of Odoo model inheritance: classical (_inherit), prototype (_inherit + _name), and delegation (_inherits). Includes super() patterns and mail.thread mixin.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/backend/model-inheritance.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Model Inheritance – Classical, Prototype, and Delegation | ylearner">
+  <meta name="twitter:description" content="Understand all three types of Odoo model inheritance: classical (_inherit), prototype (_inherit + _name), and delegation (_inherits). Includes super() patterns and mail.thread mixin.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Model Inheritance – Classical, Prototype, and Delegation",
+    "description": "Understand all three types of Odoo model inheritance: classical (_inherit), prototype (_inherit + _name), and delegation (_inherits). Includes super() patterns and mail.thread mixin.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo model inheritance, _inherit, _inherits, prototype, delegation, mail.thread, Odoo backend",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">Backend Development</span><span class="separator">›</span>
+          <span class="current">Model Inheritance</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Backend Development</div>
+          <h1>Odoo Model Inheritance – Classical, Prototype, and Delegation</h1>
+          <p class="lesson-intro">Inheritance is central to how Odoo modules extend and customise existing functionality without forking core code. Odoo has three distinct inheritance mechanisms, each solving a different problem: classical inheritance extends an existing model in place, prototype inheritance creates a copy as a new model, and delegation inheritance embeds one model inside another via a foreign key. Understanding which to use — and when — is a key skill for any Odoo backend developer.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <h3>📋 What You Will Learn</h3>
+            <ul>
+              <li>The three inheritance types and when to use each</li>
+              <li>Classical inheritance: extending models with <code>_inherit</code></li>
+              <li>Prototype inheritance: forking a model with <code>_inherit + _name</code></li>
+              <li>Delegation inheritance: embedding with <code>_inherits</code></li>
+              <li>Extending methods safely with <code>super()</code></li>
+              <li>Useful mixins: <code>mail.thread</code> and <code>mail.activity.mixin</code></li>
+            </ul>
+          </div>
+
+          <!-- Section 1 -->
+          <h2 id="three-types-of-inheritance">Three Types of Inheritance</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Type</th><th>How to declare</th><th>Creates new table?</th><th>Use case</th></tr></thead>
+              <tbody>
+                <tr><td>Classical</td><td><code>_inherit = 'existing.model'</code></td><td>No — extends in place</td><td>Add fields/methods to any model from another module</td></tr>
+                <tr><td>Prototype</td><td><code>_inherit = 'existing.model'</code> + <code>_name = 'new.model'</code></td><td>Yes — new table, new model</td><td>Start from an existing model's structure for a related but distinct concept</td></tr>
+                <tr><td>Delegation</td><td><code>_inherits = {'existing.model': 'field_id'}</code></td><td>Yes — own table + FK</td><td>Embed an existing model's fields transparently (e.g. embed <code>res.partner</code>)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Section 2 -->
+          <h2 id="classical-inheritance">Classical Inheritance (_inherit)</h2>
+          <p>Classical inheritance is the most common pattern in Odoo. You write a new Python class with only <code>_inherit</code> (no <code>_name</code>), and Odoo merges it into the existing model at startup. The changes apply globally — every module that uses the model sees the new fields and methods.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">from odoo import models, fields, api
+
+# Extending res.partner — adds library-specific fields to the contact model
+class ResPartner(models.Model):
+    _inherit = 'res.partner'   # no _name — extends in place
+
+    # These fields are added to the existing res.partner table
+    is_library_member = fields.Boolean(string='Library Member', default=False)
+    library_card_number = fields.Char(string='Library Card Number')
+    membership_expiry = fields.Date(string='Membership Expiry')
+    active_loan_count = fields.Integer(
+        string='Active Loans',
+        compute='_compute_active_loan_count',
+    )
+
+    @api.depends()
+    def _compute_active_loan_count(self):
+        for partner in self:
+            partner.active_loan_count = self.env['library.loan'].search_count([
+                ('borrower_id', '=', partner.id),
+                ('state', '=', 'active'),
+            ])</code></pre>
+          </div>
+
+          <p>There is no limit on how many modules can inherit the same model. All extensions are stacked — Odoo's registry merges them all into one final class at startup time using Python's MRO (method resolution order).</p>
+
+          <!-- Section 3 -->
+          <h2 id="prototype-inheritance">Prototype Inheritance (_inherit + _name)</h2>
+          <p>Prototype inheritance copies the structure of an existing model to create a brand-new model with its own database table. You specify both <code>_inherit</code> (the source) and <code>_name</code> (the new model's technical name).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">from odoo import models, fields
+
+# Start from mail.thread + mail.activity.mixin structure
+# Create a new, independent model for eBook loans
+class LibraryEbookLoan(models.Model):
+    _name = 'library.ebook.loan'      # new model — new table
+    _description = 'eBook Loan'
+    _inherit = 'library.loan'         # copy fields and methods from library.loan
+
+    # Add eBook-specific fields on top of inherited ones
+    download_link = fields.Char(string='Download URL')
+    device_id = fields.Char(string='Device ID')
+    drm_token = fields.Char(string='DRM Token')</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Prototype creates a completely separate model</strong>
+              <p>Changes made to <code>library.loan</code> after the prototype was created do NOT automatically propagate to <code>library.ebook.loan</code>. Use prototype inheritance sparingly — only when you genuinely need a separate model. Most of the time, classical inheritance with an extra field to distinguish the subtype is a better approach.</p>
+            </div>
+          </div>
+
+          <!-- AD BLOCK -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <!-- Section 4 -->
+          <h2 id="delegation-inheritance">Delegation Inheritance (_inherits)</h2>
+          <p>Delegation inheritance is the most sophisticated type. Your model has a Many2one field pointing to another model, and <code>_inherits</code> tells Odoo to transparently expose all fields of the linked model as if they were your own fields. Two tables exist in the database, but the ORM presents them as one.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">from odoo import models, fields
+
+class LibraryMember(models.Model):
+    _name = 'library.member'
+    _description = 'Library Member'
+
+    # Mandatory: the field that points to the delegated model
+    partner_id = fields.Many2one(
+        'res.partner',
+        string='Contact',
+        required=True,
+        ondelete='cascade',
+        auto_join=True,
+    )
+
+    # Delegation: all res.partner fields (name, email, phone, address…)
+    # are accessible directly on library.member as if they were native
+    _inherits = {'res.partner': 'partner_id'}
+
+    # Library-specific fields (stored in library_member table)
+    card_number = fields.Char(string='Library Card Number')
+    membership_tier = fields.Selection([
+        ('standard', 'Standard'),
+        ('premium', 'Premium'),
+    ], string='Membership Tier', default='standard')
+
+# Usage — name and email come from res.partner transparently:
+# member = env['library.member'].create({
+#     'name': 'Jane Smith',          # → writes to res.partner
+#     'email': 'jane@example.com',   # → writes to res.partner
+#     'card_number': 'LIB-00042',    # → writes to library.member
+# })</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>When to use delegation</th><th>When NOT to use delegation</th></tr></thead>
+              <tbody>
+                <tr><td>You want to extend <code>res.partner</code> (or similar) with a distinct identity</td><td>When classical inheritance is simpler and sufficient</td></tr>
+                <tr><td>You need the delegated record to exist independently (e.g. the partner survives member deletion)</td><td>When the two tables becoming out-of-sync would cause bugs</td></tr>
+                <tr><td>You want to reuse all the partner fields in forms and reports without copying them</td><td>When you don't need the parent model's features</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Section 5 -->
+          <h2 id="inheriting-from-multiple-models">Inheriting from Multiple Models</h2>
+          <p>A model can inherit from multiple models simultaneously by providing a list to <code>_inherit</code>. This is primarily used with mixins — abstract models that provide reusable behaviour without creating a table.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">from odoo import models, fields
+
+class LibraryBook(models.Model):
+    _name = 'library.book'
+    _description = 'Library Book'
+
+    # Inherit from multiple models — all are mixins (abstract)
+    _inherit = [
+        'mail.thread',           # adds chatter (message log) to the form
+        'mail.activity.mixin',   # adds activity scheduling (call, email, todo)
+    ]
+
+    # mail.thread adds: message_ids, follower_ids, message tracking
+    # mail.activity.mixin adds: activity_ids, activity scheduling UI
+
+    name = fields.Char(string='Title', required=True, tracking=True)
+    state = fields.Selection([
+        ('available', 'Available'),
+        ('borrowed', 'Borrowed'),
+        ('damaged', 'Damaged'),
+    ], string='State', default='available', tracking=True)  # tracking=True logs changes to chatter</code></pre>
+          </div>
+
+          <!-- Section 6 -->
+          <h2 id="extending-methods">Extending Methods (super())</h2>
+          <p>When you override a method in classical inheritance, you almost always want to call the parent implementation first. Use Python's <code>super()</code> for this:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">from odoo import models, fields, api
+import logging
+
+_logger = logging.getLogger(__name__)
+
+class LibraryBook(models.Model):
+    _inherit = 'library.book'
+
+    # Override create — add custom logic before/after the standard create
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            # Pre-processing: generate a reference number if not provided
+            if not vals.get('ref'):
+                vals['ref'] = self.env['ir.sequence'].next_by_code('library.book')
+
+        # Call the parent implementation (does the actual INSERT)
+        records = super().create(vals_list)
+
+        # Post-processing: send a welcome message to followers
+        for record in records:
+            record.message_post(
+                body=f"Book '{record.name}' has been added to the library.",
+                message_type='notification',
+            )
+            _logger.info("Created library book: %s (id=%d)", record.name, record.id)
+
+        return records
+
+    def write(self, vals):
+        # Log state transitions
+        if 'state' in vals:
+            for record in self:
+                _logger.info(
+                    "Book %s state: %s → %s",
+                    record.name, record.state, vals['state']
+                )
+        return super().write(vals)
+
+    def unlink(self):
+        # Prevent deletion of books that are currently borrowed
+        for record in self:
+            if record.state == 'borrowed':
+                from odoo.exceptions import UserError
+                raise UserError(
+                    f"Cannot delete '{record.name}' — it is currently borrowed."
+                )
+        return super().unlink()</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always use @api.model_create_multi</strong>
+              <p>In Odoo 17+, the preferred pattern for overriding <code>create</code> is <code>@api.model_create_multi</code> which receives a list of value dicts. The older <code>@api.model</code> + single dict pattern is deprecated. Using <code>create_multi</code> allows Odoo to batch-create records efficiently and is required for compatibility with bulk operations.</p>
+            </div>
+          </div>
+
+          <!-- Section 7 -->
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li><strong>Classical</strong> (<code>_inherit</code> only): extends the existing model in place — most common pattern for customisation</li>
+              <li><strong>Prototype</strong> (<code>_inherit + _name</code>): creates a new model starting from an existing one's structure — use sparingly</li>
+              <li><strong>Delegation</strong> (<code>_inherits</code>): embeds another model via FK, exposing its fields transparently — ideal for <code>res.partner</code> extension</li>
+              <li>Always call <code>super()</code> when overriding <code>create</code>, <code>write</code>, or <code>unlink</code> unless you have a very specific reason not to</li>
+              <li>Use <code>@api.model_create_multi</code> (not <code>@api.model</code>) for create overrides in Odoo 17+</li>
+              <li><code>mail.thread</code> and <code>mail.activity.mixin</code> are the standard way to add the chatter and activity features to any model</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/odoo/backend/computed-fields.html" class="topic-tag odoo-topic-tag">🐍 Computed Fields</a>
+            <a href="/odoo/backend/onchange-constraints.html" class="topic-tag odoo-topic-tag">🐍 Onchange &amp; Constraints</a>
+            <a href="/odoo/backend/wizards.html" class="topic-tag odoo-topic-tag">🐍 Wizards</a>
+            <a href="/odoo/module/models-fields.html" class="topic-tag odoo-topic-tag">🐍 Models &amp; Fields</a>
+            <a href="/odoo/module/security-access.html" class="topic-tag odoo-topic-tag">🐍 Security &amp; Access Rights</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I override a method added by another module's classical inheritance? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Since all classical inheritance extensions are merged into one class by Odoo's registry, any module can override any method on the merged class. The override order is determined by the module dependency order — a module that depends on yours will override your overrides. Always call <code>super()</code> to ensure the full override chain executes.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between _inherit and _inherits (plural)? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>_inherit</code> (singular, string) is used for classical and prototype inheritance — it names the model to extend or copy from. <code>_inherits</code> (plural, dict) is used for delegation inheritance — it maps a model name to the Many2one field name on your model that links to it. They are completely different mechanisms despite the similar names.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How does mail.thread work — what does it add to my model? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>mail.thread</code> adds: a <code>message_ids</code> One2many of messages (the chatter), follower tracking (<code>message_follower_ids</code>), automatic logging of field changes when <code>tracking=True</code> is set on a field, and the <code>message_post()</code> method for sending messages. It also adds the Chatter widget to any form view that includes <code>&lt;div class="oe_chatter"&gt;</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I use delegation inheritance or just add fields to res.partner directly? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Both approaches are valid. Adding fields directly to <code>res.partner</code> (classical inheritance) is simpler and means all library-related partner data is in one place. Delegation inheritance (<code>library.member</code> with <code>_inherits</code>) makes more sense when a library member has a distinct lifecycle and many additional fields — it keeps the partner record clean and separates concerns. For most small modules, classical inheritance is sufficient.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/backend/onchange-constraints.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Onchange &amp; Constraints</span>
+          </a>
+          <a href="/odoo/backend/wizards.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Wizards</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

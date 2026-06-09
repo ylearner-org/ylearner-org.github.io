@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Wizards – Transient Models and Dialog Windows | ylearner</title>
+  <meta name="description" content="Build Odoo wizards using TransientModel: create multi-step dialog forms, trigger them from buttons, execute business logic, and return window actions in Odoo 19.">
+  <meta name="keywords" content="Odoo wizard, TransientModel, Odoo dialog, act_window, target new, Odoo 19, wizard form view, wizard button">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/backend/wizards.html">
+  <meta property="og:title" content="Odoo Wizards – Transient Models and Dialog Windows">
+  <meta property="og:description" content="Build Odoo wizards using TransientModel: create multi-step dialog forms, trigger them from buttons, execute business logic, and return window actions in Odoo 19.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/backend/wizards.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Wizards – Transient Models and Dialog Windows | ylearner">
+  <meta name="twitter:description" content="Build Odoo wizards using TransientModel: create multi-step dialog forms, trigger them from buttons, execute business logic, and return window actions in Odoo 19.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Wizards – Transient Models and Dialog Windows",
+    "description": "Build Odoo wizards using TransientModel: create multi-step dialog forms, trigger them from buttons, execute business logic, and return window actions in Odoo 19.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo wizard, TransientModel, dialog, act_window, target new, Odoo backend",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">Backend Development</span><span class="separator">›</span>
+          <span class="current">Wizards</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Backend Development</div>
+          <h1>Odoo Wizards – Transient Models and Dialog Windows</h1>
+          <p class="lesson-intro">Wizards are a pattern in Odoo for collecting user input in a popup dialog before executing a batch or complex operation. They are built on <code>models.TransientModel</code> — temporary records that Odoo cleans up automatically after the session ends. Understanding wizards lets you build user-friendly confirmation dialogs, bulk-update forms, and multi-step workflow assistants without polluting your permanent data models.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <h3>📋 What You Will Learn</h3>
+            <ul>
+              <li>The difference between TransientModel and Model</li>
+              <li>How to define a wizard Python class</li>
+              <li>Creating a wizard form view with a dialog target</li>
+              <li>Triggering the wizard from a button on another model</li>
+              <li>Returning actions from wizard execute methods</li>
+            </ul>
+          </div>
+
+          <!-- Section 1 -->
+          <h2 id="what-is-a-wizard">What is a Wizard?</h2>
+          <p>A wizard is a form that pops up as a dialog window, collects some input from the user, then executes an action when the user clicks a button (typically labelled "Confirm" or "Apply"). Common uses include:</p>
+          <ul>
+            <li>Confirming a destructive action with a reason or note field</li>
+            <li>Bulk processing selected records (e.g. marking 50 loans as returned at once)</li>
+            <li>Collecting parameters for a report or export</li>
+            <li>Multi-step onboarding or configuration flows</li>
+          </ul>
+          <p>Wizards are implemented as <code>TransientModel</code> — a model subclass whose database records are automatically garbage-collected by Odoo's scheduled vacuum job after a configurable timeout (default: 1 hour).</p>
+
+          <!-- Section 2 -->
+          <h2 id="transientmodel-vs-model">TransientModel vs Model</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Feature</th><th>models.Model</th><th>models.TransientModel</th></tr></thead>
+              <tbody>
+                <tr><td>Data persistence</td><td>Permanent — stays until deleted</td><td>Temporary — auto-cleaned after session</td></tr>
+                <tr><td>Appears in menus</td><td>Usually yes</td><td>No — accessed only via action</td></tr>
+                <tr><td>Access rights</td><td>Full — defined in ir.model.access.csv</td><td>All internal users can create/read by default</td></tr>
+                <tr><td>Typical use</td><td>Business data (invoices, products…)</td><td>Popup forms, parameter collection, batch ops</td></tr>
+                <tr><td>Vacuum cleanup</td><td>Never automatic</td><td>Yes — records older than 1 hr are deleted</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Section 3 -->
+          <h2 id="wizard-python-class">Wizard Python Class</h2>
+          <p>A wizard is just a Python class that inherits from <code>models.TransientModel</code>. It has fields for user input and a method (usually <code>action_execute</code>) that performs the work and returns an action dict:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">from odoo import models, fields, api
+from odoo.exceptions import UserError
+import logging
+
+_logger = logging.getLogger(__name__)
+
+class LibraryBulkReturnWizard(models.TransientModel):
+    _name = 'library.bulk.return.wizard'
+    _description = 'Bulk Book Return Wizard'
+
+    # Wizard fields — what we collect from the user
+    return_date = fields.Date(
+        string='Return Date',
+        required=True,
+        default=fields.Date.today,
+    )
+    condition = fields.Selection([
+        ('good', 'Good Condition'),
+        ('damaged', 'Damaged'),
+        ('lost', 'Lost'),
+    ], string='Condition', required=True, default='good')
+    note = fields.Text(string='Internal Note')
+
+    # Reference back to the loans being returned
+    # (populated automatically when wizard is launched from a list)
+    loan_ids = fields.Many2many(
+        'library.loan',
+        string='Loans to Return',
+    )
+
+    @api.model
+    def default_get(self, fields_list):
+        """Pre-populate loan_ids from the records selected in the list view."""
+        res = super().default_get(fields_list)
+        active_ids = self.env.context.get('active_ids', [])
+        if 'loan_ids' in fields_list and active_ids:
+            res['loan_ids'] = [(6, 0, active_ids)]
+        return res
+
+    def action_execute(self):
+        """Mark all selected loans as returned and close the dialog."""
+        self.ensure_one()
+        if not self.loan_ids:
+            raise UserError("No loans selected to return.")
+
+        for loan in self.loan_ids:
+            if loan.state not in ('active', 'overdue'):
+                continue
+            loan.write({
+                'state': 'returned',
+                'return_date': self.return_date,
+                'return_condition': self.condition,
+                'return_note': self.note,
+            })
+            _logger.info("Loan %d returned on %s", loan.id, self.return_date)
+
+        # Return an action to reload the originating list view
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'library.loan',
+            'view_mode': 'list,form',
+            'name': 'Loans',
+        }
+
+    def action_cancel(self):
+        """Just close the dialog without doing anything."""
+        return {'type': 'ir.actions.act_window_close'}</code></pre>
+          </div>
+
+          <!-- AD BLOCK -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <!-- Section 4 -->
+          <h2 id="wizard-view">Wizard View (Form Dialog)</h2>
+          <p>The wizard view is a standard <code>&lt;form&gt;</code> view. The <code>target: 'new'</code> in the action (not in the view itself) is what makes it open as a dialog. Keep wizard forms concise — they should show only what the user needs to fill in:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;
+    &lt;record id="view_library_bulk_return_wizard_form" model="ir.ui.view"&gt;
+        &lt;field name="name"&gt;library.bulk.return.wizard.form&lt;/field&gt;
+        &lt;field name="model"&gt;library.bulk.return.wizard&lt;/field&gt;
+        &lt;field name="arch" type="xml"&gt;
+            &lt;form string="Return Books"&gt;
+                &lt;group&gt;
+                    &lt;field name="return_date"/&gt;
+                    &lt;field name="condition"/&gt;
+                &lt;/group&gt;
+                &lt;group string="Loans Being Returned"&gt;
+                    &lt;field name="loan_ids" widget="many2many_tags" readonly="1"/&gt;
+                &lt;/group&gt;
+                &lt;group&gt;
+                    &lt;field name="note" placeholder="Optional internal note…"/&gt;
+                &lt;/group&gt;
+                &lt;footer&gt;
+                    &lt;!-- Primary action button --&gt;
+                    &lt;button name="action_execute"
+                            string="Confirm Return"
+                            type="object"
+                            class="btn-primary"/&gt;
+                    &lt;!-- Cancel discards the wizard record --&gt;
+                    &lt;button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/&gt;
+                &lt;/footer&gt;
+            &lt;/form&gt;
+        &lt;/field&gt;
+    &lt;/record&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <p>The <code>&lt;footer&gt;</code> element renders buttons in the dialog's footer bar. <code>special="cancel"</code> closes the dialog without calling any Python method — it discards the wizard record automatically.</p>
+
+          <!-- Section 5 -->
+          <h2 id="triggering-a-wizard">Triggering a Wizard from a Button</h2>
+          <p>There are two common ways to open a wizard: from a list view's Action menu (good for bulk operations on selected records) or from a button on a form view.</p>
+
+          <h3 id="trigger-from-action-menu">From the Action Menu (List View)</h3>
+          <p>Define an <code>ir.actions.act_window</code> and bind it to the model:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;
+    &lt;record id="action_bulk_return_wizard" model="ir.actions.act_window"&gt;
+        &lt;field name="name"&gt;Return Selected Books&lt;/field&gt;
+        &lt;field name="res_model"&gt;library.bulk.return.wizard&lt;/field&gt;
+        &lt;field name="view_mode"&gt;form&lt;/field&gt;
+        &lt;field name="target"&gt;new&lt;/field&gt;  &lt;!-- 'new' opens as popup dialog --&gt;
+        &lt;!-- Bind to the loan model so it appears in Actions dropdown --&gt;
+        &lt;field name="binding_model_id" ref="model_library_loan"/&gt;
+        &lt;field name="binding_view_types"&gt;list&lt;/field&gt;  &lt;!-- show only in list view --&gt;
+    &lt;/record&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <h3 id="trigger-from-form-button">From a Form View Button</h3>
+          <p>A button on a form calls a Python method on the current model that creates a wizard record and returns an action:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- In the library.loan form view --&gt;
+&lt;button name="action_open_return_wizard"
+        string="Return This Book"
+        type="object"
+        class="btn-primary"
+        attrs="{'invisible': [('state', '!=', 'active')]}"/&gt;</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">class LibraryLoan(models.Model):
+    _inherit = 'library.loan'
+
+    def action_open_return_wizard(self):
+        """Open the return wizard pre-populated with this single loan."""
+        self.ensure_one()
+        wizard = self.env['library.bulk.return.wizard'].create({
+            'loan_ids': [(6, 0, self.ids)],
+        })
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'library.bulk.return.wizard',
+            'view_mode': 'form',
+            'res_id': wizard.id,
+            'target': 'new',
+        }</code></pre>
+          </div>
+
+          <!-- Section 6 -->
+          <h2 id="wizard-return-actions">Wizard Return Actions</h2>
+          <p>The method called by the wizard's confirm button should return an action dict. Here are the most common return values:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">def action_execute(self):
+    # ... do the work ...
+
+    # Option 1: Close the dialog and do nothing else
+    return {'type': 'ir.actions.act_window_close'}
+
+    # Option 2: Navigate to a list of the affected records
+    return {
+        'type': 'ir.actions.act_window',
+        'name': 'Returned Loans',
+        'res_model': 'library.loan',
+        'view_mode': 'list,form',
+        'domain': [('id', 'in', self.loan_ids.ids)],
+    }
+
+    # Option 3: Navigate to a single record's form view
+    return {
+        'type': 'ir.actions.act_window',
+        'res_model': 'library.loan',
+        'view_mode': 'form',
+        'res_id': new_loan.id,
+        'target': 'current',  # opens in the main window, not a popup
+    }
+
+    # Option 4: Reload the parent form (useful when wizard modified the parent record)
+    return {
+        'type': 'ir.actions.client',
+        'tag': 'reload',
+    }</code></pre>
+          </div>
+
+          <!-- Section 7 -->
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li><code>models.TransientModel</code> creates temporary records automatically cleaned up by Odoo's vacuum</li>
+              <li>Wizard forms open as dialog popups when the action has <code>target: 'new'</code></li>
+              <li>Use <code>default_get</code> to pre-populate wizard fields from <code>context['active_ids']</code></li>
+              <li>The execute method does the work and returns an action dict to control what happens next</li>
+              <li><code>special="cancel"</code> on a footer button closes the dialog and discards the wizard record cleanly</li>
+              <li>Bind the wizard action to a model with <code>binding_model_id</code> to add it to the Actions menu</li>
+              <li>Return <code>{'type': 'ir.actions.act_window_close'}</code> to simply dismiss the dialog</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/odoo/backend/model-inheritance.html" class="topic-tag odoo-topic-tag">🐍 Model Inheritance</a>
+            <a href="/odoo/backend/qweb-reports.html" class="topic-tag odoo-topic-tag">🐍 QWeb Reports</a>
+            <a href="/odoo/backend/server-actions.html" class="topic-tag odoo-topic-tag">🐍 Server Actions</a>
+            <a href="/odoo/module/menus-actions.html" class="topic-tag odoo-topic-tag">🐍 Menus &amp; Actions</a>
+            <a href="/odoo/module/basic-views.html" class="topic-tag odoo-topic-tag">🐍 Basic Views</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">How long do TransientModel records persist in the database? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>By default, Odoo's automated vacuum job deletes transient model records older than 1 hour. This is controlled by the <code>base_setup.default_transient_age_override</code> system parameter. You can also call <code>self.env['library.bulk.return.wizard']._transient_clean_rows_older(3600)</code> manually. For very large databases, keeping transient tables small improves performance.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can a wizard have multiple pages or steps? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Use Odoo's notebook/tab widget to create a multi-tab form, or use the <code>page</code> field (an Integer or Selection on the wizard model) combined with <code>attrs</code> visibility rules to show/hide different groups of fields. Each "Next" button writes to the page field and the view dynamically shows the next set of inputs. Alternatively, the first wizard's confirm button can return an action that opens a second wizard.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Do I need to add security rules for my wizard model? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>TransientModel records are accessible to all internal users by default — you don't need to add an entry in <code>ir.model.access.csv</code> for basic read/create/write access. However, if you want to restrict which user groups can even open the wizard, you should add a <code>groups</code> attribute to the action that opens it, or check permissions inside the <code>action_execute</code> method.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between target: 'new' and target: 'current'? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>target: 'new'</code> opens the view in a popup dialog window, overlaid on top of the current view. <code>target: 'current'</code> (the default) replaces the current view in the main content area. Use <code>'new'</code> for wizards and confirmation dialogs, and <code>'current'</code> for normal navigation between records and views.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/backend/model-inheritance.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Model Inheritance</span>
+          </a>
+          <a href="/odoo/backend/qweb-reports.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">QWeb Reports</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

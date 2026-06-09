@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo QWeb PDF Reports – Creating Custom Reports | ylearner</title>
+  <meta name="description" content="Create custom PDF reports in Odoo 19 using QWeb templates and ir.actions.report: t-foreach, t-field, paper formats, Bootstrap styling, and triggering reports from Python.">
+  <meta name="keywords" content="Odoo QWeb reports, ir.actions.report, qweb-pdf, t-foreach, t-field, Odoo custom report, paper format, Odoo 19 report">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/backend/qweb-reports.html">
+  <meta property="og:title" content="Odoo QWeb PDF Reports – Creating Custom Reports">
+  <meta property="og:description" content="Create custom PDF reports in Odoo 19 using QWeb templates and ir.actions.report: t-foreach, t-field, paper formats, Bootstrap styling, and triggering reports from Python.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/backend/qweb-reports.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo QWeb PDF Reports – Creating Custom Reports | ylearner">
+  <meta name="twitter:description" content="Create custom PDF reports in Odoo 19 using QWeb templates and ir.actions.report: t-foreach, t-field, paper formats, Bootstrap styling, and triggering reports from Python.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo QWeb PDF Reports – Creating Custom Reports",
+    "description": "Create custom PDF reports in Odoo 19 using QWeb templates and ir.actions.report: t-foreach, t-field, paper formats, Bootstrap styling, and triggering reports from Python.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo QWeb reports, ir.actions.report, qweb-pdf, QWeb template, paper format, Odoo backend",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">Backend Development</span><span class="separator">›</span>
+          <span class="current">QWeb Reports</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Backend Development</div>
+          <h1>Odoo QWeb PDF Reports – Creating Custom Reports</h1>
+          <p class="lesson-intro">Odoo generates PDF reports by rendering QWeb XML templates into HTML and then passing that HTML to a headless browser (wkhtmltopdf in older versions, Chromium in Odoo 17+) to produce the final PDF. Understanding the pipeline — from defining an <code>ir.actions.report</code> record to writing a QWeb template with loops and field rendering — lets you build professional-grade printable documents entirely from within your module.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <h3>📋 What You Will Learn</h3>
+            <ul>
+              <li>How Odoo generates PDF reports end-to-end</li>
+              <li>Creating a report action with <code>ir.actions.report</code></li>
+              <li>Writing a QWeb report template with loops and conditions</li>
+              <li>Rendering field values with <code>t-field</code>, <code>t-out</code>, and <code>t-esc</code></li>
+              <li>Styling reports with Bootstrap and custom CSS</li>
+              <li>Configuring paper format (A4, margins, landscape)</li>
+              <li>Triggering a PDF download from Python code</li>
+            </ul>
+          </div>
+
+          <!-- Section 1 -->
+          <h2 id="how-odoo-generates-pdf-reports">How Odoo Generates PDF Reports</h2>
+          <p>The report pipeline works in three stages:</p>
+          <ol>
+            <li><strong>Action trigger:</strong> User clicks "Print" in a form/list view. Odoo finds the matching <code>ir.actions.report</code> record.</li>
+            <li><strong>Template rendering:</strong> Odoo fetches the recordset, passes it as <code>docs</code> to the QWeb template, and renders the template to HTML.</li>
+            <li><strong>PDF conversion:</strong> The rendered HTML is sent to a headless Chromium instance (Odoo 17+), which applies CSS and produces the final PDF binary.</li>
+          </ol>
+          <p>All report templates live in your module's <code>report/</code> directory (by convention) and are loaded via your module manifest's <code>data</code> list.</p>
+
+          <!-- Section 2 -->
+          <h2 id="report-action">Report Action (ir.actions.report)</h2>
+          <p>Every report needs an <code>ir.actions.report</code> record that links the action to the model and the QWeb template name:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;
+    &lt;record id="action_report_library_loan_receipt" model="ir.actions.report"&gt;
+        &lt;field name="name"&gt;Loan Receipt&lt;/field&gt;
+        &lt;field name="model"&gt;library.loan&lt;/field&gt;
+        &lt;field name="report_type"&gt;qweb-pdf&lt;/field&gt;
+
+        &lt;!-- Must match the template's t-name exactly --&gt;
+        &lt;field name="report_name"&gt;library_management.report_loan_receipt&lt;/field&gt;
+
+        &lt;!-- Optional: filename for the downloaded PDF --&gt;
+        &lt;field name="report_file"&gt;library_management.report_loan_receipt&lt;/field&gt;
+        &lt;field name="print_report_name"&gt;'Loan Receipt - ' + object.name&lt;/field&gt;
+
+        &lt;!-- Bind to the model so it appears in the Print menu --&gt;
+        &lt;field name="binding_model_id" ref="model_library_loan"/&gt;
+        &lt;field name="binding_type"&gt;report&lt;/field&gt;
+
+        &lt;!-- Optional: paper format (A4, Letter, etc.) --&gt;
+        &lt;field name="paperformat_id" ref="base.paperformat_euro"/&gt;
+    &lt;/record&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Field</th><th>Purpose</th></tr></thead>
+              <tbody>
+                <tr><td><code>model</code></td><td>The model whose records are passed to the template</td></tr>
+                <tr><td><code>report_type</code></td><td><code>qweb-pdf</code> for PDF, <code>qweb-html</code> for HTML preview</td></tr>
+                <tr><td><code>report_name</code></td><td>The <code>t-name</code> of the QWeb template (module.template_id format)</td></tr>
+                <tr><td><code>print_report_name</code></td><td>Python expression for the filename (has access to <code>object</code>)</td></tr>
+                <tr><td><code>binding_model_id</code></td><td>The model to bind to — shows the report in the Print button dropdown</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- AD BLOCK -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <!-- Section 3 -->
+          <h2 id="qweb-report-template">QWeb Report Template</h2>
+          <p>A QWeb report template is an XML template with a specific structure. The outer template wraps a document template, which wraps individual page templates:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;
+    &lt;template id="report_loan_receipt"&gt;
+        &lt;!-- t-call loads the standard report layout (header/footer/logo) --&gt;
+        &lt;t t-call="web.html_container"&gt;
+            &lt;t t-foreach="docs" t-as="loan"&gt;
+                &lt;!-- One page per loan record --&gt;
+                &lt;t t-call="web.external_layout"&gt;
+                    &lt;div class="page"&gt;
+                        &lt;h2&gt;Library Loan Receipt&lt;/h2&gt;
+                        &lt;div class="row mt-4"&gt;
+                            &lt;div class="col-6"&gt;
+                                &lt;strong&gt;Member:&lt;/strong&gt;
+                                &lt;!-- t-field renders the value with proper ORM formatting --&gt;
+                                &lt;span t-field="loan.borrower_id.name"/&gt;
+                            &lt;/div&gt;
+                            &lt;div class="col-6"&gt;
+                                &lt;strong&gt;Date:&lt;/strong&gt;
+                                &lt;span t-field="loan.borrow_date"/&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+
+                        &lt;!-- Conditional section --&gt;
+                        &lt;t t-if="loan.days_overdue &gt; 0"&gt;
+                            &lt;div class="alert alert-warning mt-3"&gt;
+                                This loan is &lt;strong t-out="loan.days_overdue"/&gt; days overdue.
+                            &lt;/div&gt;
+                        &lt;/t&gt;
+
+                        &lt;!-- Book details table --&gt;
+                        &lt;table class="table table-sm mt-4"&gt;
+                            &lt;thead&gt;
+                                &lt;tr&gt;
+                                    &lt;th&gt;Book Title&lt;/th&gt;
+                                    &lt;th&gt;ISBN&lt;/th&gt;
+                                    &lt;th&gt;Due Date&lt;/th&gt;
+                                &lt;/tr&gt;
+                            &lt;/thead&gt;
+                            &lt;tbody&gt;
+                                &lt;tr&gt;
+                                    &lt;td t-field="loan.book_id.title"/&gt;
+                                    &lt;td t-field="loan.book_id.isbn"/&gt;
+                                    &lt;td t-field="loan.due_date"/&gt;
+                                &lt;/tr&gt;
+                            &lt;/tbody&gt;
+                        &lt;/table&gt;
+
+                        &lt;p class="mt-4 text-muted"&gt;
+                            Please return the book in good condition by the due date.
+                        &lt;/p&gt;
+                    &lt;/div&gt;
+                &lt;/t&gt;
+            &lt;/t&gt;
+        &lt;/t&gt;
+    &lt;/template&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <!-- Section 4 -->
+          <h2 id="accessing-record-data">Accessing Record Data in Templates</h2>
+          <p>The template receives a <code>docs</code> variable which is the recordset passed to the report. You loop over it with <code>t-foreach</code> and render field values with <code>t-field</code> or <code>t-out</code>:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Directive</th><th>Usage</th><th>HTML escaping</th></tr></thead>
+              <tbody>
+                <tr><td><code>t-field="record.field"</code></td><td>Renders the field using Odoo's widget (dates formatted, currency symbol, etc.)</td><td>Yes — safe</td></tr>
+                <tr><td><code>t-out="expression"</code></td><td>Renders a Python expression — escaped HTML</td><td>Yes — safe</td></tr>
+                <tr><td><code>t-esc="expression"</code></td><td>Same as t-out (older syntax, still works)</td><td>Yes — safe</td></tr>
+                <tr><td><code>t-raw="expression"</code></td><td>Renders HTML markup as-is (use only for trusted content)</td><td>No — unsafe</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- Good: use t-field for ORM fields — gets proper date/currency formatting --&gt;
+&lt;span t-field="loan.borrow_date"/&gt;
+&lt;span t-field="loan.book_id.price" t-options='{"widget": "monetary", "display_currency": loan.currency_id}'/&gt;
+
+&lt;!-- Good: use t-out for computed values and Python expressions --&gt;
+&lt;span t-out="loan.days_overdue"/&gt;
+&lt;span t-out="len(loan.book_ids)"/&gt;
+
+&lt;!-- String formatting in the template --&gt;
+&lt;p t-out="'Receipt #' + str(loan.id)"/&gt;
+
+&lt;!-- Conditional rendering --&gt;
+&lt;t t-if="loan.borrower_id.country_id"&gt;
+    &lt;span t-field="loan.borrower_id.country_id.name"/&gt;
+&lt;/t&gt;</code></pre>
+          </div>
+
+          <!-- Section 5 -->
+          <h2 id="report-styling">Report Styling with Bootstrap</h2>
+          <p>Odoo's report layout includes Bootstrap 4 CSS. You can use any Bootstrap utility class directly in your template. For module-specific styles, add a <code>&lt;style&gt;</code> block inside the template or reference a separate CSS asset:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;template id="report_loan_receipt"&gt;
+    &lt;t t-call="web.html_container"&gt;
+        &lt;t t-foreach="docs" t-as="loan"&gt;
+            &lt;t t-call="web.external_layout"&gt;
+                &lt;div class="page"&gt;
+                    &lt;!-- Custom styles scoped to this report --&gt;
+                    &lt;style&gt;
+                        .loan-header { border-bottom: 2px solid #714B67; margin-bottom: 20px; }
+                        .overdue-badge { background-color: #dc3545; color: white;
+                                         padding: 4px 8px; border-radius: 4px; }
+                        .signature-line { border-top: 1px solid #ccc; margin-top: 60px;
+                                          width: 200px; text-align: center; }
+                    &lt;/style&gt;
+
+                    &lt;div class="loan-header d-flex justify-content-between"&gt;
+                        &lt;h2&gt;Loan Receipt&lt;/h2&gt;
+                        &lt;t t-if="loan.days_overdue &gt; 0"&gt;
+                            &lt;span class="overdue-badge"&gt;OVERDUE&lt;/span&gt;
+                        &lt;/t&gt;
+                    &lt;/div&gt;
+                    &lt;!-- content... --&gt;
+                &lt;/div&gt;
+            &lt;/t&gt;
+        &lt;/t&gt;
+    &lt;/t&gt;
+&lt;/template&gt;</code></pre>
+          </div>
+
+          <!-- Section 6 -->
+          <h2 id="paper-format">Paper Format</h2>
+          <p>Paper formats control the page dimensions, margins, orientation, and header/footer height. Built-in formats include <code>base.paperformat_euro</code> (A4) and <code>base.paperformat_us_letter</code>. You can define a custom one:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;
+    &lt;record id="paperformat_library_receipt" model="report.paperformat"&gt;
+        &lt;field name="name"&gt;Library Receipt (A5)&lt;/field&gt;
+        &lt;field name="default"&gt;False&lt;/field&gt;
+        &lt;field name="format"&gt;A5&lt;/field&gt;
+        &lt;field name="page_height"&gt;0&lt;/field&gt;
+        &lt;field name="page_width"&gt;0&lt;/field&gt;
+        &lt;field name="orientation"&gt;Portrait&lt;/field&gt;
+        &lt;field name="margin_top"&gt;15&lt;/field&gt;
+        &lt;field name="margin_bottom"&gt;10&lt;/field&gt;
+        &lt;field name="margin_left"&gt;10&lt;/field&gt;
+        &lt;field name="margin_right"&gt;10&lt;/field&gt;
+        &lt;field name="header_line"&gt;False&lt;/field&gt;
+        &lt;field name="header_spacing"&gt;35&lt;/field&gt;
+        &lt;field name="dpi"&gt;90&lt;/field&gt;
+    &lt;/record&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <!-- Section 7 -->
+          <h2 id="triggering-reports">Triggering Reports</h2>
+          <p>You can trigger a PDF report download from Python code — useful for triggering from a button, wizard, or automated action:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">def action_print_receipt(self):
+    """Return an action that triggers the PDF download."""
+    self.ensure_one()
+    return self.env.ref(
+        'library_management.action_report_library_loan_receipt'
+    ).report_action(self)
+
+# Generate the PDF binary programmatically (e.g. to attach to an email)
+def _generate_receipt_pdf(self):
+    report = self.env.ref('library_management.action_report_library_loan_receipt')
+    pdf_content, content_type = self.env['ir.actions.report']._render_qweb_pdf(
+        report,
+        res_ids=self.ids,
+    )
+    return pdf_content  # bytes
+
+# Attach a generated PDF to a record as an ir.attachment
+def _attach_receipt_pdf(self):
+    self.ensure_one()
+    pdf_content = self._generate_receipt_pdf()
+    attachment = self.env['ir.attachment'].create({
+        'name': f'Receipt-{self.name}.pdf',
+        'type': 'binary',
+        'datas': base64.b64encode(pdf_content),
+        'res_model': self._name,
+        'res_id': self.id,
+        'mimetype': 'application/pdf',
+    })
+    return attachment</code></pre>
+          </div>
+
+          <!-- Section 8 -->
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li>Reports need two things: an <code>ir.actions.report</code> record and a QWeb template</li>
+              <li><code>report_name</code> in the action must exactly match the template's <code>id</code> in <code>module.id</code> format</li>
+              <li>The template receives <code>docs</code> — the recordset; loop with <code>t-foreach="docs" t-as="doc"</code></li>
+              <li>Use <code>t-field</code> for ORM fields (proper date/currency formatting); <code>t-out</code> for Python expressions</li>
+              <li>Bootstrap 4 is available in all report templates — use its grid and utility classes freely</li>
+              <li>Define a custom <code>report.paperformat</code> record to control page size, margins, and orientation</li>
+              <li>Call <code>report_action(self)</code> from Python to trigger a download; use <code>_render_qweb_pdf</code> to get raw bytes</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/odoo/backend/wizards.html" class="topic-tag odoo-topic-tag">🐍 Wizards</a>
+            <a href="/odoo/backend/email-templates.html" class="topic-tag odoo-topic-tag">🐍 Email Templates</a>
+            <a href="/odoo/backend/scheduled-actions.html" class="topic-tag odoo-topic-tag">🐍 Scheduled Actions</a>
+            <a href="/odoo/module/basic-views.html" class="topic-tag odoo-topic-tag">🐍 Basic Views</a>
+            <a href="/odoo/module/menus-actions.html" class="topic-tag odoo-topic-tag">🐍 Menus &amp; Actions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why does my PDF look different from the HTML preview? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The HTML preview renders in your browser's engine, while the PDF uses Chromium headless with a subset of CSS. Some CSS properties (flexbox, grid, certain transitions) may not render identically. Always test your report by actually downloading the PDF, not just the HTML preview. Using Bootstrap's table and grid system — which Odoo has already tested for PDF compatibility — helps avoid rendering issues.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I add a page number and total page count to the footer? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Odoo uses the <code>web.external_layout</code> template which includes a footer. You can override the footer template or add a custom one. For page numbers, you need CSS counter-based content since QWeb runs in a browser engine: <code>page { @bottom-center { content: counter(page) ' / ' counter(pages); } }</code> — this is CSS Paged Media, supported by Chromium's print engine.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I generate a report for multiple records at once? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. The <code>docs</code> variable in the template is a recordset — it may contain one or many records. The standard pattern is to loop with <code>t-foreach="docs" t-as="doc"</code> and wrap each iteration in <code>t-call="web.external_layout"</code> to create one page (or section) per record. If you select multiple records in a list and print, all are merged into a single PDF.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between report_name and report_file? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>report_name</code> is the technical name of the QWeb template (the <code>t-name</code> / XML <code>id</code>) — this is what Odoo uses to find and render the template. <code>report_file</code> is deprecated in newer Odoo versions and was historically used as a filename hint. Use <code>print_report_name</code> (a Python expression) to control the downloaded file's name dynamically.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/backend/wizards.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Wizards</span>
+          </a>
+          <a href="/odoo/backend/scheduled-actions.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Scheduled Actions</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
