@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Menus and Actions – Navigation Structure | ylearner</title>
+  <meta name="description" content="Learn how to define window actions, build Odoo menu hierarchies, and use server actions, URL actions, client actions, and report actions to extend your module's navigation.">
+  <meta name="keywords" content="Odoo menus, Odoo actions, ir.actions.act_window, ir.ui.menu, window action, server action, Odoo navigation, menuitem, Odoo module development">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/module/menus-actions.html">
+  <meta property="og:title" content="Odoo Menus and Actions – Navigation Structure">
+  <meta property="og:description" content="Learn how to define window actions, build Odoo menu hierarchies, and use server actions, URL actions, client actions, and report actions to extend your module's navigation.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/odoo/module/menus-actions.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Menus and Actions – Navigation Structure | ylearner">
+  <meta name="twitter:description" content="Learn how to define window actions, build Odoo menu hierarchies, and use server actions, URL actions, client actions, and report actions to extend your module's navigation.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Menus and Actions – Navigation Structure",
+    "description": "Learn how to define window actions, build Odoo menu hierarchies, and use server actions, URL actions, client actions, and report actions to extend your module's navigation.",
+    "educationalLevel": "Beginner",
+    "keywords": "Odoo menus, Odoo actions, window action, menuitem, server action, URL action, client action, report action",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/module/module-structure.html">Module Development</a><span class="separator">›</span>
+          <span class="current">Menus &amp; Actions</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Module Development</div>
+          <h1>Odoo Menus and Actions – Building the Navigation Structure</h1>
+          <p class="lesson-intro">Every entry in Odoo's navigation bar is a menu item. Every menu item triggers an action — most commonly a window action that opens a model in a view. This page covers how to define window actions, how to build the menu hierarchy, and how to use server actions, URL actions, and client actions to extend your module's navigation.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <!-- Section 1: Window Actions -->
+          <h2 id="window-actions">Window Actions (ir.actions.act_window)</h2>
+          <p>A window action opens a model in one or more view types. It is the most common action type.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="action_library_book" model="ir.actions.act_window"&gt;
+    &lt;field name="name"&gt;Books&lt;/field&gt;
+    &lt;field name="res_model"&gt;library.book&lt;/field&gt;
+    &lt;field name="view_mode"&gt;list,kanban,form&lt;/field&gt;
+
+    &lt;!-- Optional: filter records shown --&gt;
+    &lt;field name="domain"&gt;[('active', '=', True)]&lt;/field&gt;
+
+    &lt;!-- Optional: pass context to views (activate default filters, set defaults) --&gt;
+    &lt;field name="context"&gt;{
+        'search_default_available': 1,
+        'default_state': 'available'
+    }&lt;/field&gt;
+
+    &lt;!-- Optional: force a specific view for one of the modes --&gt;
+    &lt;field name="view_id" ref="view_library_book_list"/&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Field</th><th>Purpose</th></tr></thead>
+              <tbody>
+                <tr><td><code>name</code></td><td>Display name in the breadcrumb and window title</td></tr>
+                <tr><td><code>res_model</code></td><td>The model to open</td></tr>
+                <tr><td><code>view_mode</code></td><td>Comma-separated list of allowed view types</td></tr>
+                <tr><td><code>domain</code></td><td>Permanent filter applied to all records shown</td></tr>
+                <tr><td><code>context</code></td><td>Dict passed to views; <code>search_default_X</code> activates filter X; <code>default_field</code> sets new-record defaults</td></tr>
+                <tr><td><code>view_id</code></td><td>Force a specific view for the first view mode</td></tr>
+                <tr><td><code>target</code></td><td><code>current</code> (default), <code>new</code> (popup dialog), <code>fullscreen</code>, <code>main</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Section 2: Menu Items -->
+          <h2 id="menu-items">Menu Items (ir.ui.menu)</h2>
+          <p>Menu items are the navigation entries in the top bar and sidebar. They form a hierarchy:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- Level 1: Top-level app menu (visible in the main hamburger menu) --&gt;
+&lt;menuitem id="menu_library_root"
+          name="Library"
+          web_icon="library_management,static/description/icon.png"
+          sequence="50"/&gt;
+
+&lt;!-- Level 2: Section heading (no action — just groups sub-items) --&gt;
+&lt;menuitem id="menu_library_catalog"
+          name="Catalog"
+          parent="menu_library_root"
+          sequence="10"/&gt;
+
+&lt;!-- Level 3: Actual clickable item that opens a view --&gt;
+&lt;menuitem id="menu_library_books"
+          name="Books"
+          parent="menu_library_catalog"
+          action="action_library_book"
+          sequence="10"/&gt;
+
+&lt;menuitem id="menu_library_categories"
+          name="Categories"
+          parent="menu_library_catalog"
+          action="action_library_category"
+          sequence="20"/&gt;
+
+&lt;!-- Level 2: Configuration section --&gt;
+&lt;menuitem id="menu_library_config"
+          name="Configuration"
+          parent="menu_library_root"
+          sequence="90"
+          groups="base.group_system"/&gt;
+
+&lt;menuitem id="menu_library_config_settings"
+          name="Settings"
+          parent="menu_library_config"
+          action="action_library_settings"
+          sequence="10"/&gt;</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Attribute</th><th>Purpose</th></tr></thead>
+              <tbody>
+                <tr><td><code>id</code></td><td>XML ID for referencing</td></tr>
+                <tr><td><code>name</code></td><td>Display label</td></tr>
+                <tr><td><code>parent</code></td><td>Parent menuitem XML ID (omit for root)</td></tr>
+                <tr><td><code>action</code></td><td>XML ID of the action to trigger when clicked</td></tr>
+                <tr><td><code>sequence</code></td><td>Sort order (lower number = appears first)</td></tr>
+                <tr><td><code>groups</code></td><td>Restrict visibility to specific user groups</td></tr>
+                <tr><td><code>web_icon</code></td><td>Module icon for top-level app menus</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>menuitem shorthand</strong>
+              <p><code>&lt;menuitem&gt;</code> does not need a <code>&lt;record&gt;</code> wrapper — it is its own shorthand element. The <code>action</code> attribute takes just the local XML ID within the same module, or <code>module_name.xml_id</code> for cross-module references.</p>
+            </div>
+          </div>
+
+          <!-- AD BLOCK -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <!-- Section 3: Other Action Types -->
+          <h2 id="action-types">Other Action Types</h2>
+          <p>Besides window actions, Odoo has four other action types.</p>
+
+          <p><strong>Server Action (ir.actions.server)</strong> — runs Python code:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="action_server_send_reminders" model="ir.actions.server"&gt;
+    &lt;field name="name"&gt;Send Overdue Reminders&lt;/field&gt;
+    &lt;field name="model_id" ref="model_library_book"/&gt;
+    &lt;field name="binding_model_id" ref="model_library_book"/&gt;
+    &lt;field name="state"&gt;code&lt;/field&gt;
+    &lt;field name="code"&gt;
+        records.action_send_overdue_reminders()
+    &lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+          <p>When <code>binding_model_id</code> is set, this action appears in the Action menu (⚙️) on the list and form views of that model.</p>
+
+          <p><strong>URL Action (ir.actions.act_url)</strong> — opens a URL:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="action_open_docs" model="ir.actions.act_url"&gt;
+    &lt;field name="name"&gt;Open Documentation&lt;/field&gt;
+    &lt;field name="url"&gt;https://algorid.com/docs&lt;/field&gt;
+    &lt;field name="target"&gt;new&lt;/field&gt;  &lt;!-- new tab --&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <p><strong>Client Action (ir.actions.client)</strong> — loads a custom OWL JS component:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="action_library_dashboard" model="ir.actions.client"&gt;
+    &lt;field name="name"&gt;Library Dashboard&lt;/field&gt;
+    &lt;field name="tag"&gt;library_management.LibraryDashboard&lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <p><strong>Report Action (ir.actions.report)</strong> — generates a QWeb PDF:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="action_report_library_book" model="ir.actions.report"&gt;
+    &lt;field name="name"&gt;Book Card&lt;/field&gt;
+    &lt;field name="model"&gt;library.book&lt;/field&gt;
+    &lt;field name="report_type"&gt;qweb-pdf&lt;/field&gt;
+    &lt;field name="report_name"&gt;library_management.report_book_document&lt;/field&gt;
+    &lt;field name="binding_model_id" ref="model_library_book"/&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <!-- Section 4: Correct File Load Order -->
+          <h2 id="load-order">Correct File Load Order</h2>
+          <p>Menus that reference actions, and actions that reference views, must be loaded in the correct order. The manifest <code>data</code> list must be:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">'data': [
+    'security/ir.model.access.csv',    # 1. Security first
+    'views/book_views.xml',            # 2. Views
+    'views/member_views.xml',
+    'views/actions.xml',               # 3. Actions (reference views)
+    'views/menus.xml',                 # 4. Menus (reference actions)
+    'report/book_report.xml',          # 5. Reports
+    'data/book_sequence.xml',          # 6. Default data last
+],</code></pre>
+          </div>
+
+          <!-- Section 5: Using Context for Defaults and Filters -->
+          <h2 id="action-context">Using Context for Defaults and Filters</h2>
+          <p>The <code>context</code> field on a window action is extremely powerful:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="action_my_books" model="ir.actions.act_window"&gt;
+    &lt;field name="name"&gt;My Books&lt;/field&gt;
+    &lt;field name="res_model"&gt;library.book&lt;/field&gt;
+    &lt;field name="view_mode"&gt;list,form&lt;/field&gt;
+    &lt;field name="context"&gt;{
+        'search_default_my_books': 1,
+        'search_default_available': 1,
+        'default_librarian_id': uid,
+        'default_state': 'available'
+    }&lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <ul>
+            <li><code>search_default_X</code> — automatically activates a filter named <code>X</code> in the search view (the <code>name</code> attribute on the <code>&lt;filter&gt;</code> element)</li>
+            <li><code>default_fieldname</code> — sets the default value for <code>fieldname</code> when creating new records through this action</li>
+            <li><code>uid</code> — the current user's ID (available in context expressions)</li>
+          </ul>
+
+          <!-- Section 6: Summary -->
+          <div class="summary-box" id="summary">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li>Window actions (<code>ir.actions.act_window</code>) open a model in view modes specified by <code>view_mode</code></li>
+              <li><code>&lt;menuitem&gt;</code> elements build the navigation hierarchy; leaf items link to an <code>action</code> by XML ID</li>
+              <li>Use <code>sequence</code> to control order; lower numbers appear first</li>
+              <li>Use <code>groups</code> on menu items to restrict visibility by user group</li>
+              <li>Other action types: server (Python code), URL (open a link), client (OWL component), report (PDF)</li>
+              <li>Load order in manifest: security → views → actions → menus → data</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/odoo/module/module-structure.html" class="topic-tag odoo-topic-tag">🐍 Module Structure</a>
+            <a href="/odoo/module/models-fields.html" class="topic-tag odoo-topic-tag">🐍 Models &amp; Fields</a>
+            <a href="/odoo/module/basic-views.html" class="topic-tag odoo-topic-tag">🐍 Basic Views</a>
+            <a href="/odoo/module/security-access.html" class="topic-tag odoo-topic-tag">🐍 Security &amp; Access Rights</a>
+            <a href="/odoo/backend/computed-fields.html" class="topic-tag odoo-topic-tag">🐍 QWeb PDF Reports</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>target="new"</code> and <code>target="current"</code> on a window action? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>target="current"</code> (default) opens the view in the main content area, replacing what was there. <code>target="new"</code> opens the action in a modal dialog (popup). Use <code>"new"</code> for wizard-style flows, confirmations, and quick-create forms. Use <code>"current"</code> for main navigation flows.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can a menu item exist without an action? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. A menu item without an <code>action</code> attribute is a non-clickable section header — it just groups child items visually. This is common for parent-level menus like "Configuration" or "Reporting".</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I add my action to the top Action menu (⚙️ gear) on a model's views? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Set <code>binding_model_id</code> on the action: <code>&lt;field name="binding_model_id" ref="model_my_model"/&gt;</code>. This binds the action to that model's views. Server actions and report actions can both be bound this way. The <code>model_</code> prefix + model name with dots→underscores is the auto-generated XML ID for the <code>ir.model</code> record.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What does <code>web_icon</code> do on a root menuitem? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It sets the icon shown on the app tile in the main Apps home screen. The value format is <code>module_name,path/to/icon.png</code>. The icon should be 128×128 pixels, placed at <code>static/description/icon.png</code> in your module.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/module/models-fields.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Models &amp; Fields</span>
+          </a>
+          <a href="/odoo/module/security-access.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Security &amp; Access Rights</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

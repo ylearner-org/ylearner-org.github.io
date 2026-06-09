@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo __manifest__.py – Module Configuration File | ylearner</title>
+  <meta name="description" content="Complete guide to Odoo's __manifest__.py — every key explained with examples: name, version, depends, data, demo, assets, application, auto_install, and more.">
+  <meta name="keywords" content="Odoo manifest, __manifest__.py, Odoo module configuration, Odoo depends, Odoo assets, Odoo data files, Odoo auto_install, Odoo application key">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/module/manifest-file.html">
+  <meta property="og:title" content="Odoo __manifest__.py – Module Configuration File">
+  <meta property="og:description" content="Complete guide to Odoo's __manifest__.py — every key explained with examples: name, version, depends, data, demo, assets, application, auto_install, and more.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ylearner.org/odoo/module/manifest-file.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo __manifest__.py – Module Configuration File | ylearner">
+  <meta name="twitter:description" content="Complete guide to Odoo's __manifest__.py — every key explained with examples: name, version, depends, data, demo, assets, application, auto_install, and more.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo __manifest__.py – Module Configuration File",
+    "description": "Complete guide to Odoo's __manifest__.py — every key explained with examples: name, version, depends, data, demo, assets, application, auto_install.",
+    "educationalLevel": "Beginner",
+    "keywords": "Odoo manifest, __manifest__.py, depends, data, assets, auto_install",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/module/module-structure.html">Module Development</a><span class="separator">›</span>
+          <span class="current">Manifest File</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Module Development</div>
+          <h1>Odoo __manifest__.py – The Module Manifest</h1>
+          <p class="lesson-intro">The <code>__manifest__.py</code> file is the identity card and configuration file for every Odoo module. It tells Odoo the module's name, version, dependencies, which files to load, which assets to register, and much more. This page covers every manifest key — required and optional — with examples and explanations of when to use each one.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <!-- Section 1: Complete Manifest Example -->
+          <h2 id="full-manifest-example">A Complete Manifest Example</h2>
+          <p>Here is a real, fully-annotated <code>__manifest__.py</code> covering every commonly-used key:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">{
+    # ── Required keys ──────────────────────────────────────────────────────────
+    'name': 'Library Management',          # Human-readable display name
+    'version': '19.0.1.0.0',              # Format: odoo_version.major.minor.patch
+
+    # ── Metadata ───────────────────────────────────────────────────────────────
+    'summary': 'Manage your library books, members, and borrowings',
+    'description': """
+        Library Management System
+        =========================
+        Track books, members, borrowings, and returns.
+        Includes portal access for members to view their history.
+    """,
+    'author': 'Algorid Limited',
+    'website': 'https://algorid.com',
+    'category': 'Services/Library',       # Apps menu category
+    'license': 'LGPL-3',                  # or OPL-1 for proprietary
+
+    # ── Dependencies ───────────────────────────────────────────────────────────
+    'depends': [
+        'base',          # always required (implicitly, but explicit is better)
+        'mail',          # for chatter / messaging
+        'portal',        # for customer portal access
+    ],
+
+    # ── Files to load ──────────────────────────────────────────────────────────
+    'data': [
+        'security/ir.model.access.csv',
+        'security/record_rules.xml',
+        'views/book_views.xml',
+        'views/member_views.xml',
+        'views/menus.xml',
+        'data/book_sequence.xml',
+        'report/book_report.xml',
+    ],
+    'demo': [
+        'demo/demo_books.xml',
+        'demo/demo_members.xml',
+    ],
+
+    # ── Web assets ─────────────────────────────────────────────────────────────
+    'assets': {
+        'web.assets_backend': [
+            'library_management/static/src/scss/library.scss',
+            'library_management/static/src/js/book_widget.js',
+            'library_management/static/src/xml/book_widget.xml',
+        ],
+        'web.assets_frontend': [
+            'library_management/static/src/scss/portal.scss',
+        ],
+    },
+
+    # ── App behaviour ──────────────────────────────────────────────────────────
+    'application': True,          # Shows as a top-level app in Apps menu
+    'installable': True,          # Can be installed (default True)
+    'auto_install': False,        # Don't auto-install when all depends installed
+}</code></pre>
+          </div>
+
+          <!-- Section 2: Required Keys -->
+          <h2 id="required-keys">Required Keys</h2>
+          <ul>
+            <li><strong><code>name</code></strong> (string) — the display name shown in the Apps menu. Keep it short and clear.</li>
+            <li><strong><code>version</code></strong> (string) — must follow the <code>odoo_version.major.minor.patch</code> format. The first number must match the Odoo major version (19 for Odoo 19). Increment the patch for bug fixes, minor for new features, major for breaking changes.</li>
+          </ul>
+
+          <!-- AD BLOCK -->
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <!-- Section 3: Dependency Keys -->
+          <h2 id="dependency-keys">Dependencies</h2>
+          <p>The <code>depends</code> key is a list of module technical names this module requires. Odoo loads dependencies first. If a dependency isn't installed, this module can't be installed either.</p>
+          <p>Always depend on <code>base</code> (the foundation). If you use the chatter, depend on <code>mail</code>. If you extend sale orders, depend on <code>sale</code>.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Depend</th><th>Gives you</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>base</code></td><td>Core models (<code>res.partner</code>, <code>res.users</code>, etc.)</td></tr>
+                <tr><td><code>mail</code></td><td>Chatter, messaging, mail templates</td></tr>
+                <tr><td><code>portal</code></td><td>Portal routes, portal user group</td></tr>
+                <tr><td><code>sale</code></td><td>Sale orders, sale teams</td></tr>
+                <tr><td><code>purchase</code></td><td>Purchase orders</td></tr>
+                <tr><td><code>stock</code></td><td>Inventory, warehouses, stock moves</td></tr>
+                <tr><td><code>account</code></td><td>Accounting, invoices, journals</td></tr>
+                <tr><td><code>website</code></td><td>Public website, snippets, eCommerce</td></tr>
+                <tr><td><code>point_of_sale</code></td><td>POS models and UI</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Section 4: Data and Demo Keys -->
+          <h2 id="data-keys">Data and Demo Keys</h2>
+          <ul>
+            <li><strong><code>data</code></strong> list — loaded on every install <em>and</em> upgrade, in order. Security CSV must come before views (the model must exist before access rules can reference it), views before menus, menus before actions.</li>
+            <li><strong><code>demo</code></strong> list — loaded only when demo data is enabled at database creation.</li>
+            <li>File paths are relative to the module root.</li>
+          </ul>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Load order matters</strong>
+              <p>Odoo processes <code>data</code> files top-to-bottom. A file that references (via <code>ref=</code>) a record from a later file will raise "External ID not found". Always list security first, then views, then actions, then menus.</p>
+            </div>
+          </div>
+
+          <!-- Section 5: Assets Key -->
+          <h2 id="assets-key">Assets Key (Odoo 14+)</h2>
+          <p>The <code>assets</code> dict registers static files into asset bundles. Files added to a bundle are compiled and served together by Odoo's asset pipeline.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Bundle</th><th>When loaded</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>web.assets_backend</code></td><td>Backend (logged-in Odoo interface)</td></tr>
+                <tr><td><code>web.assets_frontend</code></td><td>Frontend (public website, portal)</td></tr>
+                <tr><td><code>web.assets_common</code></td><td>Both backend and frontend</td></tr>
+                <tr><td><code>point_of_sale.assets</code></td><td>POS UI</td></tr>
+                <tr><td><code>web.report_assets_common</code></td><td>QWeb PDF reports</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Section 6: Metadata Keys -->
+          <h2 id="metadata-keys">Metadata Keys</h2>
+          <ul>
+            <li><strong><code>summary</code></strong> — one-line description shown under the module name in the Apps list</li>
+            <li><strong><code>description</code></strong> — long description (RST format supported); shown in the module info page</li>
+            <li><strong><code>author</code></strong> — your name or company name</li>
+            <li><strong><code>website</code></strong> — your website URL</li>
+            <li><strong><code>category</code></strong> — path like <code>'Services/Library'</code> or <code>'Technical'</code> — controls Apps menu grouping</li>
+            <li><strong><code>license</code></strong> — <code>'LGPL-3'</code> for open-source Community modules; <code>'OPL-1'</code> for proprietary/Enterprise modules</li>
+          </ul>
+
+          <!-- Section 7: App Behaviour Keys -->
+          <h2 id="app-keys">App Behaviour Keys</h2>
+          <ul>
+            <li><strong><code>application: True</code></strong> — module appears as a top-level app tile (with an icon) in the Apps menu. Set to True only for modules that are the "main app" of a feature area.</li>
+            <li><strong><code>installable: True</code></strong> — module appears in the Apps list and can be installed. Set to False to hide a module (e.g. a base library module not meant to be installed directly).</li>
+            <li><strong><code>auto_install: False</code></strong> — if True, Odoo automatically installs this module when ALL of its dependencies are installed. Used for "glue modules" that add integration between two other modules (e.g. <code>sale_stock</code>, which adds stock features when both <code>sale</code> and <code>stock</code> are installed).</li>
+          </ul>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Glue modules</strong>
+              <p>A glue module has <code>auto_install: True</code> and two or more dependencies. It is automatically installed when all its dependencies are present. The Odoo core uses this pattern extensively — for example, <code>sale_stock</code> bridges <code>sale</code> and <code>stock</code> with delivery-related fields on sale orders.</p>
+            </div>
+          </div>
+
+          <!-- Section 8: Version Numbering -->
+          <h2 id="version-format">Version Numbering</h2>
+          <p>The version format <code>odoo_version.major.minor.patch</code> (e.g. <code>19.0.1.0.0</code>) is a community convention — not enforced by Odoo — but followed universally:</p>
+          <ul>
+            <li><code>19</code> — must match the Odoo major version</li>
+            <li><code>1</code> — major version of your module (increment for breaking changes)</li>
+            <li><code>0</code> — minor version (increment for new features)</li>
+            <li><code>0</code> — patch (increment for bug fixes)</li>
+          </ul>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Part</th><th>When to increment</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Major (<code>19</code>)</td><td>Never during normal development — changes when you port to a new Odoo version</td></tr>
+                <tr><td>2nd (<code>1</code>)</td><td>Module has breaking changes — data migration needed</td></tr>
+                <tr><td>3rd (<code>0</code>)</td><td>New features added, backward compatible</td></tr>
+                <tr><td>4th (<code>0</code>)</td><td>Bug fixes only</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Section 9: Summary -->
+          <div class="summary-box" id="summary">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li><code>name</code> and <code>version</code> are the only truly required keys — Odoo will load a module without others, but best practice is to include all metadata keys.</li>
+              <li>The <code>depends</code> list determines load order — missing dependencies prevent installation entirely.</li>
+              <li><code>data</code> files load on every install and upgrade; <code>demo</code> files load only with demo data. Load order within <code>data</code> matters — security first, then views, then actions, then menus.</li>
+              <li>The <code>assets</code> dict registers JS/SCSS/XML into bundles — use <code>web.assets_backend</code> for backend, <code>web.assets_frontend</code> for portal/website.</li>
+              <li><code>application: True</code> adds a top-level app tile; <code>auto_install: True</code> creates a glue module that installs automatically when all its dependencies are present.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/odoo/module/module-structure.html" class="topic-tag odoo-topic-tag">🐍 Module Structure</a>
+            <a href="/odoo/module/models-fields.html" class="topic-tag odoo-topic-tag">🐍 Models &amp; Fields</a>
+            <a href="/odoo/module/basic-views.html" class="topic-tag odoo-topic-tag">🐍 Basic Views</a>
+            <a href="/odoo/module/security-access.html" class="topic-tag odoo-topic-tag">🐍 Security &amp; Access Rights</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What happens if I add a new file to <code>data</code> in an upgraded module? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Odoo will load the new file and create the records it defines. Existing records defined in existing files will also be reloaded and updated, unless wrapped in <code>noupdate="1"</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>application: True</code> and <code>installable: True</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>installable: True</code> makes the module appear in the Apps list at all. <code>application: True</code> additionally gives it a main menu entry and an icon tile — it becomes a "top-level app". A module can be installable without being an application — most integration or extension modules are installable but not applications.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I depend on a module that isn't installed? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. If a module in your <code>depends</code> list is not installed, your module cannot be installed either. Odoo checks all dependencies are available before allowing installation.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is a glue module? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A module with <code>auto_install: True</code> and two or more dependencies — it automatically installs when all its dependencies are present. For example, <code>sale_stock</code> is a glue module: it adds stock-related features to sale orders, but only makes sense when both <code>sale</code> and <code>stock</code> are installed.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/module/module-structure.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Module Structure</span>
+          </a>
+          <a href="/odoo/module/models-fields.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Models &amp; Fields</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
