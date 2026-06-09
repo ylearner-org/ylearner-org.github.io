@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creating Custom Models and Apps in Odoo Studio | ylearner</title>
+  <meta name="description" content="Learn how to create custom models, apps, and menus using Odoo Studio in Odoo 19 — no Python required. Covers the New App wizard, field setup, views, access rights, and Studio limitations.">
+  <meta name="keywords" content="Odoo Studio custom model, Odoo Studio new app, Odoo create app no code, Odoo Studio x_model, Odoo Studio access rights, Odoo custom app wizard">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/studio/custom-models.html">
+  <meta property="og:title" content="Creating Custom Models and Apps in Odoo Studio">
+  <meta property="og:description" content="Learn how to create custom models, apps, and menus using Odoo Studio in Odoo 19 — no Python required. Covers the New App wizard, field setup, views, access rights, and Studio limitations.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/studio/custom-models.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Creating Custom Models and Apps in Odoo Studio | ylearner">
+  <meta name="twitter:description" content="Learn how to create custom models, apps, and menus using Odoo Studio in Odoo 19 — no Python required. Covers the New App wizard, field setup, views, access rights, and Studio limitations.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Creating Custom Models and Apps in Odoo Studio",
+    "description": "Learn how to create custom models, apps, and menus using Odoo Studio in Odoo 19 — no Python required. Covers the New App wizard, field setup, views, access rights, and Studio limitations.",
+    "educationalLevel": "Beginner",
+    "keywords": "Odoo Studio, custom model, new app, no-code app builder, access rights, Studio limitations",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/studio/what-is-studio.html">Odoo Studio</a><span class="separator">›</span>
+          <span class="current">Custom Models &amp; Apps</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🎨 Odoo Studio</div>
+          <h1>Creating Custom Models and Apps in Odoo Studio</h1>
+          <p class="lesson-intro">Studio doesn't just extend existing apps — it can create entirely new ones from scratch. The New App wizard walks you through naming your app, creating its underlying model, and generating the default form, list, and kanban views in minutes. This page covers the full process from wizard to working app, including access rights and the limitations you'll hit if requirements become complex.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="creating-a-new-app">Creating a New App</h2>
+          <p>To create a brand-new application with Studio:</p>
+          <ol>
+            <li>Click the main menu (grid icon) to go to the home screen.</li>
+            <li>Click the <strong>Studio</strong> icon (pencil) — this opens the Studio home, not tied to any specific app.</li>
+            <li>Click <strong>New App</strong>.</li>
+            <li>The wizard asks for:
+              <ul>
+                <li><strong>App name</strong> — shown in the menu (e.g., "Equipment Requests")</li>
+                <li><strong>Menu icon</strong> — pick from the icon palette</li>
+                <li><strong>Menu color</strong> — background color for the app tile</li>
+              </ul>
+            </li>
+            <li>Click <strong>Build your app</strong>. Studio creates the app, model, and views and drops you into Studio mode on the new app's form view.</li>
+          </ol>
+
+          <h2 id="creating-a-new-model">Creating a New Model</h2>
+          <p>When you use the New App wizard, Studio automatically creates an underlying model. The model technical name follows the pattern <code>x_&lt;app_name_snake_case&gt;</code>. For example, an app named "Equipment Requests" gets the model <code>x_equipment_requests</code>.</p>
+          <p>You can also create additional models from within an existing Studio session by using the <strong>New Model</strong> option under the Views tab in the left panel. This is useful when you need related sub-models (e.g., a "Request Line" model linked to the main model).</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Automatic fields</strong>
+              <p>Every new Studio model comes with a default set of built-in fields: <code>id</code>, <code>name</code> (display name), <code>create_date</code>, <code>write_date</code>, <code>create_uid</code>, <code>write_uid</code>, and <code>active</code> (for archiving). You don't need to add these — they come automatically.</p>
+            </div>
+          </div>
+
+          <h2 id="adding-fields-to-your-model">Adding Fields to Your Model</h2>
+          <p>After the wizard completes, you land on the empty form view of your new model. Add fields exactly as described in the Custom Fields page:</p>
+          <ul>
+            <li>Use the <strong>Components tab</strong> to drag a New Field onto the form.</li>
+            <li>Choose the type and configure properties.</li>
+            <li>Repeat for all the fields your model needs.</li>
+          </ul>
+          <p>You can also add a <strong>Status Bar</strong> component from the Components tab to give the model a pipeline-style state machine (similar to sale orders or CRM leads). Studio creates a <code>Selection</code> field for the stages and adds the statusbar widget automatically.</p>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="configuring-views-for-custom-models">Configuring Views for Custom Models</h2>
+          <p>Studio auto-generates three views for every new model:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>View type</th><th>Auto-generated content</th></tr></thead>
+              <tbody>
+                <tr><td>Form</td><td>Name field and chatter (messaging thread)</td></tr>
+                <tr><td>List</td><td>Name column and creation date</td></tr>
+                <tr><td>Kanban</td><td>Name displayed on card, grouped by status if a statusbar exists</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>Use the <strong>Views tab</strong> in the Studio left panel to switch between these views and customize each one. Add, remove, and reorder fields as needed. You can also enable or disable view types (e.g., hide the kanban view if it isn't useful for your model) from the Views tab.</p>
+
+          <h2 id="access-rights-for-custom-models">Access Rights for Custom Models</h2>
+          <p>When Studio creates a new model and app, it also sets up access rights automatically. By default, all internal users (<code>base.group_user</code>) get full CRUD access to the new model. Studio manages this via <code>ir.model.access</code> records created in the background.</p>
+          <p>If you need more granular control:</p>
+          <ul>
+            <li>Go to <strong>Settings → Technical → Security → Access Rights</strong> and filter for your model name (e.g., <code>x_equipment_requests</code>).</li>
+            <li>Modify or add access rules there.</li>
+            <li>Alternatively, export to a module (see Studio vs Module) and define proper <code>res.groups</code> and CSV access rules in code.</li>
+          </ul>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Studio doesn't create user groups</strong>
+              <p>Studio gives all internal users full access by default. It does not create app-specific user groups (e.g., "Equipment Manager" vs "Equipment User"). If you need role-based access for your custom app, you must set that up manually or export to a module and define groups in code.</p>
+            </div>
+          </div>
+
+          <h2 id="limitations-of-studio-models">Limitations of Studio Models</h2>
+          <p>Studio models are powerful for simple data collection and tracking use cases, but they have important limitations you will eventually run into:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Limitation</th><th>Workaround</th></tr></thead>
+              <tbody>
+                <tr><td>No Python methods or business logic</td><td>Export to module and add Python code</td></tr>
+                <tr><td>No <code>@api.constrains</code> (validation rules)</td><td>Use required fields as a substitute; complex validation needs Python</td></tr>
+                <tr><td>No <code>@api.onchange</code> (field triggers)</td><td>Limited via Formula fields; full onchange needs Python</td></tr>
+                <tr><td>No scheduled actions</td><td>Use Studio Automations with time-based triggers instead</td></tr>
+                <tr><td>No ORM inheritance (<code>_inherit</code>)</td><td>Must be a custom module to extend with Python</td></tr>
+                <tr><td>No custom widgets</td><td>Use available Studio widgets; custom widgets need JavaScript development</td></tr>
+                <tr><td>Not version-controlled by default</td><td>Export to module ZIP and commit to git</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>When you hit these limitations, the right move is to export the Studio app as a module (using the Export button in Studio), unzip it, and extend it with Python code. The exported module includes all your fields and views as a starting point — you don't lose the work you did in Studio.</p>
+
+          <div class="summary-box" id="summary">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li>Use the New App wizard (from Studio home) to create an app, model, and default views in one step.</li>
+              <li>Studio model names get the <code>x_</code> prefix (e.g., <code>x_equipment_requests</code>).</li>
+              <li>All internal users get full CRUD access to new Studio models by default — add granular access rights manually in Technical settings.</li>
+              <li>Auto-generated views: form (name + chatter), list (name + date), kanban — customize each from the Views tab.</li>
+              <li>Status Bar component creates a pipeline-stage field automatically.</li>
+              <li>Studio models cannot have Python logic, ORM constraints, onchange handlers, or inheritance — export to a module for those features.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/odoo/studio/what-is-studio.html" class="topic-tag odoo-topic-tag">🎨 What is Odoo Studio?</a>
+            <a href="/odoo/studio/custom-fields.html" class="topic-tag odoo-topic-tag">🎨 Custom Fields</a>
+            <a href="/odoo/studio/studio-automations.html" class="topic-tag odoo-topic-tag">🎨 Studio Automations</a>
+            <a href="/odoo/studio/studio-vs-module.html" class="topic-tag odoo-topic-tag">🎨 Studio vs Module</a>
+            <a href="/odoo/module/models-fields.html" class="topic-tag odoo-topic-tag">🐍 Models &amp; Fields</a>
+            <a href="/odoo/module/security-access.html" class="topic-tag odoo-topic-tag">🐍 Security &amp; Access Rights</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I create sub-menus under a Studio app? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. In Studio, open the app and click the <strong>Views tab</strong> in the left panel. There is a section for managing the app's menu structure. You can add sub-menu items pointing to list views of different models, allowing you to build a multi-section app with separate menus for, say, "Requests" and "Categories".</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens to a Studio app when Studio is uninstalled? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>If Studio is uninstalled, Studio-created apps, models, and data are removed as well. This is a destructive operation. Before uninstalling Studio, export all your customizations as a module and install that module separately so your apps persist independently of Studio.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I add a chatter (messaging thread) to a Studio model? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Studio automatically adds the chatter to new model forms. If you removed it, open the form in Studio, go to the Components tab, and drag the <strong>Chatter</strong> component back onto the form. The chatter requires the model to inherit <code>mail.thread</code> — Studio handles this automatically for new models.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I add a Studio model to an existing app (not a new one)? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Open an existing app in Studio, go to the Views tab in the left panel, and use the "New Model" option to create a new model. Then add a sub-menu entry in the app's menu structure pointing to this new model. This way you extend an existing app with a new data object without creating a separate app icon.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/studio/custom-fields.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Custom Fields</span>
+          </a>
+          <a href="/odoo/studio/studio-automations.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Studio Automations</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

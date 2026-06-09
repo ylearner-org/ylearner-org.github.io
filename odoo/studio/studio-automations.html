@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Automations in Odoo Studio – Visual Workflow Builder | ylearner</title>
+  <meta name="description" content="Learn how to build automated workflows in Odoo Studio without code. Covers trigger types, domain filters, available actions, and a worked example of auto-sending email on sale order confirmation.">
+  <meta name="keywords" content="Odoo Studio automations, Odoo ir.base.automation, Odoo automated actions, Odoo no-code workflow, Odoo send email automation, Odoo trigger on create update">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/studio/studio-automations.html">
+  <meta property="og:title" content="Automations in Odoo Studio – Visual Workflow Builder">
+  <meta property="og:description" content="Learn how to build automated workflows in Odoo Studio without code. Covers trigger types, domain filters, available actions, and a worked example of auto-sending email on sale order confirmation.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/studio/studio-automations.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Automations in Odoo Studio – Visual Workflow Builder | ylearner">
+  <meta name="twitter:description" content="Learn how to build automated workflows in Odoo Studio without code. Covers trigger types, domain filters, available actions, and a worked example of auto-sending email on sale order confirmation.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Automations in Odoo Studio – Visual Workflow Builder",
+    "description": "Learn how to build automated workflows in Odoo Studio without code. Covers trigger types, domain filters, available actions, and a worked example of auto-sending email on sale order confirmation.",
+    "educationalLevel": "Beginner",
+    "keywords": "Odoo Studio automations, ir.base.automation, trigger types, domain filters, send email, no-code workflow",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/studio/what-is-studio.html">Odoo Studio</a><span class="separator">›</span>
+          <span class="current">Studio Automations</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🎨 Odoo Studio</div>
+          <h1>Automations in Odoo Studio – Visual Workflow Builder</h1>
+          <p class="lesson-intro">Studio Automations let you react to events in Odoo — record creation, field updates, time elapsed — and automatically perform actions like sending emails, updating fields, or creating linked records. All of this is built through a visual form interface without writing Python. Under the hood, Studio creates <code>ir.base.automation</code> records, the same engine used by Odoo's core automated actions.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-are-studio-automations">What are Studio Automations?</h2>
+          <p>An automation is a rule that says: <em>"When [trigger] happens on [model], and [condition] is true, perform [action]."</em></p>
+          <p>Studio Automations are stored as <code>ir.base.automation</code> records (also known as "Automated Actions"). You can also manage them outside Studio via <strong>Settings → Technical → Automation → Automated Actions</strong>.</p>
+          <p>Common use cases for Studio Automations:</p>
+          <ul>
+            <li>Send a confirmation email when a sale order is confirmed.</li>
+            <li>Automatically assign a salesperson based on the customer's country.</li>
+            <li>Set a due date 7 days after a task is created.</li>
+            <li>Create a follow-up activity when an invoice becomes overdue.</li>
+            <li>Add a follower when a record's state changes to "In Progress".</li>
+          </ul>
+
+          <h2 id="creating-an-automation">Creating an Automation</h2>
+          <p>To create an automation from Studio:</p>
+          <ol>
+            <li>Open Studio on the app whose model you want to automate (e.g., open a Sale Order and click Studio).</li>
+            <li>In the left panel, click the <strong>Automations</strong> tab (gear/lightning icon).</li>
+            <li>Click <strong>New</strong> to open the automation editor.</li>
+            <li>Give the automation a descriptive name (e.g., "Send email on order confirmation").</li>
+            <li>Set the <strong>Trigger</strong>, <strong>Condition</strong> (optional), and <strong>Actions</strong>.</li>
+            <li>Toggle the automation to <strong>Active</strong> and save.</li>
+          </ol>
+
+          <h2 id="trigger-types">Trigger Types</h2>
+          <p>The trigger defines when the automation fires:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Trigger</th><th>Fires when…</th><th>Typical use</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Record Created</strong></td><td>A new record is saved for the first time</td><td>Set default values, send welcome notification</td></tr>
+                <tr><td><strong>Record Updated</strong></td><td>A specific field changes on an existing record</td><td>React to state change, update related field</td></tr>
+                <tr><td><strong>Record Created or Updated</strong></td><td>On both create and write</td><td>Sync fields, log changes</td></tr>
+                <tr><td><strong>Record Deleted</strong></td><td>A record is deleted (unlinked)</td><td>Archive related records, notify admin</td></tr>
+                <tr><td><strong>Based on a Timed Condition</strong></td><td>A date on the record is reached (e.g., <code>date_deadline</code>)</td><td>Send reminders, auto-close expired records</td></tr>
+                <tr><td><strong>External (Webhook)</strong></td><td>An HTTP POST triggers the automation</td><td>Integrate with external systems</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>For the <strong>Record Updated</strong> trigger, you must specify which field(s) to watch. The automation only fires when one of the watched fields changes — not on every save.</p>
+
+          <div class="ad-container ad-in-content">Ad – 336×280</div>
+
+          <h2 id="defining-conditions">Defining Conditions (Filters)</h2>
+          <p>Conditions limit when the automation fires even if the trigger is met. Click the <strong>Add a condition</strong> button to open a domain builder.</p>
+          <p>The domain builder provides a visual filter editor — the same interface used in list view filters. You select a field, an operator, and a value. Multiple conditions can be combined with AND or OR logic.</p>
+          <p>Example condition: only fire when <code>state = 'sale'</code> (sale order is confirmed) and <code>amount_total &gt; 1000</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Domain (generated by Studio)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">[('state', '=', 'sale'), ('amount_total', '>', 1000)]</code></pre>
+          </div>
+
+          <h2 id="actions-you-can-automate">Actions You Can Automate</h2>
+          <p>Each automation can perform one or more actions when triggered:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Action type</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Update a Record</strong></td><td>Set a field to a specific value on the triggering record</td></tr>
+                <tr><td><strong>Create a Record</strong></td><td>Create a new record in any model with pre-filled values</td></tr>
+                <tr><td><strong>Send an Email</strong></td><td>Send an email using a chosen email template</td></tr>
+                <tr><td><strong>Send a SMS</strong></td><td>Send an SMS using an SMS template (requires SMS credit)</td></tr>
+                <tr><td><strong>Add Followers</strong></td><td>Subscribe users to the record's chatter thread</td></tr>
+                <tr><td><strong>Create an Activity</strong></td><td>Schedule an activity (call, meeting, to-do) on the record</td></tr>
+                <tr><td><strong>Execute Server Action</strong></td><td>Run a more complex server action (Python code) — advanced use</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Worked example: auto-send email when sale order is confirmed</h3>
+          <ol>
+            <li>Open a Sale Order → click Studio.</li>
+            <li>Go to the Automations tab → New.</li>
+            <li>Name: "Notify manager when order confirmed".</li>
+            <li>Trigger: <strong>Record Updated</strong>. Watched field: <strong>Status</strong> (<code>state</code>).</li>
+            <li>Condition: <code>state = 'sale'</code>.</li>
+            <li>Action: <strong>Send an Email</strong>. Choose the email template "Sales Order: Confirmation" (or create a new template).</li>
+            <li>Toggle Active and save.</li>
+          </ol>
+          <p>Now every time a sale order is confirmed (state changes to 'sale'), the chosen email template is sent automatically.</p>
+
+          <h2 id="testing-your-automation">Testing Your Automation</h2>
+          <p>To test without waiting for the trigger to happen naturally:</p>
+          <ol>
+            <li>Open a record that matches your automation's model and conditions.</li>
+            <li>In developer mode, the record's Action menu (cog icon) includes a <strong>Run Automations</strong> option.</li>
+            <li>Click it to manually fire all applicable automations on that record.</li>
+            <li>Check the chatter or email log to confirm the action ran.</li>
+          </ol>
+          <p>For time-based automations, you can adjust the record's date field to be in the past and then manually trigger the scheduler from <strong>Settings → Technical → Automation → Scheduled Actions</strong> — run the "Base Automation: Timed Conditions" action.</p>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Automation loops</strong>
+              <p>Be careful with "Record Updated" automations that themselves update a field being watched — this can create infinite loops. Odoo has loop detection for direct circular triggers, but complex chains can still cause unexpected behavior. Always test in a non-production environment first.</p>
+            </div>
+          </div>
+
+          <div class="summary-box" id="summary">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li>Studio Automations = <code>ir.base.automation</code> records built without code using a visual form.</li>
+              <li>Trigger types: Record Created, Updated, Deleted, time-based, or webhook.</li>
+              <li>Conditions use the same domain builder as list view filters — combine field/operator/value checks.</li>
+              <li>Actions include: update field, create record, send email, send SMS, add follower, create activity.</li>
+              <li>Test automations using the "Run Automations" option in the record's Action menu (developer mode).</li>
+              <li>Watch for automation loops when the action updates a watched field — test on staging first.</li>
+            </ul>
+          </div>
+
+          <div class="related-topics">
+            <a href="/odoo/studio/what-is-studio.html" class="topic-tag odoo-topic-tag">🎨 What is Odoo Studio?</a>
+            <a href="/odoo/studio/custom-models.html" class="topic-tag odoo-topic-tag">🎨 Custom Models</a>
+            <a href="/odoo/studio/studio-reports.html" class="topic-tag odoo-topic-tag">🎨 Studio Reports</a>
+            <a href="/odoo/studio/studio-vs-module.html" class="topic-tag odoo-topic-tag">🎨 Studio vs Module</a>
+            <a href="/odoo/backend/server-actions.html" class="topic-tag odoo-topic-tag">🐍 Server Actions</a>
+            <a href="/odoo/backend/scheduled-actions.html" class="topic-tag odoo-topic-tag">🐍 Scheduled Actions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can Studio automations run Python code? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, through the "Execute Server Action" action type. Server actions can include Python code. However, writing that Python code still requires developer access via <strong>Settings → Technical → Server Actions</strong>. The Studio visual builder doesn't provide a Python editor — it just links to an existing server action. For truly code-free automations, stick to the built-in action types.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do time-based automations work exactly? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>You specify a date field on the record (e.g., <code>date_deadline</code>) and a delay (e.g., -1 day = 1 day before, +3 days = 3 days after). Odoo's scheduler runs every hour and checks all time-based automations. Records where the calculated date has passed since the last check will have the automation fired on them.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I have multiple actions in one automation? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. In Odoo 19, Studio Automations support adding multiple actions in a single automation rule. Click "Add an action" after configuring the first one. All actions run in sequence when the automation fires.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Will automations fire when records are imported via CSV? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. CSV imports create records via the ORM, so "Record Created" automations will fire for each imported record. This can cause issues (e.g., sending hundreds of emails during a bulk import). To prevent this, temporarily disable the automation before a large import, or add a condition that excludes freshly imported records.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/studio/custom-models.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Custom Models</span>
+          </a>
+          <a href="/odoo/studio/studio-reports.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Studio Reports</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
