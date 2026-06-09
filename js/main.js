@@ -794,6 +794,77 @@
     },
   ];
 
+  const ODOO_NAV_DATA = [
+    { title: '🐍 Introduction', items: [
+      { title: 'What is Odoo?', url: '/odoo/what-is-odoo.html' },
+      { title: 'Why Learn Odoo Dev?', url: '/odoo/why-learn-odoo.html' },
+      { title: 'Odoo Architecture', url: '/odoo/odoo-architecture.html' },
+      { title: 'Odoo Prerequisites', url: '/odoo/odoo-prerequisites.html' },
+      { title: 'Installation & Setup', url: '/odoo/odoo-installation.html' },
+    ]},
+    { title: '⚙️ Module Development', items: [
+      { title: 'Module Structure', url: '/odoo/module/module-structure.html' },
+      { title: 'The Manifest File', url: '/odoo/module/manifest-file.html' },
+      { title: 'Models & Fields', url: '/odoo/module/models-fields.html' },
+      { title: 'Basic Views', url: '/odoo/module/basic-views.html' },
+      { title: 'Menus & Actions', url: '/odoo/module/menus-actions.html' },
+      { title: 'Security & Access Rights', url: '/odoo/module/security-access.html' },
+    ]},
+    { title: '🔧 Backend Development', items: [
+      { title: 'Computed Fields', url: '/odoo/backend/computed-fields.html' },
+      { title: 'Onchange & Constraints', url: '/odoo/backend/onchange-constraints.html' },
+      { title: 'Model Inheritance', url: '/odoo/backend/model-inheritance.html' },
+      { title: 'Wizards', url: '/odoo/backend/wizards.html' },
+      { title: 'QWeb PDF Reports', url: '/odoo/backend/qweb-reports.html' },
+      { title: 'Scheduled Actions', url: '/odoo/backend/scheduled-actions.html' },
+      { title: 'Server Actions', url: '/odoo/backend/server-actions.html' },
+      { title: 'Email Templates', url: '/odoo/backend/email-templates.html' },
+    ]},
+    { title: '🌐 Portal Development', items: [
+      { title: 'Portal Overview', url: '/odoo/portal/portal-overview.html' },
+      { title: 'Portal Controllers', url: '/odoo/portal/portal-controllers.html' },
+      { title: 'Portal Templates', url: '/odoo/portal/portal-templates.html' },
+      { title: 'Portal Forms', url: '/odoo/portal/portal-forms.html' },
+      { title: 'Portal Security', url: '/odoo/portal/portal-security.html' },
+    ]},
+    { title: '💻 Website Development', items: [
+      { title: 'Website Module Overview', url: '/odoo/website/website-overview.html' },
+      { title: 'Website Controllers', url: '/odoo/website/website-controllers.html' },
+      { title: 'QWeb Website Templates', url: '/odoo/website/qweb-templates.html' },
+      { title: 'Website Forms', url: '/odoo/website/website-forms.html' },
+      { title: 'Snippets & Building Blocks', url: '/odoo/website/snippets.html' },
+      { title: 'eCommerce Basics', url: '/odoo/website/ecommerce-basics.html' },
+    ]},
+    { title: '🛒 POS Development', items: [
+      { title: 'POS Architecture', url: '/odoo/pos/pos-architecture.html' },
+      { title: 'Extending POS Models', url: '/odoo/pos/extending-pos-models.html' },
+      { title: 'Custom POS Screens', url: '/odoo/pos/custom-pos-screens.html' },
+      { title: 'POS Payment Methods', url: '/odoo/pos/pos-payment-methods.html' },
+      { title: 'POS Receipts', url: '/odoo/pos/pos-receipts.html' },
+    ]},
+    { title: '🦉 OWL in Odoo', items: [
+      { title: 'Client Actions', url: '/odoo/owl/client-actions.html' },
+      { title: 'Custom Field Widgets', url: '/odoo/owl/custom-widgets.html' },
+      { title: 'Dashboard Components', url: '/odoo/owl/dashboard-components.html' },
+      { title: 'Action Managers', url: '/odoo/owl/action-managers.html' },
+    ]},
+    { title: '📊 Advanced Topics', items: [
+      { title: 'Performance & Caching', url: '/odoo/advanced/performance-caching.html' },
+      { title: 'Multi-company Setup', url: '/odoo/advanced/multi-company.html' },
+      { title: 'Testing Odoo Modules', url: '/odoo/advanced/testing.html' },
+      { title: 'Deployment', url: '/odoo/advanced/deployment.html' },
+    ]},
+    { title: '🎯 Interview Prep', items: [
+      { title: 'Interview Questions', url: '/odoo/interview/questions.html', badge: 'hot' },
+      { title: 'Coding Exercises', url: '/odoo/interview/exercises.html' },
+    ]},
+    { title: '🛠️ Projects', items: [
+      { title: 'Custom CRM Module', url: '/odoo/projects/custom-crm.html' },
+      { title: 'Customer Portal Project', url: '/odoo/projects/customer-portal.html' },
+      { title: 'POS Extension Project', url: '/odoo/projects/pos-extension.html' },
+    ]},
+  ];
+
   function getNavData() {
     const path = window.location.pathname;
     if (path.includes('/javascript/')) return JS_NAV_DATA;
@@ -802,6 +873,7 @@
     if (path.includes('/csslessons/')) return CSS_NAV_DATA;
     if (path.includes('/git/')) return GIT_NAV_DATA;
     if (path.includes('/sql/')) return SQL_NAV_DATA;
+    if (path.includes('/odoo/')) return ODOO_NAV_DATA;
     return NAV_DATA;
   }
 
@@ -813,11 +885,12 @@
     if (url.includes('/csslessons/')) return 'CSS';
     if (url.includes('/git/'))        return 'Git';
     if (url.includes('/sql/'))        return 'SQL';
+    if (url.includes('/odoo/'))       return 'Odoo';
     return '';
   }
 
   // Search index (with BASE-prefixed URLs for file:// searches)
-  const SEARCH_INDEX = [...NAV_DATA, ...JS_NAV_DATA, ...OWL_NAV_DATA, ...HTML_NAV_DATA, ...CSS_NAV_DATA, ...GIT_NAV_DATA, ...SQL_NAV_DATA].flatMap(section =>
+  const SEARCH_INDEX = [...NAV_DATA, ...JS_NAV_DATA, ...OWL_NAV_DATA, ...HTML_NAV_DATA, ...CSS_NAV_DATA, ...GIT_NAV_DATA, ...SQL_NAV_DATA, ...ODOO_NAV_DATA].flatMap(section =>
     section.items.map(item => {
       const course = courseFromUrl(item.url);
       const sectionName = section.title.replace(/^.{2}\s/, '');
