@@ -1217,6 +1217,136 @@
   }
 
   // ========================
+  // Quiz Flashcard
+  // ========================
+  function initQuiz() {
+    const faqSection = document.querySelector('.faq-section');
+    if (!faqSection) return;
+
+    const faqItems = faqSection.querySelectorAll('.faq-item');
+    if (!faqItems.length) return;
+
+    const questions = [];
+    faqItems.forEach(item => {
+      const qEl = item.querySelector('.faq-question');
+      const aEl = item.querySelector('.faq-answer');
+      if (!qEl || !aEl) return;
+      // Strip the toggle span (+/-) from question text
+      const qClone = qEl.cloneNode(true);
+      const toggle = qClone.querySelector('.faq-toggle');
+      if (toggle) toggle.remove();
+      questions.push({ q: qClone.innerHTML.trim(), a: aEl.innerHTML.trim() });
+    });
+
+    if (!questions.length) return;
+
+    // Wrap faq section so TOC anchor works
+    const quizAnchor = document.createElement('div');
+    quizAnchor.id = 'quiz-section';
+
+    // Add "Take a Quiz" button after faq section
+    const triggerWrap = document.createElement('div');
+    triggerWrap.className = 'quiz-trigger-wrap';
+    quizAnchor.appendChild(triggerWrap);
+
+    const triggerBtn = document.createElement('button');
+    triggerBtn.className = 'quiz-trigger-btn';
+    triggerBtn.innerHTML = '📝 Take a Quiz';
+    triggerWrap.appendChild(triggerBtn);
+    faqSection.after(quizAnchor);
+
+    // Inject into TOC
+    const tocList = document.querySelector('#toc .toc-list');
+    if (tocList) {
+      const li = document.createElement('li');
+      li.className = 'toc-quiz-entry';
+      li.innerHTML = '<a href="#quiz-section">📝 Take a Quiz</a>';
+      tocList.appendChild(li);
+    }
+
+    // Build modal
+    const overlay = document.createElement('div');
+    overlay.className = 'quiz-overlay';
+    overlay.id = 'quizOverlay';
+    overlay.innerHTML = `
+      <div class="quiz-card" role="dialog" aria-modal="true" aria-label="Quiz flashcard">
+        <div class="quiz-card-header">
+          <span class="quiz-label">📝 Quiz</span>
+          <span class="quiz-counter">1 / ${questions.length}</span>
+          <button class="quiz-close-btn" aria-label="Close quiz">✕</button>
+        </div>
+        <div class="quiz-card-body">
+          <div class="quiz-question-text"></div>
+          <div class="quiz-answer-box"></div>
+        </div>
+        <div class="quiz-card-footer">
+          <div class="quiz-nav">
+            <button class="quiz-nav-btn" id="quizPrev" aria-label="Previous question">‹</button>
+            <button class="quiz-nav-btn" id="quizNext" aria-label="Next question">›</button>
+          </div>
+          <button class="quiz-see-answer-btn">See Answer</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    let current = 0;
+    let answerVisible = false;
+
+    const counter    = overlay.querySelector('.quiz-counter');
+    const qText      = overlay.querySelector('.quiz-question-text');
+    const aBox       = overlay.querySelector('.quiz-answer-box');
+    const prevBtn    = overlay.querySelector('#quizPrev');
+    const nextBtn    = overlay.querySelector('#quizNext');
+    const seeBtn     = overlay.querySelector('.quiz-see-answer-btn');
+    const closeBtn   = overlay.querySelector('.quiz-close-btn');
+
+    function renderCard(idx) {
+      current = idx;
+      answerVisible = false;
+      counter.textContent = `${idx + 1} / ${questions.length}`;
+      qText.innerHTML = questions[idx].q;
+      aBox.innerHTML  = questions[idx].a;
+      aBox.classList.remove('visible');
+      seeBtn.textContent = 'See Answer';
+      seeBtn.classList.remove('revealed');
+      prevBtn.disabled = idx === 0;
+      nextBtn.disabled = idx === questions.length - 1;
+    }
+
+    function openQuiz() {
+      renderCard(0);
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeQuiz() {
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    triggerBtn.addEventListener('click', openQuiz);
+    closeBtn.addEventListener('click', closeQuiz);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeQuiz(); });
+
+    document.addEventListener('keydown', e => {
+      if (!overlay.classList.contains('active')) return;
+      if (e.key === 'Escape') closeQuiz();
+      if (e.key === 'ArrowLeft' && current > 0) renderCard(current - 1);
+      if (e.key === 'ArrowRight' && current < questions.length - 1) renderCard(current + 1);
+    });
+
+    prevBtn.addEventListener('click', () => { if (current > 0) renderCard(current - 1); });
+    nextBtn.addEventListener('click', () => { if (current < questions.length - 1) renderCard(current + 1); });
+
+    seeBtn.addEventListener('click', () => {
+      answerVisible = !answerVisible;
+      aBox.classList.toggle('visible', answerVisible);
+      seeBtn.textContent = answerVisible ? 'Hide Answer' : 'See Answer';
+      seeBtn.classList.toggle('revealed', answerVisible);
+    });
+  }
+
+  // ========================
   // Share Button
   // ========================
   function initShareButton() {
@@ -1356,6 +1486,7 @@
     initHighlight();
     injectAlgoridCredit();
     initShareButton();
+    initQuiz();
 
     // Theme toggle button
     const themeBtn = document.getElementById('themeToggle');
