@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Website Snippets – Building Blocks for the Page Editor | ylearner</title>
+  <meta name="description" content="Create custom website building blocks (snippets) in Odoo. Learn snippet XML structure, options, JavaScript interactions, and the oe_structure editable zone.">
+  <meta name="keywords" content="Odoo website snippets, building blocks, oe_structure, snippet options, website editor, custom snippet, Odoo 19">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/website/snippets.html">
+  <meta property="og:title" content="Odoo Website Snippets – Building Blocks for the Page Editor">
+  <meta property="og:description" content="Create custom website building blocks (snippets) in Odoo. Learn snippet XML structure, options, JavaScript interactions, and the oe_structure editable zone.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/website/snippets.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Website Snippets – Building Blocks for the Page Editor | ylearner">
+  <meta name="twitter:description" content="Create custom Odoo website building blocks with snippet XML, oe_structure, options, and JavaScript.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Website Snippets – Building Blocks for the Page Editor",
+    "description": "Create custom website building blocks (snippets) in Odoo. Learn snippet XML structure, options, JavaScript interactions, and the oe_structure editable zone.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo website snippets, building blocks, oe_structure, snippet options, website editor",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/website/website-overview.html">Website Development</a><span class="separator">›</span>
+          <span class="current">Website Snippets</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">💻 Website Development</div>
+          <h1>Odoo Website Snippets – Building Blocks for the Page Editor</h1>
+          <p class="lesson-intro">Snippets (building blocks) are the drag-and-drop components that appear in the Odoo website editor's block palette. You can create custom snippets by registering a template with the right XML structure, and add options that let non-developers configure them visually.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>Snippet XML structure and how to register a building block</li>
+              <li>Making zones editable with <code>oe_structure</code></li>
+              <li>Adding snippet options (color pickers, layout selectors)</li>
+              <li>Dynamic snippets that load data from Odoo models</li>
+              <li>JavaScript snippet initialization</li>
+            </ul>
+          </div>
+
+          <div id="toc"></div>
+
+          <h2 id="snippet-structure">Snippet XML Structure</h2>
+          <p>A snippet consists of two parts: the snippet template itself, and an entry in the snippets panel. Both live in the same XML file, typically <code>views/snippets/</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- 1. The snippet HTML template --&gt;
+&lt;template id="s_book_highlight" name="Book Highlight"&gt;
+  &lt;section class="s_book_highlight pt-5 pb-5"&gt;
+    &lt;div class="container"&gt;
+      &lt;div class="row align-items-center"&gt;
+        &lt;div class="col-lg-6"&gt;
+          &lt;h2&gt;Featured Book&lt;/h2&gt;
+          &lt;p class="lead"&gt;Discover our top pick this month.&lt;/p&gt;
+          &lt;a href="/books" class="btn btn-primary"&gt;Browse Library&lt;/a&gt;
+        &lt;/div&gt;
+        &lt;div class="col-lg-6"&gt;
+          &lt;img src="/web/image/library.book/1/cover_image"
+               class="img-fluid rounded" alt="Featured Book"/&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+&lt;/template&gt;
+
+&lt;!-- 2. Register it in the snippets panel --&gt;
+&lt;template id="snippets" inherit_id="website.snippets"&gt;
+  &lt;xpath expr="//div[@id='snippet_content']" position="before"&gt;
+    &lt;t t-snippet="my_module.s_book_highlight"
+       t-thumbnail="/my_module/static/description/book_highlight_thumb.png"/&gt;
+  &lt;/xpath&gt;
+&lt;/template&gt;</code></pre>
+          </div>
+          <p>The thumbnail image (160×120px recommended) shows in the editor's block palette. Store it in your module's <code>static/description/</code> folder.</p>
+
+          <h2 id="oe-structure">oe_structure – Editable Zones</h2>
+          <p>Areas where editors can drag more snippets are marked with the <code>oe_structure</code> class. Add an <code>id</code> attribute to persist changes to the database:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;section class="s_book_highlight"&gt;
+  &lt;div class="container"&gt;
+    &lt;!-- Editable zone: editors can drag snippets here --&gt;
+    &lt;div class="oe_structure oe_empty" id="oe_structure_book_highlight_1"/&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</code></pre>
+          </div>
+          <p>The <code>oe_empty</code> class shows a placeholder message ("Drag building blocks here") when the zone is empty. When an editor drops a snippet here and saves, Odoo stores the HTML in an <code>ir.ui.view</code> record keyed to this <code>id</code>.</p>
+
+          <h2 id="snippet-options">Snippet Options</h2>
+          <p>Options let editors configure snippet appearance from the sidebar without editing HTML. Register options by targeting the snippet's CSS class:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;template id="s_book_highlight_options" inherit_id="website.snippet_options"&gt;
+  &lt;xpath expr="." position="inside"&gt;
+    &lt;div data-js="BookHighlight" data-selector=".s_book_highlight"&gt;
+      &lt;!-- Background style option --&gt;
+      &lt;we-select string="Background"&gt;
+        &lt;we-button data-select-class="bg-light"&gt;Light&lt;/we-button&gt;
+        &lt;we-button data-select-class="bg-dark text-white"&gt;Dark&lt;/we-button&gt;
+        &lt;we-button data-select-class="bg-primary text-white"&gt;Primary&lt;/we-button&gt;
+      &lt;/we-select&gt;
+
+      &lt;!-- Layout option --&gt;
+      &lt;we-select string="Layout"&gt;
+        &lt;we-button data-select-class="flex-row"&gt;Image Right&lt;/we-button&gt;
+        &lt;we-button data-select-class="flex-row-reverse"&gt;Image Left&lt;/we-button&gt;
+      &lt;/we-select&gt;
+    &lt;/div&gt;
+  &lt;/xpath&gt;
+&lt;/template&gt;</code></pre>
+          </div>
+          <p><code>data-select-class</code> adds/removes CSS classes on the snippet root element when an option is selected. No JavaScript needed for class-based options.</p>
+
+          <div class="ad-container ad-in-content">Ad – 728×90</div>
+
+          <h2 id="dynamic-snippets">Dynamic Snippets</h2>
+          <p>Dynamic snippets fetch data from Odoo models and render it in a carousel, grid, or list. They use a JSON route to reload data based on options the editor selects:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class LibrarySnippets(http.Controller):
+
+    @http.route('/books/snippet/featured',
+                type='json', auth='public', website=True)
+    def featured_books(self, limit=4, **kw):
+        books = request.env['library.book'].sudo().search([
+            ('website_published', '=', True),
+            ('featured', '=', True),
+        ], limit=limit)
+        return request.env['ir.ui.view']._render_template(
+            'my_module.s_featured_books_content',
+            {'books': books},
+        )</code></pre>
+          </div>
+          <p>The snippet's JavaScript calls this route when it initializes and when editor options change. Built-in dynamic snippets like <code>s_dynamic_snippet</code> follow this same pattern.</p>
+
+          <h2 id="javascript-initialization">JavaScript Snippet Initialization</h2>
+          <p>For client-side behavior (carousels, counters, animations), add a JavaScript file in <code>static/src/js/</code> and register a snippet widget:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { SnippetOption } from '@web_editor/js/editor/snippets.options';
+import { registry } from "@web/core/registry";
+
+// Public widget — runs on the frontend for visitors
+import publicWidget from '@web/legacy/js/public/public_widget';
+
+publicWidget.registry.BookHighlight = publicWidget.Widget.extend({
+    selector: '.s_book_highlight',
+
+    start() {
+        // Runs when snippet loads on the page
+        this._initCounter();
+        return this._super(...arguments);
+    },
+
+    _initCounter() {
+        const counter = this.el.querySelector('.book-count');
+        if (counter) {
+            // Animate the counter
+            const target = parseInt(counter.dataset.target, 10);
+            counter.textContent = target.toLocaleString();
+        }
+    },
+});</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>A snippet needs two XML records: the template itself and an entry in <code>website.snippets</code></li>
+              <li>Use <code>oe_structure</code> with a unique <code>id</code> to create editable zones within your snippet</li>
+              <li>Snippet options use <code>we-select</code> / <code>we-button</code> with <code>data-select-class</code> for class-based configuration</li>
+              <li>Dynamic snippets fetch model data via JSON routes and re-render when options change</li>
+            </ul>
+          </div>
+
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/website/qweb-templates.html" class="topic-tag odoo-topic-tag">💻 QWeb Templates</a>
+              <a href="/odoo/website/website-overview.html" class="topic-tag odoo-topic-tag">💻 Website Overview</a>
+              <a href="/odoo/website/ecommerce-basics.html" class="topic-tag odoo-topic-tag">💻 eCommerce Basics</a>
+              <a href="/odoo/studio/customizing-views.html" class="topic-tag odoo-topic-tag">🎨 Customizing Views</a>
+            </div>
+          </section>
+
+          <section class="faq-section">
+            <h3>Frequently Asked Questions</h3>
+            <div class="faq-item">
+              <h4>How do I prevent editors from moving or deleting my snippet?</h4>
+              <p>Add <code>data-oe-protected="true"</code> to the snippet root element. This prevents the website editor from moving, duplicating, or removing it. Useful for structural snippets that are part of a page template rather than content blocks.</p>
+            </div>
+            <div class="faq-item">
+              <h4>Where does Odoo store edits made to a page in the editor?</h4>
+              <p>Each page is an <code>ir.ui.view</code> record with a unique key. When an editor saves, Odoo creates a "cow" (copy-on-write) view that overrides the original template for the current website. The original template is preserved and the override is stored as a child view with <code>website_id</code> set.</p>
+            </div>
+            <div class="faq-item">
+              <h4>Can I make snippet text content editable inline?</h4>
+              <p>Yes — add <code>data-oe-model</code>, <code>data-oe-id</code>, and <code>data-oe-field</code> attributes to an element. Odoo's editor will allow inline editing and save changes back to the model field. For static text (not linked to a model), just add the <code>oe_editable</code> class to enable inline text editing that saves to the view record.</p>
+            </div>
+          </section>
+
+        </article>
+      </main>
+      <aside class="right-sidebar">
+        <div id="toc-sidebar" class="toc-widget">
+          <h3>On this page</h3>
+          <div id="toc"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a href="/odoo/website/website-forms.html" class="lesson-nav-link">
+      <span class="nav-label">← Prev</span>
+      <span class="nav-title">Website Forms</span>
+    </a>
+    <a href="/odoo/website/ecommerce-basics.html" class="lesson-nav-link next">
+      <span class="nav-label">Next →</span>
+      <span class="nav-title">eCommerce Basics</span>
+    </a>
+  </nav>
+  <footer class="site-footer">
+    <p>&copy; 2026 <a href="/">ylearner</a> — a product by <strong>Algorid Limited</strong>. Free tutorials for everyone.</p>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

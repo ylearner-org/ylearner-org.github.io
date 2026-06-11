@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo POS Receipts – Customizing the Receipt Template | ylearner</title>
+  <meta name="description" content="Customize the Odoo POS receipt: extend the QWeb receipt template, add custom fields, create email receipts, and configure thermal printer output.">
+  <meta name="keywords" content="Odoo POS receipt, customize receipt, QWeb receipt template, POS email receipt, thermal printer, Odoo 19 receipt">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/pos/pos-receipts.html">
+  <meta property="og:title" content="Odoo POS Receipts – Customizing the Receipt Template">
+  <meta property="og:description" content="Customize the Odoo POS receipt: extend the QWeb receipt template, add custom fields, create email receipts, and configure thermal printer output.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/pos/pos-receipts.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo POS Receipts – Customizing the Receipt Template | ylearner">
+  <meta name="twitter:description" content="Customize Odoo POS receipt templates: QWeb extension, custom fields, email receipts, thermal printer.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo POS Receipts – Customizing the Receipt Template",
+    "description": "Customize the Odoo POS receipt: extend the QWeb receipt template, add custom fields, create email receipts, and configure thermal printer output.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo POS receipt, QWeb receipt, email receipt, thermal printer, custom receipt fields",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/pos/pos-architecture.html">POS Development</a><span class="separator">›</span>
+          <span class="current">POS Receipts</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🖥️ POS Development</div>
+          <h1>Odoo POS Receipts – Customizing the Receipt Template</h1>
+          <p class="lesson-intro">The POS receipt is a QWeb template rendered in the browser after payment. You can extend the default receipt to add custom fields, loyalty points, promotional messages, or QR codes — all without touching core Odoo files. The receipt is also used for email receipts and thermal printer output.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>How the POS receipt template works</li>
+              <li>Extending the receipt with XPath inheritance</li>
+              <li>Making custom order fields available in the receipt</li>
+              <li>Email receipts and how they differ from screen receipts</li>
+              <li>Thermal printer considerations</li>
+            </ul>
+          </div>
+
+          <div id="toc"></div>
+
+          <h2 id="receipt-template">The Receipt Template</h2>
+          <p>The main receipt template is <code>point_of_sale.receipt</code>. It is a QWeb template that receives the order data as context. Extend it using <code>inherit_id</code> and XPath:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;templates&gt;
+  &lt;t t-name="my_module.ReceiptExtension"
+     t-inherit="point_of_sale.receipt"
+     t-inherit-mode="extension"&gt;
+
+    &lt;!-- Add content after the order lines --&gt;
+    &lt;xpath expr="//div[hasclass('pos-receipt-orderlines')]" position="after"&gt;
+      &lt;t t-if="receipt.membership_card"&gt;
+        &lt;div class="pos-receipt-loyalty"&gt;
+          &lt;span&gt;Loyalty Card: &lt;/span&gt;
+          &lt;span t-esc="receipt.membership_card"/&gt;
+        &lt;/div&gt;
+        &lt;div class="pos-receipt-loyalty"&gt;
+          &lt;span&gt;Points Earned: &lt;/span&gt;
+          &lt;span t-esc="receipt.loyalty_points_earned"/&gt;
+        &lt;/div&gt;
+      &lt;/t&gt;
+    &lt;/xpath&gt;
+
+    &lt;!-- Add a promotional message at the bottom --&gt;
+    &lt;xpath expr="//div[hasclass('pos-receipt-contact')]" position="after"&gt;
+      &lt;div class="pos-receipt-promo" style="text-align:center; margin-top:10px;"&gt;
+        &lt;p&gt;Thank you for shopping with us!&lt;/p&gt;
+        &lt;p&gt;Visit us again for 10% off your next purchase.&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/xpath&gt;
+
+  &lt;/t&gt;
+&lt;/templates&gt;</code></pre>
+          </div>
+          <p>Note: POS template inheritance uses <code>t-inherit</code> and <code>t-inherit-mode="extension"</code> — different from regular Odoo QWeb which uses <code>inherit_id</code> in XML records.</p>
+
+          <h2 id="custom-fields-in-receipt">Making Custom Fields Available</h2>
+          <p>The receipt template accesses order data via the <code>receipt</code> object. To include your custom <code>pos.order</code> fields, override <code>export_for_printing()</code> in JavaScript:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { patch } from '@web/core/utils/patch';
+import { Order } from '@point_of_sale/app/store/models';
+
+patch(Order.prototype, {
+    export_for_printing() {
+        const result = super.export_for_printing();
+        result.membership_card = this.membership_card || '';
+        result.loyalty_points_earned = this.loyalty_points_earned || 0;
+        return result;
+    },
+});</code></pre>
+          </div>
+          <p><code>export_for_printing()</code> builds the dict that becomes the <code>receipt</code> object in the template. Add your custom fields here so the template can access them.</p>
+
+          <div class="ad-container ad-in-content">Ad – 728×90</div>
+
+          <h2 id="email-receipts">Email Receipts</h2>
+          <p>Email receipts use the same QWeb template rendered on the server as an HTML email. The server-side rendering is triggered when the cashier clicks "Send by Email" on the ReceiptScreen.</p>
+          <p>The email template is <code>point_of_sale.message_body</code>. Extend it the same way as the screen receipt:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;template id="pos_email_receipt_extension"
+          inherit_id="point_of_sale.message_body"&gt;
+  &lt;xpath expr="//div[hasclass('pos-receipt-orderlines')]" position="after"&gt;
+    &lt;t t-if="order.membership_card"&gt;
+      &lt;p&gt;Loyalty Card: &lt;t t-esc="order.membership_card"/&gt;&lt;/p&gt;
+      &lt;p&gt;Points Earned: &lt;t t-esc="order.loyalty_points_earned"/&gt;&lt;/p&gt;
+    &lt;/t&gt;
+  &lt;/xpath&gt;
+&lt;/template&gt;</code></pre>
+          </div>
+          <p>For the email template, the context variable is <code>order</code> (a <code>pos.order</code> Python record), unlike the screen template where it's <code>receipt</code> (a JavaScript dict). Remember this distinction.</p>
+
+          <h2 id="thermal-printer">Thermal Printer Considerations</h2>
+          <p>Odoo POS supports printing via:</p>
+          <ul>
+            <li><strong>Browser print dialog</strong> — the default, uses CSS to style the receipt for print</li>
+            <li><strong>IoT Box / Epson ePOS</strong> — the POS communicates with a local IoT Box that drives the thermal printer via ESC/POS commands</li>
+          </ul>
+          <p>For IoT Box printing, keep the receipt template simple. Thermal printers typically don't support:</p>
+          <ul>
+            <li>CSS flexbox or grid layouts</li>
+            <li>Background colors or images</li>
+            <li>Custom fonts (use system fonts only)</li>
+            <li>Complex borders</li>
+          </ul>
+          <p>Test on an actual thermal printer — browser print preview doesn't show how the receipt will look on paper.</p>
+
+          <h2 id="receipt-css">Styling the Receipt</h2>
+          <p>Add custom CSS to the receipt by targeting the <code>.pos-receipt</code> class. Register the CSS in the <code>point_of_sale.assets</code> bundle:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">.pos-receipt .pos-receipt-loyalty {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    border-top: 1px dashed #ccc;
+    padding-top: 4px;
+    margin-top: 4px;
+}
+
+.pos-receipt .pos-receipt-promo {
+    font-style: italic;
+    font-size: 11px;
+    color: #555;
+}
+
+@media print {
+    .pos-receipt .pos-receipt-promo {
+        color: #000;  /* ensure legibility on paper */
+    }
+}</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Extend <code>point_of_sale.receipt</code> using <code>t-inherit</code> with XPath for screen receipt changes</li>
+              <li>Override <code>export_for_printing()</code> on <code>Order</code> to expose custom fields to the template</li>
+              <li>Email receipts use <code>point_of_sale.message_body</code> with <code>order</code> as the Python record context variable</li>
+              <li>Keep thermal receipt templates simple — no CSS grid, no images, no custom fonts</li>
+            </ul>
+          </div>
+
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/pos/pos-architecture.html" class="topic-tag odoo-topic-tag">🖥️ POS Architecture</a>
+              <a href="/odoo/pos/pos-models.html" class="topic-tag odoo-topic-tag">🖥️ POS Models</a>
+              <a href="/odoo/pos/pos-payment.html" class="topic-tag odoo-topic-tag">🖥️ POS Payment</a>
+              <a href="/odoo/backend/qweb-reports.html" class="topic-tag odoo-topic-tag">🐍 QWeb Reports</a>
+            </div>
+          </section>
+
+          <section class="faq-section">
+            <h3>Frequently Asked Questions</h3>
+            <div class="faq-item">
+              <h4>How do I add a QR code to the receipt?</h4>
+              <p>Use the <code>/report/barcode/QR/</code> route to generate a QR code image: <code>&lt;img t-attf-src="/report/barcode/QR/#{receipt.some_url}?width=100&amp;height=100"/&gt;</code>. For thermal printers, check if your printer supports image printing — many entry-level thermal printers don't render images correctly.</p>
+            </div>
+            <div class="faq-item">
+              <h4>Can I print multiple receipts (e.g., customer copy and kitchen copy)?</h4>
+              <p>Yes — configure receipt printers in the POS settings with IoT Box. You can set up different printers for different categories (e.g., a kitchen display/printer triggered when certain product categories are ordered). This is done via the <code>pos.printer</code> model configuration and IoT Box integration.</p>
+            </div>
+            <div class="faq-item">
+              <h4>Why does my receipt look different on screen vs paper?</h4>
+              <p>The screen receipt is rendered in a browser div; the print version uses CSS <code>@media print</code> styles and browser print dialog. Differences arise from browser print margins, page breaks, and how the browser renders the receipt DOM. Always test with actual printing, and use <code>@media print</code> CSS rules to control the printed output specifically.</p>
+            </div>
+          </section>
+
+        </article>
+      </main>
+      <aside class="right-sidebar">
+        <div id="toc-sidebar" class="toc-widget">
+          <h3>On this page</h3>
+          <div id="toc"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a href="/odoo/pos/pos-payment.html" class="lesson-nav-link">
+      <span class="nav-label">← Prev</span>
+      <span class="nav-title">POS Payment Integration</span>
+    </a>
+    <a href="/odoo/owl/owl-in-odoo.html" class="lesson-nav-link next">
+      <span class="nav-label">Next →</span>
+      <span class="nav-title">OWL in Odoo</span>
+    </a>
+  </nav>
+  <footer class="site-footer">
+    <p>&copy; 2026 <a href="/">ylearner</a> — a product by <strong>Algorid Limited</strong>. Free tutorials for everyone.</p>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

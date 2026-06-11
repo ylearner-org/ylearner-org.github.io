@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo POS Architecture – How the Point of Sale Works | ylearner</title>
+  <meta name="description" content="Understand the Odoo POS architecture: the OWL-based frontend, pos.session, pos.config, POS models synced to the browser, and the communication layer.">
+  <meta name="keywords" content="Odoo POS architecture, point of sale, pos.session, pos.config, OWL POS, POS models, Odoo 19 POS">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/pos/pos-architecture.html">
+  <meta property="og:title" content="Odoo POS Architecture – How the Point of Sale Works">
+  <meta property="og:description" content="Understand the Odoo POS architecture: the OWL-based frontend, pos.session, pos.config, POS models synced to the browser, and the communication layer.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/pos/pos-architecture.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo POS Architecture – How the Point of Sale Works | ylearner">
+  <meta name="twitter:description" content="Understand Odoo POS: OWL frontend, pos.session, pos.config, synced models, and the communication layer.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo POS Architecture – How the Point of Sale Works",
+    "description": "Understand the Odoo POS architecture: the OWL-based frontend, pos.session, pos.config, POS models synced to the browser, and the communication layer.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo POS architecture, pos.session, pos.config, OWL, POS models, communication",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">POS Development</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🖥️ POS Development</div>
+          <h1>Odoo POS Architecture – How the Point of Sale Works</h1>
+          <p class="lesson-intro">The Odoo Point of Sale is a single-page application built with OWL (Odoo Web Library) that runs entirely in the browser. At session open, it loads all necessary data from the server — products, customers, taxes, payment methods — and then operates offline-capable until the session is closed and synced back.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>The two-layer architecture: Python backend + OWL frontend</li>
+              <li>How <code>pos.config</code> and <code>pos.session</code> work</li>
+              <li>How data is loaded into the browser at session open</li>
+              <li>How orders are created, stored, and synced</li>
+              <li>The communication layer: RPC calls from POS to server</li>
+            </ul>
+          </div>
+
+          <div id="toc"></div>
+
+          <h2 id="two-layer-architecture">Two-Layer Architecture</h2>
+          <p>Odoo POS has a clear separation between two layers:</p>
+          <table>
+            <thead><tr><th>Layer</th><th>Technology</th><th>Location</th></tr></thead>
+            <tbody>
+              <tr><td>Backend (server)</td><td>Python + PostgreSQL</td><td>Odoo server</td></tr>
+              <tr><td>Frontend (client)</td><td>OWL + JavaScript</td><td>Browser (cashier's device)</td></tr>
+            </tbody>
+          </table>
+          <p>When a cashier opens a POS session, the browser loads all necessary data from the server in one batch. After that, the POS works with local JavaScript objects. The server is only contacted for specific operations: real-time card payments, loyalty program lookups, and closing the session.</p>
+
+          <h2 id="pos-config">pos.config – Shop Configuration</h2>
+          <p><code>pos.config</code> is the static configuration of a POS shop. One business can have multiple configs (e.g., one for each register or each shop location). Key fields:</p>
+          <ul>
+            <li><code>name</code> — display name ("Cash Register 1")</li>
+            <li><code>payment_method_ids</code> — accepted payment methods (cash, card, etc.)</li>
+            <li><code>pricelist_id</code> — default pricelist for this POS</li>
+            <li><code>product_configurator_ids</code> — which product categories to show</li>
+            <li><code>module_account</code> — whether to generate invoices at checkout</li>
+          </ul>
+          <p>Custom modules that add settings to the POS extend <code>pos.config</code> with new fields.</p>
+
+          <h2 id="pos-session">pos.session – An Active Session</h2>
+          <p><code>pos.session</code> represents one working session on one <code>pos.config</code>. A session has states:</p>
+          <table>
+            <thead><tr><th>State</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td>opening_control</td><td>Cashier enters opening cash amount</td></tr>
+              <tr><td>opened</td><td>Active — orders can be processed</td></tr>
+              <tr><td>closing_control</td><td>Cashier counts cash before closing</td></tr>
+              <tr><td>closed</td><td>Session closed, payments posted to accounting</td></tr>
+            </tbody>
+          </table>
+          <p>Closing a session posts all session payments as bank/cash journal entries and marks all session orders as done. The session's <code>statement_ids</code> link to accounting journal items.</p>
+
+          <h2 id="data-loading">Data Loading at Session Open</h2>
+          <p>When the POS loads, it calls <code>/pos/ui</code> which returns a JSON payload containing everything the frontend needs. The <code>_get_pos_ui_data()</code> method (on <code>pos.config</code>) controls what is loaded:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># What gets sent to the browser at session open (simplified):
+{
+    'pos.session':     [session data],
+    'pos.config':      [config data],
+    'product.product': [all products visible in POS],
+    'res.partner':     [all customers],
+    'account.tax':     [all taxes],
+    'pos.payment.method': [payment methods],
+    'pos.category':    [product categories],
+    # ... more models
+}</code></pre>
+          </div>
+          <p>To add your custom model's data to this payload, override <code>_get_pos_ui_data()</code> in your Python extension of <code>pos.config</code>.</p>
+
+          <div class="ad-container ad-in-content">Ad – 728×90</div>
+
+          <h2 id="order-lifecycle">Order Lifecycle</h2>
+          <p>A POS order goes through these stages:</p>
+          <ol>
+            <li><strong>New order</strong> — created as a JavaScript object in the browser</li>
+            <li><strong>Lines added</strong> — product lines with qty, price, tax computed locally</li>
+            <li><strong>Payment</strong> — payment lines added; total validated</li>
+            <li><strong>Order finalized</strong> — sent to server via <code>/pos/create_from_ui</code></li>
+            <li><strong>Server creates records</strong> — <code>pos.order</code> + <code>pos.order.line</code> + <code>account.payment</code></li>
+          </ol>
+          <p>If the internet connection drops after step 3, the order is stored locally (IndexedDB) and synced when connectivity is restored.</p>
+
+          <h2 id="rpc-communication">RPC Communication</h2>
+          <p>The POS frontend calls the server using JSON-RPC. Key endpoints:</p>
+          <table>
+            <thead><tr><th>Endpoint</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td>/pos/ui</td><td>Load initial session data</td></tr>
+              <tr><td>/pos/create_from_ui</td><td>Submit completed orders</td></tr>
+              <tr><td>/pos/web_read_models</td><td>Fetch additional model data on demand</td></tr>
+              <tr><td>/web/dataset/call_kw</td><td>Generic ORM calls (search, read, write)</td></tr>
+            </tbody>
+          </table>
+          <p>From JavaScript, use <code>this.env.services.orm.call(model, method, args)</code> to call Python model methods from the POS frontend.</p>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>POS is an OWL single-page app that loads all data at session open and operates offline-capable</li>
+              <li><code>pos.config</code> = static shop settings; <code>pos.session</code> = one working session</li>
+              <li>Data is loaded via <code>_get_pos_ui_data()</code> — override it to include your custom model</li>
+              <li>Completed orders are synced to the server via <code>/pos/create_from_ui</code></li>
+            </ul>
+          </div>
+
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/pos/pos-models.html" class="topic-tag odoo-topic-tag">🖥️ POS Models</a>
+              <a href="/odoo/pos/pos-ui-components.html" class="topic-tag odoo-topic-tag">🖥️ POS UI Components</a>
+              <a href="/odoo/owljs/what-is-owl.html" class="topic-tag odoo-topic-tag">🦉 What is OWL?</a>
+              <a href="/odoo/website/website-overview.html" class="topic-tag odoo-topic-tag">💻 Website Overview</a>
+            </div>
+          </section>
+
+          <section class="faq-section">
+            <h3>Frequently Asked Questions</h3>
+            <div class="faq-item">
+              <h4>Can the POS work without an internet connection?</h4>
+              <p>Yes — once the session is loaded, the POS can process orders offline. Completed orders are stored in the browser's IndexedDB and synced to the server when connectivity is restored. However, some features require connectivity: real-time card payments via payment terminals, loyalty programs with server-side validation, and loading new products added after session open.</p>
+            </div>
+            <div class="faq-item">
+              <h4>How do I add a custom model to the POS data payload?</h4>
+              <p>Override <code>_get_pos_ui_data()</code> on <code>pos.config</code> in Python, add your model's data to the returned dict, and register the model in JavaScript using the POS model loading system. The model's data will be available as <code>this.env.pos.models</code> in the frontend.</p>
+            </div>
+            <div class="faq-item">
+              <h4>What is the difference between pos.order and pos.order.line?</h4>
+              <p><code>pos.order</code> represents one customer transaction — it has a session, a cashier, payment lines, and a total. <code>pos.order.line</code> represents one product item within that order — it has a product, quantity, price, and tax. One order has many order lines. After closing, orders and lines are archived but remain visible in Odoo's backend for reporting.</p>
+            </div>
+          </section>
+
+        </article>
+      </main>
+      <aside class="right-sidebar">
+        <div id="toc-sidebar" class="toc-widget">
+          <h3>On this page</h3>
+          <div id="toc"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a href="/odoo/website/ecommerce-basics.html" class="lesson-nav-link">
+      <span class="nav-label">← Prev</span>
+      <span class="nav-title">eCommerce Basics</span>
+    </a>
+    <a href="/odoo/pos/pos-models.html" class="lesson-nav-link next">
+      <span class="nav-label">Next →</span>
+      <span class="nav-title">POS Models</span>
+    </a>
+  </nav>
+  <footer class="site-footer">
+    <p>&copy; 2026 <a href="/">ylearner</a> — a product by <strong>Algorid Limited</strong>. Free tutorials for everyone.</p>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

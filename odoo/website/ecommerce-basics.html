@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo eCommerce Basics – Products, Cart, and Checkout | ylearner</title>
+  <meta name="description" content="Build eCommerce with Odoo: product.template website fields, pricelists, the cart and checkout flow, payment acquirers, and extending the shop controller.">
+  <meta name="keywords" content="Odoo eCommerce, website_sale, product.template website, Odoo cart, checkout, payment acquirer, pricelist, Odoo 19 shop">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/website/ecommerce-basics.html">
+  <meta property="og:title" content="Odoo eCommerce Basics – Products, Cart, and Checkout">
+  <meta property="og:description" content="Build eCommerce with Odoo: product.template website fields, pricelists, the cart and checkout flow, payment acquirers, and extending the shop controller.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/website/ecommerce-basics.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo eCommerce Basics – Products, Cart, and Checkout | ylearner">
+  <meta name="twitter:description" content="Understand Odoo eCommerce: products, pricelists, cart, checkout, and extending the shop.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo eCommerce Basics – Products, Cart, and Checkout",
+    "description": "Build eCommerce with Odoo: product.template website fields, pricelists, the cart and checkout flow, payment acquirers, and extending the shop controller.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo eCommerce, website_sale, product.template, cart, checkout, pricelist, payment",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/website/website-overview.html">Website Development</a><span class="separator">›</span>
+          <span class="current">eCommerce Basics</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">💻 Website Development</div>
+          <h1>Odoo eCommerce Basics – Products, Cart, and Checkout</h1>
+          <p class="lesson-intro">The <code>website_sale</code> module turns Odoo into a full eCommerce platform. Products from your backend appear in the online shop, customers add them to a cart, and checkout integrates with Odoo's payment acquirers and sales order flow — all without leaving Odoo.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>How <code>website_sale</code> extends <code>product.template</code> for the shop</li>
+              <li>Publishing products and managing shop visibility</li>
+              <li>How the cart and checkout flow works technically</li>
+              <li>Pricelists and how they affect displayed prices</li>
+              <li>Extending the shop controller with custom logic</li>
+            </ul>
+          </div>
+
+          <div id="toc"></div>
+
+          <h2 id="website-sale-module">The website_sale Module</h2>
+          <p><code>website_sale</code> depends on <code>website</code>, <code>sale</code>, and <code>account</code>. It adds:</p>
+          <ul>
+            <li>Website fields on <code>product.template</code> (published, website description, ribbons)</li>
+            <li>The <code>/shop</code> controller with product listing, filtering, and search</li>
+            <li>Cart management at <code>/shop/cart</code></li>
+            <li>Checkout flow at <code>/shop/checkout</code></li>
+            <li>Payment integration via the <code>payment</code> module</li>
+            <li>eCommerce categories (<code>product.public.category</code>)</li>
+          </ul>
+
+          <h2 id="product-website-fields">Product Website Fields</h2>
+          <p>Key fields added by <code>website_sale</code> to <code>product.template</code>:</p>
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td>is_published</td><td>Boolean</td><td>Visible in the shop</td></tr>
+              <tr><td>website_description</td><td>Html</td><td>Long description shown on product page</td></tr>
+              <tr><td>website_id</td><td>Many2one</td><td>Restrict to a specific website (null = all)</td></tr>
+              <tr><td>public_categ_ids</td><td>Many2many</td><td>eCommerce categories for filtering</td></tr>
+              <tr><td>website_sequence</td><td>Integer</td><td>Sort order in the shop</td></tr>
+              <tr><td>website_ribbon_id</td><td>Many2one</td><td>"New", "Sale" badge on product card</td></tr>
+            </tbody>
+          </table>
+          <p>Products are only visible if <code>is_published = True</code> and <code>website_id</code> matches the current website (or is False).</p>
+
+          <h2 id="cart-flow">Cart and Checkout Flow</h2>
+          <p>The cart is a sale order in draft state (<code>state='draft'</code>) linked to the current visitor's session. Key controllers:</p>
+          <table>
+            <thead><tr><th>URL</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td>/shop/cart/update</td><td>Add/update product quantity (JSON)</td></tr>
+              <tr><td>/shop/cart</td><td>Cart page — shows current order lines</td></tr>
+              <tr><td>/shop/checkout</td><td>Address entry and delivery method selection</td></tr>
+              <tr><td>/shop/payment</td><td>Payment method selection and acquirer redirect</td></tr>
+              <tr><td>/shop/payment/validate</td><td>Post-payment callback — confirms the sale order</td></tr>
+            </tbody>
+          </table>
+          <p>The draft order is retrieved or created via <code>request.website.sale_get_order()</code>. After payment, it is confirmed automatically and becomes a confirmed sale order in the backend.</p>
+
+          <h2 id="pricelists">Pricelists and Pricing</h2>
+          <p>Displayed prices in the shop depend on the active pricelist. The active pricelist is determined by:</p>
+          <ol>
+            <li>The visitor's country (geo-IP based)</li>
+            <li>The portal user's partner pricelist</li>
+            <li>A pricelist code in the URL (<code>?pl=SUMMER20</code>)</li>
+            <li>The website's default pricelist</li>
+          </ol>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Get current pricelist in a controller
+pricelist = request.website.get_current_pricelist()
+
+# Get price for a product
+product = request.env['product.template'].browse(product_id)
+price = product.with_context(pricelist=pricelist.id).price</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 728×90</div>
+
+          <h2 id="extending-shop-controller">Extending the Shop Controller</h2>
+          <p>Extend the shop listing or product detail page by subclassing <code>WebsiteSale</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo.addons.website_sale.controllers.main import WebsiteSale
+
+
+class ExtendedShop(WebsiteSale):
+
+    def _get_search_domain(self, search, category, attrib_values,
+                           search_in_description=True):
+        """Add custom filter: only show products in stock."""
+        domain = super()._get_search_domain(
+            search, category, attrib_values, search_in_description
+        )
+        domain += [('qty_available', '>', 0)]
+        return domain
+
+    def _prepare_product_values(self, product, category, search, **kwargs):
+        """Add extra context to the product detail page."""
+        values = super()._prepare_product_values(
+            product, category, search, **kwargs
+        )
+        values['related_books'] = request.env['library.book'].sudo().search([
+            ('author', '=', product.name),
+        ], limit=4)
+        return values</code></pre>
+          </div>
+
+          <h2 id="custom-shop-features">Common Customizations</h2>
+          <p>Frequent eCommerce customization patterns:</p>
+          <table>
+            <thead><tr><th>Feature</th><th>Approach</th></tr></thead>
+            <tbody>
+              <tr><td>Custom product attributes</td><td>Add <code>product.attribute</code> records and <code>product.attribute.value</code> via data XML</td></tr>
+              <tr><td>Custom cart validation</td><td>Override <code>_cart_update()</code> in a shop controller subclass</td></tr>
+              <tr><td>Post-order hooks</td><td>Override <code>action_confirm()</code> on <code>sale.order</code></td></tr>
+              <tr><td>Custom checkout steps</td><td>Override <code>checkout_values()</code> and add extra template blocks</td></tr>
+              <tr><td>Minimum order quantity</td><td>Set <code>sale_line_warn_msg</code> or override <code>_cart_update()</code></td></tr>
+            </tbody>
+          </table>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li><code>website_sale</code> manages shop products via <code>is_published</code> and <code>website_id</code> fields on <code>product.template</code></li>
+              <li>The cart is a draft <code>sale.order</code> — retrieved via <code>request.website.sale_get_order()</code></li>
+              <li>Pricelists control displayed prices; the active pricelist is resolved from geo-IP, user, or URL parameter</li>
+              <li>Extend the shop by subclassing <code>WebsiteSale</code> and overriding specific methods</li>
+            </ul>
+          </div>
+
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/website/website-overview.html" class="topic-tag odoo-topic-tag">💻 Website Overview</a>
+              <a href="/odoo/website/website-controllers.html" class="topic-tag odoo-topic-tag">💻 Website Controllers</a>
+              <a href="/odoo/website/snippets.html" class="topic-tag odoo-topic-tag">💻 Website Snippets</a>
+              <a href="/odoo/portal/portal-overview.html" class="topic-tag odoo-topic-tag">🌐 Portal Overview</a>
+            </div>
+          </section>
+
+          <section class="faq-section">
+            <h3>Frequently Asked Questions</h3>
+            <div class="faq-item">
+              <h4>How do I add a product variant selector to the product page?</h4>
+              <p>Product variants are handled automatically by <code>website_sale</code> when a product has multiple attribute values. Set up <code>product.attribute</code> and <code>product.attribute.value</code> records, link them to the product template, and the variant selector appears automatically on the product page. No controller changes needed.</p>
+            </div>
+            <div class="faq-item">
+              <h4>Can I add custom fields to the checkout form?</h4>
+              <p>Yes — extend the checkout template via XPath to add extra fields, and override the <code>checkout_values()</code> method to process and validate the extra data. Store custom values on the sale order or a linked model using a Python controller override of <code>_checkout_form_save()</code>.</p>
+            </div>
+            <div class="faq-item">
+              <h4>How does Odoo handle multi-currency in the shop?</h4>
+              <p>Currency is controlled by the active pricelist. Each pricelist has a currency. If your website uses multiple currencies, create one pricelist per currency. The visitor's pricelist is selected based on country, session, or URL parameter. Price display uses the pricelist's currency automatically.</p>
+            </div>
+            <div class="faq-item">
+              <h4>What happens to the cart if a visitor doesn't complete checkout?</h4>
+              <p>The cart remains as a draft sale order indefinitely. Odoo has a built-in scheduled action ("Sales / Cancel Quotations") that can cancel old quotations after a configurable number of days. You can also create a custom cron job to clean up abandoned carts by filtering <code>sale.order</code> with <code>state='draft'</code> and <code>website_id != False</code> beyond a certain age.</p>
+            </div>
+          </section>
+
+        </article>
+      </main>
+      <aside class="right-sidebar">
+        <div id="toc-sidebar" class="toc-widget">
+          <h3>On this page</h3>
+          <div id="toc"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a href="/odoo/website/snippets.html" class="lesson-nav-link">
+      <span class="nav-label">← Prev</span>
+      <span class="nav-title">Website Snippets</span>
+    </a>
+    <a href="/odoo/pos/pos-architecture.html" class="lesson-nav-link next">
+      <span class="nav-label">Next →</span>
+      <span class="nav-title">POS Architecture</span>
+    </a>
+  </nav>
+  <footer class="site-footer">
+    <p>&copy; 2026 <a href="/">ylearner</a> — a product by <strong>Algorid Limited</strong>. Free tutorials for everyone.</p>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

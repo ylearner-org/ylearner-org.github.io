@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo POS UI Components – OWL in the Point of Sale | ylearner</title>
+  <meta name="description" content="Build custom UI for Odoo POS using OWL components. Learn how to patch existing components, add screens, buttons, and popups to the POS interface.">
+  <meta name="keywords" content="Odoo POS UI, OWL POS components, patch POS, POS popup, POS screen, POS button, ProductScreen, Odoo 19 POS">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/pos/pos-ui-components.html">
+  <meta property="og:title" content="Odoo POS UI Components – OWL in the Point of Sale">
+  <meta property="og:description" content="Build custom UI for Odoo POS using OWL components. Learn how to patch existing components, add screens, buttons, and popups to the POS interface.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/pos/pos-ui-components.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo POS UI Components – OWL in the Point of Sale | ylearner">
+  <meta name="twitter:description" content="Build custom POS UI using OWL: patch existing components, add screens, buttons, and popups.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo POS UI Components – OWL in the Point of Sale",
+    "description": "Build custom UI for Odoo POS using OWL components. Learn how to patch existing components, add screens, buttons, and popups to the POS interface.",
+    "educationalLevel": "Advanced",
+    "keywords": "Odoo POS UI, OWL components, patch, POS popup, POS screen, button, ProductScreen",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/pos/pos-architecture.html">POS Development</a><span class="separator">›</span>
+          <span class="current">POS UI Components</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🖥️ POS Development</div>
+          <h1>Odoo POS UI Components – OWL in the Point of Sale</h1>
+          <p class="lesson-intro">The POS frontend is built with OWL components. Customizing the UI means patching existing components to add behavior, or registering new components as screens, buttons, or popups. Odoo's patching system lets you do this without forking the original code.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>The POS component tree: ProductScreen, OrderWidget, PaymentScreen</li>
+              <li>Patching existing POS components with <code>patch()</code></li>
+              <li>Adding a custom button to the ProductScreen control pad</li>
+              <li>Creating and showing a popup dialog</li>
+              <li>Registering a new screen</li>
+            </ul>
+          </div>
+
+          <div id="toc"></div>
+
+          <h2 id="pos-component-tree">POS Component Tree</h2>
+          <p>The POS is a hierarchy of OWL components. Key components:</p>
+          <table>
+            <thead><tr><th>Component</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td>Chrome</td><td>Root component — manages which screen is active</td></tr>
+              <tr><td>ProductScreen</td><td>Main selling screen with product grid and order</td></tr>
+              <tr><td>OrderWidget</td><td>The current order (right panel on ProductScreen)</td></tr>
+              <tr><td>PaymentScreen</td><td>Payment method selection and tendering</td></tr>
+              <tr><td>ReceiptScreen</td><td>Displays the receipt after payment</td></tr>
+              <tr><td>Numpad</td><td>Quantity/price/discount input pad</td></tr>
+              <tr><td>ActionpadWidget</td><td>Buttons below the order (New Order, Pay, etc.)</td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="patching-components">Patching Existing Components</h2>
+          <p>Use the <code>patch()</code> utility from <code>@web/core/utils/patch</code> to extend an existing POS component without replacing it:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { patch } from '@web/core/utils/patch';
+import { ProductScreen } from '@point_of_sale/app/screens/product_screen/product_screen';
+
+patch(ProductScreen.prototype, {
+    /**
+     * Override to show loyalty points on product select.
+     */
+    selectProduct(product, options) {
+        super.selectProduct(product, options);
+        const order = this.env.pos.get_order();
+        console.log('Current order lines:', order.orderlines.length);
+    },
+});</code></pre>
+          </div>
+          <p><code>patch()</code> merges your methods with the existing component. Call <code>super.method()</code> to invoke the original implementation before or after your code.</p>
+
+          <h2 id="adding-button">Adding a Custom Button</h2>
+          <p>Add a button to the POS control pad by patching <code>ActionpadWidget</code> and extending its template:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (QWeb/OWL)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- views/pos_templates.xml --&gt;
+&lt;template id="LoyaltyButton" inherit_id="point_of_sale.ActionpadWidget"&gt;
+  &lt;xpath expr="//div[hasclass('actionpad')]" position="inside"&gt;
+    &lt;button class="btn btn-secondary loyalty-btn"
+            t-on-click="onClickLoyalty"&gt;
+      Loyalty
+    &lt;/button&gt;
+  &lt;/xpath&gt;
+&lt;/template&gt;</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { patch } from '@web/core/utils/patch';
+import { ActionpadWidget } from '@point_of_sale/app/screens/product_screen/action_pad/action_pad';
+
+patch(ActionpadWidget.prototype, {
+    async onClickLoyalty() {
+        const { confirmed, payload } = await this.popup.add(LoyaltyCardPopup, {
+            title: 'Loyalty Card',
+        });
+        if (confirmed) {
+            this.env.pos.get_order().set_loyalty_card(payload.card_code);
+        }
+    },
+});</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 728×90</div>
+
+          <h2 id="custom-popup">Creating a Popup</h2>
+          <p>A popup is an OWL component registered in the popup registry. It must extend <code>AbstractAwaitablePopup</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { Component, useState } from '@odoo/owl';
+import { AbstractAwaitablePopup } from '@point_of_sale/app/popup/abstract_awaitable_popup';
+
+export class LoyaltyCardPopup extends AbstractAwaitablePopup {
+    static template = 'my_module.LoyaltyCardPopup';
+    static defaultProps = { title: 'Loyalty Card' };
+
+    setup() {
+        super.setup();
+        this.state = useState({ cardCode: '' });
+    }
+
+    getPayload() {
+        return { card_code: this.state.cardCode };
+    }
+}</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (OWL template)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;templates&gt;
+  &lt;t t-name="my_module.LoyaltyCardPopup"&gt;
+    &lt;div class="popup"&gt;
+      &lt;header&gt;&lt;h3 t-esc="props.title"/&gt;&lt;/header&gt;
+      &lt;section&gt;
+        &lt;div class="input-group"&gt;
+          &lt;label&gt;Card Code&lt;/label&gt;
+          &lt;input type="text" t-model="state.cardCode"
+                 placeholder="Scan or type card code"/&gt;
+        &lt;/div&gt;
+      &lt;/section&gt;
+      &lt;footer&gt;
+        &lt;button class="cancel" t-on-click="cancel"&gt;Cancel&lt;/button&gt;
+        &lt;button class="confirm" t-on-click="confirm"&gt;Apply&lt;/button&gt;
+      &lt;/footer&gt;
+    &lt;/div&gt;
+  &lt;/t&gt;
+&lt;/templates&gt;</code></pre>
+          </div>
+
+          <h2 id="asset-bundling">Registering JS/CSS in POS Assets</h2>
+          <p>POS JS and XML files must be added to the <code>point_of_sale.assets</code> bundle in your module's <code>__manifest__.py</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">'assets': {
+    'point_of_sale.assets': [
+        'my_module/static/src/js/loyalty_popup.js',
+        'my_module/static/src/xml/loyalty_popup.xml',
+        'my_module/static/src/css/pos_custom.css',
+    ],
+}</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Use <code>patch()</code> to extend existing POS components — never fork the original file</li>
+              <li>Add buttons via QWeb template inheritance on the target component's template</li>
+              <li>Popups extend <code>AbstractAwaitablePopup</code> and return a payload via <code>getPayload()</code></li>
+              <li>Register all JS and XML files under <code>'point_of_sale.assets'</code> in <code>__manifest__.py</code></li>
+            </ul>
+          </div>
+
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/pos/pos-architecture.html" class="topic-tag odoo-topic-tag">🖥️ POS Architecture</a>
+              <a href="/odoo/pos/pos-models.html" class="topic-tag odoo-topic-tag">🖥️ POS Models</a>
+              <a href="/odoo/owl/owl-components.html" class="topic-tag odoo-topic-tag">🦉 OWL Components</a>
+              <a href="/odoo/pos/pos-payment.html" class="topic-tag odoo-topic-tag">🖥️ POS Payment</a>
+            </div>
+          </section>
+
+          <section class="faq-section">
+            <h3>Frequently Asked Questions</h3>
+            <div class="faq-item">
+              <h4>How is patching different from class inheritance in OWL?</h4>
+              <p>OWL uses ES6 class inheritance for creating entirely new components. <code>patch()</code> modifies an existing component's prototype in-place — it's used when you want to extend an existing component that is already registered in the POS and don't want to replace its registration. Use inheritance for brand-new components; use <code>patch()</code> for extending existing ones.</p>
+            </div>
+            <div class="faq-item">
+              <h4>Can I show a popup without waiting for the result?</h4>
+              <p>Yes — the popup service's <code>add()</code> method returns a promise, but you don't have to await it. If you don't await, the popup appears and the code continues. The popup will close when the user clicks confirm or cancel, but you won't receive the payload. For most use cases, awaiting is the right choice.</p>
+            </div>
+            <div class="faq-item">
+              <h4>How do I access the current order from any POS component?</h4>
+              <p>Inject the POS store service: <code>this.env.pos</code> is available in any POS component that is inside the Chrome root. Call <code>this.env.pos.get_order()</code> for the active order. If your component is outside the POS tree, inject the pos service via <code>static serviceDependencies = ['pos']</code>.</p>
+            </div>
+          </section>
+
+        </article>
+      </main>
+      <aside class="right-sidebar">
+        <div id="toc-sidebar" class="toc-widget">
+          <h3>On this page</h3>
+          <div id="toc"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a href="/odoo/pos/pos-models.html" class="lesson-nav-link">
+      <span class="nav-label">← Prev</span>
+      <span class="nav-title">POS Models</span>
+    </a>
+    <a href="/odoo/pos/pos-payment.html" class="lesson-nav-link next">
+      <span class="nav-label">Next →</span>
+      <span class="nav-title">POS Payment Integration</span>
+    </a>
+  </nav>
+  <footer class="site-footer">
+    <p>&copy; 2026 <a href="/">ylearner</a> — a product by <strong>Algorid Limited</strong>. Free tutorials for everyone.</p>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

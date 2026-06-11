@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Website Module – Overview and Architecture | ylearner</title>
+  <meta name="description" content="Learn how the Odoo website module works: the website controller, ir.website, multi-website, SEO fields, and how it integrates with the CMS and eCommerce.">
+  <meta name="keywords" content="Odoo website module, ir.website, website controller, Odoo CMS, multi-website, website.page, Odoo 19 website">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/website/website-overview.html">
+  <meta property="og:title" content="Odoo Website Module – Overview and Architecture">
+  <meta property="og:description" content="Learn how the Odoo website module works: the website controller, ir.website, multi-website, SEO fields, and integration with CMS and eCommerce.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/website/website-overview.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Website Module – Overview and Architecture | ylearner">
+  <meta name="twitter:description" content="Understand the Odoo website module architecture, ir.website, and CMS integration.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Website Module – Overview and Architecture",
+    "description": "Learn how the Odoo website module works: the website controller, ir.website, multi-website, SEO fields, and integration with CMS and eCommerce.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo website module, ir.website, website controller, multi-website, CMS",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">Website Development</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">💻 Website Development</div>
+          <h1>Odoo Website Module – Overview and Architecture</h1>
+          <p class="lesson-intro">The Odoo website module is a full-featured CMS and web framework built on top of Odoo's controller layer. It adds a drag-and-drop page editor, SEO tools, website-specific routes, and a multi-website architecture — all deeply integrated with your backend data models.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>What the website module provides and how it differs from the portal</li>
+              <li>The <code>ir.website</code> model and website context</li>
+              <li>How multi-website works and how routes are website-aware</li>
+              <li>Built-in SEO fields and how to use <code>website.seo.metadata</code></li>
+              <li>Key modules that build on website: eCommerce, Blog, Forum, Live Chat</li>
+            </ul>
+          </div>
+
+          <div id="toc"></div>
+
+          <h2 id="what-is-website-module">What is the Website Module?</h2>
+          <p>The <code>website</code> module (<code>odoo/addons/website/</code>) turns Odoo into a CMS. It provides:</p>
+          <ul>
+            <li><strong>Page editor</strong> — drag-and-drop building blocks (snippets) for non-developers</li>
+            <li><strong>Website-aware routes</strong> — controllers can be restricted to a specific website instance</li>
+            <li><strong>SEO management</strong> — per-page title, description, sitemap inclusion, structured data</li>
+            <li><strong>Multi-website</strong> — run multiple websites from one Odoo instance with different domains</li>
+            <li><strong>ir.website</strong> — the database model representing a website instance</li>
+          </ul>
+          <p>Unlike the portal (<code>/my/</code>), website pages are publicly accessible at <code>/</code>. You build public-facing marketing and product pages here, not authenticated customer areas.</p>
+
+          <h2 id="ir-website-model">The ir.website Model</h2>
+          <p><code>ir.website</code> stores configuration for each website: domain, language, default language, favicon, header/footer theme, and social media links. From Python you access the current website via <code>request.website</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo import http
+from odoo.http import request
+
+class MyController(http.Controller):
+
+    @http.route('/about', type='http', auth='public', website=True)
+    def about_page(self, **kw):
+        website = request.website          # ir.website record
+        company = website.company_id       # linked res.company
+        return request.render('my_module.about_page_template', {
+            'website': website,
+            'company': company,
+        })</code></pre>
+          </div>
+          <p>The <code>website=True</code> parameter on <code>@http.route</code> is what activates website context — it makes <code>request.website</code> available and enables multi-website routing.</p>
+
+          <h2 id="website-vs-portal">Website vs Portal</h2>
+          <table>
+            <thead><tr><th>Feature</th><th>website module</th><th>portal module</th></tr></thead>
+            <tbody>
+              <tr><td>URL prefix</td><td>/  (public pages)</td><td>/my/ (authenticated area)</td></tr>
+              <tr><td>Authentication</td><td>Public (no login required)</td><td>Portal user login required</td></tr>
+              <tr><td>Target audience</td><td>Anonymous visitors</td><td>Existing customers</td></tr>
+              <tr><td>Page editor</td><td>Yes — drag-and-drop snippets</td><td>No</td></tr>
+              <tr><td>SEO tools</td><td>Built-in</td><td>Minimal</td></tr>
+              <tr><td>Dependency</td><td>web, mail</td><td>web</td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="multi-website">Multi-Website Architecture</h2>
+          <p>One Odoo instance can host multiple websites (e.g., brand-a.com and brand-b.com) simultaneously. Each website has its own <code>ir.website</code> record. Routes with <code>website=True</code> are automatically scoped to the current website by matching <code>request.httprequest.environ['HTTP_HOST']</code> against the website's domain.</p>
+          <p>To restrict a page to a specific website, use <code>request.website.id</code> as a domain filter in your controllers:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">products = request.env['product.template'].search([
+    ('website_id', 'in', [False, request.website.id]),
+    ('website_published', '=', True),
+])</code></pre>
+          </div>
+          <p>Records with <code>website_id = False</code> are visible on all websites. Records with a specific <code>website_id</code> are only visible on that website.</p>
+
+          <h2 id="seo-metadata">SEO Metadata – website.seo.metadata</h2>
+          <p>Add the <code>website.seo.metadata</code> mixin to your model to get built-in SEO fields managed from the backend or the website editor:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class LibraryBook(models.Model):
+    _name = 'library.book'
+    _inherit = ['website.seo.metadata', 'website.published.mixin']
+    _description = 'Library Book'
+
+    name = fields.Char(string='Title', required=True)
+    author = fields.Char(string='Author')
+    description = fields.Html(string='Description')</code></pre>
+          </div>
+          <p>The <code>website.seo.metadata</code> mixin adds: <code>website_meta_title</code>, <code>website_meta_description</code>, <code>website_meta_keywords</code>, and <code>website_meta_og_img</code> fields. These are editable in the website editor's SEO panel.</p>
+          <p>The <code>website.published.mixin</code> adds <code>is_published</code> and <code>website_published</code> fields plus publish/unpublish actions.</p>
+
+          <div class="ad-container ad-in-content">Ad – 728×90</div>
+
+          <h2 id="website-module-ecosystem">Website Module Ecosystem</h2>
+          <p>Several Odoo apps build directly on the website module:</p>
+          <table>
+            <thead><tr><th>Module</th><th>What it adds</th></tr></thead>
+            <tbody>
+              <tr><td>website_sale</td><td>eCommerce: product pages, cart, checkout, payment</td></tr>
+              <tr><td>website_blog</td><td>Blog with posts, tags, and comments</td></tr>
+              <tr><td>website_forum</td><td>Q&amp;A forum with voting</td></tr>
+              <tr><td>website_slides</td><td>eLearning: slide channels and presentations</td></tr>
+              <tr><td>website_event</td><td>Event registration and ticketing</td></tr>
+              <tr><td>website_livechat</td><td>Live chat widget integration</td></tr>
+            </tbody>
+          </table>
+          <p>Each of these follows the same pattern: <code>website=True</code> routes, QWeb templates inheriting from <code>website.layout</code>, and models that mix in <code>website.seo.metadata</code>.</p>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li><code>website=True</code> on <code>@http.route</code> activates website context and makes <code>request.website</code> available</li>
+              <li><code>ir.website</code> represents a website instance — one Odoo can run many</li>
+              <li>Website pages are public (<code>/</code>); portal pages are authenticated (<code>/my/</code>)</li>
+              <li>Add <code>website.seo.metadata</code> and <code>website.published.mixin</code> to make records CMS-manageable</li>
+            </ul>
+          </div>
+
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/website/website-controllers.html" class="topic-tag odoo-topic-tag">💻 Website Controllers</a>
+              <a href="/odoo/website/qweb-templates.html" class="topic-tag odoo-topic-tag">💻 QWeb Templates</a>
+              <a href="/odoo/website/snippets.html" class="topic-tag odoo-topic-tag">💻 Website Snippets</a>
+              <a href="/odoo/portal/portal-overview.html" class="topic-tag odoo-topic-tag">🌐 Portal Overview</a>
+            </div>
+          </section>
+
+          <section class="faq-section">
+            <h3>Frequently Asked Questions</h3>
+            <div class="faq-item">
+              <h4>Do I need the website module to build public pages in Odoo?</h4>
+              <p>No — you can build public HTTP controllers with just <code>web</code> as a dependency. But without the <code>website</code> module you lose the page editor, SEO tools, sitemap generation, multi-website, and the <code>website.layout</code> template. For most public-facing sites, installing <code>website</code> is the right choice.</p>
+            </div>
+            <div class="faq-item">
+              <h4>What's the difference between website=True and type='http'?</h4>
+              <p><code>type='http'</code> means the route handles a standard HTTP request (not JSON-RPC). <code>website=True</code> is a separate flag that enables website context — it sets up <code>request.website</code>, handles multi-website routing, and activates the theme layer. You can have <code>type='http'</code> without <code>website=True</code> for non-website HTTP routes.</p>
+            </div>
+            <div class="faq-item">
+              <h4>Can I use the website editor on pages I create in a custom module?</h4>
+              <p>Yes. Register your page URL as an <code>ir.ui.view</code> with the appropriate key and inherit from <code>website.layout</code>. Odoo's website editor will pick it up and allow drag-and-drop editing of snippet areas you mark with <code>oe_structure</code>.</p>
+            </div>
+            <div class="faq-item">
+              <h4>How does multi-language work with the website module?</h4>
+              <p>The website module adds URL-prefixed language routing (e.g., <code>/fr/about</code> for French). Each <code>ir.website</code> record has a default language and a list of supported languages. <code>request.website.get_current_pricelist()</code> and <code>request.lang</code> are set automatically based on the URL prefix or browser preference.</p>
+            </div>
+          </section>
+
+        </article>
+      </main>
+      <aside class="right-sidebar">
+        <div id="toc-sidebar" class="toc-widget">
+          <h3>On this page</h3>
+          <div id="toc"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a href="/odoo/portal/portal-security.html" class="lesson-nav-link">
+      <span class="nav-label">← Prev</span>
+      <span class="nav-title">Portal Security</span>
+    </a>
+    <a href="/odoo/website/website-controllers.html" class="lesson-nav-link next">
+      <span class="nav-label">Next →</span>
+      <span class="nav-title">Website Controllers</span>
+    </a>
+  </nav>
+  <footer class="site-footer">
+    <p>&copy; 2026 <a href="/">ylearner</a> — a product by <strong>Algorid Limited</strong>. Free tutorials for everyone.</p>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>
