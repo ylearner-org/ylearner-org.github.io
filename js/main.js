@@ -1217,6 +1217,38 @@
   }
 
   // ========================
+  // Share Button
+  // ========================
+  function initShareButton() {
+    const lessonHeader = document.querySelector('.lesson-header');
+    if (!lessonHeader) return;
+    const lessonTag = lessonHeader.querySelector('.lesson-tag');
+    if (!lessonTag) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'lesson-header-top';
+    lessonTag.parentNode.insertBefore(wrapper, lessonTag);
+    wrapper.appendChild(lessonTag);
+
+    const btn = document.createElement('button');
+    btn.className = 'share-btn';
+    btn.setAttribute('aria-label', 'Copy page link');
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Share';
+    wrapper.appendChild(btn);
+
+    btn.addEventListener('click', function () {
+      navigator.clipboard.writeText(window.location.href).then(function () {
+        btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Link Copied!';
+        btn.classList.add('copied');
+        setTimeout(function () {
+          btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Share';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+  }
+
+  // ========================
   // Course Nav Header (Sidebar top label)
   // ========================
   function renderCourseLabel(container) {
@@ -1323,6 +1355,7 @@
     initScrollTop();
     initHighlight();
     injectAlgoridCredit();
+    initShareButton();
 
     // Theme toggle button
     const themeBtn = document.getElementById('themeToggle');
