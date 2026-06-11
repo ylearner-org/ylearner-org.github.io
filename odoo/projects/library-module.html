@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build a Library Management Module – Odoo Capstone Project | ylearner</title>
+  <meta name="description" content="Build a complete Odoo library management module from scratch: models, views, security, computed fields, wizards, portal integration, and automated actions.">
+  <meta name="keywords" content="Odoo library module project, build Odoo module, capstone project, library management Odoo, complete module tutorial, Odoo 19 project">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/projects/library-module.html">
+  <meta property="og:title" content="Build a Library Management Module – Odoo Capstone Project">
+  <meta property="og:description" content="Build a complete Odoo library management module from scratch: models, views, security, computed fields, wizards, portal integration, and automated actions.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/projects/library-module.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Build a Library Management Module – Odoo Capstone Project | ylearner">
+  <meta name="twitter:description" content="Complete Odoo capstone project: build a library module with models, views, portal, and automations.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Build a Library Management Module – Odoo Capstone Project",
+    "description": "Build a complete Odoo library management module from scratch: models, views, security, computed fields, wizards, portal integration, and automated actions.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo library module, capstone project, complete module, models views security portal",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">Projects</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🛠️ Projects</div>
+          <h1>Build a Library Management Module – Odoo Capstone Project</h1>
+          <p class="lesson-intro">This capstone project brings together everything you've learned in the Odoo course: defining models, writing views, setting up security, creating computed fields, building wizards, adding portal pages, and automating actions. By the end you'll have a fully functional library management module with book tracking, member loans, and a customer portal.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 3-5 hours</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <strong>What you'll build:</strong>
+            <ul>
+              <li>Three models: <code>library.book</code>, <code>library.member</code>, <code>library.loan</code></li>
+              <li>Form, list, kanban, and search views</li>
+              <li>Access rights and record rules</li>
+              <li>Computed fields: loan count, overdue status, fine amount</li>
+              <li>A wizard: "Return Book" dialog with batch processing</li>
+              <li>Customer portal: member's loan history</li>
+              <li>Scheduled action: mark overdue loans automatically</li>
+            </ul>
+          </div>
+
+          <div id="toc"></div>
+
+          <h2 id="project-overview">Project Overview</h2>
+          <p>The library module tracks books and member loan history. The requirements:</p>
+          <ul>
+            <li>Librarians manage books, members, and loans from the backend</li>
+            <li>Members can view their active and past loans via a portal page at <code>/my/loans</code></li>
+            <li>Overdue loans (past due date) are automatically marked by a daily cron job</li>
+            <li>A "Return Book" wizard allows processing multiple returns at once</li>
+          </ul>
+
+          <h2 id="step1-structure">Step 1: Module Structure</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-bash">library_management/
+├── __init__.py
+├── __manifest__.py
+├── models/
+│   ├── __init__.py
+│   ├── library_book.py
+│   ├── library_member.py
+│   └── library_loan.py
+├── views/
+│   ├── library_book_views.xml
+│   ├── library_member_views.xml
+│   ├── library_loan_views.xml
+│   └── library_menus.xml
+├── security/
+│   ├── ir.model.access.csv
+│   └── library_security.xml
+├── wizards/
+│   ├── __init__.py
+│   ├── return_book_wizard.py
+│   └── return_book_wizard_views.xml
+├── controllers/
+│   ├── __init__.py
+│   └── portal.py
+├── data/
+│   └── library_cron.xml
+└── templates/
+    └── portal_my_loans.xml</code></pre>
+          </div>
+
+          <h2 id="step2-models">Step 2: Models</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># models/library_loan.py
+from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+from datetime import date
+
+
+class LibraryLoan(models.Model):
+    _name = 'library.loan'
+    _inherit = ['portal.mixin', 'mail.thread']
+    _description = 'Library Loan'
+    _order = 'loan_date desc'
+
+    member_id = fields.Many2one('res.partner', string='Member', required=True)
+    book_id = fields.Many2one('library.book', string='Book', required=True)
+    loan_date = fields.Date(string='Loan Date', default=fields.Date.today)
+    due_date = fields.Date(string='Due Date', required=True)
+    return_date = fields.Date(string='Return Date')
+    state = fields.Selection([
+        ('active', 'Active'),
+        ('returned', 'Returned'),
+        ('overdue', 'Overdue'),
+    ], default='active', tracking=True)
+
+    days_overdue = fields.Integer(
+        string='Days Overdue',
+        compute='_compute_days_overdue',
+    )
+    fine_amount = fields.Float(
+        string='Fine (€)',
+        compute='_compute_fine_amount',
+        store=True,
+    )
+
+    @api.depends('due_date', 'return_date', 'state')
+    def _compute_days_overdue(self):
+        today = date.today()
+        for loan in self:
+            end = loan.return_date or today
+            if loan.due_date and end > loan.due_date:
+                loan.days_overdue = (end - loan.due_date).days
+            else:
+                loan.days_overdue = 0
+
+    @api.depends('days_overdue')
+    def _compute_fine_amount(self):
+        rate = 0.50  # €0.50 per day overdue
+        for loan in self:
+            loan.fine_amount = loan.days_overdue * rate
+
+    def _compute_access_url(self):
+        for loan in self:
+            loan.access_url = f'/my/loans/{loan.id}'
+
+    @api.constrains('due_date', 'loan_date')
+    def _check_due_date(self):
+        for loan in self:
+            if loan.due_date and loan.loan_date:
+                if loan.due_date < loan.loan_date:
+                    raise ValidationError(
+                        'Due date must be after the loan date.'
+                    )</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 728×90</div>
+
+          <h2 id="step3-wizard">Step 3: Return Book Wizard</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># wizards/return_book_wizard.py
+from odoo import models, fields, api
+from datetime import date
+
+
+class ReturnBookWizard(models.TransientModel):
+    _name = 'library.return.wizard'
+    _description = 'Return Book Wizard'
+
+    loan_ids = fields.Many2many(
+        'library.loan',
+        string='Loans to Return',
+        domain=[('state', 'in', ['active', 'overdue'])],
+    )
+    return_date = fields.Date(
+        string='Return Date',
+        default=fields.Date.today,
+        required=True,
+    )
+
+    def action_return(self):
+        self.loan_ids.write({
+            'state': 'returned',
+            'return_date': self.return_date,
+        })
+        for loan in self.loan_ids:
+            loan.book_id.available_copies += 1
+        return {'type': 'ir.actions.act_window_close'}</code></pre>
+          </div>
+
+          <h2 id="step4-cron">Step 4: Scheduled Action</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- data/library_cron.xml --&gt;
+&lt;record id="ir_cron_mark_overdue_loans" model="ir.cron"&gt;
+  &lt;field name="name"&gt;Library: Mark Overdue Loans&lt;/field&gt;
+  &lt;field name="model_id" ref="model_library_loan"/&gt;
+  &lt;field name="state"&gt;code&lt;/field&gt;
+  &lt;field name="code"&gt;model.mark_overdue_loans()&lt;/field&gt;
+  &lt;field name="interval_number"&gt;1&lt;/field&gt;
+  &lt;field name="interval_type"&gt;days&lt;/field&gt;
+  &lt;field name="numbercall"&gt;-1&lt;/field&gt;
+  &lt;field name="active"&gt;True&lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># In LibraryLoan model
+@api.model
+def mark_overdue_loans(self):
+    from datetime import date
+    overdue = self.search([
+        ('state', '=', 'active'),
+        ('due_date', '&lt;', date.today()),
+    ])
+    overdue.write({'state': 'overdue'})</code></pre>
+          </div>
+
+          <h2 id="step5-portal">Step 5: Portal Integration</h2>
+          <p>Add the portal controller (extend <code>CustomerPortal</code>) and a QWeb template. See the <a href="/odoo/portal/portal-controllers.html">Portal Controllers</a> and <a href="/odoo/portal/portal-templates.html">Portal Templates</a> lessons for the full patterns to follow.</p>
+          <p>Key steps for the portal page:</p>
+          <ol>
+            <li>Add <code>portal.mixin</code> to <code>library.loan</code> (already done above)</li>
+            <li>Add access rights for <code>base.group_portal</code> in <code>ir.model.access.csv</code></li>
+            <li>Add record rule: portal users see only their own loans</li>
+            <li>Write <code>LibraryPortal(CustomerPortal)</code> with <code>portal_my_loans</code> and <code>portal_loan_detail</code> routes</li>
+            <li>Write QWeb templates inheriting <code>portal.portal_layout</code></li>
+          </ol>
+
+          <div class="summary-box">
+            <strong>Extension challenges:</strong>
+            <ul>
+              <li>Add a <code>library.category</code> model and filter books by category in the list view</li>
+              <li>Add an email notification when a loan becomes overdue (using mail.template)</li>
+              <li>Extend the portal to allow members to request a loan via a form</li>
+              <li>Add a Kanban view for loans grouped by state</li>
+              <li>Add a dashboard with a count of active loans, overdue loans, and total fines</li>
+            </ul>
+          </div>
+
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/projects/ecommerce-extension.html" class="topic-tag odoo-topic-tag">🛠️ eCommerce Extension</a>
+              <a href="/odoo/projects/pos-loyalty.html" class="topic-tag odoo-topic-tag">🛠️ POS Loyalty Module</a>
+              <a href="/odoo/module/models-fields.html" class="topic-tag odoo-topic-tag">🐍 Models &amp; Fields</a>
+              <a href="/odoo/portal/portal-overview.html" class="topic-tag odoo-topic-tag">🌐 Portal Overview</a>
+            </div>
+          </section>
+
+        </article>
+      </main>
+      <aside class="right-sidebar">
+        <div id="toc-sidebar" class="toc-widget">
+          <h3>On this page</h3>
+          <div id="toc"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a href="/odoo/interview/odoo-advanced-interview.html" class="lesson-nav-link">
+      <span class="nav-label">← Prev</span>
+      <span class="nav-title">Advanced Interview Questions</span>
+    </a>
+    <a href="/odoo/projects/ecommerce-extension.html" class="lesson-nav-link next">
+      <span class="nav-label">Next →</span>
+      <span class="nav-title">eCommerce Extension Project</span>
+    </a>
+  </nav>
+  <footer class="site-footer">
+    <p>&copy; 2026 <a href="/">ylearner</a> — a product by <strong>Algorid Limited</strong>. Free tutorials for everyone.</p>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

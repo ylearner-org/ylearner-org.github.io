@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eCommerce Extension Project – Odoo website_sale Customization | ylearner</title>
+  <meta name="description" content="Build an Odoo eCommerce extension: add custom product fields, extend the shop controller, create a product comparison widget, and build a custom checkout step.">
+  <meta name="keywords" content="Odoo eCommerce extension project, website_sale customization, custom checkout, product comparison, shop extension, Odoo 19 project">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/projects/ecommerce-extension.html">
+  <meta property="og:title" content="eCommerce Extension Project – Odoo website_sale Customization">
+  <meta property="og:description" content="Build an Odoo eCommerce extension: add custom product fields, extend the shop controller, create a product comparison widget, and build a custom checkout step.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/projects/ecommerce-extension.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="eCommerce Extension Project – Odoo website_sale Customization | ylearner">
+  <meta name="twitter:description" content="Extend Odoo eCommerce: custom product fields, shop controller, comparison widget, checkout step.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "eCommerce Extension Project – Odoo website_sale Customization",
+    "description": "Build an Odoo eCommerce extension: add custom product fields, extend the shop controller, create a product comparison widget, and build a custom checkout step.",
+    "educationalLevel": "Advanced",
+    "keywords": "Odoo eCommerce extension, website_sale, custom checkout, product comparison, shop extension",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/projects/library-module.html">Projects</a><span class="separator">›</span>
+          <span class="current">eCommerce Extension</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🛠️ Projects</div>
+          <h1>eCommerce Extension Project – Odoo website_sale Customization</h1>
+          <p class="lesson-intro">This project extends Odoo's built-in eCommerce with custom features that real shops need: sustainability badges on products, a product comparison feature, and a "gift message" input at checkout. It covers extending <code>product.template</code>, subclassing <code>WebsiteSale</code>, building a website snippet, and adding a custom checkout step.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 4-6 hours</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <strong>What you'll build:</strong>
+            <ul>
+              <li>Sustainability badge field on <code>product.template</code> (Eco, Organic, Recycled)</li>
+              <li>Badge display on product cards and product detail pages</li>
+              <li>Shop controller extension to filter by badge type</li>
+              <li>A "Gift Message" field added to checkout with custom validation</li>
+              <li>Email template that includes the gift message in the order confirmation</li>
+            </ul>
+          </div>
+
+          <div id="toc"></div>
+
+          <h2 id="feature1-badge">Feature 1: Sustainability Badge</h2>
+          <p>Extend <code>product.template</code> to add a sustainability badge field:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># models/product_template.py
+from odoo import models, fields
+
+
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
+
+    sustainability_badge = fields.Selection([
+        ('none', 'None'),
+        ('eco', 'Eco-Friendly'),
+        ('organic', 'Organic'),
+        ('recycled', 'Made from Recycled Materials'),
+    ], string='Sustainability Badge', default='none')</code></pre>
+          </div>
+          <p>Display the badge on the product card by extending the shop template with XPath. Add a colored ribbon using Bootstrap utility classes and a CSS data attribute for the badge type.</p>
+
+          <h2 id="feature2-shop-filter">Feature 2: Shop Filter by Badge</h2>
+          <p>Extend the shop's search domain to support filtering by badge type:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># controllers/main.py
+from odoo.addons.website_sale.controllers.main import WebsiteSale
+
+
+class EcoShop(WebsiteSale):
+
+    def _get_search_domain(self, search, category, attrib_values,
+                           search_in_description=True):
+        domain = super()._get_search_domain(
+            search, category, attrib_values, search_in_description
+        )
+        badge = request.params.get('badge')
+        if badge and badge != 'all':
+            domain += [('sustainability_badge', '=', badge)]
+        return domain
+
+    def shop(self, page=0, category=None, search='', **post):
+        response = super().shop(
+            page=page, category=category, search=search, **post
+        )
+        response.qcontext['current_badge'] = post.get('badge', 'all')
+        response.qcontext['badge_options'] = [
+            ('all', 'All Products'),
+            ('eco', 'Eco-Friendly'),
+            ('organic', 'Organic'),
+            ('recycled', 'Recycled Materials'),
+        ]
+        return response</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 728×90</div>
+
+          <h2 id="feature3-gift-message">Feature 3: Gift Message at Checkout</h2>
+          <p>Add a gift message field to <code>sale.order</code> and capture it at checkout:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># models/sale_order.py
+from odoo import models, fields
+
+
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    gift_message = fields.Text(string='Gift Message')
+    is_gift = fields.Boolean(string='This is a Gift')</code></pre>
+          </div>
+          <p>Extend the checkout template to add a gift message section, and override <code>_checkout_form_save()</code> in the controller to persist the field:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class EcoShop(WebsiteSale):
+
+    def _checkout_form_save(self, mode, checkout, all_values):
+        order = request.website.sale_get_order()
+        is_gift = bool(all_values.get('is_gift'))
+        gift_message = (all_values.get('gift_message') or '').strip()
+
+        if is_gift and not gift_message:
+            return {'errors': {'gift_message': 'Gift message is required.'}}
+
+        order.write({
+            'is_gift': is_gift,
+            'gift_message': gift_message if is_gift else '',
+        })
+        return super()._checkout_form_save(mode, checkout, all_values)</code></pre>
+          </div>
+
+          <h2 id="feature4-email">Feature 4: Gift Message in Order Email</h2>
+          <p>Extend the sale order confirmation email template to include the gift message:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;template id="sale_email_gift_extension"
+          inherit_id="sale.mail_template_sale_confirmation"&gt;
+  &lt;xpath expr="//div[@name='order_lines']" position="before"&gt;
+    &lt;t t-if="object.is_gift"&gt;
+      &lt;div style="background: #f8f9fa; padding: 12px; margin-bottom: 16px;
+                  border-left: 4px solid #28a745; border-radius: 4px;"&gt;
+        &lt;strong&gt;🎁 Gift Order&lt;/strong&gt;
+        &lt;p style="margin: 8px 0 0;"&gt;
+          &lt;em&gt;&lt;t t-out="object.gift_message"/&gt;&lt;/em&gt;
+        &lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/t&gt;
+  &lt;/xpath&gt;
+&lt;/template&gt;</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <strong>Extension challenges:</strong>
+            <ul>
+              <li>Add a "sustainability score" computed field that aggregates badge count across a product category</li>
+              <li>Build a website snippet that shows top eco-friendly products dynamically</li>
+              <li>Add a discount for orders over €100 that are marked as gifts</li>
+              <li>Create a backend report showing total gift orders by month</li>
+            </ul>
+          </div>
+
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/projects/library-module.html" class="topic-tag odoo-topic-tag">🛠️ Library Module Project</a>
+              <a href="/odoo/projects/pos-loyalty.html" class="topic-tag odoo-topic-tag">🛠️ POS Loyalty Module</a>
+              <a href="/odoo/website/ecommerce-basics.html" class="topic-tag odoo-topic-tag">💻 eCommerce Basics</a>
+              <a href="/odoo/website/website-controllers.html" class="topic-tag odoo-topic-tag">💻 Website Controllers</a>
+            </div>
+          </section>
+
+        </article>
+      </main>
+      <aside class="right-sidebar">
+        <div id="toc-sidebar" class="toc-widget">
+          <h3>On this page</h3>
+          <div id="toc"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a href="/odoo/projects/library-module.html" class="lesson-nav-link">
+      <span class="nav-label">← Prev</span>
+      <span class="nav-title">Library Module Project</span>
+    </a>
+    <a href="/odoo/projects/pos-loyalty.html" class="lesson-nav-link next">
+      <span class="nav-label">Next →</span>
+      <span class="nav-title">POS Loyalty Module</span>
+    </a>
+  </nav>
+  <footer class="site-footer">
+    <p>&copy; 2026 <a href="/">ylearner</a> — a product by <strong>Algorid Limited</strong>. Free tutorials for everyone.</p>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>
