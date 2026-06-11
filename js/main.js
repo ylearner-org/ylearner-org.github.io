@@ -839,16 +839,16 @@
     ]},
     { title: '🛒 POS Development', items: [
       { title: 'POS Architecture', url: '/odoo/pos/pos-architecture.html' },
-      { title: 'Extending POS Models', url: '/odoo/pos/extending-pos-models.html' },
-      { title: 'Custom POS Screens', url: '/odoo/pos/custom-pos-screens.html' },
-      { title: 'POS Payment Methods', url: '/odoo/pos/pos-payment-methods.html' },
+      { title: 'Extending POS Models', url: '/odoo/pos/pos-models.html' },
+      { title: 'POS UI Components', url: '/odoo/pos/pos-ui-components.html' },
+      { title: 'POS Payment Methods', url: '/odoo/pos/pos-payment.html' },
       { title: 'POS Receipts', url: '/odoo/pos/pos-receipts.html' },
     ]},
     { title: '🦉 OWL in Odoo', items: [
-      { title: 'Client Actions', url: '/odoo/owl/client-actions.html' },
+      { title: 'OWL in Odoo', url: '/odoo/owl/owl-in-odoo.html' },
+      { title: 'OWL Components', url: '/odoo/owl/owl-components.html' },
+      { title: 'OWL Services', url: '/odoo/owl/owl-services.html' },
       { title: 'Custom Field Widgets', url: '/odoo/owl/custom-widgets.html' },
-      { title: 'Dashboard Components', url: '/odoo/owl/dashboard-components.html' },
-      { title: 'Action Managers', url: '/odoo/owl/action-managers.html' },
     ]},
     { title: '🎨 Odoo Studio', items: [
       { title: 'What is Odoo Studio?', url: '/odoo/studio/what-is-studio.html' },
@@ -866,13 +866,13 @@
       { title: 'Deployment', url: '/odoo/advanced/deployment.html' },
     ]},
     { title: '🎯 Interview Prep', items: [
-      { title: 'Interview Questions', url: '/odoo/interview/questions.html', badge: 'hot' },
-      { title: 'Coding Exercises', url: '/odoo/interview/exercises.html' },
+      { title: 'Interview Questions', url: '/odoo/interview/odoo-interview-questions.html', badge: 'hot' },
+      { title: 'Advanced Interview Q&A', url: '/odoo/interview/odoo-advanced-interview.html' },
     ]},
     { title: '🛠️ Projects', items: [
-      { title: 'Custom CRM Module', url: '/odoo/projects/custom-crm.html' },
-      { title: 'Customer Portal Project', url: '/odoo/projects/customer-portal.html' },
-      { title: 'POS Extension Project', url: '/odoo/projects/pos-extension.html' },
+      { title: 'Library Module Project', url: '/odoo/projects/library-module.html' },
+      { title: 'eCommerce Extension', url: '/odoo/projects/ecommerce-extension.html' },
+      { title: 'POS Loyalty Module', url: '/odoo/projects/pos-loyalty.html' },
     ]},
   ];
 
