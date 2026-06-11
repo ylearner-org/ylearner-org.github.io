@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL Components in Odoo – Writing and Registering Components | ylearner</title>
+  <meta name="description" content="Write OWL components for Odoo backend customizations. Learn component structure, props, slots, lifecycle hooks, and how to register components in Odoo views.">
+  <meta name="keywords" content="OWL components Odoo, Component class, props, slots, lifecycle hooks, useState, onMounted, Odoo 19 OWL">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/owl/owl-components.html">
+  <meta property="og:title" content="OWL Components in Odoo – Writing and Registering Components">
+  <meta property="og:description" content="Write OWL components for Odoo backend customizations. Learn component structure, props, slots, lifecycle hooks, and how to register components in Odoo views.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/owl/owl-components.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL Components in Odoo – Writing and Registering Components | ylearner">
+  <meta name="twitter:description" content="Write OWL components for Odoo: structure, props, slots, lifecycle hooks, and view registration.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL Components in Odoo – Writing and Registering Components",
+    "description": "Write OWL components for Odoo backend customizations. Learn component structure, props, slots, lifecycle hooks, and how to register components in Odoo views.",
+    "educationalLevel": "Intermediate",
+    "keywords": "OWL components, Component class, props, slots, lifecycle, useState, onMounted",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/owl/owl-in-odoo.html">OWL in Odoo</a><span class="separator">›</span>
+          <span class="current">OWL Components</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 OWL in Odoo</div>
+          <h1>OWL Components in Odoo – Writing and Registering Components</h1>
+          <p class="lesson-intro">OWL components are ES6 classes that extend <code>Component</code>. They have a linked XML template, reactive state, and a lifecycle managed by OWL. In Odoo, you write components to build custom field widgets, systray items, dashboard panels, or entire views.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>Component class structure: template, props, state</li>
+              <li>Reactive state with <code>useState()</code></li>
+              <li>Lifecycle hooks: <code>onMounted</code>, <code>onWillUnmount</code>, <code>onWillUpdateProps</code></li>
+              <li>Parent-child communication: props down, events up</li>
+              <li>Using slots for composable components</li>
+            </ul>
+          </div>
+
+          <div id="toc"></div>
+
+          <h2 id="component-structure">Component Structure</h2>
+          <p>Every OWL component has a JavaScript class and an XML template. The class links to the template via <code>static template</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { Component, useState, onMounted } from '@odoo/owl';
+import { useService } from '@web/core/utils/hooks';
+
+
+export class BookCounter extends Component {
+    static template = 'my_module.BookCounter';
+
+    // Prop validation (optional but recommended)
+    static props = {
+        modelName: { type: String },
+        domain: { type: Array, optional: true },
+    };
+
+    setup() {
+        // Services
+        this.orm = useService('orm');
+
+        // Reactive state — changes trigger re-render
+        this.state = useState({
+            count: 0,
+            loading: true,
+        });
+
+        // Lifecycle hook — runs after first render
+        onMounted(async () => {
+            await this.loadCount();
+        });
+    }
+
+    async loadCount() {
+        this.state.loading = true;
+        this.state.count = await this.orm.searchCount(
+            this.props.modelName,
+            this.props.domain || [],
+        );
+        this.state.loading = false;
+    }
+}</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (OWL template)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;templates&gt;
+  &lt;t t-name="my_module.BookCounter"&gt;
+    &lt;div class="book-counter"&gt;
+      &lt;t t-if="state.loading"&gt;
+        &lt;span&gt;Loading...&lt;/span&gt;
+      &lt;/t&gt;
+      &lt;t t-else=""&gt;
+        &lt;span class="count"&gt;&lt;t t-esc="state.count"/&gt;&lt;/span&gt;
+        &lt;span class="label"&gt;&lt;t t-esc="props.modelName"/&gt; records&lt;/span&gt;
+      &lt;/t&gt;
+    &lt;/div&gt;
+  &lt;/t&gt;
+&lt;/templates&gt;</code></pre>
+          </div>
+
+          <h2 id="reactive-state">Reactive State with useState</h2>
+          <p><code>useState()</code> wraps a plain object in a reactive proxy. Any mutation to its properties triggers a re-render of the component and its affected children:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">this.state = useState({ items: [], filter: '' });
+
+// Mutating state triggers re-render
+this.state.filter = 'active';
+this.state.items = await this.orm.searchRead(...);
+
+// Don't replace the reactive object itself — mutate properties
+// WRONG: this.state = useState({ ...newData })
+// RIGHT: Object.assign(this.state, newData)</code></pre>
+          </div>
+
+          <h2 id="lifecycle-hooks">Lifecycle Hooks</h2>
+          <table>
+            <thead><tr><th>Hook</th><th>When it runs</th></tr></thead>
+            <tbody>
+              <tr><td>onMounted(fn)</td><td>After first render, DOM is available</td></tr>
+              <tr><td>onWillUnmount(fn)</td><td>Before component is removed from DOM — cleanup here</td></tr>
+              <tr><td>onWillUpdateProps(fn)</td><td>Before props change — re-fetch data if needed</td></tr>
+              <tr><td>onPatched(fn)</td><td>After every render (including re-renders)</td></tr>
+              <tr><td>onWillRender(fn)</td><td>Before each render</td></tr>
+            </tbody>
+          </table>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { onMounted, onWillUnmount, onWillUpdateProps } from '@odoo/owl';
+
+setup() {
+    this.state = useState({ records: [] });
+
+    onMounted(async () => {
+        await this.loadRecords(this.props.domain);
+    });
+
+    onWillUpdateProps(async (nextProps) => {
+        if (nextProps.domain !== this.props.domain) {
+            await this.loadRecords(nextProps.domain);
+        }
+    });
+
+    onWillUnmount(() => {
+        clearInterval(this._refreshInterval);
+    });
+}</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 728×90</div>
+
+          <h2 id="props-and-events">Props Down, Events Up</h2>
+          <p>Data flows down via props; user interactions flow up via custom events:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Child component emits event
+export class BookCard extends Component {
+    static template = 'my_module.BookCard';
+    static props = { book: Object };
+
+    onSelect() {
+        this.props.onBookSelected(this.props.book);  // callback prop
+    }
+}
+
+// Parent passes callback as prop
+export class BookList extends Component {
+    static template = 'my_module.BookList';
+    static components = { BookCard };  // register sub-components
+
+    setup() {
+        this.state = useState({ selectedBook: null });
+    }
+
+    onBookSelected(book) {
+        this.state.selectedBook = book;
+    }
+}</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (OWL template)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Parent template --&gt;
+&lt;t t-foreach="state.books" t-as="book"&gt;
+  &lt;BookCard
+    book="book"
+    onBookSelected="(b) => this.onBookSelected(b)"/&gt;
+&lt;/t&gt;</code></pre>
+          </div>
+
+          <h2 id="slots">Slots</h2>
+          <p>Slots allow parent components to inject content into a child's template:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (OWL template)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Card component template with a slot --&gt;
+&lt;t t-name="my_module.Card"&gt;
+  &lt;div class="card"&gt;
+    &lt;div class="card-header"&gt;&lt;t t-esc="props.title"/&gt;&lt;/div&gt;
+    &lt;div class="card-body"&gt;
+      &lt;t t-slot="default"/&gt;  &lt;!-- content from parent --&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/t&gt;
+
+&lt;!-- Parent usage --&gt;
+&lt;Card title="'My Book'"&gt;
+  &lt;p&gt;This content goes into the slot.&lt;/p&gt;
+  &lt;BookCounter modelName="'library.book'"/&gt;
+&lt;/Card&gt;</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Components link to templates via <code>static template = 'module.TemplateName'</code></li>
+              <li><code>useState()</code> creates reactive state — mutate properties, never replace the proxy object</li>
+              <li>Use <code>onMounted</code> for initial data loading and <code>onWillUnmount</code> for cleanup</li>
+              <li>Props flow down; callbacks (or events) flow up — never mutate parent state directly</li>
+            </ul>
+          </div>
+
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/owl/owl-in-odoo.html" class="topic-tag odoo-topic-tag">🦉 OWL in Odoo</a>
+              <a href="/odoo/owl/owl-services.html" class="topic-tag odoo-topic-tag">🦉 OWL Services</a>
+              <a href="/odoo/owl/custom-widgets.html" class="topic-tag odoo-topic-tag">🦉 Custom Widgets</a>
+            </div>
+          </section>
+
+          <section class="faq-section">
+            <h3>Frequently Asked Questions</h3>
+            <div class="faq-item">
+              <h4>When should I use useState vs useRef?</h4>
+              <p><code>useState()</code> for data that should trigger re-renders when changed (counts, records, flags). <code>useRef()</code> for mutable values that should NOT trigger re-renders — DOM element references, timers, or caches. Mutating a ref doesn't cause a re-render; mutating state does.</p>
+            </div>
+            <div class="faq-item">
+              <h4>How do I access the component's DOM element?</h4>
+              <p>Use <code>useRef()</code> and attach it with <code>t-ref</code>: declare <code>this.root = useRef('root')</code> in setup, then add <code>t-ref="root"</code> to the element in the template. After mounting, <code>this.root.el</code> is the DOM element. Only access it in <code>onMounted</code> or later — it's null before the first render.</p>
+            </div>
+            <div class="faq-item">
+              <h4>Does OWL support async rendering?</h4>
+              <p>Yes — OWL supports async components via <code>willStart()</code> (an old API) and async lifecycle hooks. Modern approach: use <code>onMounted</code> with <code>await</code> for data loading, but render a loading state immediately so the UI isn't blocked. OWL batches state mutations within the same microtask to minimize re-renders.</p>
+            </div>
+          </section>
+
+        </article>
+      </main>
+      <aside class="right-sidebar">
+        <div id="toc-sidebar" class="toc-widget">
+          <h3>On this page</h3>
+          <div id="toc"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a href="/odoo/owl/owl-in-odoo.html" class="lesson-nav-link">
+      <span class="nav-label">← Prev</span>
+      <span class="nav-title">OWL in Odoo</span>
+    </a>
+    <a href="/odoo/owl/owl-services.html" class="lesson-nav-link next">
+      <span class="nav-label">Next →</span>
+      <span class="nav-title">OWL Services</span>
+    </a>
+  </nav>
+  <footer class="site-footer">
+    <p>&copy; 2026 <a href="/">ylearner</a> — a product by <strong>Algorid Limited</strong>. Free tutorials for everyone.</p>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

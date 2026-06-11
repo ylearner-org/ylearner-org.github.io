@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Performance and Caching – Optimizing Backend Code | ylearner</title>
+  <meta name="description" content="Optimize Odoo backend performance: prefetch fields, use ormcache, avoid N+1 query patterns, batch operations, and profile with query logs.">
+  <meta name="keywords" content="Odoo performance, ormcache, prefetch, N+1 query, batch operations, query profiling, Odoo 19 optimization">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/advanced/performance-caching.html">
+  <meta property="og:title" content="Odoo Performance and Caching – Optimizing Backend Code">
+  <meta property="og:description" content="Optimize Odoo backend performance: prefetch fields, use ormcache, avoid N+1 query patterns, batch operations, and profile with query logs.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/advanced/performance-caching.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Performance and Caching – Optimizing Backend Code | ylearner">
+  <meta name="twitter:description" content="Optimize Odoo with prefetch, ormcache, batch writes, and query profiling.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Performance and Caching – Optimizing Backend Code",
+    "description": "Optimize Odoo backend performance: prefetch fields, use ormcache, avoid N+1 query patterns, batch operations, and profile with query logs.",
+    "educationalLevel": "Advanced",
+    "keywords": "Odoo performance, ormcache, prefetch, N+1, batch, query profiling",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">Advanced Topics</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚡ Advanced Topics</div>
+          <h1>Odoo Performance and Caching – Optimizing Backend Code</h1>
+          <p class="lesson-intro">Performance issues in Odoo modules usually come from three sources: too many database queries (N+1), missing prefetch on relational fields, and computed fields that re-execute unnecessarily. Understanding how Odoo's ORM batches queries and how to cache expensive computations will help you build fast modules.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>How Odoo's prefetch cache prevents N+1 queries</li>
+              <li>When and how to use <code>@tools.ormcache</code></li>
+              <li>Batch reading and writing for bulk operations</li>
+              <li>Profiling queries with <code>?debug=1</code> and Python logging</li>
+              <li>Avoiding common performance anti-patterns</li>
+            </ul>
+          </div>
+
+          <div id="toc"></div>
+
+          <h2 id="n-plus-1">N+1 Query Problem</h2>
+          <p>The N+1 problem occurs when iterating a recordset and reading a relational field one record at a time:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># BAD: N+1 queries — one SELECT per loan in the loop
+loans = self.env['library.loan'].search([])
+for loan in loans:
+    print(loan.member_id.name)  # triggers SELECT for each member_id
+
+# GOOD: Odoo prefetch fetches all member names in 1 extra SELECT
+# Just access the field — ORM batches automatically within the recordset
+for loan in loans:
+    print(loan.member_id.name)  # only 2 queries total: loans + members</code></pre>
+          </div>
+          <p>Odoo's ORM automatically prefetches fields for the entire current recordset when you access a field on one record. This means reading <code>loan.member_id.name</code> for all loans in the recordset costs only 2 queries, not N+1. The problem occurs when you call <code>browse()</code> inside a loop, which creates new single-record environments:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># BAD: browse() inside loop breaks prefetch batching
+for loan_id in loan_ids:
+    loan = self.env['library.loan'].browse(loan_id)  # new env each time
+    print(loan.member_id.name)  # N queries
+
+# GOOD: browse all IDs at once — ORM prefetches together
+loans = self.env['library.loan'].browse(loan_ids)
+for loan in loans:
+    print(loan.member_id.name)  # 2 queries total</code></pre>
+          </div>
+
+          <h2 id="ormcache">ormcache – Caching Model Method Results</h2>
+          <p><code>@tools.ormcache</code> caches the return value of a model method keyed on its arguments. The cache is invalidated when the model's records are written or deleted. Use it for expensive computations that return the same result for the same inputs:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo import tools
+
+class LibraryBook(models.Model):
+    _name = 'library.book'
+
+    @tools.ormcache('self.env.uid', 'category_id')
+    def get_books_by_category(self, category_id):
+        """Cached — result reused across requests until invalidated."""
+        return self.search([('category_id', '=', category_id)]).ids
+
+    def write(self, vals):
+        result = super().write(vals)
+        # Cache is automatically cleared on write by ORM
+        return result</code></pre>
+          </div>
+          <p>Cache key args should be simple scalars (IDs, booleans, strings). Include <code>self.env.uid</code> if the result differs per user (access rights). The cache lives in memory per worker process — it's not shared across workers.</p>
+
+          <h2 id="batch-operations">Batch Operations</h2>
+          <p>Use <code>create([list])</code> and single-call <code>write()</code> over an entire recordset instead of looping:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># BAD: N individual INSERT queries
+for item in data:
+    self.env['library.loan'].create({'member_id': item['id'], ...})
+
+# GOOD: 1 batched INSERT
+self.env['library.loan'].create([
+    {'member_id': item['id'], ...}
+    for item in data
+])
+
+# BAD: loop write
+for loan in loans:
+    loan.write({'state': 'returned'})
+
+# GOOD: single write on the whole recordset
+loans.write({'state': 'returned'})  # 1 UPDATE WHERE id IN (...)</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 728×90</div>
+
+          <h2 id="stored-vs-non-stored">Stored vs Non-Stored Computed Fields</h2>
+          <p>Stored computed fields are computed on write and stored in the database column — fast to read, computed only when dependencies change. Non-stored fields recompute on every read.</p>
+          <table>
+            <thead><tr><th>Type</th><th>When computed</th><th>Best for</th></tr></thead>
+            <tbody>
+              <tr><td>stored=True</td><td>On write (when dependency changes)</td><td>Heavy computations, frequently read values</td></tr>
+              <tr><td>stored=False (default)</td><td>On every read</td><td>Simple UI formatting, rarely read values</td></tr>
+            </tbody>
+          </table>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Store it if it's read often and computation is non-trivial
+total_amount = fields.Float(
+    string='Total',
+    compute='_compute_total_amount',
+    store=True,  # stored in DB column, updated when line_ids changes
+)
+
+@api.depends('line_ids.subtotal')
+def _compute_total_amount(self):
+    for record in self:
+        record.total_amount = sum(record.line_ids.mapped('subtotal'))</code></pre>
+          </div>
+
+          <h2 id="profiling">Profiling Queries</h2>
+          <p>Enable SQL query logging in development by setting <code>log_level = debug</code> in <code>odoo.conf</code> or using the debug overlay. In code, use the profiler context manager:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import logging
+_logger = logging.getLogger(__name__)
+
+# Log query count around an operation
+before = self.env.cr.sql_log_count if hasattr(self.env.cr, 'sql_log_count') else 0
+loans = self.env['library.loan'].search([('state', '=', 'active')])
+for loan in loans:
+    _ = loan.member_id.name
+after = getattr(self.env.cr, 'sql_log_count', 0)
+_logger.info("Queries executed: %d", after - before)</code></pre>
+          </div>
+          <p>In production, use Odoo's built-in profiler: open Odoo in debug mode, go to Settings → Technical → Profiler, start profiling, perform the slow action, and review the flamegraph.</p>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Never call <code>browse()</code> inside a loop — browse the whole list first</li>
+              <li>Use <code>@tools.ormcache</code> for expensive model methods that return stable results</li>
+              <li>Batch creates and writes: <code>create([list])</code> and <code>recordset.write(vals)</code></li>
+              <li>Use <code>store=True</code> on computed fields that are read often and expensive to compute</li>
+            </ul>
+          </div>
+
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/advanced/multi-company.html" class="topic-tag odoo-topic-tag">⚡ Multi-Company</a>
+              <a href="/odoo/backend/computed-fields.html" class="topic-tag odoo-topic-tag">🐍 Computed Fields</a>
+              <a href="/odoo/advanced/testing.html" class="topic-tag odoo-topic-tag">⚡ Testing</a>
+            </div>
+          </section>
+
+          <section class="faq-section">
+            <h3>Frequently Asked Questions</h3>
+            <div class="faq-item">
+              <h4>When does ormcache get invalidated?</h4>
+              <p><code>@tools.ormcache</code> is invalidated when: (1) any record of the model is written or deleted — Odoo's ORM calls <code>invalidate_cache()</code> automatically on write/unlink; (2) you call <code>self.env['model'].invalidate_cache()</code> manually; (3) the Odoo worker process restarts. The cache is per-process — it is NOT invalidated across worker processes in a multi-worker setup.</p>
+            </div>
+            <div class="faq-item">
+              <h4>What's the difference between prefetch_ids and with_prefetch?</h4>
+              <p><code>prefetch_ids</code> is a set on the environment that tells the ORM which record IDs to batch-fetch when a field is first accessed. <code>with_prefetch(ids)</code> creates a new recordset that shares a prefetch set with the given IDs. This is used internally by the ORM. In most cases you don't need to set these manually — the ORM manages them automatically when you operate on a recordset.</p>
+            </div>
+            <div class="faq-item">
+              <h4>Is it safe to use sudo() for performance in portal controllers?</h4>
+              <p><code>sudo()</code> bypasses record rules, which can reduce query overhead on large datasets. But only use it after you've validated ownership. Never use <code>sudo().search([])</code> without a domain on portal-facing code — it will expose all records to the current request.</p>
+            </div>
+          </section>
+
+        </article>
+      </main>
+      <aside class="right-sidebar">
+        <div id="toc-sidebar" class="toc-widget">
+          <h3>On this page</h3>
+          <div id="toc"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a href="/odoo/owl/custom-widgets.html" class="lesson-nav-link">
+      <span class="nav-label">← Prev</span>
+      <span class="nav-title">Custom Field Widgets</span>
+    </a>
+    <a href="/odoo/advanced/multi-company.html" class="lesson-nav-link next">
+      <span class="nav-label">Next →</span>
+      <span class="nav-title">Multi-Company Support</span>
+    </a>
+  </nav>
+  <footer class="site-footer">
+    <p>&copy; 2026 <a href="/">ylearner</a> — a product by <strong>Algorid Limited</strong>. Free tutorials for everyone.</p>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

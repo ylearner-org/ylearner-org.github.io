@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Testing Odoo Modules – Unit Tests, Common Cases, and Test Data | ylearner</title>
+  <meta name="description" content="Write tests for Odoo modules: TransactionCase, tagged tests, test data setup, testing computed fields, constraints, and running tests with odoo-bin.">
+  <meta name="keywords" content="Odoo testing, TransactionCase, odoo-bin test, tagged tests, test setup, computed field test, Odoo 19 unit tests">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/advanced/testing.html">
+  <meta property="og:title" content="Testing Odoo Modules – Unit Tests, Common Cases, and Test Data">
+  <meta property="og:description" content="Write tests for Odoo modules: TransactionCase, tagged tests, test data setup, testing computed fields, constraints, and running tests with odoo-bin.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/advanced/testing.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Testing Odoo Modules – Unit Tests, Common Cases, and Test Data | ylearner">
+  <meta name="twitter:description" content="Write Odoo module tests: TransactionCase, tagged tests, test data, computed fields, constraints.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Testing Odoo Modules – Unit Tests, Common Cases, and Test Data",
+    "description": "Write tests for Odoo modules: TransactionCase, tagged tests, test data setup, testing computed fields, constraints, and running tests with odoo-bin.",
+    "educationalLevel": "Advanced",
+    "keywords": "Odoo testing, TransactionCase, tagged tests, odoo-bin test, computed field test, constraints",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/advanced/performance-caching.html">Advanced Topics</a><span class="separator">›</span>
+          <span class="current">Testing Odoo Modules</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚡ Advanced Topics</div>
+          <h1>Testing Odoo Modules – Unit Tests, Common Cases, and Test Data</h1>
+          <p class="lesson-intro">Odoo tests run inside a real database transaction that is rolled back after each test class. You write tests as Python classes that inherit <code>TransactionCase</code>, set up data in <code>setUpClass()</code>, and use standard Python <code>assertEqual()</code> / <code>assertRaises()</code> assertions. Tests run via <code>odoo-bin -t</code>.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>Test file structure and <code>TransactionCase</code></li>
+              <li>Setting up test data with <code>setUpClass()</code></li>
+              <li>Tagging tests with <code>@tagged</code></li>
+              <li>Testing computed fields, constraints, and exceptions</li>
+              <li>Running tests with <code>odoo-bin</code></li>
+            </ul>
+          </div>
+
+          <div id="toc"></div>
+
+          <h2 id="test-structure">Test File Structure</h2>
+          <p>Place tests in a <code>tests/</code> folder inside your module. Each file must start with <code>test_</code>. Import it in <code>tests/__init__.py</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># tests/__init__.py
+from . import test_library_book
+from . import test_library_loan</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># tests/test_library_book.py
+from odoo.tests import TransactionCase, tagged
+
+
+@tagged('library', '-standard')
+class TestLibraryBook(TransactionCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # Create test data once for all test methods in this class
+        cls.book = cls.env['library.book'].create({
+            'name': 'Clean Code',
+            'author': 'Robert C. Martin',
+            'available_copies': 3,
+        })
+        cls.member = cls.env['res.partner'].create({
+            'name': 'Alice Test',
+            'email': 'alice@example.com',
+        })
+
+    def test_book_created(self):
+        self.assertEqual(self.book.name, 'Clean Code')
+        self.assertEqual(self.book.available_copies, 3)
+
+    def test_book_checkout(self):
+        self.book.checkout(self.member)
+        self.assertEqual(self.book.available_copies, 2)</code></pre>
+          </div>
+
+          <h2 id="transaction-case">TransactionCase vs BaseCase</h2>
+          <table>
+            <thead><tr><th>Class</th><th>Isolation</th><th>Use when</th></tr></thead>
+            <tbody>
+              <tr><td>TransactionCase</td><td>Each test method runs in a savepoint (rolled back after)</td><td>Most model tests — creates/writes real records, all rolled back</td></tr>
+              <tr><td>SavepointCase (deprecated)</td><td>Like TransactionCase, older API</td><td>Avoid in new code</td></tr>
+              <tr><td>HttpCase</td><td>Full HTTP server — uses Werkzeug test client</td><td>Testing website routes and controller responses</td></tr>
+            </tbody>
+          </table>
+          <p>In <code>TransactionCase</code>, <code>setUpClass()</code> runs once per class in a transaction that is rolled back after all tests complete. Individual test methods each run in a savepoint that is rolled back at the end of the method — so they always start with the data from <code>setUpClass()</code>.</p>
+
+          <h2 id="testing-computed-fields">Testing Computed Fields</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def test_loan_total_computed(self):
+    order = self.env['library.loan'].create({
+        'member_id': self.member.id,
+        'book_id': self.book.id,
+    })
+    # Computed fields update when dependencies change
+    self.book.write({'price': 10.0})
+    order.invalidate_recordset()  # force recompute if stored=False
+
+    # For stored computed fields, write a dependency and check
+    self.assertEqual(order.total_cost, 10.0)</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 728×90</div>
+
+          <h2 id="testing-constraints">Testing Constraints</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo.exceptions import ValidationError, UserError
+
+
+def test_negative_copies_raises(self):
+    with self.assertRaises(ValidationError):
+        self.book.write({'available_copies': -1})
+
+def test_duplicate_isbn_raises(self):
+    with self.assertRaises(Exception):  # IntegrityError or ValidationError
+        self.env['library.book'].create({
+            'name': 'Another Book',
+            'isbn': self.book.isbn,  # duplicate unique field
+        })
+
+def test_checkout_unavailable_raises(self):
+    self.book.write({'available_copies': 0})
+    with self.assertRaises(UserError):
+        self.book.checkout(self.member)</code></pre>
+          </div>
+
+          <h2 id="tagged-tests">Tagging Tests</h2>
+          <p>The <code>@tagged</code> decorator lets you run specific subsets of tests:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo.tests import tagged
+
+@tagged('library', 'post_install', '-standard')
+class TestLibraryLoan(TransactionCase):
+    ...
+
+# Run only tests tagged 'library':
+# odoo-bin -t --test-tags library
+
+# Run post_install tests (after module install):
+# odoo-bin -t --test-tags post_install
+
+# -standard means: exclude from the default test suite
+# Remove -standard to run with default suite</code></pre>
+          </div>
+
+          <h2 id="running-tests">Running Tests</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-bash"># Run all tests for your module (on test database)
+python odoo-bin -t -d test_db --addons-path=addons -u my_module
+
+# Run specific test class
+python odoo-bin -t -d test_db --test-tags '/my_module/TestLibraryBook'
+
+# Run with specific tag
+python odoo-bin -t -d test_db --test-tags library
+
+# Run tests, log level for SQL debug
+python odoo-bin -t -d test_db --log-sql -u my_module</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Place tests in <code>tests/test_*.py</code>; import them in <code>tests/__init__.py</code></li>
+              <li>Use <code>setUpClass()</code> for data shared across all test methods in a class</li>
+              <li>Each test method starts fresh from <code>setUpClass()</code> data — rollback is automatic</li>
+              <li>Use <code>assertRaises(ValidationError)</code> to test constraints and exceptions</li>
+            </ul>
+          </div>
+
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/advanced/performance-caching.html" class="topic-tag odoo-topic-tag">⚡ Performance &amp; Caching</a>
+              <a href="/odoo/advanced/multi-company.html" class="topic-tag odoo-topic-tag">⚡ Multi-Company</a>
+              <a href="/odoo/advanced/deployment.html" class="topic-tag odoo-topic-tag">⚡ Deployment</a>
+              <a href="/odoo/backend/onchange-constraints.html" class="topic-tag odoo-topic-tag">🐍 Onchange &amp; Constraints</a>
+            </div>
+          </section>
+
+          <section class="faq-section">
+            <h3>Frequently Asked Questions</h3>
+            <div class="faq-item">
+              <h4>Does each test run in its own database?</h4>
+              <p>No — all tests in a test run share the same database. Isolation is achieved via savepoints (SQL SAVEPOINT / ROLLBACK TO SAVEPOINT). The database is created once (or reused) and all test data is created and rolled back per test method. This is why tests are faster than creating a fresh database per test.</p>
+            </div>
+            <div class="faq-item">
+              <h4>How do I test an HTTP controller (website route)?</h4>
+              <p>Inherit from <code>HttpCase</code> instead of <code>TransactionCase</code>. It starts a Werkzeug test client pointing at your Odoo server. Use <code>self.url_open('/your/route')</code> to make requests and assert on the response status code and content. Authenticate with <code>self.authenticate('user', 'password')</code> before making requests that require login.</p>
+            </div>
+            <div class="faq-item">
+              <h4>Should I use demo data for tests?</h4>
+              <p>No — tests should create their own data in <code>setUpClass()</code> or <code>setUp()</code>. Demo data is not guaranteed to be present in all test environments. Tests that depend on demo data are fragile and can break when demo data changes. Always create your own isolated, minimal test fixtures.</p>
+            </div>
+          </section>
+
+        </article>
+      </main>
+      <aside class="right-sidebar">
+        <div id="toc-sidebar" class="toc-widget">
+          <h3>On this page</h3>
+          <div id="toc"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a href="/odoo/advanced/multi-company.html" class="lesson-nav-link">
+      <span class="nav-label">← Prev</span>
+      <span class="nav-title">Multi-Company Support</span>
+    </a>
+    <a href="/odoo/advanced/deployment.html" class="lesson-nav-link next">
+      <span class="nav-label">Next →</span>
+      <span class="nav-title">Deployment &amp; Upgrades</span>
+    </a>
+  </nav>
+  <footer class="site-footer">
+    <p>&copy; 2026 <a href="/">ylearner</a> — a product by <strong>Algorid Limited</strong>. Free tutorials for everyone.</p>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>
