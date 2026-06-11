@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Portal Development – Customer Portal Overview | ylearner</title>
+  <meta name="description" content="Learn how Odoo's customer portal works: the /my/ route, portal.mixin, access tokens, and how to expose backend records to authenticated customers.">
+  <meta name="keywords" content="Odoo portal, customer portal, portal.mixin, Odoo /my/, portal development, Odoo access token, portal controller, Odoo 19 portal">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/portal/portal-overview.html">
+  <meta property="og:title" content="Odoo Portal Development – Customer Portal Overview">
+  <meta property="og:description" content="Learn how Odoo's customer portal works: the /my/ route, portal.mixin, access tokens, and how to expose backend records to authenticated customers.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/portal/portal-overview.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Portal Development – Customer Portal Overview | ylearner">
+  <meta name="twitter:description" content="Learn how Odoo's customer portal works: the /my/ route, portal.mixin, and access tokens.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Portal Development – Customer Portal Overview",
+    "description": "Learn how Odoo's customer portal works: the /my/ route, portal.mixin, access tokens, and exposing backend records to customers.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo portal, customer portal, portal.mixin, access token, /my/",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">Portal Development</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 Portal Development</div>
+          <h1>Odoo Portal Development – Customer Portal Overview</h1>
+          <p class="lesson-intro">The Odoo customer portal is an authenticated web area under <code>/my/</code> where customers can view their own records — orders, invoices, support tickets, and anything else you expose. It sits between the backend (staff-only) and the public website, giving customers self-service access to their data without requiring a backend user licence.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>What the Odoo portal is and how it differs from the backend and website</li>
+              <li>How <code>portal.mixin</code> adds portal support to a model</li>
+              <li>Access tokens and <code>_compute_access_url()</code></li>
+              <li>How to enable portal access for a custom model</li>
+            </ul>
+          </div>
+
+          <div id="toc"></div>
+
+          <h2 id="what-is-portal">What is the Odoo Customer Portal?</h2>
+          <p>The customer portal is a set of web pages at <code>/my/</code> that authenticated customers (portal users) can access. Out of the box, Odoo shows customers their sales orders, invoices, delivery orders, and project tasks here.</p>
+          <p>As a developer, you can extend the portal to show records from your own custom models — for example, library loan history, rental agreements, or support cases.</p>
+          <p>Portal users have a restricted security group (<code>base.group_portal</code>) that gives read access to their own records only. They cannot access the backend (<code>/web/</code>) at all.</p>
+
+          <h2 id="portal-vs-website-vs-backend">Portal vs Website vs Backend</h2>
+          <table>
+            <thead><tr><th>Area</th><th>URL prefix</th><th>Auth</th><th>Who uses it</th></tr></thead>
+            <tbody>
+              <tr><td>Backend</td><td>/web/</td><td>Internal user</td><td>Staff, managers</td></tr>
+              <tr><td>Portal</td><td>/my/</td><td>Portal user (customer login)</td><td>Customers with an account</td></tr>
+              <tr><td>Website</td><td>/</td><td>Public (no login needed)</td><td>Anyone on the internet</td></tr>
+            </tbody>
+          </table>
+          <p>A portal user logs in with their email and a password you send them. They cannot see other customers' records — record rules enforce this at the database level.</p>
+
+          <h2 id="how-portal-works">How Portal Works (Technical Overview)</h2>
+          <p>The portal is built on Odoo's HTTP controller layer. The main moving parts are:</p>
+          <ul>
+            <li><strong>portal.mixin</strong> — a mixin you add to your model; it contributes the <code>access_token</code> field and helper methods.</li>
+            <li><strong>CustomerPortal controller</strong> — a base controller in <code>odoo/addons/portal/controllers/portal.py</code> that you inherit to add your model's listing and detail pages.</li>
+            <li><strong>QWeb templates</strong> — portal pages use <code>t-call="portal.portal_layout"</code> as a wrapper that provides the header, breadcrumbs, and sidebar.</li>
+            <li><strong>Record rules</strong> — restrict portal users to their own records via <code>ir.rule</code> domain filters on <code>base.group_portal</code>.</li>
+          </ul>
+
+          <h2 id="portal-mixin">portal.mixin</h2>
+          <p><code>portal.mixin</code> is an abstract model defined in <code>odoo/addons/portal/models/portal_mixin.py</code>. Adding it to your model gives you:</p>
+          <ul>
+            <li><code>access_token</code> — a UUID field stored in the database, used for share links that bypass authentication.</li>
+            <li><code>access_url</code> — a computed field that calls <code>_compute_access_url()</code>; you must override this.</li>
+            <li><code>access_warning</code> — a warning string shown when access is restricted.</li>
+          </ul>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo import models, fields
+from odoo.addons.portal.models.portal_mixin import PortalMixin
+
+class LibraryLoan(models.Model, PortalMixin):
+    _name = 'library.loan'
+    _description = 'Library Loan'
+
+    def _compute_access_url(self):
+        for loan in self:
+            loan.access_url = f'/my/loans/{loan.id}'</code></pre>
+          </div>
+          <p>You also need to declare <code>portal.mixin</code> as a dependency in your <code>_inherit</code> list or use <code>models.Model</code> alongside it:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class LibraryLoan(models.Model):
+    _name = 'library.loan'
+    _inherit = ['portal.mixin', 'mail.thread']
+    _description = 'Library Loan'
+
+    member_id = fields.Many2one('res.partner', string='Member')
+    book_id = fields.Many2one('library.book', string='Book')
+    loan_date = fields.Date(string='Loan Date')
+    return_date = fields.Date(string='Return Date')
+    state = fields.Selection([
+        ('active', 'Active'),
+        ('returned', 'Returned'),
+        ('overdue', 'Overdue'),
+    ], default='active')
+
+    def _compute_access_url(self):
+        for loan in self:
+            loan.access_url = f'/my/loans/{loan.id}'</code></pre>
+          </div>
+
+          <h2 id="enabling-portal-access">Enabling Portal Access for a Model</h2>
+          <p>Three things are required to make records visible in the portal:</p>
+          <ol>
+            <li><strong>Add portal.mixin</strong> — as shown above.</li>
+            <li><strong>Add access rights for portal users</strong> — in your <code>ir.model.access.csv</code>, give <code>base.group_portal</code> read access (perm_read=1, all others 0).</li>
+            <li><strong>Add a record rule</strong> — ensure portal users can only read their own records.</li>
+          </ol>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSV</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-plaintext">id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_library_loan_portal,library.loan portal,model_library_loan,base.group_portal,1,0,0,0</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;record id="rule_library_loan_portal" model="ir.rule"&gt;
+  &lt;field name="name"&gt;Library Loan: portal users see own loans&lt;/field&gt;
+  &lt;field name="model_id" ref="model_library_loan"/&gt;
+  &lt;field name="groups" eval="[(4, ref('base.group_portal'))]"/&gt;
+  &lt;field name="domain_force"&gt;[('member_id', '=', user.partner_id.id)]&lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <h2 id="portal-url-structure">Portal URL Structure</h2>
+          <p>By convention, portal URLs follow this pattern:</p>
+          <ul>
+            <li><code>/my/</code> — portal home page (list of all available sections)</li>
+            <li><code>/my/loans</code> — listing page for your model</li>
+            <li><code>/my/loans/&lt;int:loan_id&gt;</code> — detail page for a single record</li>
+            <li><code>/my/loans/&lt;int:loan_id&gt;?access_token=xxxx</code> — shared link with access token</li>
+          </ul>
+          <p>Pagination is also standard: <code>/my/loans/page/&lt;int:page&gt;</code>.</p>
+
+          <div class="ad-container ad-in-content">Ad – 728×90</div>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li><code>portal.mixin</code> adds <code>access_token</code> and <code>access_url</code> to your model</li>
+              <li>Portal users are in <code>base.group_portal</code> — they can't access the backend</li>
+              <li>Record rules restrict portal users to their own records</li>
+              <li>You need access rights CSV + record rule + controller + templates to complete a portal integration</li>
+            </ul>
+          </div>
+
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/portal/portal-controllers.html" class="topic-tag odoo-topic-tag">🌐 Portal Controllers</a>
+              <a href="/odoo/portal/portal-templates.html" class="topic-tag odoo-topic-tag">🌐 Portal Templates</a>
+              <a href="/odoo/portal/portal-security.html" class="topic-tag odoo-topic-tag">🌐 Portal Security</a>
+              <a href="/odoo/module/security-access.html" class="topic-tag odoo-topic-tag">🐍 Security &amp; Access Rights</a>
+              <a href="/odoo/module/models-fields.html" class="topic-tag odoo-topic-tag">🐍 Models &amp; Fields</a>
+            </div>
+          </section>
+
+          <section class="faq-section">
+            <h3>Frequently Asked Questions</h3>
+            <div class="faq-item">
+              <h4>Does every customer automatically get portal access?</h4>
+              <p>No. You must explicitly grant portal access to a contact from the backend: open the contact, click Action → Grant Portal Access, and select the user. This creates a portal user account and sends them an invitation email.</p>
+            </div>
+            <div class="faq-item">
+              <h4>Can a portal user edit records?</h4>
+              <p>Only if you grant write access in the CSV and build a form controller. By default portal users are read-only. For write operations use dedicated form pages (see Portal Forms).</p>
+            </div>
+            <div class="faq-item">
+              <h4>What is the access_token used for?</h4>
+              <p>Access tokens allow unauthenticated sharing — a customer can forward a URL containing their token and the recipient can view the record without logging in. The token is a UUID generated per-record and can be reset.</p>
+            </div>
+            <div class="faq-item">
+              <h4>Do I need the website module for portal?</h4>
+              <p>No. The portal (<code>portal</code> module) is separate from the website builder (<code>website</code> module). The portal works without website installed, though both share the same QWeb layout infrastructure.</p>
+            </div>
+          </section>
+
+        </article>
+      </main>
+      <aside class="right-sidebar">
+        <div id="toc-sidebar" class="toc-widget">
+          <h3>On this page</h3>
+          <div id="toc"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a href="/odoo/backend/email-templates.html" class="lesson-nav-link">
+      <span class="nav-label">← Prev</span>
+      <span class="nav-title">Email Templates</span>
+    </a>
+    <a href="/odoo/portal/portal-controllers.html" class="lesson-nav-link next">
+      <span class="nav-label">Next →</span>
+      <span class="nav-title">Portal Controllers</span>
+    </a>
+  </nav>
+  <footer class="site-footer">
+    <p>&copy; 2026 <a href="/">ylearner</a> — a product by <strong>Algorid Limited</strong>. Free tutorials for everyone.</p>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

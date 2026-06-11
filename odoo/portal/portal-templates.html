@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Portal QWeb Templates – Building Portal Pages | ylearner</title>
+  <meta name="description" content="Build Odoo portal pages with QWeb. Learn portal.portal_layout, listing and detail templates, pager widget, breadcrumbs, and t-field rendering.">
+  <meta name="keywords" content="Odoo portal templates, portal.portal_layout, QWeb portal, portal pager, portal breadcrumb, t-field portal, Odoo 19 portal">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/portal/portal-templates.html">
+  <meta property="og:title" content="Odoo Portal QWeb Templates – Building Portal Pages">
+  <meta property="og:description" content="Build Odoo portal pages with QWeb. Learn portal.portal_layout, listing and detail templates, pager, and t-field rendering.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/portal/portal-templates.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Portal QWeb Templates – Building Portal Pages | ylearner">
+  <meta name="twitter:description" content="Build Odoo portal pages with QWeb templates using portal.portal_layout.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Portal QWeb Templates – Building Portal Pages",
+    "description": "Build Odoo portal pages with QWeb. Learn portal.portal_layout, listing and detail templates, pager, and t-field rendering.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo portal templates, QWeb, portal_layout, pager, t-field",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/portal/portal-overview.html">Portal Development</a><span class="separator">›</span>
+          <span class="current">Portal Templates</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 Portal Development</div>
+          <h1>Odoo Portal QWeb Templates – Building Portal Pages</h1>
+          <p class="lesson-intro">Portal pages are QWeb templates that wrap their content inside <code>portal.portal_layout</code>. This layout adds the portal header, breadcrumb navigation, and sidebar. You define listing templates (showing many records) and detail templates (showing one record) in your module's <code>views/</code> XML files.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>How to use <code>portal.portal_layout</code> as a page wrapper</li>
+              <li>Listing page template with pager and sort controls</li>
+              <li>Detail page template with breadcrumbs and status badges</li>
+              <li><code>t-field</code> for formatted output and share links with access tokens</li>
+            </ul>
+          </div>
+
+          <div id="toc"></div>
+
+          <h2 id="portal-template-structure">Portal Template Structure</h2>
+          <p>Portal templates live in your module under <code>views/portal_templates.xml</code> and are registered as <code>ir.ui.view</code> records with <code>type="qweb"</code>. They are loaded by listing them in <code>__manifest__.py</code> under <code>data</code>.</p>
+          <p>Every portal page calls <code>portal.portal_layout</code> as its outer wrapper:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;template id="portal_my_loans" name="My Loans"&gt;
+  &lt;t t-call="portal.portal_layout"&gt;
+    &lt;t t-set="breadcrumbs_searchbar" t-value="True"/&gt;
+    &lt;!-- page content goes here --&gt;
+  &lt;/t&gt;
+&lt;/template&gt;</code></pre>
+          </div>
+
+          <h2 id="portal-home-entry">Adding to the Portal Home</h2>
+          <p>Inherit <code>portal.portal_my_home</code> to add a link and counter to the <code>/my/</code> home page:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;template id="portal_my_home_loan" name="Portal My Home: Loans"
+          inherit_id="portal.portal_my_home" priority="40"&gt;
+  &lt;xpath expr="//div[hasclass('o_portal_docs')]" position="inside"&gt;
+    &lt;t t-if="loan_count" t-call="portal.portal_docs_entry"&gt;
+      &lt;t t-set="title"&gt;Loans&lt;/t&gt;
+      &lt;t t-set="url"&gt;/my/loans&lt;/t&gt;
+      &lt;t t-set="count" t-value="loan_count"/&gt;
+    &lt;/t&gt;
+  &lt;/xpath&gt;
+&lt;/template&gt;</code></pre>
+          </div>
+          <p>The <code>loan_count</code> variable is set by your controller's <code>_prepare_home_portal_values</code> method.</p>
+
+          <h2 id="listing-page-template">Listing Page Template</h2>
+          <p>A full listing template with sort controls and pager:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;template id="portal_my_loans" name="My Loans"&gt;
+  &lt;t t-call="portal.portal_layout"&gt;
+    &lt;t t-set="breadcrumbs_searchbar" t-value="True"/&gt;
+
+    &lt;t t-call="portal.portal_searchbar"&gt;
+      &lt;t t-set="title"&gt;My Loans&lt;/t&gt;
+      &lt;t t-set="searchbar_sortings" t-value="searchbar_sortings"/&gt;
+      &lt;t t-set="sortby" t-value="sortby"/&gt;
+    &lt;/t&gt;
+
+    &lt;t t-if="not loans"&gt;
+      &lt;div class="alert alert-info"&gt;You have no active loans.&lt;/div&gt;
+    &lt;/t&gt;
+
+    &lt;t t-if="loans"&gt;
+      &lt;div class="card"&gt;
+        &lt;div class="table-responsive"&gt;
+          &lt;table class="table table-sm o_portal_my_doc_table"&gt;
+            &lt;thead&gt;
+              &lt;tr&gt;
+                &lt;th&gt;Book&lt;/th&gt;
+                &lt;th&gt;Loan Date&lt;/th&gt;
+                &lt;th&gt;Return Date&lt;/th&gt;
+                &lt;th&gt;Status&lt;/th&gt;
+              &lt;/tr&gt;
+            &lt;/thead&gt;
+            &lt;tbody&gt;
+              &lt;t t-foreach="loans" t-as="loan"&gt;
+                &lt;tr&gt;
+                  &lt;td&gt;
+                    &lt;a t-attf-href="/my/loans/#{loan.id}"&gt;
+                      &lt;t t-out="loan.book_id.name"/&gt;
+                    &lt;/a&gt;
+                  &lt;/td&gt;
+                  &lt;td&gt;&lt;t t-field="loan.loan_date"/&gt;&lt;/td&gt;
+                  &lt;td&gt;&lt;t t-field="loan.return_date"/&gt;&lt;/td&gt;
+                  &lt;td&gt;
+                    &lt;span t-attf-class="badge badge-#{
+                      'success' if loan.state == 'returned' else
+                      'danger' if loan.state == 'overdue' else 'info'
+                    }"&gt;
+                      &lt;t t-out="loan.state"/&gt;
+                    &lt;/span&gt;
+                  &lt;/td&gt;
+                &lt;/tr&gt;
+              &lt;/t&gt;
+            &lt;/tbody&gt;
+          &lt;/table&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div t-if="pager" class="o_portal_pager text-center"&gt;
+        &lt;t t-call="portal.pager"/&gt;
+      &lt;/div&gt;
+    &lt;/t&gt;
+  &lt;/t&gt;
+&lt;/template&gt;</code></pre>
+          </div>
+
+          <h2 id="detail-page-template">Detail Page Template</h2>
+          <p>The detail template shows one record and includes a share link using the access token:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;template id="portal_loan_detail" name="Loan Detail"&gt;
+  &lt;t t-call="portal.portal_layout"&gt;
+    &lt;t t-set="o_portal_fullwidth_alert"&gt;
+      &lt;t t-call="portal.portal_back_in_edit_mode"&gt;
+        &lt;t t-set="backend_url"
+           t-value="'/web#model=library.loan&amp;id=%s&amp;view_type=form' % loan.id"/&gt;
+      &lt;/t&gt;
+    &lt;/t&gt;
+
+    &lt;div class="row"&gt;
+      &lt;div class="col-12 col-lg-8"&gt;
+        &lt;div class="card"&gt;
+          &lt;div class="card-header"&gt;
+            &lt;h4&gt;Loan: &lt;t t-field="loan.book_id.name"/&gt;&lt;/h4&gt;
+          &lt;/div&gt;
+          &lt;div class="card-body"&gt;
+            &lt;dl class="row"&gt;
+              &lt;dt class="col-4"&gt;Member&lt;/dt&gt;
+              &lt;dd class="col-8"&gt;&lt;t t-field="loan.member_id.name"/&gt;&lt;/dd&gt;
+              &lt;dt class="col-4"&gt;Loan Date&lt;/dt&gt;
+              &lt;dd class="col-8"&gt;&lt;t t-field="loan.loan_date"/&gt;&lt;/dd&gt;
+              &lt;dt class="col-4"&gt;Return Date&lt;/dt&gt;
+              &lt;dd class="col-8"&gt;&lt;t t-field="loan.return_date"/&gt;&lt;/dd&gt;
+            &lt;/dl&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/t&gt;
+&lt;/template&gt;</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 728×90</div>
+
+          <h2 id="t-field-rendering">t-field vs t-out vs t-esc</h2>
+          <table>
+            <thead><tr><th>Directive</th><th>Use case</th><th>Escaping</th></tr></thead>
+            <tbody>
+              <tr><td><code>t-field</code></td><td>Odoo field — renders with proper formatting (dates, currencies, Many2one names)</td><td>Yes, via widget</td></tr>
+              <tr><td><code>t-out</code></td><td>Any Python expression — renders HTML as-is</td><td>No (raw HTML)</td></tr>
+              <tr><td><code>t-esc</code></td><td>Any Python expression — renders as escaped text</td><td>Yes</td></tr>
+            </tbody>
+          </table>
+          <p>Prefer <code>t-field</code> for model fields — it handles date formatting, currency symbols, and related record names automatically.</p>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>All portal templates wrap content in <code>t-call="portal.portal_layout"</code></li>
+              <li>Add your section to <code>/my/</code> by inheriting <code>portal.portal_my_home</code></li>
+              <li>Use <code>t-call="portal.pager"</code> for pagination</li>
+              <li>Use <code>t-field</code> for model fields — it formats dates, currencies, and relations correctly</li>
+            </ul>
+          </div>
+
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/portal/portal-controllers.html" class="topic-tag odoo-topic-tag">🌐 Portal Controllers</a>
+              <a href="/odoo/portal/portal-forms.html" class="topic-tag odoo-topic-tag">🌐 Portal Forms</a>
+              <a href="/odoo/module/basic-views.html" class="topic-tag odoo-topic-tag">🐍 Basic Views</a>
+              <a href="/odoo/website/qweb-templates.html" class="topic-tag odoo-topic-tag">💻 QWeb Website Templates</a>
+            </div>
+          </section>
+
+          <section class="faq-section">
+            <h3>Frequently Asked Questions</h3>
+            <div class="faq-item">
+              <h4>Where do portal templates go in the module?</h4>
+              <p>In <code>views/portal_templates.xml</code> (or any XML file listed in <code>__manifest__.py</code> under <code>data</code>). They are <code>ir.ui.view</code> records with <code>type="qweb"</code> and no <code>model</code> attribute.</p>
+            </div>
+            <div class="faq-item">
+              <h4>How do I add custom CSS/JS to portal pages?</h4>
+              <p>Add your assets to the <code>web.assets_frontend</code> bundle in <code>__manifest__.py</code> under <code>assets</code>. Frontend assets are loaded on all public-facing pages including the portal.</p>
+            </div>
+            <div class="faq-item">
+              <h4>Can I use Bootstrap classes in portal templates?</h4>
+              <p>Yes. Bootstrap is included in Odoo's frontend assets, so all standard Bootstrap utility and component classes work in portal templates.</p>
+            </div>
+          </section>
+
+        </article>
+      </main>
+      <aside class="right-sidebar">
+        <div id="toc-sidebar" class="toc-widget">
+          <h3>On this page</h3>
+          <div id="toc"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a href="/odoo/portal/portal-controllers.html" class="lesson-nav-link">
+      <span class="nav-label">← Prev</span>
+      <span class="nav-title">Portal Controllers</span>
+    </a>
+    <a href="/odoo/portal/portal-forms.html" class="lesson-nav-link next">
+      <span class="nav-label">Next →</span>
+      <span class="nav-title">Portal Forms</span>
+    </a>
+  </nav>
+  <footer class="site-footer">
+    <p>&copy; 2026 <a href="/">ylearner</a> — a product by <strong>Algorid Limited</strong>. Free tutorials for everyone.</p>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>

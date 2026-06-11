@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Portal Security – Access Tokens and Permissions | ylearner</title>
+  <meta name="description" content="Secure your Odoo portal: access tokens, record rules for portal users, _document_check_access, preventing data leaks, and safe use of sudo().">
+  <meta name="keywords" content="Odoo portal security, access token, portal record rules, base.group_portal, _document_check_access, sudo portal, data leak prevention, Odoo 19">
+  <meta name="author" content="ylearner – Algorid Limited">
+  <link rel="canonical" href="https://ylearner.org/odoo/portal/portal-security.html">
+  <meta property="og:title" content="Odoo Portal Security – Access Tokens and Permissions">
+  <meta property="og:description" content="Secure your Odoo portal: access tokens, record rules, _document_check_access, preventing data leaks, and safe sudo().">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.png">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.png">
+  <meta property="og:url" content="https://ylearner.org/odoo/portal/portal-security.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Portal Security – Access Tokens and Permissions | ylearner">
+  <meta name="twitter:description" content="Secure your Odoo portal with access tokens, record rules, and safe permission checks.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Portal Security – Access Tokens and Permissions",
+    "description": "Secure your Odoo portal: access tokens, record rules for portal users, _document_check_access, preventing data leaks, and safe use of sudo().",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo portal security, access token, record rules, base.group_portal, data leak",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/portal/portal-overview.html">Portal Development</a><span class="separator">›</span>
+          <span class="current">Portal Security</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 Portal Development</div>
+          <h1>Odoo Portal Security – Access Tokens and Permissions</h1>
+          <p class="lesson-intro">Portal security requires attention at multiple layers: access rights let portal users read models, record rules restrict them to their own records, access tokens enable safe sharing, and <code>_document_check_access</code> ties it all together in controllers. Missing any layer can expose sensitive customer data.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>The portal security model: who is a portal user and what they can do</li>
+              <li>How access tokens work and when to use them</li>
+              <li>Record rules scoped to <code>base.group_portal</code></li>
+              <li>How to use <code>_document_check_access</code> safely</li>
+              <li>Common mistakes that cause data leaks</li>
+            </ul>
+          </div>
+
+          <div id="toc"></div>
+
+          <h2 id="portal-security-model">Portal Security Model</h2>
+          <p>Portal users belong to the <code>base.group_portal</code> security group. This group has no backend access — portal users cannot access <code>/web/</code>. Their permissions are limited to what you explicitly grant via:</p>
+          <ol>
+            <li><strong>Access rights</strong> (<code>ir.model.access.csv</code>) — what models they can read/write/create/delete</li>
+            <li><strong>Record rules</strong> (<code>ir.rule</code>) — which rows within a model they can access</li>
+          </ol>
+          <p>Without a record rule, a portal user with read access to your model could potentially read <em>all</em> records. Always add a record rule.</p>
+
+          <h2 id="access-tokens">Access Tokens</h2>
+          <p>Access tokens are UUID-4 strings stored in the <code>access_token</code> field (added by <code>portal.mixin</code>). They allow unauthenticated access to a single record — useful for sharing a link with a third party who doesn't have a portal account.</p>
+          <p>Tokens are:</p>
+          <ul>
+            <li>Generated automatically when first needed via <code>_portal_ensure_token()</code></li>
+            <li>Passed as a URL query parameter: <code>/my/loans/42?access_token=abc123...</code></li>
+            <li>Resettable by the user via the "Regenerate Token" button in portal</li>
+          </ul>
+          <p>Never expose access tokens in templates except inside the share URL. Don't render them as plain text.</p>
+
+          <h2 id="record-rules">Record Rules for Portal Users</h2>
+          <p>A proper record rule for your model restricts portal users to records they own:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Grant read access to portal users --&gt;
+&lt;!-- in security/ir.model.access.csv --&gt;
+&lt;!-- access_library_loan_portal,library.loan portal,model_library_loan,base.group_portal,1,0,0,0 --&gt;
+
+&lt;!-- Record rule: restrict to own loans --&gt;
+&lt;record id="rule_library_loan_portal_user" model="ir.rule"&gt;
+  &lt;field name="name"&gt;Library Loan: portal users see own records&lt;/field&gt;
+  &lt;field name="model_id" ref="model_library_loan"/&gt;
+  &lt;field name="groups" eval="[(4, ref('base.group_portal'))]"/&gt;
+  &lt;field name="domain_force"&gt;
+    [('member_id.user_ids', 'in', [user.id])]
+  &lt;/field&gt;
+  &lt;field name="perm_read" eval="True"/&gt;
+  &lt;field name="perm_write" eval="False"/&gt;
+  &lt;field name="perm_create" eval="False"/&gt;
+  &lt;field name="perm_unlink" eval="False"/&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+          <p>The domain <code>[('member_id.user_ids', 'in', [user.id])]</code> resolves to: "the loan's member partner must have the current user in their <code>user_ids</code> list" — i.e., the member and the logged-in portal user are the same person.</p>
+
+          <h2 id="document-check-access">_document_check_access</h2>
+          <p>Use this helper in your detail page controller. It tries two things in order:</p>
+          <ol>
+            <li>Check if the current user owns the record (via normal ORM access check)</li>
+            <li>If that fails, validate the <code>access_token</code> parameter against the record's stored token</li>
+          </ol>
+          <p>If both fail, it raises <code>AccessError</code>. If either succeeds, it returns a sudoed recordset:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo.exceptions import AccessError, MissingError
+
+try:
+    loan_sudo = self._document_check_access(
+        'library.loan',   # model name
+        loan_id,          # record ID from URL
+        access_token,     # from request query string (None if not provided)
+    )
+except (AccessError, MissingError):
+    return request.redirect('/my')
+
+# loan_sudo is a sudo() recordset — safe to read any field
+return request.render('my_module.portal_loan_detail', {'loan': loan_sudo})</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content">Ad – 728×90</div>
+
+          <h2 id="preventing-data-leaks">Preventing Data Leaks</h2>
+          <p>Common mistakes that expose data unintentionally:</p>
+          <table>
+            <thead><tr><th>Mistake</th><th>Risk</th><th>Fix</th></tr></thead>
+            <tbody>
+              <tr><td>Using <code>sudo()</code> on listing page without domain</td><td>All records exposed</td><td>Always pass ownership domain to <code>search()</code></td></tr>
+              <tr><td>No record rule for <code>group_portal</code></td><td>Portal users can enumerate all records via ORM</td><td>Add <code>ir.rule</code> scoped to <code>base.group_portal</code></td></tr>
+              <tr><td>Returning full record JSON in API route</td><td>Sensitive fields exposed</td><td>Whitelist fields explicitly when returning JSON</td></tr>
+              <tr><td>Not validating <code>loan_id</code> in URL</td><td>IDOR — guess any ID to access any record</td><td>Always use <code>_document_check_access</code></td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="field-level-security">Field-Level Security</h2>
+          <p>Sensitive fields (internal notes, cost price, employee salaries) should use the <code>groups</code> attribute so portal users can't read them even with sudo:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">internal_notes = fields.Text(
+    string='Internal Notes',
+    groups='base.group_user',  # internal users only
+)
+cost_price = fields.Float(
+    string='Cost Price',
+    groups='account.group_account_user',
+)</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Portal users are in <code>base.group_portal</code> — no backend access</li>
+              <li>Always add a record rule scoped to <code>base.group_portal</code> — without it, access rights alone allow reading all records</li>
+              <li>Use <code>_document_check_access</code> on detail pages — never browse a record by ID without checking ownership first</li>
+              <li>Sensitive fields should use <code>groups='base.group_user'</code> to prevent portal users from seeing them even via sudo</li>
+            </ul>
+          </div>
+
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/portal/portal-overview.html" class="topic-tag odoo-topic-tag">🌐 Portal Overview</a>
+              <a href="/odoo/portal/portal-controllers.html" class="topic-tag odoo-topic-tag">🌐 Portal Controllers</a>
+              <a href="/odoo/module/security-access.html" class="topic-tag odoo-topic-tag">🐍 Security &amp; Access Rights</a>
+              <a href="/odoo/website/website-overview.html" class="topic-tag odoo-topic-tag">💻 Website Module Overview</a>
+            </div>
+          </section>
+
+          <section class="faq-section">
+            <h3>Frequently Asked Questions</h3>
+            <div class="faq-item">
+              <h4>Can a portal user reset their own access token?</h4>
+              <p>Yes — the portal mixin adds a "Regenerate Access Token" button to the portal detail page. This invalidates the old token immediately. Use this to revoke shared links.</p>
+            </div>
+            <div class="faq-item">
+              <h4>What happens if I forget the record rule for group_portal?</h4>
+              <p>Without a record rule, the ORM applies no row-level filter for that group. Any portal user with read access to your model can potentially call <code>search([])</code> and retrieve all records — a serious data exposure risk.</p>
+            </div>
+            <div class="faq-item">
+              <h4>Is it safe to use sudo() in portal controllers?</h4>
+              <p>Yes, with care. Use sudo() only after validating ownership (via <code>_document_check_access</code> or manual check). Never call <code>sudo().search([])</code> on the listing page without an ownership domain — this would expose all records.</p>
+            </div>
+            <div class="faq-item">
+              <h4>How do I share a portal link that works without login?</h4>
+              <p>Generate the URL as <code>{record.access_url}?access_token={record.access_token}</code>. The detail page controller must use <code>auth='public'</code> and validate with <code>_document_check_access</code> passing the token.</p>
+            </div>
+          </section>
+
+        </article>
+      </main>
+      <aside class="right-sidebar">
+        <div id="toc-sidebar" class="toc-widget">
+          <h3>On this page</h3>
+          <div id="toc"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <nav class="lesson-nav" aria-label="Lesson navigation">
+    <a href="/odoo/portal/portal-forms.html" class="lesson-nav-link">
+      <span class="nav-label">← Prev</span>
+      <span class="nav-title">Portal Forms</span>
+    </a>
+    <a href="/odoo/website/website-overview.html" class="lesson-nav-link next">
+      <span class="nav-label">Next →</span>
+      <span class="nav-title">Website Module Overview</span>
+    </a>
+  </nav>
+  <footer class="site-footer">
+    <p>&copy; 2026 <a href="/">ylearner</a> — a product by <strong>Algorid Limited</strong>. Free tutorials for everyone.</p>
+  </footer>
+  <script src="../../js/main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</body>
+</html>
