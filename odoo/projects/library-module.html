@@ -89,8 +89,6 @@
             </ul>
           </div>
 
-          <div id="toc"></div>
-
           <h2 id="project-overview">Project Overview</h2>
           <p>The library module tracks books and member loan history. The requirements:</p>
           <ul>
@@ -293,31 +291,50 @@ def mark_overdue_loans(self):
             </div>
           </section>
 
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why use TransientModel for the return wizard instead of a regular form? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The return wizard only needs to exist for the duration of the user's action — the data (return date, condition, note) is not a permanent business record. <code>TransientModel</code> records are auto-cleaned by Odoo's vacuum job, so you don't accumulate wizard records in the database over time.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is <code>portal.mixin</code> and why is it added to library.loan? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>portal.mixin</code> adds <code>_compute_access_url()</code> and an access token field, giving each loan record a unique portal URL. The controller uses <code>_document_check_access()</code> (also from the mixin) to verify the logged-in user is the loan's member before rendering the page.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How does the overdue cron job avoid updating already-returned loans? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The cron domain filters <code>[('state', '=', 'active'), ('due_date', '&lt;', fields.Date.today())]</code> — only active loans past their due date are updated to <code>overdue</code>. Returned or lost loans are already in a terminal state and are excluded by the domain.</p></div>
+            </div>
+          </section>
         </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a href="/odoo/interview/quiz.html" class="lesson-nav-link">
+        <span class="nav-label">← Prev</span>
+        <span class="nav-title">📝 Interview Quiz</span>
+        </a>
+        <a href="/odoo/projects/ecommerce-extension.html" class="lesson-nav-link next">
+        <span class="nav-label">Next →</span>
+        <span class="nav-title">eCommerce Extension Project</span>
+        </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
       </main>
-      <aside class="right-sidebar">
-        <div id="toc-sidebar" class="toc-widget">
-          <h3>On this page</h3>
-          <div id="toc"></div>
-        </div>
-      </aside>
     </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
   </div>
-  <nav class="lesson-nav" aria-label="Lesson navigation">
-    <a href="/odoo/interview/quiz.html" class="lesson-nav-link">
-      <span class="nav-label">← Prev</span>
-      <span class="nav-title">📝 Interview Quiz</span>
-    </a>
-    <a href="/odoo/projects/ecommerce-extension.html" class="lesson-nav-link next">
-      <span class="nav-label">Next →</span>
-      <span class="nav-title">eCommerce Extension Project</span>
-    </a>
-  </nav>
   <footer class="site-footer">
-    <p>&copy; 2026 <a href="/">ylearner</a> — a product by <strong>Algorid Limited</strong>. Free tutorials for everyone.</p>
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
   </footer>
-  <script src="../../js/main.js"></script>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-  <script>hljs.highlightAll();</script>
+  <script src="../../js/main.js"></script>
 </body>
 </html>

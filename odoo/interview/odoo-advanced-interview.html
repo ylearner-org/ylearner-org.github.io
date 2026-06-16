@@ -89,35 +89,35 @@
             </ul>
           </div>
 
-          <div id="toc"></div>
-
           <h2 id="performance-questions">Performance Questions</h2>
 
-          <div class="faq-item">
-            <h4>Explain the N+1 query problem in Odoo and how to avoid it.</h4>
-            <p>N+1 occurs when you loop over a recordset and access a relational field one record at a time via <code>browse()</code> inside the loop — each access triggers a separate SQL query. Odoo's ORM prevents this through prefetch batching: when you iterate a recordset and access a field on any record, the ORM fetches that field for the entire recordset in a single query. The key rule: always <code>browse()</code> a complete list of IDs before looping — never browse inside a loop.</p>
+                    <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+<div class="faq-item">
+            <div class="faq-question">Explain the N+1 query problem in Odoo and how to avoid it. <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>N+1 occurs when you loop over a recordset and access a relational field one record at a time via <code>browse()</code> inside the loop — each access triggers a separate SQL query. Odoo's ORM prevents this through prefetch batching: when you iterate a recordset and access a field on any record, the ORM fetches that field for the entire recordset in a single query. The key rule: always <code>browse()</code> a complete list of IDs before looping — never browse inside a loop.</p></div>
           </div>
 
           <div class="faq-item">
-            <h4>What is @tools.ormcache and what are its limitations?</h4>
-            <p><code>@tools.ormcache</code> caches the return value of a model method keyed on its arguments. The cache lives in memory per Odoo worker process and is invalidated when any record of the model is written or deleted. Limitations: (1) cache is not shared across workers — in multi-worker setups, each worker has its own cache; (2) cache is not persisted across restarts; (3) incorrect cache keys (forgetting <code>self.env.uid</code> when the result varies per user) can cause data leaks between users.</p>
+            <div class="faq-question">What is @tools.ormcache and what are its limitations? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p><code>@tools.ormcache</code> caches the return value of a model method keyed on its arguments. The cache lives in memory per Odoo worker process and is invalidated when any record of the model is written or deleted. Limitations: (1) cache is not shared across workers — in multi-worker setups, each worker has its own cache; (2) cache is not persisted across restarts; (3) incorrect cache keys (forgetting <code>self.env.uid</code> when the result varies per user) can cause data leaks between users.</p></div>
           </div>
 
           <div class="faq-item">
-            <h4>When would you use a stored computed field and what are the trade-offs?</h4>
-            <p>Use <code>store=True</code> when: the field is searched/filtered in domain expressions, it's read on large lists (performance), or computing it on every read is expensive. Trade-offs: stored fields consume disk space, add write overhead (recomputed on every dependency change), and can cause cascading recomputes in complex dependency chains. Non-stored fields add read overhead but zero write overhead and no storage cost.</p>
+            <div class="faq-question">When would you use a stored computed field and what are the trade-offs? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>Use <code>store=True</code> when: the field is searched/filtered in domain expressions, it's read on large lists (performance), or computing it on every read is expensive. Trade-offs: stored fields consume disk space, add write overhead (recomputed on every dependency change), and can cause cascading recomputes in complex dependency chains. Non-stored fields add read overhead but zero write overhead and no storage cost.</p></div>
           </div>
 
           <h2 id="multicompany-questions">Multi-Company Questions</h2>
 
           <div class="faq-item">
-            <h4>How does Odoo's multi-company isolation work and how do you implement it?</h4>
-            <p>Multi-company isolation is achieved through <code>company_id</code> fields on records and record rules that filter by <code>company_ids</code> (the user's active companies). To implement it: (1) add a <code>company_id = fields.Many2one('res.company', ...)</code> field with a default of <code>self.env.company</code>; (2) add an <code>ir.rule</code> with domain <code>['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</code>. Records with <code>company_id=False</code> are shared across all companies.</p>
+            <div class="faq-question">How does Odoo's multi-company isolation work and how do you implement it? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>Multi-company isolation is achieved through <code>company_id</code> fields on records and record rules that filter by <code>company_ids</code> (the user's active companies). To implement it: (1) add a <code>company_id = fields.Many2one('res.company', ...)</code> field with a default of <code>self.env.company</code>; (2) add an <code>ir.rule</code> with domain <code>['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</code>. Records with <code>company_id=False</code> are shared across all companies.</p></div>
           </div>
 
           <div class="faq-item">
-            <h4>What is company_dependent and when would you use it?</h4>
-            <p><code>company_dependent=True</code> on a field means each company stores its own value without duplicating records. The ORM transparently reads/writes the value for <code>self.env.company</code>. Use it for configuration settings that differ per company (e.g., late fee rates, default email signatures, fiscal year settings) while keeping one configuration record per company rather than per record.</p>
+            <div class="faq-question">What is company_dependent and when would you use it? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p><code>company_dependent=True</code> on a field means each company stores its own value without duplicating records. The ORM transparently reads/writes the value for <code>self.env.company</code>. Use it for configuration settings that differ per company (e.g., late fee rates, default email signatures, fiscal year settings) while keeping one configuration record per company rather than per record.</p></div>
           </div>
 
           <div class="ad-container ad-in-content">Ad – 728×90</div>
@@ -125,39 +125,39 @@
           <h2 id="owl-questions">OWL Frontend Questions</h2>
 
           <div class="faq-item">
-            <h4>Explain the difference between using patch() and class inheritance for OWL components.</h4>
-            <p>OWL class inheritance (<code>class MyWidget extends CharField</code>) creates a new class — use it when creating a new component type. <code>patch()</code> modifies an existing component's prototype in-place — use it when you want to extend a component that is already registered in Odoo's registries (like a POS component or a built-in field widget) without replacing its registry entry. If you used class inheritance for an existing widget, you'd also need to re-register it under the same key, which can break other modules inheriting the original.</p>
+            <div class="faq-question">Explain the difference between using patch() and class inheritance for OWL components. <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>OWL class inheritance (<code>class MyWidget extends CharField</code>) creates a new class — use it when creating a new component type. <code>patch()</code> modifies an existing component's prototype in-place — use it when you want to extend a component that is already registered in Odoo's registries (like a POS component or a built-in field widget) without replacing its registry entry. If you used class inheritance for an existing widget, you'd also need to re-register it under the same key, which can break other modules inheriting the original.</p></div>
           </div>
 
           <div class="faq-item">
-            <h4>How does the OWL registry pattern work and why is it used instead of direct imports?</h4>
-            <p>The registry is a key→value store that components declare what they need without knowing who provides it. This allows multiple modules to register for the same key, override entries, or add new ones without modifying original files. For example, <code>registry.category('fields').add('my_widget', ...)</code> makes the widget available to any view that uses <code>widget="my_widget"</code> without the view needing to import it. This is essential for a plugin-based architecture where modules don't know about each other.</p>
+            <div class="faq-question">How does the OWL registry pattern work and why is it used instead of direct imports? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>The registry is a key→value store that components declare what they need without knowing who provides it. This allows multiple modules to register for the same key, override entries, or add new ones without modifying original files. For example, <code>registry.category('fields').add('my_widget', ...)</code> makes the widget available to any view that uses <code>widget="my_widget"</code> without the view needing to import it. This is essential for a plugin-based architecture where modules don't know about each other.</p></div>
           </div>
 
           <h2 id="pos-questions">POS Architecture Questions</h2>
 
           <div class="faq-item">
-            <h4>How does the Odoo POS handle offline operation?</h4>
-            <p>At session open, the POS loads all required data (products, customers, taxes, payment methods) in a single batch from the server. Orders are created as JavaScript objects in memory. Completed orders are stored locally in IndexedDB if the server is unreachable. When connectivity is restored, they are synced via <code>/pos/create_from_ui</code>. This makes the POS resilient to temporary network loss during a session — core selling functionality works offline.</p>
+            <div class="faq-question">How does the Odoo POS handle offline operation? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>At session open, the POS loads all required data (products, customers, taxes, payment methods) in a single batch from the server. Orders are created as JavaScript objects in memory. Completed orders are stored locally in IndexedDB if the server is unreachable. When connectivity is restored, they are synced via <code>/pos/create_from_ui</code>. This makes the POS resilient to temporary network loss during a session — core selling functionality works offline.</p></div>
           </div>
 
           <div class="faq-item">
-            <h4>How do you add custom data to the POS session and make it available in JavaScript?</h4>
-            <p>Override <code>_get_pos_ui_data()</code> on <code>pos.config</code> in Python and add your model's data under a key in the returned dict: <code>data['my.model'] = self.env['my.model'].search_read([...], fields=[...])</code>. On the JavaScript side, the data is available after session load. Register the model in the POS DB to index it for fast lookups: <code>this.env.pos.db.add_records('my.model', data)</code>.</p>
+            <div class="faq-question">How do you add custom data to the POS session and make it available in JavaScript? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>Override <code>_get_pos_ui_data()</code> on <code>pos.config</code> in Python and add your model's data under a key in the returned dict: <code>data['my.model'] = self.env['my.model'].search_read([...], fields=[...])</code>. On the JavaScript side, the data is available after session load. Register the model in the POS DB to index it for fast lookups: <code>this.env.pos.db.add_records('my.model', data)</code>.</p></div>
           </div>
 
           <h2 id="portal-questions">Portal Security Questions</h2>
 
           <div class="faq-item">
-            <h4>What are the security layers in an Odoo portal integration and what is the most common mistake?</h4>
-            <p>Three layers: (1) <strong>Access rights</strong> — <code>ir.model.access.csv</code> gives <code>base.group_portal</code> read access; (2) <strong>Record rules</strong> — an <code>ir.rule</code> restricts portal users to their own records; (3) <strong>_document_check_access</strong> — validates ownership or access token in the controller before rendering a detail page. The most common mistake is forgetting the record rule — without it, a portal user with read access can call <code>search([])</code> and enumerate all records.</p>
+            <div class="faq-question">What are the security layers in an Odoo portal integration and what is the most common mistake? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>Three layers: (1) <strong>Access rights</strong> — <code>ir.model.access.csv</code> gives <code>base.group_portal</code> read access; (2) <strong>Record rules</strong> — an <code>ir.rule</code> restricts portal users to their own records; (3) <strong>_document_check_access</strong> — validates ownership or access token in the controller before rendering a detail page. The most common mistake is forgetting the record rule — without it, a portal user with read access can call <code>search([])</code> and enumerate all records.</p></div>
           </div>
 
           <h2 id="deployment-questions">Deployment Questions</h2>
 
           <div class="faq-item">
-            <h4>What is the purpose of a migration script and when does it run?</h4>
-            <p>Migration scripts handle data transformations when the module's version number changes. They run during <code>odoo-bin -u</code> in version order: <code>pre_migrate.py</code> runs before new field definitions are applied (use for column renames before ORM recreates them), and <code>post_migrate.py</code> runs after (use for data backfills). They receive the raw database cursor — not the ORM — because the ORM state may not match the database schema during migration.</p>
+            <div class="faq-question">What is the purpose of a migration script and when does it run? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>Migration scripts handle data transformations when the module's version number changes. They run during <code>odoo-bin -u</code> in version order: <code>pre_migrate.py</code> runs before new field definitions are applied (use for column renames before ORM recreates them), and <code>post_migrate.py</code> runs after (use for data backfills). They receive the raw database cursor — not the ORM — because the ORM state may not match the database schema during migration.</p></div>
           </div>
 
           <section class="related-topics">
@@ -171,30 +171,35 @@
           </section>
 
         </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a href="/odoo/interview/odoo-interview-questions.html" class="lesson-nav-link">
+        <span class="nav-label">← Prev</span>
+        <span class="nav-title">Interview Questions</span>
+        </a>
+        <a href="/odoo/interview/quiz.html" class="lesson-nav-link next">
+        <span class="nav-label">Next →</span>
+        <span class="nav-title">📝 Take a Quiz</span>
+        </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
       </main>
-      <aside class="right-sidebar">
-        <div id="toc-sidebar" class="toc-widget">
-          <h3>On this page</h3>
-          <div id="toc"></div>
-        </div>
-      </aside>
     </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
   </div>
-  <nav class="lesson-nav" aria-label="Lesson navigation">
-    <a href="/odoo/interview/odoo-interview-questions.html" class="lesson-nav-link">
-      <span class="nav-label">← Prev</span>
-      <span class="nav-title">Interview Questions</span>
-    </a>
-    <a href="/odoo/interview/quiz.html" class="lesson-nav-link next">
-            <span class="nav-label">Next →</span>
-            <span class="nav-title">📝 Take a Quiz</span>
-    </a>
-  </nav>
   <footer class="site-footer">
-    <p>&copy; 2026 <a href="/">ylearner</a> — a product by <strong>Algorid Limited</strong>. Free tutorials for everyone.</p>
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+          </section>
   </footer>
-  <script src="../../js/main.js"></script>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-  <script>hljs.highlightAll();</script>
+  <script src="../../js/main.js"></script>
 </body>
 </html>
