@@ -355,20 +355,6 @@ function reportError(error, context = {}) {
             <p>Build an error boundary utility for async operations. Write a function <code>withErrorBoundary(fn, fallback, onError)</code> that wraps any async function: if it throws, calls <code>onError(error)</code> for logging and returns <code>fallback</code> instead of propagating the error. Then create a higher-order version <code>createBoundedFn(fn, options)</code> that adds retry logic, timeout, and error categorization.</p>
           </div>
 
-          <h2 id="faq">FAQ</h2>
-          <dl>
-            <dt>Does <code>finally</code> always execute?</dt>
-            <dd>Yes — except when the entire JavaScript engine halts (e.g., <code>process.exit()</code>) or an infinite loop blocks execution. Even if <code>try</code> or <code>catch</code> contains a <code>return</code> statement, <code>finally</code> runs first. If <code>finally</code> itself contains a <code>return</code>, it overrides the value from <code>try</code>/<code>catch</code>.</dd>
-            <dt>Should I use <code>error instanceof TypeError</code> or <code>error.name === 'TypeError'</code>?</dt>
-            <dd><code>instanceof</code> is generally safer and more idiomatic. However, across iframes or different execution contexts, <code>instanceof</code> can give false negatives (because each frame has its own <code>Error</code> prototype). For cross-realm code, <code>error.name === 'TypeError'</code> is more reliable.</dd>
-            <dt>Can I throw any value in JavaScript?</dt>
-            <dd>Yes — you can <code>throw</code> any value (string, number, object). However, always use <code>throw new Error()</code> or a subclass. Only <code>Error</code> objects include a <code>stack</code> trace, which is essential for debugging in production.</dd>
-            <dt>What is the difference between <code>Promise.all</code> and <code>Promise.allSettled</code>?</dt>
-            <dd><code>Promise.all</code> rejects immediately if any promise rejects. <code>Promise.allSettled</code> waits for all promises to complete, regardless of success or failure, and returns an array of result objects with <code>status: 'fulfilled'</code> or <code>status: 'rejected'</code>.</dd>
-            <dt>How do error boundaries work in React?</dt>
-            <dd>React's error boundaries are class components that implement <code>componentDidCatch</code>. They catch errors thrown during rendering, lifecycle methods, and constructors of child components — but not errors in event handlers or async code. For those, use regular try/catch.</dd>
-          </dl>
-
           <div class="ad-container ad-in-content">Ad – 336×280</div>
 
           <div class="summary-box">
@@ -391,6 +377,30 @@ function reportError(error, context = {}) {
             <a href="/javascript/advanced/async-await.html" class="topic-tag">Async/Await</a>
             <a href="/javascript/advanced/promises.html" class="topic-tag">Promises</a>
           </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does <code>finally</code> always execute? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — except when the entire JavaScript engine halts (e.g., <code>process.exit()</code>) or an infinite loop blocks execution. Even if <code>try</code> or <code>catch</code> contains a <code>return</code> statement, <code>finally</code> runs first. If <code>finally</code> itself contains a <code>return</code>, it overrides the value from <code>try</code>/<code>catch</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I use <code>error instanceof TypeError</code> or <code>error.name === 'TypeError'</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>instanceof</code> is generally safer and more idiomatic. However, across iframes or different execution contexts, <code>instanceof</code> can give false negatives (because each frame has its own <code>Error</code> prototype). For cross-realm code, <code>error.name === 'TypeError'</code> is more reliable.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I throw any value in JavaScript? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — you can <code>throw</code> any value (string, number, object). However, always use <code>throw new Error()</code> or a subclass. Only <code>Error</code> objects include a <code>stack</code> trace, which is essential for debugging in production.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>Promise.all</code> and <code>Promise.allSettled</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>Promise.all</code> rejects immediately if any promise rejects. <code>Promise.allSettled</code> waits for all promises to complete, regardless of success or failure, and returns an array of result objects with <code>status: 'fulfilled'</code> or <code>status: 'rejected'</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do error boundaries work in React? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>React's error boundaries are class components that implement <code>componentDidCatch</code>. They catch errors thrown during rendering, lifecycle methods, and constructors of child components — but not errors in event handlers or async code. For those, use regular try/catch.</p></div>
+            </div>
+          </section>
 
         </article>
         <nav class="lesson-nav" aria-label="Lesson navigation">

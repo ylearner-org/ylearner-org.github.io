@@ -357,20 +357,6 @@ request.onsuccess = (event) => {
             <p>Create a <code>StorageManager</code> class that abstracts over localStorage with these features: automatic expiry (store data with a TTL and return <code>null</code> when expired), namespacing (all keys prefixed to avoid collisions), a <code>subscribe(key, callback)</code> method for reactive updates via the storage event, and automatic compression detection using <code>localStorage.length</code> to warn when nearing the 5MB limit.</p>
           </div>
 
-          <h2 id="faq">FAQ</h2>
-          <dl>
-            <dt>Is localStorage synchronous and does that matter?</dt>
-            <dd>Yes, it is synchronous. For small amounts of data this is fine. For large reads/writes or high-frequency operations (e.g., saving on every keystroke in a complex app), the synchronous I/O can block the main thread. In those cases, debounce saves or switch to IndexedDB which is fully asynchronous.</dd>
-            <dt>Can localStorage be accessed from a Service Worker?</dt>
-            <dd>No. Service Workers run in a separate thread and do not have access to localStorage or sessionStorage. For Service Worker storage, use the Cache API or IndexedDB.</dd>
-            <dt>Why do cookies have a much smaller size limit than localStorage?</dt>
-            <dd>Cookies are sent with every HTTP request to the matching domain. Keeping them small (~4KB) minimises the HTTP overhead on every request. localStorage and sessionStorage exist purely client-side and are never sent automatically to the server, so they can afford a much larger limit (~5–10MB).</dd>
-            <dt>Is data in localStorage encrypted?</dt>
-            <dd>No. Data is stored as plain text on the user's disk. Any code running in the same origin can read it, and an attacker with physical access to the device can read it too. For sensitive data, always encrypt before storing, use HttpOnly cookies, or keep the data on the server.</dd>
-            <dt>What is the difference between <code>localStorage.getItem('key')</code> and <code>localStorage.key</code>?</dt>
-            <dd>Both return the stored value for most keys. However, property-style access can accidentally shadow the localStorage API if a key has the same name as an API method (e.g., <code>localStorage.clear</code> would give you the stored value, not the function). Always use <code>getItem/setItem</code> for safety.</dd>
-          </dl>
-
           <div class="ad-container ad-in-content">Ad – 336×280</div>
 
           <div class="summary-box">
@@ -393,6 +379,30 @@ request.onsuccess = (event) => {
             <a href="/javascript/oop/classes.html" class="topic-tag">Classes &amp; Objects</a>
             <a href="/javascript/dom/dom-basics.html" class="topic-tag">DOM Basics</a>
           </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Is localStorage synchronous and does that matter? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, it is synchronous. For small amounts of data this is fine. For large reads/writes or high-frequency operations (e.g., saving on every keystroke in a complex app), the synchronous I/O can block the main thread. In those cases, debounce saves or switch to IndexedDB which is fully asynchronous.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can localStorage be accessed from a Service Worker? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Service Workers run in a separate thread and do not have access to localStorage or sessionStorage. For Service Worker storage, use the Cache API or IndexedDB.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why do cookies have a much smaller size limit than localStorage? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Cookies are sent with every HTTP request to the matching domain. Keeping them small (~4KB) minimises the HTTP overhead on every request. localStorage and sessionStorage exist purely client-side and are never sent automatically to the server, so they can afford a much larger limit (~5–10MB).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is data in localStorage encrypted? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Data is stored as plain text on the user's disk. Any code running in the same origin can read it, and an attacker with physical access to the device can read it too. For sensitive data, always encrypt before storing, use HttpOnly cookies, or keep the data on the server.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>localStorage.getItem('key')</code> and <code>localStorage.key</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Both return the stored value for most keys. However, property-style access can accidentally shadow the localStorage API if a key has the same name as an API method (e.g., <code>localStorage.clear</code> would give you the stored value, not the function). Always use <code>getItem/setItem</code> for safety.</p></div>
+            </div>
+          </section>
 
         </article>
         <nav class="lesson-nav" aria-label="Lesson navigation">
