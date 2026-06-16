@@ -1360,6 +1360,7 @@
   // Quiz Flashcard
   // ========================
   function initQuiz() {
+    if (window.location.pathname === '/' || window.location.pathname.endsWith('/index.html')) return;
     const faqSection = document.querySelector('.faq-section');
     if (!faqSection) return;
 
