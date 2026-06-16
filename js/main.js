@@ -932,8 +932,8 @@
 
     const html = getNavData().map((section, i) => {
       const links = section.items.map(item => {
-        const slug = item.url.replace('.html', '').split('/').pop();
-        const active = currentPath.includes(slug) && slug.length > 2;
+        const itemPath = item.url.replace('.html', '');
+        const active = currentPath.replace('.html', '') === itemPath || currentPath.replace('.html', '').endsWith(itemPath);
         const badge = item.badge ? `<span class="nav-badge badge-${item.badge}">${item.badge.toUpperCase()}</span>` : '';
         const href = BASE + item.url; // BASE='' on server, BASE='file:///...' locally
         return `<li><a href="${href}" ${active ? 'class="active"' : ''}>${item.title}${badge}</a></li>`;
