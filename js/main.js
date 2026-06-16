@@ -1299,6 +1299,9 @@
           <button class="qp-next-btn"${selected === null ? ' disabled' : ''}>
             ${current === shuffled.length - 1 ? 'Submit Quiz →' : 'Next →'}
           </button>
+        </div>
+        <div class="qp-cancel-row">
+          <button class="qp-cancel-btn">✕ Cancel Quiz</button>
         </div>`;
 
       root.querySelectorAll('.qp-option').forEach(btn => btn.addEventListener('click', () => {
@@ -1317,6 +1320,8 @@
 
       const backBtn = root.querySelector('.qp-back-btn');
       if (backBtn) backBtn.addEventListener('click', () => { current--; renderQuestion(); });
+
+      root.querySelector('.qp-cancel-btn').addEventListener('click', renderIntro);
     }
 
     function renderResults() {
