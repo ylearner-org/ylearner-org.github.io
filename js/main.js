@@ -355,6 +355,7 @@
         { title: 'Setting Up OWL JS', url: '/owljs/getting-started/setup.html' },
         { title: 'Your First OWL App', url: '/owljs/getting-started/first-app.html' },
         { title: 'OWL Project Structure', url: '/owljs/getting-started/project-structure.html' },
+        { title: '📝 Section Quiz', url: '/owljs/getting-started/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -365,6 +366,7 @@
         { title: 'Props', url: '/owljs/core/props.html' },
         { title: 'State & useState', url: '/owljs/core/state.html' },
         { title: 'Event Handling', url: '/owljs/core/events.html' },
+        { title: '📝 Section Quiz', url: '/owljs/core/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -375,6 +377,7 @@
         { title: 'willStart & Async Init', url: '/owljs/lifecycle/will-start.html' },
         { title: 'willPatch & patched', url: '/owljs/lifecycle/patch-hooks.html' },
         { title: 'willUnmount & Cleanup', url: '/owljs/lifecycle/unmount.html' },
+        { title: '📝 Section Quiz', url: '/owljs/lifecycle/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -385,6 +388,7 @@
         { title: 'Input Binding (t-model)', url: '/owljs/templates/input-binding.html' },
         { title: 'Dynamic Attributes (t-att)', url: '/owljs/templates/dynamic-attrs.html' },
         { title: 'Refs (t-ref)', url: '/owljs/templates/refs.html' },
+        { title: '📝 Section Quiz', url: '/owljs/templates/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -396,6 +400,7 @@
         { title: 'Environment & Services', url: '/owljs/advanced/environment.html' },
         { title: 'Error Handling', url: '/owljs/advanced/error-handling.html' },
         { title: 'Concurrency Model', url: '/owljs/advanced/concurrency.html' },
+        { title: '📝 Section Quiz', url: '/owljs/advanced/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -404,6 +409,7 @@
         { title: 'OWL in Odoo Backend', url: '/owljs/odoo/owl-in-odoo.html' },
         { title: 'Odoo Services', url: '/owljs/odoo/services.html' },
         { title: 'RPC – Calling Python', url: '/owljs/odoo/rpc-calls.html' },
+        { title: '📝 Section Quiz', url: '/owljs/odoo/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -411,6 +417,7 @@
       items: [
         { title: 'OWL Interview Questions', url: '/owljs/interview/questions.html', badge: 'hot' },
         { title: 'Practical Exercises', url: '/owljs/interview/exercises.html' },
+        { title: '📝 Section Quiz', url: '/owljs/interview/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -420,6 +427,7 @@
         { title: 'Counter Widget', url: '/owljs/projects/counter.html' },
         { title: 'Form with Validation', url: '/owljs/projects/form-validation.html' },
         { title: 'Dashboard Component', url: '/owljs/projects/dashboard.html' },
+        { title: '📝 Section Quiz', url: '/owljs/projects/quiz.html', badge: 'quiz' },
       ]
     },
   ];
