@@ -811,6 +811,7 @@
       { title: 'Basic Views', url: '/odoo/module/basic-views.html' },
       { title: 'Menus & Actions', url: '/odoo/module/menus-actions.html' },
       { title: 'Security & Access Rights', url: '/odoo/module/security-access.html' },
+      { title: '📝 Section Quiz', url: '/odoo/module/quiz.html', badge: 'quiz' },
     ]},
     { title: '🔧 Backend Development', items: [
       { title: 'Computed Fields', url: '/odoo/backend/computed-fields.html' },
@@ -821,6 +822,7 @@
       { title: 'Scheduled Actions', url: '/odoo/backend/scheduled-actions.html' },
       { title: 'Server Actions', url: '/odoo/backend/server-actions.html' },
       { title: 'Email Templates', url: '/odoo/backend/email-templates.html' },
+      { title: '📝 Section Quiz', url: '/odoo/backend/quiz.html', badge: 'quiz' },
     ]},
     { title: '🌐 Portal Development', items: [
       { title: 'Portal Overview', url: '/odoo/portal/portal-overview.html' },
@@ -828,6 +830,7 @@
       { title: 'Portal Templates', url: '/odoo/portal/portal-templates.html' },
       { title: 'Portal Forms', url: '/odoo/portal/portal-forms.html' },
       { title: 'Portal Security', url: '/odoo/portal/portal-security.html' },
+      { title: '📝 Section Quiz', url: '/odoo/portal/quiz.html', badge: 'quiz' },
     ]},
     { title: '💻 Website Development', items: [
       { title: 'Website Module Overview', url: '/odoo/website/website-overview.html' },
@@ -836,6 +839,7 @@
       { title: 'Website Forms', url: '/odoo/website/website-forms.html' },
       { title: 'Snippets & Building Blocks', url: '/odoo/website/snippets.html' },
       { title: 'eCommerce Basics', url: '/odoo/website/ecommerce-basics.html' },
+      { title: '📝 Section Quiz', url: '/odoo/website/quiz.html', badge: 'quiz' },
     ]},
     { title: '🛒 POS Development', items: [
       { title: 'POS Architecture', url: '/odoo/pos/pos-architecture.html' },
@@ -843,12 +847,14 @@
       { title: 'POS UI Components', url: '/odoo/pos/pos-ui-components.html' },
       { title: 'POS Payment Methods', url: '/odoo/pos/pos-payment.html' },
       { title: 'POS Receipts', url: '/odoo/pos/pos-receipts.html' },
+      { title: '📝 Section Quiz', url: '/odoo/pos/quiz.html', badge: 'quiz' },
     ]},
     { title: '🦉 OWL in Odoo', items: [
       { title: 'OWL in Odoo', url: '/odoo/owl/owl-in-odoo.html' },
       { title: 'OWL Components', url: '/odoo/owl/owl-components.html' },
       { title: 'OWL Services', url: '/odoo/owl/owl-services.html' },
       { title: 'Custom Field Widgets', url: '/odoo/owl/custom-widgets.html' },
+      { title: '📝 Section Quiz', url: '/odoo/owl/quiz.html', badge: 'quiz' },
     ]},
     { title: '🎨 Odoo Studio', items: [
       { title: 'What is Odoo Studio?', url: '/odoo/studio/what-is-studio.html' },
@@ -858,21 +864,25 @@
       { title: 'Automations in Studio', url: '/odoo/studio/studio-automations.html' },
       { title: 'Reports in Studio', url: '/odoo/studio/studio-reports.html' },
       { title: 'Studio vs Custom Module', url: '/odoo/studio/studio-vs-module.html' },
+      { title: '📝 Section Quiz', url: '/odoo/studio/quiz.html', badge: 'quiz' },
     ]},
     { title: '📊 Advanced Topics', items: [
       { title: 'Performance & Caching', url: '/odoo/advanced/performance-caching.html' },
       { title: 'Multi-company Setup', url: '/odoo/advanced/multi-company.html' },
       { title: 'Testing Odoo Modules', url: '/odoo/advanced/testing.html' },
       { title: 'Deployment', url: '/odoo/advanced/deployment.html' },
+      { title: '📝 Section Quiz', url: '/odoo/advanced/quiz.html', badge: 'quiz' },
     ]},
     { title: '🎯 Interview Prep', items: [
       { title: 'Interview Questions', url: '/odoo/interview/odoo-interview-questions.html', badge: 'hot' },
       { title: 'Advanced Interview Q&A', url: '/odoo/interview/odoo-advanced-interview.html' },
+      { title: '📝 Section Quiz', url: '/odoo/interview/quiz.html', badge: 'quiz' },
     ]},
     { title: '🛠️ Projects', items: [
       { title: 'Library Module Project', url: '/odoo/projects/library-module.html' },
       { title: 'eCommerce Extension', url: '/odoo/projects/ecommerce-extension.html' },
       { title: 'POS Loyalty Module', url: '/odoo/projects/pos-loyalty.html' },
+      { title: '📝 Section Quiz', url: '/odoo/projects/quiz.html', badge: 'quiz' },
     ]},
   ];
 
@@ -1217,6 +1227,131 @@
   }
 
   // ========================
+  // MCQ Section Quiz Page
+  // ========================
+  function initQuizPage() {
+    const root = document.getElementById('quiz-root');
+    if (!root || !window.QUIZ_DATA) return;
+    const { questions } = window.QUIZ_DATA;
+
+    // Auto-pick count: largest multiple of 5 ≥ 10 that fits available questions
+    function pickCount(total) {
+      const candidates = [25, 20, 15, 10].filter(n => n <= total);
+      return candidates[0] || total;
+    }
+
+    let shuffled = [], current = 0, userAnswers = [];
+    const lessonNav = document.getElementById('quiz-lesson-nav');
+
+    function showNav() { if (lessonNav) lessonNav.style.display = 'grid'; }
+    function hideNav() { if (lessonNav) lessonNav.style.display = 'none'; }
+
+    function renderIntro() {
+      const n = pickCount(questions.length);
+      const title = window.QUIZ_DATA.title || 'Section Quiz';
+      root.innerHTML = `
+        <div class="qp-intro">
+          <div class="qp-intro-icon">📝</div>
+          <h2 class="qp-intro-title">${title}</h2>
+          <p class="qp-intro-desc">Test your knowledge with <strong>${n} multiple-choice questions</strong>. Answer all questions, then submit to see your score and a full breakdown.</p>
+          <ul class="qp-intro-rules">
+            <li>⏱️ No time limit</li>
+            <li>✅ Select one answer per question</li>
+            <li>📊 Score revealed at the end</li>
+          </ul>
+          <button class="qp-start-btn">Take a Quiz →</button>
+        </div>`;
+      showNav();
+      root.querySelector('.qp-start-btn').addEventListener('click', startQuiz);
+    }
+
+    function startQuiz() {
+      const n = pickCount(questions.length);
+      shuffled = [...questions].sort(() => Math.random() - 0.5).slice(0, n);
+      userAnswers = new Array(n).fill(null);
+      current = 0;
+      hideNav();
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const q = shuffled[current];
+      const pct = (current / shuffled.length) * 100;
+      const selected = userAnswers[current];
+      root.innerHTML = `
+        <div class="qp-header">
+          <span>Question ${current + 1} of ${shuffled.length}</span>
+          <span>${shuffled.length} Questions</span>
+        </div>
+        <div class="qp-progress-bar"><div class="qp-progress-fill" style="width:${pct}%"></div></div>
+        <div class="qp-question-card">
+          <div class="qp-q-num">Q${current + 1}</div>
+          <p class="qp-question-text">${q.q}</p>
+          <div class="qp-options">${q.options.map((opt, i) =>
+            `<button class="qp-option${selected === i ? ' selected' : ''}" data-i="${i}">
+              <span class="qp-opt-label">${'ABCD'[i]}</span>
+              <span class="qp-opt-text">${opt}</span>
+            </button>`).join('')}
+          </div>
+        </div>
+        <div class="qp-nav-row">
+          ${current > 0 ? '<button class="qp-back-btn">← Back</button>' : '<span></span>'}
+          <button class="qp-next-btn"${selected === null ? ' disabled' : ''}>
+            ${current === shuffled.length - 1 ? 'Submit Quiz →' : 'Next →'}
+          </button>
+        </div>`;
+
+      root.querySelectorAll('.qp-option').forEach(btn => btn.addEventListener('click', () => {
+        userAnswers[current] = +btn.dataset.i;
+        root.querySelectorAll('.qp-option').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        root.querySelector('.qp-next-btn').removeAttribute('disabled');
+      }));
+
+      const nextBtn = root.querySelector('.qp-next-btn');
+      nextBtn.addEventListener('click', () => {
+        if (userAnswers[current] === null) return;
+        current++;
+        if (current < shuffled.length) renderQuestion(); else renderResults();
+      });
+
+      const backBtn = root.querySelector('.qp-back-btn');
+      if (backBtn) backBtn.addEventListener('click', () => { current--; renderQuestion(); });
+    }
+
+    function renderResults() {
+      const score = shuffled.reduce((acc, q, i) => acc + (userAnswers[i] === q.answer ? 1 : 0), 0);
+      const pct = Math.round((score / shuffled.length) * 100);
+      const grade = pct >= 80 ? '🎉 Excellent!' : pct >= 60 ? '👍 Good Job!' : '📚 Keep Studying!';
+
+      // Build per-question breakdown
+      const breakdown = shuffled.map((q, i) => {
+        const correct = userAnswers[i] === q.answer;
+        return `<div class="qp-breakdown-item ${correct ? 'correct' : 'wrong'}">
+          <span class="qp-bd-icon">${correct ? '✓' : '✗'}</span>
+          <div>
+            <div class="qp-bd-q">${q.q}</div>
+            ${!correct ? `<div class="qp-bd-ans">Correct: <strong>${q.options[q.answer]}</strong></div>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+
+      root.innerHTML = `<div class="qp-results">
+        <div class="qp-score-circle">${pct}<span style="font-size:0.55em">/100</span></div>
+        <h2>${grade}</h2>
+        <p>You answered <strong>${score} of ${shuffled.length}</strong> questions correctly.</p>
+        <button class="qp-retry-btn">↺ Retry Quiz</button>
+        <div class="qp-breakdown">${breakdown}</div>
+      </div>`;
+
+      showNav();
+      root.querySelector('.qp-retry-btn').addEventListener('click', renderIntro);
+    }
+
+    renderIntro();
+  }
+
+  // ========================
   // Quiz Flashcard
   // ========================
   function initQuiz() {
@@ -1487,6 +1622,7 @@
     injectAlgoridCredit();
     initShareButton();
     initQuiz();
+    initQuizPage();
 
     // Theme toggle button
     const themeBtn = document.getElementById('themeToggle');
