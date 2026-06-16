@@ -235,6 +235,7 @@
         { title: 'Type Conversion', url: '/javascript/beginner/type-conversion.html' },
         { title: 'User Input', url: '/javascript/beginner/user-input.html' },
         { title: 'Comments', url: '/javascript/beginner/comments.html' },
+        { title: '📝 Section Quiz', url: '/javascript/beginner/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -246,6 +247,7 @@
         { title: 'For Loop', url: '/javascript/control-flow/for-loop.html' },
         { title: 'While Loop', url: '/javascript/control-flow/while-loop.html' },
         { title: 'Break & Continue', url: '/javascript/control-flow/break-continue.html' },
+        { title: '📝 Section Quiz', url: '/javascript/control-flow/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -258,6 +260,7 @@
         { title: 'Scope', url: '/javascript/functions/scope.html' },
         { title: 'Closures', url: '/javascript/functions/closures.html' },
         { title: 'Higher-Order Functions', url: '/javascript/functions/higher-order-functions.html' },
+        { title: '📝 Section Quiz', url: '/javascript/functions/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -269,6 +272,7 @@
         { title: 'Destructuring', url: '/javascript/data-structures/destructuring.html' },
         { title: 'Spread & Rest', url: '/javascript/data-structures/spread-rest.html' },
         { title: 'Array Methods', url: '/javascript/data-structures/array-methods.html' },
+        { title: '📝 Section Quiz', url: '/javascript/data-structures/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -281,6 +285,7 @@
         { title: 'Date & Time', url: '/javascript/intermediate/date-time.html' },
         { title: 'Regular Expressions', url: '/javascript/intermediate/regex.html' },
         { title: 'Local Storage', url: '/javascript/intermediate/local-storage.html' },
+        { title: '📝 Section Quiz', url: '/javascript/intermediate/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -292,6 +297,7 @@
         { title: 'Encapsulation', url: '/javascript/oop/encapsulation.html' },
         { title: 'Polymorphism', url: '/javascript/oop/polymorphism.html' },
         { title: 'Prototypes', url: '/javascript/oop/prototypes.html' },
+        { title: '📝 Section Quiz', url: '/javascript/oop/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -304,6 +310,7 @@
         { title: 'Generators & Iterators', url: '/javascript/advanced/generators.html' },
         { title: 'Proxy & Reflect', url: '/javascript/advanced/proxy-reflect.html' },
         { title: 'Symbols', url: '/javascript/advanced/symbols.html' },
+        { title: '📝 Section Quiz', url: '/javascript/advanced/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -316,6 +323,7 @@
         { title: 'Fetch API', url: '/javascript/dom/fetch-api.html' },
         { title: 'AJAX', url: '/javascript/dom/ajax.html' },
         { title: 'Web Storage', url: '/javascript/dom/web-storage.html' },
+        { title: '📝 Section Quiz', url: '/javascript/dom/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -324,6 +332,7 @@
         { title: 'React', url: '/javascript/frameworks/react.html', badge: 'hot' },
         { title: 'Vue.js', url: '/javascript/frameworks/vue.html' },
         { title: 'Node.js', url: '/javascript/frameworks/nodejs.html', badge: 'hot' },
+        { title: '📝 Section Quiz', url: '/javascript/frameworks/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -332,6 +341,7 @@
         { title: 'Interview Questions', url: '/javascript/interview/questions.html', badge: 'hot' },
         { title: 'Coding Challenges', url: '/javascript/interview/coding-challenges.html' },
         { title: 'Practical Exercises', url: '/javascript/interview/exercises.html' },
+        { title: '📝 Section Quiz', url: '/javascript/interview/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -343,6 +353,7 @@
         { title: 'Quiz App', url: '/javascript/projects/quiz-app.html' },
         { title: 'Expense Tracker', url: '/javascript/projects/expense-tracker.html' },
         { title: 'Memory Game', url: '/javascript/projects/memory-game.html' },
+        { title: '📝 Section Quiz', url: '/javascript/projects/quiz.html', badge: 'quiz' },
       ]
     },
   ];
