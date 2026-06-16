@@ -1392,7 +1392,7 @@
 
     const triggerBtn = document.createElement('button');
     triggerBtn.className = 'quiz-trigger-btn';
-    triggerBtn.innerHTML = '📝 Take a Quiz';
+    triggerBtn.innerHTML = '📝 Test Your Knowledge';
     triggerWrap.appendChild(triggerBtn);
     faqSection.after(quizAnchor);
 
@@ -1401,7 +1401,7 @@
     if (tocList) {
       const li = document.createElement('li');
       li.className = 'toc-quiz-entry';
-      li.innerHTML = '<a href="#quiz-section">📝 Take a Quiz</a>';
+      li.innerHTML = '<a href="#quiz-section">📝 Test Your Knowledge</a>';
       tocList.appendChild(li);
     }
 
@@ -1412,7 +1412,7 @@
     overlay.innerHTML = `
       <div class="quiz-card" role="dialog" aria-modal="true" aria-label="Quiz flashcard">
         <div class="quiz-card-header">
-          <span class="quiz-label">📝 Quiz</span>
+          <span class="quiz-label">📝 Test Your Knowledge</span>
           <span class="quiz-counter">1 / ${questions.length}</span>
           <button class="quiz-close-btn" aria-label="Close quiz">✕</button>
         </div>
