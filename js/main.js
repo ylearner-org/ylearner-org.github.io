@@ -68,6 +68,7 @@
         { title: 'Numbers', url: '/python/beginner/numbers.html' },
         { title: 'Comments', url: '/python/beginner/comments.html' },
         { title: 'Type Conversion', url: '/python/beginner/type-conversion.html' },
+        { title: '📝 Section Quiz', url: '/python/beginner/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -79,6 +80,7 @@
         { title: 'For Loop', url: '/python/control-flow/for-loop.html' },
         { title: 'While Loop', url: '/python/control-flow/while-loop.html' },
         { title: 'Break & Continue', url: '/python/control-flow/break-continue-pass.html' },
+        { title: '📝 Section Quiz', url: '/python/control-flow/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -90,6 +92,7 @@
         { title: 'Lambda Functions', url: '/python/functions/lambda.html' },
         { title: 'Scope', url: '/python/functions/scope.html' },
         { title: 'Recursion', url: '/python/functions/recursion.html' },
+        { title: '📝 Section Quiz', url: '/python/functions/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -101,6 +104,7 @@
         { title: 'Dictionaries', url: '/python/data-structures/dictionaries.html' },
         { title: 'List Comprehensions', url: '/python/data-structures/list-comprehensions.html' },
         { title: 'Dict Comprehensions', url: '/python/data-structures/dict-comprehensions.html' },
+        { title: '📝 Section Quiz', url: '/python/data-structures/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -114,6 +118,7 @@
         { title: 'JSON', url: '/python/intermediate/json.html' },
         { title: 'CSV Files', url: '/python/intermediate/csv.html' },
         { title: 'Virtual Environments', url: '/python/intermediate/virtual-environments.html' },
+        { title: '📝 Section Quiz', url: '/python/intermediate/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -126,6 +131,7 @@
         { title: 'Polymorphism', url: '/python/oop/polymorphism.html' },
         { title: 'Abstraction', url: '/python/oop/abstraction.html' },
         { title: 'Magic Methods', url: '/python/oop/magic-methods.html' },
+        { title: '📝 Section Quiz', url: '/python/oop/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -140,6 +146,7 @@
         { title: 'Async Programming', url: '/python/advanced/async.html' },
         { title: 'Type Hinting', url: '/python/advanced/type-hinting.html' },
         { title: 'Dataclasses', url: '/python/advanced/dataclasses.html' },
+        { title: '📝 Section Quiz', url: '/python/advanced/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -153,6 +160,7 @@
         { title: 'Logging', url: '/python/real-world/logging.html' },
         { title: 'Testing', url: '/python/real-world/testing.html' },
         { title: 'Debugging', url: '/python/real-world/debugging.html' },
+        { title: '📝 Section Quiz', url: '/python/real-world/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -161,6 +169,7 @@
         { title: 'Flask', url: '/python/frameworks/flask.html', badge: 'hot' },
         { title: 'Django', url: '/python/frameworks/django.html' },
         { title: 'FastAPI', url: '/python/frameworks/fastapi.html', badge: 'new' },
+        { title: '📝 Section Quiz', url: '/python/frameworks/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -171,6 +180,7 @@
         { title: 'Matplotlib', url: '/python/data-science/matplotlib.html' },
         { title: 'Seaborn', url: '/python/data-science/seaborn.html' },
         { title: 'Machine Learning Intro', url: '/python/data-science/machine-learning.html' },
+        { title: '📝 Section Quiz', url: '/python/data-science/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -179,6 +189,7 @@
         { title: 'Interview Questions', url: '/python/interview/questions.html', badge: 'hot' },
         { title: 'Coding Challenges', url: '/python/interview/coding-challenges.html' },
         { title: 'Practical Exercises', url: '/python/interview/exercises.html' },
+        { title: '📝 Section Quiz', url: '/python/interview/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -192,6 +203,7 @@
         { title: 'Web Scraper', url: '/python/projects/web-scraper.html' },
         { title: 'API Project', url: '/python/projects/api-project.html' },
         { title: 'Full Stack Project', url: '/python/projects/full-stack.html' },
+        { title: '📝 Section Quiz', url: '/python/projects/quiz.html', badge: 'quiz' },
       ]
     },
   ];
