@@ -481,6 +481,7 @@
         { title: 'Images', url: '/html/beginner/images.html' },
         { title: 'HTML Comments', url: '/html/beginner/comments.html' },
         { title: 'HTML Entities', url: '/html/beginner/entities.html' },
+        { title: '📝 Section Quiz', url: '/html/beginner/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -492,6 +493,7 @@
         { title: 'HTML Tables', url: '/html/core-elements/tables.html' },
         { title: 'HTML Attributes', url: '/html/core-elements/attributes.html' },
         { title: 'HTML Classes & IDs', url: '/html/core-elements/classes-ids.html' },
+        { title: '📝 Section Quiz', url: '/html/core-elements/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -503,6 +505,7 @@
         { title: 'Buttons', url: '/html/forms/buttons.html' },
         { title: 'Select & Textarea', url: '/html/forms/select-textarea.html' },
         { title: 'Fieldset & Legend', url: '/html/forms/fieldset-legend.html' },
+        { title: '📝 Section Quiz', url: '/html/forms/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -513,6 +516,7 @@
         { title: 'Main, Article, Section', url: '/html/semantic/main-article-section.html' },
         { title: 'Aside & Figure', url: '/html/semantic/aside-figure.html' },
         { title: 'HTML5 New Elements', url: '/html/semantic/html5-elements.html' },
+        { title: '📝 Section Quiz', url: '/html/semantic/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -523,6 +527,7 @@
         { title: 'HTML Canvas', url: '/html/advanced/canvas.html' },
         { title: 'HTML Video & Audio', url: '/html/advanced/video-audio.html' },
         { title: 'Iframe', url: '/html/advanced/iframe.html' },
+        { title: '📝 Section Quiz', url: '/html/advanced/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -530,6 +535,7 @@
       items: [
         { title: 'HTML Interview Questions', url: '/html/interview/questions.html', badge: 'hot' },
         { title: 'HTML Exercises', url: '/html/interview/exercises.html' },
+        { title: '📝 Section Quiz', url: '/html/interview/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -539,6 +545,7 @@
         { title: 'Landing Page', url: '/html/projects/landing-page.html' },
         { title: 'Registration Form', url: '/html/projects/registration-form.html' },
         { title: 'HTML Email Template', url: '/html/projects/email-template.html' },
+        { title: '📝 Section Quiz', url: '/html/projects/quiz.html', badge: 'quiz' },
       ]
     },
   ];
