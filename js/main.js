@@ -20,7 +20,8 @@
       'intermediate','oop','advanced','real-world','frameworks','data-science','interview','projects','dom',
       'getting-started','core','lifecycle','templates','odoo',
       'core-elements','forms','semantic','selectors','layout','responsive','effects',
-      'intro','basics','tables','filtering','joins','grouping','subqueries','dml'];
+      'intro','basics','tables','filtering','joins','grouping','subqueries','dml',
+      'branching','remotes','workflows'];
     const isDepth2 = depth2Folders.some(f => path.includes('/' + f + '/'));
     const isDepth1 = !isDepth2 && ['/python/','/javascript/','/c/','/cpp/','/java/','/sql/','/owljs/','/html/','/csslessons/'].some(s => path.includes(s));
     if (isDepth2) parts.splice(-2);
@@ -652,6 +653,7 @@
         { title: 'Git vs GitHub vs GitLab', url: '/git/git-vs-github.html' },
         { title: 'Installing & Configuring Git', url: '/git/git-installation.html' },
         { title: 'How Git Thinks (Mental Model)', url: '/git/git-mental-model.html' },
+        { title: '📝 Section Quiz', url: '/git/intro/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -662,6 +664,7 @@
         { title: 'git status & git log', url: '/git/basics/status-log.html' },
         { title: 'Undoing Changes', url: '/git/basics/undoing-changes.html' },
         { title: 'Viewing Diffs (git diff)', url: '/git/basics/viewing-diffs.html' },
+        { title: '📝 Section Quiz', url: '/git/basics/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -672,6 +675,7 @@
         { title: 'Merging Branches', url: '/git/branching/merging.html' },
         { title: 'Resolving Merge Conflicts', url: '/git/branching/merge-conflicts.html' },
         { title: 'Rebasing (git rebase)', url: '/git/branching/rebase.html' },
+        { title: '📝 Section Quiz', url: '/git/branching/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -681,6 +685,7 @@
         { title: 'Push, Pull & Fetch', url: '/git/remotes/push-pull-fetch.html' },
         { title: 'GitHub PR Workflow', url: '/git/remotes/github-workflow.html' },
         { title: 'SSH Keys & Auth', url: '/git/remotes/ssh-keys.html' },
+        { title: '📝 Section Quiz', url: '/git/remotes/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -691,6 +696,7 @@
         { title: 'Cherry-pick', url: '/git/advanced/cherry-pick.html' },
         { title: 'Bisect & Blame', url: '/git/advanced/git-bisect.html' },
         { title: 'Git Hooks', url: '/git/advanced/git-hooks.html' },
+        { title: '📝 Section Quiz', url: '/git/advanced/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -700,6 +706,7 @@
         { title: 'Feature Branch Workflow', url: '/git/workflows/feature-branch-workflow.html' },
         { title: 'Conventional Commits', url: '/git/workflows/conventional-commits.html' },
         { title: '.gitignore & .gitattributes', url: '/git/workflows/gitignore.html' },
+        { title: '📝 Section Quiz', url: '/git/workflows/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -707,6 +714,7 @@
       items: [
         { title: 'Git Interview Questions', url: '/git/interview/questions.html', badge: 'hot' },
         { title: 'Practical Exercises', url: '/git/interview/exercises.html' },
+        { title: '📝 Section Quiz', url: '/git/interview/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -715,6 +723,7 @@
         { title: 'Version Your First Project', url: '/git/projects/version-your-project.html' },
         { title: 'Simulate Team Collaboration', url: '/git/projects/team-workflow.html' },
         { title: 'Open Source Contribution', url: '/git/projects/open-source-contribution.html' },
+        { title: '📝 Section Quiz', url: '/git/projects/quiz.html', badge: 'quiz' },
       ]
     },
   ];

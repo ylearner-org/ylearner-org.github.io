@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git Interview Prep Quiz – Test Your Knowledge | ylearner</title>
+  <meta name="description" content="Test your Git interview readiness with 25 questions on tricky Git scenarios, reset vs revert, reflog, detached HEAD, rebasing safely, and common interview patterns.">
+  <meta name="keywords" content="git interview quiz, git interview questions test, git advanced scenarios quiz, git tricky questions">
+  <link rel="canonical" href="https://ylearner.org/git/interview/quiz.html">
+  <meta property="og:title" content="Git Interview Prep Quiz – Test Your Knowledge | ylearner">
+  <meta property="og:description" content="25-question Git interview prep quiz covering reset vs revert, reflog, detached HEAD, rebase safety, and common interview scenarios.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/git/interview/quiz.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Git Interview Prep Quiz – Test Your Knowledge | ylearner">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+  <script>
+  window.QUIZ_DATA = {
+    title: "Git Interview Prep Quiz",
+    questions: [
+      { q: "What is the difference between <code>git reset --soft</code>, <code>--mixed</code>, and <code>--hard</code>?", options: ["They are identical except for speed", "--soft undoes the commit but keeps changes staged; --mixed undoes commit and unstages changes (keeps in WD); --hard discards everything", "--soft is for files; --mixed is for commits; --hard is for branches", "--hard is the default; --soft and --mixed are the same"], answer: 1 },
+      { q: "What does <code>git revert</code> do that makes it safe for shared branches?", options: ["It is faster than git reset", "It creates a new commit that undoes changes without rewriting existing history — other developers can still pull safely", "It only affects files not yet pushed", "It requires approval from other developers"], answer: 1 },
+      { q: "How would you recover from accidentally running <code>git reset --hard HEAD~3</code>?", options: ["The commits are permanently lost", "Run git reflog to find the lost commits, then git reset --hard &lt;hash&gt; or git cherry-pick to restore them", "Run git revert HEAD~3", "Run git reset --undo"], answer: 1 },
+      { q: "What is a detached HEAD state and when does it occur?", options: ["A corrupted HEAD file", "When you checkout a specific commit (or tag) instead of a branch — HEAD points to a commit, not a branch. New commits won't be on any branch.", "When HEAD is deleted", "When two branches point to the same commit"], answer: 1 },
+      { q: "How do you safely exit a detached HEAD state with your new commits?", options: ["They are lost when you checkout a branch", "Create a new branch: git branch new-branch — then your commits are saved on that branch", "Run git attach HEAD", "Run git reattach"], answer: 1 },
+      { q: "What does <code>git reflog</code> track?", options: ["All commits ever made in the repo", "All HEAD movements (including resets, checkouts, commits) for the past 90 days — lets you recover "lost" commits", "All remote push events", "All stash operations only"], answer: 1 },
+      { q: "You accidentally merged the wrong branch. How do you undo the merge on a shared branch?", options: ["git reset --hard HEAD~1 (dangerous on shared branches)", "git revert -m 1 HEAD (creates a revert of the merge commit, preserving history)", "git merge --undo", "git branch --delete-merge"], answer: 1 },
+      { q: "What is the difference between <code>git merge</code> and <code>git rebase</code> in terms of resulting history?", options: ["They are identical", "merge preserves branch topology with a merge commit; rebase creates a linear history by replaying commits — no merge commit", "merge is for local; rebase is for remote", "rebase always creates fewer commits"], answer: 1 },
+      { q: "What does "rewriting history" mean and why is it dangerous on shared branches?", options: ["Editing the README file", "Changing commit SHAs (via reset, rebase, amend) — other developers who have built on the old SHAs will have diverged histories and conflicts on next pull", "Deleting old log files", "Renaming branches"], answer: 1 },
+      { q: "How do you find which commit introduced a specific bug using Git?", options: ["git search "bug description"", "git bisect — binary search through commits marking each as good or bad to narrow down the culprit commit", "git blame --all", "git log --find-bug"], answer: 1 },
+      { q: "What does <code>git log --author="Alice"</code> show?", options: ["All commits mentioning Alice in the message", "All commits authored by Alice", "Commits that Alice approved", "All commits after Alice's first commit"], answer: 1 },
+      { q: "You made 5 messy commits on a feature branch. Before merging to main, you want to combine them into one clean commit. How?", options: ["git merge --squash", "git rebase -i HEAD~5 and squash/fixup the commits, or git merge --squash when merging the PR", "git commit --combine 5", "git squash HEAD~5"], answer: 1 },
+      { q: "What does <code>git log --grep="fix"</code> do?", options: ["Searches file contents for "fix"", "Filters the commit log to show only commits whose message contains "fix"", "Searches branch names for "fix"", "Finds all bug fix commits automatically"], answer: 1 },
+      { q: "What is <code>git shortlog -sn</code> useful for?", options: ["Showing a short git log", "Showing a summary of commit counts per author — sorted by number of commits", "Showing the last commit only", "Showing commits without messages"], answer: 1 },
+      { q: "What happens when you push to a branch after rebasing it (changing its history)?", options: ["The push succeeds normally", "The push is rejected because the remote history has diverged — you need git push --force-with-lease (with caution on shared branches)", "Git automatically merges", "The rebase is undone"], answer: 1 },
+      { q: "What does <code>git stash -u</code> (or <code>--include-untracked</code>) do differently from plain <code>git stash</code>?", options: ["Stashes only untracked files", "Stashes tracked changes AND untracked (new, not yet added) files", "Stashes staged files only", "Makes stash permanent"], answer: 1 },
+      { q: "How would you apply a single commit from a release branch to your hotfix branch?", options: ["git merge the release branch", "git cherry-pick &lt;commit-hash&gt;", "git rebase --onto", "git patch apply"], answer: 1 },
+      { q: "What is the purpose of <code>git tag -v &lt;tagname&gt;</code>?", options: ["Creates a verbose tag", "Verifies the GPG signature on an annotated tag", "Lists all tags with verbose output", "Deletes a verified tag"], answer: 1 },
+      { q: "What does <code>git diff HEAD~2 HEAD</code> show?", options: ["The diff between 2 branches", "The cumulative diff between 2 commits ago and the current HEAD (the net changes of the last 2 commits)", "The diff of only the second-to-last commit", "The diff between HEAD and the remote"], answer: 1 },
+      { q: "What is a "monorepo" in the context of Git?", options: ["A repository with only one file", "A single Git repository containing multiple projects or services — enables atomic cross-project commits but requires tooling to manage scale", "A private repository", "A repository with a single branch"], answer: 1 },
+      { q: "Why is <code>git push --force</code> dangerous on a shared branch?", options: ["It is always slow", "It overwrites the remote history — if others have pulled the old commits, their local history diverges and they will have conflicts on next pull", "It requires admin rights", "It only affects the last commit"], answer: 1 },
+      { q: "What does <code>git clean -fd</code> do?", options: ["Removes all stashed changes", "Removes untracked files (-f) and untracked directories (-d) from the working directory — permanent, cannot be recovered with git commands", "Cleans up the .git folder", "Deletes all branches"], answer: 1 },
+      { q: "How do you see what changed in a specific file over the last 10 commits?", options: ["git diff --file 10", "git log -p -10 -- path/to/file", "git blame --history 10 path/to/file", "git show --file path/to/file HEAD~10"], answer: 1 },
+      { q: "What is the purpose of <code>git bisect run &lt;script&gt;</code>?", options: ["Runs a script after each commit", "Automates git bisect — runs a test script on each candidate commit and marks it good/bad automatically based on exit code", "Runs CI checks", "Generates a bisect report"], answer: 1 },
+      { q: "What does <code>git archive --format=zip HEAD</code> do?", options: ["Archives the .git folder", "Creates a ZIP file of the project at HEAD without the .git folder — useful for creating a clean release archive", "Backs up the entire repository", "Compresses the commit history"], answer: 1 }
+    ]
+  };
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/git/interview/questions.html">Interview Prep</a><span class="separator">›</span><span class="current">Section Quiz</span>
+        </nav>
+        <div id="quiz-root" class="quiz-page-root"></div>
+        <nav class="lesson-nav" id="quiz-lesson-nav" aria-label="Lesson navigation" style="display:none">
+          <a href="/git/interview/exercises.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Practical Exercises</span>
+          </a>
+          <a href="/git/projects/version-your-project.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Version Your First Project</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
