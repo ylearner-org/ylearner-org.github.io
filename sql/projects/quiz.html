@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Projects Quiz – Test Your Knowledge | ylearner</title>
+  <meta name="description" content="Test your SQL projects knowledge with 25 questions on database design, schema decisions, query patterns, and real-world SQL applications.">
+  <meta name="keywords" content="sql projects quiz, sql database design quiz, sql schema quiz, sql real world quiz, sql capstone test">
+  <link rel="canonical" href="https://ylearner.org/sql/projects/quiz.html">
+  <meta property="og:title" content="SQL Projects Quiz – Test Your Knowledge | ylearner">
+  <meta property="og:description" content="25-question SQL projects quiz covering database design, schema decisions, query patterns, and real-world applications.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/projects/quiz.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL Projects Quiz – Test Your Knowledge | ylearner">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+  <script>
+  window.QUIZ_DATA = {
+    title: "SQL Projects Quiz",
+    questions: [
+      { q: "In a library database, which relationship best models books and authors (a book can have multiple authors, an author can write multiple books)?", options: ["One-to-One", "One-to-Many from books to authors", "Many-to-Many requiring a junction table (book_authors)", "Embedding authors inside the books table"], answer: 2 },
+      { q: "What is a junction table (bridge table)?", options: ["A table storing temporary query results", "A table that resolves a many-to-many relationship by holding foreign keys from both related tables", "The primary table in any schema", "A denormalized view of two tables"], answer: 1 },
+      { q: "In a library schema, what information would the <code>loans</code> table typically contain?", options: ["Only the book title and member name", "Foreign keys to members and books, plus loan_date and due_date", "A copy of the entire book and member record", "Only the loan amount"], answer: 1 },
+      { q: "How would you find all overdue books in a library database (due_date < today, not returned)?", options: ["SELECT * FROM loans WHERE overdue = TRUE", "SELECT * FROM loans WHERE due_date < CURRENT_DATE AND return_date IS NULL", "SELECT * FROM loans WHERE return_date > due_date", "SELECT * FROM books WHERE overdue = 1"], answer: 1 },
+      { q: "In an e-commerce schema, which tables are typically needed for a complete order?", options: ["orders only", "customers, orders, order_items, and products", "users and products only", "orders and payments only"], answer: 1 },
+      { q: "What is the purpose of an <code>order_items</code> table in an e-commerce schema?", options: ["Store customer addresses", "Store each product line within an order (quantity, price at time of purchase, product reference)", "Track payment methods", "Log user sessions"], answer: 1 },
+      { q: "Why store <code>price_at_purchase</code> in <code>order_items</code> instead of always referencing the current product price?", options: ["Because product prices never change", "To preserve the historical price at time of purchase — product prices change over time", "To avoid a JOIN with the products table", "Because foreign keys cannot reference price columns"], answer: 1 },
+      { q: "Which query finds the top 5 best-selling products by total quantity sold?", options: ["SELECT product_id, SUM(quantity) FROM order_items GROUP BY product_id ORDER BY SUM(quantity) DESC LIMIT 5", "SELECT product_id, COUNT(*) FROM orders ORDER BY COUNT(*) DESC LIMIT 5", "SELECT TOP 5 products FROM order_items", "SELECT product_id FROM order_items WHERE rank <= 5"], answer: 0 },
+      { q: "In analytics queries, what does a funnel analysis typically measure?", options: ["The shape of the database schema", "The conversion rates between sequential steps (e.g., visit → signup → purchase)", "A JOIN of funnel-shaped tables", "The performance of nested queries"], answer: 1 },
+      { q: "What query pattern finds monthly revenue from an orders table?", options: ["SELECT EXTRACT(MONTH FROM order_date), SUM(total) FROM orders GROUP BY EXTRACT(MONTH FROM order_date)", "SELECT SUM(total) FROM orders WHERE month > 0", "SELECT total FROM orders GROUP BY month", "SELECT MONTH, total FROM orders WHERE GROUP BY month"], answer: 0 },
+      { q: "What is a star schema in data warehousing?", options: ["A schema with one central fact table surrounded by dimension tables", "A schema with many interconnected tables of equal importance", "A schema using only star-shaped joins", "A schema for storing star ratings"], answer: 0 },
+      { q: "What is the difference between an OLTP and OLAP database?", options: ["OLTP is for online use; OLAP is for offline use", "OLTP is optimized for transactional operations (INSERT/UPDATE/DELETE); OLAP is optimized for analytical queries (complex SELECT with aggregations)", "OLAP always uses NoSQL; OLTP always uses SQL", "They are the same"], answer: 1 },
+      { q: "How would you query the number of books each member has currently borrowed (not yet returned)?", options: ["SELECT member_id, COUNT(*) FROM members GROUP BY member_id", "SELECT member_id, COUNT(*) FROM loans WHERE return_date IS NULL GROUP BY member_id", "SELECT * FROM loans WHERE active = 1", "SELECT member_id, SUM(books) FROM loans"], answer: 1 },
+      { q: "Which constraint ensures a member cannot borrow more than 5 books simultaneously?", options: ["A CHECK constraint on the loans table", "A TRIGGER that checks the count of active loans per member before INSERT", "CHECK constraints cannot count rows — a trigger or application-level check is needed", "A UNIQUE constraint on member_id in loans"], answer: 1 },
+      { q: "What does a cohort analysis query typically GROUP BY?", options: ["Product category", "User signup month/period to compare behavior of different user cohorts over time", "Geography", "Device type"], answer: 1 },
+      { q: "In an e-commerce schema, how would you find customers who have never placed an order?", options: ["SELECT * FROM customers WHERE orders = 0", "SELECT c.* FROM customers c LEFT JOIN orders o ON c.id = o.customer_id WHERE o.id IS NULL", "SELECT * FROM customers WHERE NOT EXISTS orders", "SELECT * FROM customers MINUS SELECT customer_id FROM orders"], answer: 1 },
+      { q: "What is the purpose of the <code>categories</code> table in a product schema?", options: ["Store price ranges", "Classify products into groups — allows querying sales by category without repeating category data in every product row", "Store shipping categories", "Track product inventory levels"], answer: 1 },
+      { q: "How would you calculate the average time a book is borrowed in a library database?", options: ["AVG(due_date) FROM loans", "AVG(return_date - loan_date) FROM loans WHERE return_date IS NOT NULL", "COUNT(return_date) / COUNT(loan_date)", "SUM(loan_duration) / COUNT(*)"], answer: 1 },
+      { q: "Which query finds products that have never been ordered?", options: ["SELECT * FROM products WHERE ordered = FALSE", "SELECT p.* FROM products p LEFT JOIN order_items oi ON p.id = oi.product_id WHERE oi.product_id IS NULL", "SELECT * FROM products WHERE id NOT IN orders", "SELECT p.* FROM products p WHERE orders = 0"], answer: 1 },
+      { q: "What is an analytics query pattern for year-over-year growth?", options: ["Subtract current year total from last year total", "(current_year - last_year) / last_year * 100 — requires joining or self-joining the aggregated data by year", "SUM(growth) FROM yearly_summary", "GROUP BY year ORDER BY year DESC LIMIT 2"], answer: 1 },
+      { q: "What does the <code>inventory</code> table in an e-commerce schema typically track?", options: ["Product prices over time", "Quantity in stock, warehouse location, and reorder thresholds per product/SKU", "Customer purchase history", "Shipping carrier rates"], answer: 1 },
+      { q: "How would you find the most popular genre in a library database?", options: ["SELECT genre FROM books ORDER BY RANDOM() LIMIT 1", "SELECT genre, COUNT(l.book_id) AS borrows FROM books b JOIN loans l ON b.id = l.book_id GROUP BY genre ORDER BY borrows DESC LIMIT 1", "SELECT MAX(genre) FROM loans", "SELECT genre FROM genres WHERE popular = 1"], answer: 1 },
+      { q: "What query shows each product's sales as a percentage of total sales?", options: ["SELECT product_id, SUM(quantity * price) / (SELECT SUM(quantity * price) FROM order_items) * 100 FROM order_items GROUP BY product_id", "SELECT product_id, sales / total FROM order_items", "SELECT product_id, PERCENT(sales) FROM order_items GROUP BY product_id", "SELECT product_id, SUM(quantity * price) FROM order_items"], answer: 0 },
+      { q: "In a normalized e-commerce schema, where should a customer's address be stored?", options: ["Repeated in every order row", "In a separate addresses table linked to the customer, with orders referencing the address at time of purchase", "In the products table", "In the order_items table"], answer: 1 },
+      { q: "What is the recommended approach for reporting queries that are too slow on a production OLTP database?", options: ["Add more indexes to all tables", "Run reports on a read replica, data warehouse, or use materialized views to avoid slowing the OLTP system", "Increase the LIMIT on all queries", "Use DELETE to remove old data before reporting"], answer: 1 }
+    ]
+  };
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header">Ad – 728×90</div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/sql/projects/library-database.html">Projects</a><span class="separator">›</span><span class="current">Section Quiz</span>
+        </nav>
+        <div id="quiz-root" class="quiz-page-root"></div>
+        <nav class="lesson-nav" id="quiz-lesson-nav" aria-label="Lesson navigation" style="display:none">
+          <a href="/sql/projects/analytics-queries.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Analytics Queries</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer">Ad – 728×90</div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box">Ad – 250×250</div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

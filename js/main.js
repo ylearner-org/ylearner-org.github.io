@@ -19,7 +19,8 @@
     const depth2Folders = ['beginner','control-flow','functions','data-structures',
       'intermediate','oop','advanced','real-world','frameworks','data-science','interview','projects','dom',
       'getting-started','core','lifecycle','templates','odoo',
-      'core-elements','forms','semantic','selectors','layout','responsive','effects'];
+      'core-elements','forms','semantic','selectors','layout','responsive','effects',
+      'intro','basics','tables','filtering','joins','grouping','subqueries','dml'];
     const isDepth2 = depth2Folders.some(f => path.includes('/' + f + '/'));
     const isDepth1 = !isDepth2 && ['/python/','/javascript/','/c/','/cpp/','/java/','/sql/','/owljs/','/html/','/csslessons/'].some(s => path.includes(s));
     if (isDepth2) parts.splice(-2);
@@ -730,6 +731,7 @@
         { title: 'SQL vs NoSQL', url: '/sql/sql-vs-nosql.html' },
         { title: 'Database Concepts', url: '/sql/database-concepts.html' },
         { title: 'SQL Installation & Setup', url: '/sql/sql-installation.html' },
+        { title: '📝 Section Quiz', url: '/sql/intro/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -741,6 +743,7 @@
         { title: 'LIMIT & OFFSET', url: '/sql/basics/limit-offset.html' },
         { title: 'DISTINCT', url: '/sql/basics/distinct.html' },
         { title: 'Aliases (AS)', url: '/sql/basics/aliases.html' },
+        { title: '📝 Section Quiz', url: '/sql/basics/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -751,6 +754,7 @@
         { title: 'ALTER TABLE', url: '/sql/tables/alter-table.html' },
         { title: 'DROP TABLE', url: '/sql/tables/drop-table.html' },
         { title: 'Constraints', url: '/sql/tables/constraints.html' },
+        { title: '📝 Section Quiz', url: '/sql/tables/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -760,6 +764,7 @@
         { title: 'Logical Operators (AND, OR, NOT)', url: '/sql/filtering/logical-operators.html' },
         { title: 'LIKE & Pattern Matching', url: '/sql/filtering/like-pattern.html' },
         { title: 'BETWEEN & IN', url: '/sql/filtering/between-in.html' },
+        { title: '📝 Section Quiz', url: '/sql/filtering/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -771,6 +776,7 @@
         { title: 'Aggregate Functions', url: '/sql/functions/aggregate-functions.html' },
         { title: 'NULL Handling', url: '/sql/functions/null-functions.html' },
         { title: 'CASE Expression', url: '/sql/functions/case-expression.html' },
+        { title: '📝 Section Quiz', url: '/sql/functions/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -782,6 +788,7 @@
         { title: 'FULL OUTER JOIN', url: '/sql/joins/full-outer-join.html' },
         { title: 'Self Join', url: '/sql/joins/self-join.html' },
         { title: 'CROSS JOIN', url: '/sql/joins/cross-join.html' },
+        { title: '📝 Section Quiz', url: '/sql/joins/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -791,6 +798,7 @@
         { title: 'HAVING Clause', url: '/sql/grouping/having-clause.html' },
         { title: 'ROLLUP & CUBE', url: '/sql/grouping/rollup-cube.html' },
         { title: 'Window Functions', url: '/sql/grouping/window-functions.html', badge: 'hot' },
+        { title: '📝 Section Quiz', url: '/sql/grouping/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -800,6 +808,7 @@
         { title: 'Correlated Subqueries', url: '/sql/subqueries/correlated-subqueries.html' },
         { title: 'EXISTS & IN', url: '/sql/subqueries/exists-in.html' },
         { title: 'CTEs (WITH clause)', url: '/sql/subqueries/cte-with.html' },
+        { title: '📝 Section Quiz', url: '/sql/subqueries/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -810,6 +819,7 @@
         { title: 'DELETE Data', url: '/sql/dml/delete-data.html' },
         { title: 'Transactions', url: '/sql/dml/transactions.html' },
         { title: 'UPSERT (ON CONFLICT)', url: '/sql/dml/upsert.html' },
+        { title: '📝 Section Quiz', url: '/sql/dml/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -820,6 +830,7 @@
         { title: 'Stored Procedures', url: '/sql/advanced/stored-procedures.html' },
         { title: 'Triggers', url: '/sql/advanced/triggers.html' },
         { title: 'Normalization', url: '/sql/advanced/normalization.html' },
+        { title: '📝 Section Quiz', url: '/sql/advanced/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -827,6 +838,7 @@
       items: [
         { title: 'SQL Interview Questions', url: '/sql/interview/questions.html', badge: 'hot' },
         { title: 'SQL Exercises', url: '/sql/interview/exercises.html' },
+        { title: '📝 Section Quiz', url: '/sql/interview/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -835,6 +847,7 @@
         { title: 'Library Database', url: '/sql/projects/library-database.html' },
         { title: 'E-Commerce Schema', url: '/sql/projects/ecommerce-schema.html' },
         { title: 'Analytics Queries', url: '/sql/projects/analytics-queries.html' },
+        { title: '📝 Section Quiz', url: '/sql/projects/quiz.html', badge: 'quiz' },
       ]
     },
   ];
