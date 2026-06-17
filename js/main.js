@@ -573,6 +573,7 @@
         { title: 'CSS Box Model', url: '/csslessons/selectors/box-model.html' },
         { title: 'CSS Margin & Padding', url: '/csslessons/selectors/margin-padding.html' },
         { title: 'CSS Borders', url: '/csslessons/selectors/borders.html' },
+        { title: '📝 CSS Basics Quiz', url: '/csslessons/selectors/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -584,6 +585,7 @@
         { title: 'CSS Grid', url: '/csslessons/layout/grid.html', badge: 'hot' },
         { title: 'CSS Float (Legacy)', url: '/csslessons/layout/float.html' },
         { title: 'CSS Z-index', url: '/csslessons/layout/z-index.html' },
+        { title: '📝 CSS Layout Quiz', url: '/csslessons/layout/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -593,6 +595,7 @@
         { title: 'Responsive Images', url: '/csslessons/responsive/responsive-images.html' },
         { title: 'Mobile-First Design', url: '/csslessons/responsive/mobile-first.html' },
         { title: 'CSS Viewport Units', url: '/csslessons/responsive/viewport-units.html' },
+        { title: '📝 Responsive Design Quiz', url: '/csslessons/responsive/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -602,6 +605,7 @@
         { title: 'CSS Animations', url: '/csslessons/effects/animations.html' },
         { title: 'CSS Transforms', url: '/csslessons/effects/transforms.html' },
         { title: 'CSS Filters', url: '/csslessons/effects/filters.html' },
+        { title: '📝 CSS Effects Quiz', url: '/csslessons/effects/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -612,6 +616,7 @@
         { title: 'CSS Pseudo-elements', url: '/csslessons/advanced/pseudo-elements.html' },
         { title: 'CSS Specificity', url: '/csslessons/advanced/specificity.html' },
         { title: 'CSS Best Practices', url: '/csslessons/advanced/best-practices.html' },
+        { title: '📝 Advanced CSS Quiz', url: '/csslessons/advanced/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -619,6 +624,7 @@
       items: [
         { title: 'CSS Interview Questions', url: '/csslessons/interview/questions.html', badge: 'hot' },
         { title: 'CSS Exercises', url: '/csslessons/interview/exercises.html' },
+        { title: '📝 Interview Prep Quiz', url: '/csslessons/interview/quiz.html', badge: 'quiz' },
       ]
     },
     {
@@ -628,6 +634,7 @@
         { title: 'CSS Card Components', url: '/csslessons/projects/cards.html' },
         { title: 'Responsive Navigation', url: '/csslessons/projects/navigation.html' },
         { title: 'Full Landing Page Style', url: '/csslessons/projects/landing-page.html' },
+        { title: '📝 Projects Quiz', url: '/csslessons/projects/quiz.html', badge: 'quiz' },
       ]
     },
   ];
