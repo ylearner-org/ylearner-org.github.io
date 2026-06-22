@@ -1288,7 +1288,7 @@
       if (footer.querySelector('.algorid-credit')) return;
       const credit = document.createElement('span');
       credit.className = 'algorid-credit';
-      credit.innerHTML = 'Developed by <a href="https://algorid.com/" target="_blank" rel="noopener noreferrer" style="color:var(--python-blue);font-weight:600;">Algorid Limited</a>';
+      credit.innerHTML = 'Developed by <a href="https://algorid.com/" target="_blank" rel="noopener noreferrer" style="color:var(--python-blue);font-weight:600;">Algorid</a>';
       footer.appendChild(credit);
     });
   }

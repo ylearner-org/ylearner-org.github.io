@@ -1,6 +1,6 @@
 # ylearner – Free Coding Tutorials
 
-**ylearner** is a free, comprehensive coding education platform at [ylearner.org](https://ylearner.org), built and maintained by [Algorid Limited](https://algorid.com/).
+**ylearner** is a free, comprehensive coding education platform at [ylearner.org](https://ylearner.org), built and maintained by [Algorid](https://algorid.com/).
 
 ## Live Courses
 
@@ -45,4 +45,4 @@ ylearner makes professional programming education accessible to everyone — no 
 
 ## Copyright
 
-© 2026 ylearner. All rights reserved. Developed by [Algorid Limited](https://algorid.com/).
+© 2026 ylearner. All rights reserved. Developed by [Algorid](https://algorid.com/).
