@@ -1192,15 +1192,16 @@
   // Code Copy Buttons
   // ========================
   function initCodeCopy() {
+    const onPython = window.location.pathname.includes('/python/');
     document.querySelectorAll('.code-block').forEach(block => {
       const btn = block.querySelector('.copy-btn');
       if (!btn) return;
       const pre = block.querySelector('pre');
       if (!pre) return;
+      const getCode = () => pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
 
       btn.addEventListener('click', () => {
-        const code = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
-        navigator.clipboard.writeText(code).then(() => {
+        navigator.clipboard.writeText(getCode()).then(() => {
           btn.textContent = '✓ Copied!';
           btn.classList.add('copied');
           setTimeout(() => {
@@ -1209,7 +1210,59 @@
           }, 2000);
         });
       });
+
+      // "Try This" — open the online IDE pre-loaded with this Python snippet.
+      if (onPython && isPythonBlock(block)) {
+        const tryBtn = document.createElement('button');
+        tryBtn.className = 'try-this-btn';
+        tryBtn.type = 'button';
+        tryBtn.textContent = '▶ Try This';
+        tryBtn.setAttribute('aria-label', 'Open this code in the online Python IDE');
+        btn.parentNode.insertBefore(tryBtn, btn);
+        tryBtn.addEventListener('click', () => {
+          window.location.href = '/python/ide.html?code=' + encodeCodeForIde(getCode());
+        });
+      }
     });
+  }
+
+  // True when a code block holds Python (skip Bash/output blocks).
+  function isPythonBlock(block) {
+    if (block.querySelector('code.language-python, code.language-py')) return true;
+    const lang = block.querySelector('.code-lang');
+    return !!lang && /python/i.test(lang.textContent);
+  }
+
+  // Base64-encode (UTF-8 safe) code for the ?code= IDE param.
+  function encodeCodeForIde(code) {
+    return encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+  }
+
+  // ========================
+  // "Try Yourself" Button (lesson header, Python lessons only)
+  // ========================
+  function initTryYourself() {
+    if (!window.location.pathname.includes('/python/')) return;
+    if (window.location.pathname.endsWith('/python/ide.html')) return;
+    const lessonHeader = document.querySelector('.lesson-header');
+    if (!lessonHeader) return;
+
+    const link = document.createElement('a');
+    link.className = 'try-btn';
+    link.href = '/python/ide.html';
+    link.setAttribute('aria-label', 'Open the online Python IDE to practice');
+    link.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Live Editor';
+
+    // Place it just before the Share button if present, else in the header-top row.
+    const place = () => {
+      const top = lessonHeader.querySelector('.lesson-header-top');
+      const share = lessonHeader.querySelector('.share-btn');
+      if (share && share.parentNode) { share.parentNode.insertBefore(link, share); return true; }
+      if (top) { top.appendChild(link); return true; }
+      return false;
+    };
+    // initShareButton builds .lesson-header-top; run after it on the same tick.
+    if (!place()) setTimeout(place, 0);
   }
 
   // ========================
@@ -1694,6 +1747,7 @@
     initHighlight();
     injectAlgoridCredit();
     initShareButton();
+    initTryYourself();
     initQuiz();
     initQuizPage();
 
