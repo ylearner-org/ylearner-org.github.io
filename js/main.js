@@ -1220,7 +1220,7 @@
         tryBtn.setAttribute('aria-label', 'Open this code in the online Python IDE');
         btn.parentNode.insertBefore(tryBtn, btn);
         tryBtn.addEventListener('click', () => {
-          window.location.href = '/python/ide.html?code=' + encodeCodeForIde(getCode());
+          window.open('/python/ide.html?code=' + encodeCodeForIde(getCode()), '_blank', 'noopener');
         });
       }
     });
@@ -1250,8 +1250,10 @@
     const link = document.createElement('a');
     link.className = 'try-btn';
     link.href = '/python/ide.html';
-    link.setAttribute('aria-label', 'Open the online Python IDE to practice');
-    link.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Live Editor';
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.setAttribute('aria-label', 'Open the online Python IDE in a new tab');
+    link.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Live Code Editor';
 
     // Place it just before the Share button if present, else in the header-top row.
     const place = () => {
