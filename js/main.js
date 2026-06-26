@@ -36,8 +36,14 @@
       if (!link) return;
       const href = link.getAttribute('href');
       if (href && href.startsWith('/') && !href.startsWith('//')) {
+        // Honor new-tab intent: explicit target, or modifier/middle clicks.
+        const newTab = link.target === '_blank' || e.metaKey || e.ctrlKey || e.button === 1;
         e.preventDefault();
-        location.href = BASE + href;
+        if (newTab) {
+          window.open(BASE + href, '_blank', 'noopener');
+        } else {
+          location.href = BASE + href;
+        }
       }
     }, true);
   }
@@ -1220,7 +1226,7 @@
         tryBtn.setAttribute('aria-label', 'Open this code in the online Python IDE');
         btn.parentNode.insertBefore(tryBtn, btn);
         tryBtn.addEventListener('click', () => {
-          window.open('/python/ide.html?code=' + encodeCodeForIde(getCode()), '_blank', 'noopener');
+          window.open(BASE + '/python/ide.html?code=' + encodeCodeForIde(getCode()), '_blank', 'noopener');
         });
       }
     });
