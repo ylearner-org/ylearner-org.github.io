@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Analytics Queries – Real-World Data Analysis Patterns | ylearner</title>
+  <meta name="description" content="Master advanced SQL analytics patterns: cohort analysis, retention, 7-day moving average, revenue percentiles, and funnel analysis using window functions and CTEs.">
+  <meta name="keywords" content="SQL analytics queries, cohort analysis SQL, retention SQL, moving average SQL, window functions analytics, SQL funnel analysis, SQL percentile, NTILE SQL">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/projects/analytics-queries.html">
+  <meta property="og:title" content="SQL Analytics Queries – Real-World Data Analysis Patterns | ylearner">
+  <meta property="og:description" content="Advanced SQL analytics: cohort analysis, user retention, 7-day moving averages, percentiles with NTILE, and conversion funnel analysis — with full SQL code and explanations.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/projects/analytics-queries.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL Analytics Queries – Real-World Data Analysis Patterns | ylearner">
+  <meta name="twitter:description" content="Advanced SQL analytics: cohort analysis, user retention, 7-day moving averages, percentiles with NTILE, and conversion funnel analysis — with full SQL code and explanations.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Analytics Queries","description":"Real-world SQL analytics patterns: cohort analysis, retention, moving averages, percentiles, and funnel analysis.","educationalLevel":"Advanced","keywords":"SQL analytics, cohort analysis, retention, moving average, window functions","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <span>Projects</span><span class="separator">›</span>
+          <span class="current">Analytics Queries</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🛠️ Projects</div>
+          <h1>SQL Analytics Queries – Real-World Data Analysis Patterns</h1>
+          <p class="lesson-intro">This advanced project builds on the e-commerce dataset from the previous lesson to demonstrate the analytical SQL patterns used by data analysts and data engineers every day. You'll implement cohort analysis, user retention, 7-day moving averages, revenue percentiles, and conversion funnel analysis — all using window functions and CTEs. Each pattern starts with a business question and ends with a result explanation.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 60 min</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="project-overview">Project Overview</h2>
+          <p>This project uses the <code>users</code>, <code>orders</code>, <code>order_items</code>, and <code>products</code> tables from the <a href="/sql/projects/ecommerce-schema.html">E-Commerce Schema project</a>. If you haven't created those tables yet, do that first. All queries are written for PostgreSQL — MySQL equivalents are noted where syntax differs.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Why these patterns matter</strong>
+              <p>Cohort analysis, retention, and funnel analysis are the core analytical frameworks behind product and growth decisions at most tech companies. Being able to write these queries from scratch — not just call a BI tool — is a strong signal in data analyst and analytics engineer interviews.</p>
+            </div>
+          </div>
+
+          <h2 id="cohort-analysis">Cohort Analysis</h2>
+          <p><strong>Business question:</strong> Group users by the month they signed up (their cohort). How much revenue does each cohort generate over time?</p>
+          <p>A cohort is a group of users who share a common characteristic at a fixed point in time — here, the month of their first order. Cohort analysis lets you compare the behavior of different user groups over their lifetimes.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Cohort Analysis (PostgreSQL)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Step 1: Assign each user to their signup cohort (first order month)
+WITH user_cohorts AS (
+  SELECT
+    user_id,
+    DATE_TRUNC('month', MIN(created_at)) AS cohort_month
+  FROM orders
+  WHERE status != 'cancelled'
+  GROUP BY user_id
+),
+
+-- Step 2: Tag every order with the user's cohort and the "month offset"
+-- (how many months after signup the order was placed)
+order_cohorts AS (
+  SELECT
+    uc.cohort_month,
+    DATE_TRUNC('month', o.created_at)            AS order_month,
+    DATE_PART('year', AGE(DATE_TRUNC('month', o.created_at), uc.cohort_month)) * 12 +
+    DATE_PART('month', AGE(DATE_TRUNC('month', o.created_at), uc.cohort_month))
+                                                 AS months_since_signup,
+    o.total
+  FROM orders o
+  JOIN user_cohorts uc ON uc.user_id = o.user_id
+  WHERE o.status != 'cancelled'
+)
+
+-- Step 3: Aggregate by cohort and month offset
+SELECT
+  TO_CHAR(cohort_month, 'YYYY-MM')  AS cohort,
+  months_since_signup               AS month_number,
+  COUNT(*)                          AS orders,
+  ROUND(SUM(total), 2)              AS revenue
+FROM order_cohorts
+GROUP BY cohort_month, months_since_signup
+ORDER BY cohort_month, months_since_signup;</code></pre>
+          </div>
+
+          <p><strong>Reading the result:</strong> Each row represents a cohort (e.g., "users who signed up in Jan 2023") at a given month offset (0 = their signup month, 1 = one month later, etc.). Compare revenue across cohorts at the same month_number to see if newer cohorts are spending more or less than older ones at the same stage of their lifecycle.</p>
+
+          <h2 id="retention">Retention Analysis</h2>
+          <p><strong>Business question:</strong> Of users who placed their first order in month M, what percentage returned to place another order in month M+1, M+2, M+3?</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Retention (PostgreSQL)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">WITH first_orders AS (
+  -- Find each user's first order month
+  SELECT user_id,
+         DATE_TRUNC('month', MIN(created_at)) AS first_month
+  FROM orders
+  WHERE status != 'cancelled'
+  GROUP BY user_id
+),
+
+monthly_activity AS (
+  -- Find all months in which each user was active (placed an order)
+  SELECT DISTINCT
+    user_id,
+    DATE_TRUNC('month', created_at) AS active_month
+  FROM orders
+  WHERE status != 'cancelled'
+)
+
+-- Calculate retention per cohort
+SELECT
+  TO_CHAR(f.first_month, 'YYYY-MM')       AS cohort_month,
+  COUNT(DISTINCT f.user_id)               AS cohort_size,
+
+  -- Month 0: should equal cohort_size (100%)
+  COUNT(DISTINCT CASE
+    WHEN ma.active_month = f.first_month THEN f.user_id END
+  ) AS month_0,
+
+  -- Month 1: users active 1 month after signup
+  COUNT(DISTINCT CASE
+    WHEN ma.active_month = f.first_month + INTERVAL '1 month' THEN f.user_id END
+  ) AS month_1,
+
+  -- Month 2
+  COUNT(DISTINCT CASE
+    WHEN ma.active_month = f.first_month + INTERVAL '2 months' THEN f.user_id END
+  ) AS month_2,
+
+  -- Month 3
+  COUNT(DISTINCT CASE
+    WHEN ma.active_month = f.first_month + INTERVAL '3 months' THEN f.user_id END
+  ) AS month_3,
+
+  -- Retention rates as percentages
+  ROUND(100.0 * COUNT(DISTINCT CASE
+    WHEN ma.active_month = f.first_month + INTERVAL '1 month' THEN f.user_id END)
+    / NULLIF(COUNT(DISTINCT f.user_id), 0), 1) AS retention_month_1_pct
+
+FROM first_orders f
+LEFT JOIN monthly_activity ma ON ma.user_id = f.user_id
+GROUP BY f.first_month
+ORDER BY f.first_month;</code></pre>
+          </div>
+
+          <p><strong>Reading the result:</strong> If cohort_size is 100 and month_1 is 40, the month-1 retention is 40%. Industry benchmarks vary widely: 20-30% month-1 retention is decent for e-commerce. A declining retention curve that flattens (rather than dropping to zero) indicates a loyal core user base.</p>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="moving-average">7-Day Moving Average of Daily Revenue</h2>
+          <p><strong>Business question:</strong> Daily revenue is noisy — weekends spike, Mondays dip. Smooth it out with a 7-day rolling average to see the real trend.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Moving Average (PostgreSQL)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">WITH daily_revenue AS (
+  -- Aggregate revenue per day
+  SELECT
+    created_at::DATE     AS day,
+    SUM(total)           AS daily_total
+  FROM orders
+  WHERE status != 'cancelled'
+  GROUP BY created_at::DATE
+),
+
+calendar AS (
+  -- Generate a complete date series so days with no orders appear as 0
+  -- (PostgreSQL generate_series)
+  SELECT generate_series(
+    (SELECT MIN(day) FROM daily_revenue),
+    (SELECT MAX(day) FROM daily_revenue),
+    '1 day'::INTERVAL
+  )::DATE AS day
+)
+
+SELECT
+  c.day,
+  COALESCE(dr.daily_total, 0)   AS daily_revenue,
+  ROUND(
+    AVG(COALESCE(dr.daily_total, 0)) OVER (
+      ORDER BY c.day
+      ROWS BETWEEN 6 PRECEDING AND CURRENT ROW  -- 7-day window
+    ), 2
+  )                             AS rolling_7d_avg
+FROM calendar c
+LEFT JOIN daily_revenue dr ON dr.day = c.day
+ORDER BY c.day;</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>ROWS vs RANGE in window frames</strong>
+              <p><code>ROWS BETWEEN 6 PRECEDING AND CURRENT ROW</code> means exactly the 7 physical rows preceding (including current). <code>RANGE BETWEEN INTERVAL '6 days' PRECEDING AND CURRENT ROW</code> means all rows within 6 days by date value — useful when you have gaps in the data. Use ROWS for fixed-size rolling windows.</p>
+            </div>
+          </div>
+
+          <h2 id="percentile-analysis">Revenue Percentile Analysis</h2>
+          <p><strong>Business question:</strong> Segment orders into revenue quartiles. What does a typical order look like in each quartile? Who are the top 10% by spend?</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Percentiles with NTILE (PostgreSQL &amp; MySQL)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- NTILE divides rows into N equal buckets by the ORDER BY column
+WITH order_quartiles AS (
+  SELECT
+    id          AS order_id,
+    user_id,
+    total,
+    NTILE(4) OVER (ORDER BY total) AS quartile,
+    NTILE(10) OVER (ORDER BY total) AS decile
+  FROM orders
+  WHERE status != 'cancelled'
+)
+SELECT
+  quartile,
+  COUNT(*)             AS order_count,
+  ROUND(MIN(total), 2) AS min_total,
+  ROUND(MAX(total), 2) AS max_total,
+  ROUND(AVG(total), 2) AS avg_total
+FROM order_quartiles
+GROUP BY quartile
+ORDER BY quartile;
+
+-- Find the top 10% spenders (decile 10)
+SELECT u.name, u.email, SUM(o.total) AS total_spend
+FROM orders o
+JOIN users u ON u.id = o.user_id
+WHERE o.status != 'cancelled'
+GROUP BY u.id, u.name, u.email
+HAVING SUM(o.total) >= (
+  -- The 90th percentile cutoff
+  SELECT PERCENTILE_CONT(0.9) WITHIN GROUP (ORDER BY total)
+  FROM orders WHERE status != 'cancelled'
+)
+ORDER BY total_spend DESC;</code></pre>
+          </div>
+
+          <h2 id="funnel-analysis">Conversion Funnel Analysis</h2>
+          <p><strong>Business question:</strong> Of all users, how many: (1) placed at least one order, (2) placed more than one order, (3) spent over $500 total? This is a simplified purchase funnel.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Funnel Analysis</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">WITH user_stats AS (
+  SELECT
+    u.id,
+    u.name,
+    COUNT(o.id)       AS order_count,
+    SUM(o.total)      AS total_spend
+  FROM users u
+  LEFT JOIN orders o ON o.user_id = u.id AND o.status != 'cancelled'
+  GROUP BY u.id, u.name
+),
+
+funnel AS (
+  SELECT
+    COUNT(*) AS total_users,
+
+    -- Step 1: Users who placed at least one order
+    COUNT(CASE WHEN order_count >= 1 THEN 1 END) AS placed_order,
+
+    -- Step 2: Users who came back and ordered more than once (repeat buyers)
+    COUNT(CASE WHEN order_count >= 2 THEN 1 END) AS repeat_buyer,
+
+    -- Step 3: High-value customers (spent over $500)
+    COUNT(CASE WHEN total_spend > 500 THEN 1 END) AS high_value
+  FROM user_stats
+)
+SELECT
+  'All Users'             AS step,
+  total_users             AS user_count,
+  100.0                   AS pct_of_previous
+
+UNION ALL
+
+SELECT
+  '1. Placed any order',
+  placed_order,
+  ROUND(100.0 * placed_order / NULLIF(total_users, 0), 1)
+FROM funnel
+
+UNION ALL
+
+SELECT
+  '2. Placed 2+ orders (repeat)',
+  repeat_buyer,
+  ROUND(100.0 * repeat_buyer / NULLIF(placed_order, 0), 1)
+FROM funnel
+
+UNION ALL
+
+SELECT
+  '3. Spent > $500 (high-value)',
+  high_value,
+  ROUND(100.0 * high_value / NULLIF(placed_order, 0), 1)
+FROM funnel;</code></pre>
+          </div>
+
+          <p><strong>Reading the result:</strong> Each step shows how many users reached that stage and the conversion rate from the previous step. A steep drop between "placed any order" and "placed 2+ orders" (e.g., only 20% repeat) indicates a retention problem. A large high-value segment (20%+ of buyers spend over your threshold) is a healthy sign of a loyal core customer base.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Extending the funnel with event data</strong>
+              <p>In a real product analytics setup, the funnel would use an events table (page_view, add_to_cart, checkout_started, order_completed) rather than just orders. The SQL pattern is the same: count distinct users at each step and divide by the previous step's count. Tools like Mixpanel and Amplitude automate this, but knowing how to write it in SQL gives you control over exactly how steps are defined.</p>
+            </div>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Compute monthly revenue.</li>
+              <li>Find the top 5 products by sales.</li>
+              <li>Compute customer lifetime value.</li>
+              <li>Calculate month-over-month growth.</li>
+              <li>Find repeat customers.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write an analytics query that reports monthly revenue and month-over-month growth using a window function (<code>LAG</code>), then rank the top 3 products per month. Explain how window functions and GROUP BY combine for reporting.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Cohort analysis</strong> — group users by signup month, track behavior month-by-month using DATE_TRUNC and AGE functions.</li>
+              <li><strong>Retention</strong> — for each cohort, count users who were active in each subsequent month using conditional COUNT(DISTINCT CASE ...).</li>
+              <li><strong>7-day moving average</strong> — use <code>AVG() OVER (ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)</code>; fill gaps with generate_series + LEFT JOIN + COALESCE.</li>
+              <li><strong>Percentile / quartile analysis</strong> — use <code>NTILE(n)</code> for bucketing; <code>PERCENTILE_CONT(p)</code> for exact percentile values.</li>
+              <li><strong>Funnel analysis</strong> — define funnel steps with CASE WHEN inside COUNT; chain UNION ALL to display as a vertical funnel report.</li>
+              <li>All patterns use CTEs for readability — complex analytics queries are much harder to follow without them.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you compute a running total or month-over-month growth?</li>
+            <li>Which window functions are useful for analytics?</li>
+            <li>How do you find the top-N rows per group?</li>
+            <li>How do you calculate customer lifetime value?</li>
+            <li>How do GROUP BY and window functions differ in reports?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/projects/ecommerce-schema.html" class="topic-tag sql-topic-tag">🗄️ E-Commerce Schema</a>
+            <a href="/sql/projects/library-database.html" class="topic-tag sql-topic-tag">🗄️ Library Database</a>
+            <a href="/sql/advanced/views.html" class="topic-tag sql-topic-tag">🗄️ Views</a>
+            <a href="/sql/interview/questions.html" class="topic-tag sql-topic-tag">🗄️ Interview Questions</a>
+            <a href="/sql/interview/exercises.html" class="topic-tag sql-topic-tag">🗄️ SQL Exercises</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between PERCENTILE_CONT and PERCENTILE_DISC? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>PERCENTILE_CONT(p)</code> (continuous) returns an interpolated value that may not exist in the actual dataset — for example, the median of [1, 3] would be 2.0. <code>PERCENTILE_DISC(p)</code> (discrete) returns the actual nearest value that exists in the dataset — the median of [1, 3] would be 1 or 3, not 2. For most analytics purposes, PERCENTILE_CONT is more useful because it gives a true statistical measure. Both are aggregate functions that use the <code>WITHIN GROUP (ORDER BY ...)</code> syntax.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is cohort analysis possible in MySQL? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, with adaptations. MySQL doesn't have DATE_TRUNC — use DATE_FORMAT(date, '%Y-%m-01') to truncate to month. MySQL doesn't have generate_series — use a numbers table or a recursive CTE (MySQL 8.0+) to generate a date series. AGE intervals can be approximated with TIMESTAMPDIFF(MONTH, start, end). The logic is identical; only the date functions differ.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When should I use a BI tool instead of writing analytics SQL? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>BI tools like Metabase, Looker, Tableau, or Redash are great for recurring dashboards, non-technical stakeholders, and standard charts. Write custom analytics SQL when: the question is novel and not covered by existing dashboards; you need exact control over how a metric is defined; you're building data pipelines or dbt models; or you're debugging a discrepancy in a BI tool's output. SQL and BI tools complement each other — SQL generates the dataset, BI visualizes it.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I handle time zones in analytics queries? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Always store timestamps in UTC. When querying for day/month breakdowns, convert to the user's local time zone before truncating: <code>DATE_TRUNC('day', created_at AT TIME ZONE 'UTC' AT TIME ZONE 'America/New_York')</code>. If you truncate in UTC, a purchase made at 11pm New York time (3am UTC the next day) will appear on the wrong day in reports. Most analytics databases (Redshift, BigQuery, Snowflake) have built-in timezone conversion functions — always document which timezone your dashboards use.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/projects/ecommerce-schema.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">E-Commerce Schema</span>
+          </a>
+          <a href="/sql/projects/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

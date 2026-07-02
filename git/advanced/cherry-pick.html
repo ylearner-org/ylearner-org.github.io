@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>git cherry-pick – Apply Specific Commits to Another Branch | ylearner</title>
+  <meta name="description" content="Learn how to use git cherry-pick to copy specific commits from one branch to another. Covers single commits, ranges, conflict resolution, and when to use or avoid cherry-pick.">
+  <meta name="keywords" content="git cherry-pick, cherry pick commit, git cherry-pick range, backport git, git cherry-pick conflict, copy commit to branch">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/git/advanced/cherry-pick.html">
+  <meta property="og:title" content="git cherry-pick – Apply Specific Commits to Another Branch | ylearner">
+  <meta property="og:description" content="Learn how to use git cherry-pick to copy specific commits from one branch to another, handle conflicts, and decide when to use it.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/git/advanced/cherry-pick.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="git cherry-pick – Apply Specific Commits to Another Branch | ylearner">
+  <meta name="twitter:description" content="Learn how to use git cherry-pick to copy specific commits from one branch to another, handle conflicts, and decide when to use it.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"git cherry-pick – Apply Specific Commits to Another Branch","description":"Learn how to use git cherry-pick to copy specific commits across branches, handle conflicts, and understand when to use or avoid it.","educationalLevel":"Intermediate","keywords":"git cherry-pick, backport commit, copy commit to branch","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <span>Advanced Git</span><span class="separator">›</span>
+          <span class="current">Cherry-Pick</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Advanced Git</div>
+          <h1>git cherry-pick – Apply Specific Commits to Another Branch</h1>
+          <p class="lesson-intro">Sometimes the perfect fix is already sitting in another branch — but you don't want to merge the whole branch. <strong>git cherry-pick</strong> lets you copy one or more specific commits onto your current branch, creating new commits with the same changes but different hashes. It's the surgical tool for backporting fixes, rescuing good commits from abandoned branches, and applying isolated improvements.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-cherry-pick">What Is Cherry-Pick?</h2>
+          <p>Cherry-pick takes the changes introduced by a specific commit and applies them as a <em>new commit</em> on your current branch. The original commit remains in place — cherry-pick creates a copy with the same diff but a different commit hash.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Classic use case: backporting a bugfix</strong>
+              <p>A critical security bug is fixed on the <code>main</code> branch with commit <code>a1b2c3d</code>. You also need that fix on the <code>release/1.x</code> maintenance branch — but you don't want to merge all of <code>main</code>'s other changes. Cherry-pick <code>a1b2c3d</code> onto <code>release/1.x</code> and you're done.</p>
+            </div>
+          </div>
+
+          <h2 id="basic-usage">Basic Cherry-Pick Usage</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># First, identify the commit hash you want to copy
+git log --oneline feature/login-form
+# a1b2c3d Fix null check in login validation
+# 9f8e7d6 Add loading spinner to login button
+# ...
+
+# Switch to the target branch
+git switch main
+
+# Cherry-pick that specific commit onto main
+git cherry-pick a1b2c3d</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            [main 7c3e2f1] Fix null check in login validation<br>
+            Date: Mon Jun 8 10:22:00 2026 +0000<br>
+            1 file changed, 3 insertions(+), 1 deletion(-)
+          </div>
+
+          <p>The commit is now on <code>main</code> with a new hash (<code>7c3e2f1</code>), but the same commit message and diff as the original.</p>
+
+          <h3>Cherry-picking multiple commits</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Cherry-pick multiple specific commits (applied in order)
+git cherry-pick a1b2c3d e5f6a7b f8c9d0e
+
+# Apply without committing immediately (--no-commit / -n)
+# Useful when you want to inspect or modify before committing
+git cherry-pick -n a1b2c3d</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="range-pick">Cherry-Picking a Range of Commits</h2>
+          <p>You can cherry-pick a sequential range of commits. Note the important difference between exclusive and inclusive range syntax:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Range syntax: a1b2..e5f6
+# This picks commits AFTER a1b2 up to AND INCLUDING e5f6
+# (a1b2 itself is NOT included — exclusive start)
+git cherry-pick a1b2c3d..e5f6a7b
+
+# To INCLUDE the start commit, use the caret (^) notation:
+git cherry-pick a1b2c3d^..e5f6a7b
+
+# Example: pick last 3 commits from feature branch
+git log --oneline feature/payments
+# e5f6a7b Add payment success email    ← want
+# c3d4e5f Add Stripe webhook handler   ← want
+# a1b2c3d Add payment model            ← want
+# 9f8e7d6 Setup feature branch         ← don't want
+
+git switch main
+git cherry-pick a1b2c3d^..e5f6a7b</code></pre>
+          </div>
+
+          <h2 id="conflicts">Handling Cherry-Pick Conflicts</h2>
+          <p>If the cherry-picked commit modifies lines that differ between the source and target branch, Git will pause and ask you to resolve conflicts:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">git cherry-pick a1b2c3d
+# CONFLICT (content): Merge conflict in src/auth.js
+# error: could not apply a1b2c3d... Fix null check in login validation
+# hint: After resolving the conflicts, mark them with
+# hint: "git add/rm &lt;pathspec&gt;", then run
+# hint: "git cherry-pick --continue"
+
+# 1. Open the conflicting file(s) and resolve conflicts manually
+
+# 2. Stage the resolved file(s)
+git add src/auth.js
+
+# 3. Continue the cherry-pick
+git cherry-pick --continue
+
+# OR: Abort the cherry-pick entirely (go back to before it started)
+git cherry-pick --abort
+
+# OR: Skip this commit and continue to the next (in a range)
+git cherry-pick --skip</code></pre>
+          </div>
+
+          <h2 id="when-to-use">When to Use Cherry-Pick</h2>
+          <ul>
+            <li><strong>Backporting fixes</strong> — apply a bug/security fix from <code>main</code> to an older maintenance branch</li>
+            <li><strong>Rescuing commits from abandoned branches</strong> — a branch was abandoned but had one good commit worth keeping</li>
+            <li><strong>Hotfixes that need to go to multiple branches</strong> — <code>main</code> and <code>release/2.x</code> and <code>release/1.x</code></li>
+            <li><strong>Applying isolated, self-contained commits</strong> — a commit that doesn't depend on other changes in its branch</li>
+          </ul>
+
+          <h2 id="when-to-avoid">When to Avoid Cherry-Pick</h2>
+          <ul>
+            <li><strong>Moving entire features</strong> — if you need a whole feature branch, use <code>merge</code> or <code>rebase</code> instead</li>
+            <li><strong>Commits that depend on others</strong> — cherry-picking commit C when it depends on commit B (which you didn't pick) will likely cause conflicts or broken behavior</li>
+            <li><strong>Duplicate commits in history</strong> — cherry-pick creates a new commit with the same diff but a different hash. If both branches are later merged, Git may apply the change twice or produce confusing history</li>
+          </ul>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Cherry-pick creates duplicate commits</strong>
+              <p>After cherry-picking commit X from branch A to branch B, both branches have the same change but with different commit hashes. If branch A is later merged into branch B, Git will usually handle this gracefully (recognizing the changes are already applied), but it can occasionally create confusion. Use cherry-pick purposefully, not as a substitute for proper branching strategy.</p>
+            </div>
+          </div>
+
+          <h2 id="deep-cherrypick">cherry-pick: Grab One Commit, Not the Whole Branch</h2>
+          <p><code>git cherry-pick</code> copies a <em>single</em> commit from one branch onto your current branch. Use it when you want just one fix — not everything else that branch contains.</p>
+          <pre><code class="language-bash">git switch main
+git cherry-pick a1b2c3d          # apply that one commit here
+git cherry-pick a1b2c3d..e4f5g6  # a range (exclusive of the first)</code></pre>
+          <p><strong>Key detail:</strong> the picked commit gets a <em>new hash</em> on your branch — it's a copy, not a move. The original stays put. That's why cherry-picking the same change into two branches, then merging them, can produce "duplicate commit" noise.</p>
+          <table>
+            <thead><tr><th>Situation</th><th>Reach for</th></tr></thead>
+            <tbody>
+              <tr><td>Backport one hotfix to a release branch</td><td>cherry-pick</td></tr>
+              <tr><td>Bring in <em>all</em> of another branch's work</td><td>merge</td></tr>
+              <tr><td>Pulled a fix onto the wrong branch</td><td>cherry-pick to the right one</td></tr>
+            </tbody>
+          </table>
+          <p>Conflicts are resolved just like a merge: edit, <code>git add</code>, then <code>git cherry-pick --continue</code> (or <code>--abort</code> to bail). <strong>Use sparingly</strong> — heavy cherry-picking between long-lived branches fragments history; a proper merge keeps the relationship between commits intact.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Cherry-pick a commit onto another branch.</li>
+              <li>Cherry-pick by commit hash.</li>
+              <li>Cherry-pick a range of commits.</li>
+              <li>Resolve a cherry-pick conflict.</li>
+              <li>Abort a cherry-pick.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Apply a single bug-fix commit from a feature branch onto main using <code>git cherry-pick</code>, without merging the whole branch. Explain when cherry-pick is the right tool and why it creates a new commit with a different hash.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>git cherry-pick &lt;hash&gt;</strong> — copies a specific commit's changes onto the current branch as a new commit.</li>
+              <li>Multiple commits: <code>git cherry-pick hash1 hash2 hash3</code> (applied in order).</li>
+              <li>Range (exclusive start): <code>git cherry-pick a1b2..e5f6</code></li>
+              <li>Range (inclusive start): <code>git cherry-pick a1b2^..e5f6</code></li>
+              <li>On conflict: resolve → <code>git add</code> → <code>git cherry-pick --continue</code></li>
+              <li><strong>-n / --no-commit</strong> — apply changes but don't commit yet (inspect first).</li>
+              <li>Best for: <strong>backporting bugfixes</strong> to maintenance branches.</li>
+              <li>Avoid for: moving whole features, or commits that depend on un-picked commits.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does <code>git cherry-pick</code> do?</li>
+            <li>When would you use cherry-pick?</li>
+            <li>Does cherry-pick keep the original commit hash?</li>
+            <li>How do you cherry-pick multiple commits?</li>
+            <li>What are the risks of cherry-picking?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/git/advanced/tags-releases.html" class="topic-tag git-topic-tag">⚙️ Tags &amp; Releases</a>
+            <a href="/git/branching/rebase.html" class="topic-tag git-topic-tag">🔀 Rebase</a>
+            <a href="/git/branching/merging.html" class="topic-tag git-topic-tag">🔀 Merging</a>
+            <a href="/git/branching/merge-conflicts.html" class="topic-tag git-topic-tag">🔀 Merge Conflicts</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does cherry-pick modify the original commit? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Cherry-pick leaves the original commit completely untouched. It creates a brand new commit on the target branch with the same changes (diff) but a different commit hash, timestamp, and potentially a different author context. The original commit on the source branch is unaffected.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I find the commit hash I want to cherry-pick? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>git log --oneline &lt;branch-name&gt;</code> to list commits on a specific branch with their short hashes. You can also use <code>git log --oneline --all --graph</code> to see all branches at once. On GitHub, you can find commit hashes in the commit history view and copy them from the URL (e.g., <code>github.com/user/repo/commit/a1b2c3d...</code>).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is cherry-pick the same as rebase? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Both cherry-pick and rebase apply commits from one place to another by replaying their diffs. The key difference is scope: rebase moves an entire sequence of commits (re-applying a branch on top of a new base), while cherry-pick is for selecting individual specific commits. Internally, a rebase is essentially performing cherry-picks of each commit in sequence.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is -x flag in cherry-pick? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The <code>-x</code> flag appends a line to the commit message indicating the original commit hash: <code>(cherry picked from commit a1b2c3d...)</code>. This is useful in public/shared repositories where traceability matters — it makes it clear that the commit was cherry-picked and allows someone to look up the original. For private repositories this is optional, but it's good practice when backporting fixes to maintenance branches.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/advanced/tags-releases.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Tags &amp; Releases</span>
+          </a>
+          <a href="/git/advanced/git-bisect.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">git bisect</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

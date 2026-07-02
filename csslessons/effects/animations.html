@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Animations – @keyframes Complete Guide | ylearner</title>
+  <meta name="description" content="Master CSS animations: @keyframes, animation-name, duration, timing-function, delay, iteration-count, direction, fill-mode, play-state, and real animation patterns.">
+  <meta name="keywords" content="CSS animations, CSS keyframes, animation-iteration-count, CSS animation tutorial, CSS animation fill-mode, CSS animation delay, CSS loading spinner">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/csslessons/effects/animations.html">
+  <meta property="og:title" content="CSS Animations – @keyframes Complete Guide | ylearner">
+  <meta property="og:description" content="@keyframes, animation properties, iteration, direction, fill-mode — the complete CSS animations guide with real examples.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/csslessons/effects/animations.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CSS Animations @keyframes Guide | ylearner">
+  <meta name="twitter:description" content="@keyframes, animation shorthand, infinite loops, fill-mode — complete CSS animation tutorial.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "CSS Animations",
+    "description": "Complete guide to CSS animations — @keyframes, animation-name, duration, timing-function, delay, iteration-count, direction, fill-mode, play-state, and real patterns.",
+    "educationalLevel": "Beginner",
+    "keywords": "CSS animations, @keyframes, animation-iteration-count, fill-mode, CSS animation",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+  <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.08);opacity:.8} }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-16px)} }
+    @keyframes fade-in { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes shimmer {
+      0%{background-position:-400px 0}
+      100%{background-position:400px 0}
+    }
+    .spin-demo { width:40px;height:40px;border:4px solid #e0e0e0;border-top-color:#1572B6;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block; }
+    .pulse-demo { display:inline-block;padding:10px 24px;background:#1572B6;color:white;border-radius:6px;font-weight:700;animation:pulse 2s ease-in-out infinite; }
+    .bounce-demo { display:inline-block;width:20px;height:20px;background:#1572B6;border-radius:50%;animation:bounce 0.8s ease-in-out infinite; }
+    .fade-demo { display:inline-block;padding:10px 20px;background:rgba(21,114,182,.1);border:1px solid #1572B6;border-radius:6px;font-weight:600;color:#1572B6;animation:fade-in 0.6s ease-out both; }
+    .skeleton { height:20px;border-radius:4px;background:linear-gradient(90deg,#e0e0e0 25%,#f0f0f0 50%,#e0e0e0 75%);background-size:800px 100%;animation:shimmer 1.5s infinite; }
+    .demo-row { display:flex;flex-wrap:wrap;gap:16px;margin:1rem 0 1.5rem;align-items:center; }
+    @media (prefers-reduced-motion:reduce) {
+      .spin-demo,.pulse-demo,.bounce-demo,.fade-demo,.skeleton { animation:none; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/csslessons/what-is-css.html">CSS</a><span class="separator">›</span>
+          <a href="/csslessons/effects/transitions.html">CSS Effects</a><span class="separator">›</span>
+          <span class="current">CSS Animations</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">✨ CSS Effects</div>
+          <h1>CSS Animations – @keyframes and the Animation API</h1>
+          <p class="lesson-intro">While transitions animate between two states triggered by a user interaction, CSS animations run independently — they can start on page load, loop forever, move through multiple steps, and play in reverse. CSS animations are built from two parts: the <code>@keyframes</code> rule that defines the motion, and the <code>animation</code> properties that control playback. In this lesson you will learn to write complex multi-step animations, control every aspect of playback, and build the most common animation patterns used in real products.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Beginner–Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 2 of 4</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="keyframes">@keyframes – Defining the Motion</h2>
+          <p>A <code>@keyframes</code> rule defines a named animation with waypoints (keyframes) that specify what CSS looks like at each point in the animation timeline.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – @keyframes syntax</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* from / to — two-step animation */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Percentage waypoints — multi-step */
+@keyframes bounce {
+  0%   { transform: translateY(0);    }
+  30%  { transform: translateY(-24px); }
+  60%  { transform: translateY(-12px); }
+  80%  { transform: translateY(-6px);  }
+  100% { transform: translateY(0);    }
+}
+
+/* Multiple properties at once */
+@keyframes hero-entrance {
+  0%   { opacity: 0; transform: scale(0.8) translateY(40px); }
+  60%  { opacity: 1; transform: scale(1.02) translateY(-4px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Rules can share keyframes */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.05); opacity: 0.85; }
+}</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Live animation demos</div>
+            <div class="demo-row">
+              <div class="spin-demo" aria-label="Spinner"></div>
+              <div class="pulse-demo">Pulse</div>
+              <div class="bounce-demo" aria-label="Bounce"></div>
+              <div class="fade-demo">Fade In</div>
+            </div>
+          </div>
+
+          <h2 id="animation-properties">The Animation Properties</h2>
+
+          <h3>animation-name</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">animation-name: fade-in;       /* matches @keyframes name */
+animation-name: none;          /* disables animation */
+animation-name: spin, pulse;   /* multiple animations */</code></pre>
+          </div>
+
+          <h3>animation-duration</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">animation-duration: 0.6s;    /* how long one cycle takes */
+animation-duration: 1500ms;  /* same as 1.5s */</code></pre>
+          </div>
+
+          <h3>animation-timing-function</h3>
+          <p>Same values as <code>transition-timing-function</code>: <code>ease</code>, <code>linear</code>, <code>ease-in</code>, <code>ease-out</code>, <code>ease-in-out</code>, <code>cubic-bezier()</code>, <code>steps()</code>.</p>
+
+          <h3>animation-delay</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">animation-delay: 0s;      /* starts immediately */
+animation-delay: 0.5s;    /* waits 0.5s before starting */
+animation-delay: -1s;     /* starts 1s INTO the animation (skip beginning) */</code></pre>
+          </div>
+
+          <h3>animation-iteration-count</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">animation-iteration-count: 1;         /* play once (default) */
+animation-iteration-count: 3;         /* play 3 times */
+animation-iteration-count: infinite;  /* loop forever */
+animation-iteration-count: 2.5;       /* 2.5 cycles — ends halfway through */</code></pre>
+          </div>
+
+          <h3>animation-direction</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">animation-direction: normal;            /* default — plays forward */
+animation-direction: reverse;           /* plays backward */
+animation-direction: alternate;         /* forward, then backward, then forward… */
+animation-direction: alternate-reverse; /* backward, then forward, then backward… */</code></pre>
+          </div>
+
+          <h3 id="fill-mode">animation-fill-mode</h3>
+          <p>Controls what styles apply <em>before</em> and <em>after</em> the animation runs — one of the most misunderstood properties.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – fill-mode</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">animation-fill-mode: none;      /* default — no styles held */
+animation-fill-mode: forwards;  /* keep final keyframe styles after animation ends */
+animation-fill-mode: backwards; /* apply from keyframe styles during delay period */
+animation-fill-mode: both;      /* apply backwards + forwards — almost always what you want */
+
+/* Example: fade-in that stays visible after finishing */
+.card {
+  opacity: 0;   /* start invisible */
+  animation: fade-in 0.6s ease-out 0.2s both;
+  /* 'both' means:
+     - during delay (0.2s): apply 'from' styles (opacity: 0) — no flash of visible
+     - after ending: keep 'to' styles (opacity: 1) — stays visible */
+}</code></pre>
+          </div>
+
+          <h3>animation-play-state</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">animation-play-state: running;  /* default — animation plays */
+animation-play-state: paused;   /* pause the animation */
+
+/* Pause on hover */
+.spinner:hover { animation-play-state: paused; }
+
+/* Controlled by JS class */
+.anim-paused { animation-play-state: paused; }</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="shorthand">animation Shorthand</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – animation shorthand</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* animation: name duration timing-function delay iteration-count direction fill-mode */
+animation: fade-in 0.6s ease-out 0.2s 1 normal both;
+
+/* Most common shorthand patterns */
+.spinner { animation: spin 0.8s linear infinite; }
+.pulse   { animation: pulse 2s ease-in-out infinite; }
+.entrance { animation: fade-in 0.5s ease-out both; }
+.stagger  { animation: slide-up 0.4s ease-out 0.1s both; }
+
+/* Multiple animations on one element */
+.element {
+  animation:
+    fade-in  0.5s ease-out both,
+    float    3s ease-in-out 0.5s infinite;
+}</code></pre>
+          </div>
+
+          <h2 id="real-patterns">Real-World Animation Patterns</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Practical animations</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* 1. Loading spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spinner {
+  width: 40px; height: 40px;
+  border: 4px solid #e0e0e0;
+  border-top-color: #1572B6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* 2. Skeleton loader (shimmer) */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #e0e0e0 25%, #f5f5f5 50%, #e0e0e0 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+/* 3. Page entrance (stagger children) */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card { animation: slide-up 0.4s ease-out both; }
+.card:nth-child(1) { animation-delay: 0s; }
+.card:nth-child(2) { animation-delay: 0.08s; }
+.card:nth-child(3) { animation-delay: 0.16s; }
+.card:nth-child(4) { animation-delay: 0.24s; }
+
+/* 4. Attention pulse */
+@keyframes attention {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(21,114,182,0.4); }
+  70%       { box-shadow: 0 0 0 12px rgba(21,114,182,0); }
+}
+.notification-dot { animation: attention 2s infinite; }
+
+/* 5. Floating effect */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-12px); }
+}
+.hero-icon { animation: float 3s ease-in-out infinite; }
+
+/* 6. Typewriter cursor */
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+.cursor { animation: blink 1s step-end infinite; }
+
+/* 7. Accessibility: always respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .spinner, .skeleton, .card, .notification-dot, .hero-icon, .cursor {
+    animation: none;
+  }
+}</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Skeleton loader demo</div>
+            <div style="display:grid;gap:12px;max-width:340px;">
+              <div class="skeleton" style="height:16px;width:60%;"></div>
+              <div class="skeleton" style="height:12px;"></div>
+              <div class="skeleton" style="height:12px;width:80%;"></div>
+              <div class="skeleton" style="height:12px;width:70%;"></div>
+            </div>
+          </div>
+
+          <h2 id="deep-animations">Transition vs Animation, and the Performance Rule</h2>
+          <p>Both create motion, but they answer different questions. A <strong>transition</strong> animates <em>between two states</em> triggered by something (hover, class change). An <strong>animation</strong> (<code>@keyframes</code>) runs a multi-step sequence on its own, and can loop.</p>
+          <pre><code class="language-css">/* Transition: A → B on hover */
+.btn { transition: transform 0.2s; }
+.btn:hover { transform: scale(1.1); }
+
+/* Animation: multi-step, self-running, loops */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+.dot { animation: pulse 1s infinite; }</code></pre>
+          <h3>Animate only transform and opacity</h3>
+          <p>This is the one rule that separates smooth 60fps motion from janky animation. The browser can move <code>transform</code> and <code>opacity</code> on the GPU without recalculating layout. Animating <code>width</code>, <code>height</code>, <code>top</code>, or <code>margin</code> forces a <strong>reflow</strong> every frame — expensive and stuttery.</p>
+          <table>
+            <thead><tr><th>Cheap (GPU)</th><th>Expensive (reflow)</th></tr></thead>
+            <tbody>
+              <tr><td><code>transform: translate/scale/rotate</code></td><td><code>top</code>, <code>left</code>, <code>margin</code></td></tr>
+              <tr><td><code>opacity</code></td><td><code>width</code>, <code>height</code></td></tr>
+            </tbody>
+          </table>
+          <p>Need to move a box? Use <code>transform: translateX(100px)</code>, not <code>left: 100px</code>.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Define a <code>@keyframes</code> animation.</li>
+              <li>Apply it with the <code>animation</code> property.</li>
+              <li>Set the duration and iteration count.</li>
+              <li>Loop it with <code>infinite</code>.</li>
+              <li>Add percentage keyframes (0%, 50%, 100%).</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Create a loading spinner with <code>@keyframes</code> that rotates 360° infinitely, plus a separate "pulse" animation on a badge. Control timing, iteration, and easing. Explain the difference between transitions and keyframe animations and when to use each.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>@keyframes name { }</strong> — defines the animation. Use <code>from/to</code> or percentage waypoints.</li>
+              <li><strong>animation-name</strong> — links element to a <code>@keyframes</code> rule.</li>
+              <li><strong>animation-duration</strong> — how long one cycle takes.</li>
+              <li><strong>animation-iteration-count: infinite</strong> — loops forever.</li>
+              <li><strong>animation-direction: alternate</strong> — forward then backward (ping-pong).</li>
+              <li><strong>animation-fill-mode: both</strong> — apply first keyframe during delay, keep last keyframe after end. Almost always use <code>both</code>.</li>
+              <li><strong>animation-play-state: paused</strong> — pause/resume with CSS or JS.</li>
+              <li>Shorthand: <code>animation: name duration timing delay count direction fill</code></li>
+              <li>Stagger: use <code>animation-delay</code> with <code>:nth-child()</code>.</li>
+              <li>Always add <code>prefers-reduced-motion</code> override.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a <code>@keyframes</code> rule?</li>
+            <li>What is the difference between a transition and an animation?</li>
+            <li>What does <code>animation-iteration-count: infinite</code> do?</li>
+            <li>How do percentage keyframes work?</li>
+            <li>What does <code>animation-fill-mode</code> control?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/csslessons/effects/transitions.html" class="topic-tag css-topic-tag">🎨 CSS Transitions</a>
+            <a href="/csslessons/effects/transforms.html" class="topic-tag css-topic-tag">🎨 CSS Transforms</a>
+            <a href="/csslessons/effects/filters.html" class="topic-tag css-topic-tag">🎨 CSS Filters</a>
+            <a href="/csslessons/responsive/media-queries.html" class="topic-tag css-topic-tag">🎨 prefers-reduced-motion</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why does my animation flash at the start? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The element shows its natural CSS state before the animation's first keyframe applies. Fix: set <code>animation-fill-mode: backwards</code> or <code>both</code> — this applies the <code>from</code> keyframe styles immediately, even during the delay period. For a <code>fade-in</code> animation, also set <code>opacity: 0</code> on the element as a backup for browsers that don't support <code>fill-mode</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I restart a CSS animation? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>CSS animations don't replay once complete unless looped. To restart via JavaScript: remove the class with the animation, force a reflow (read <code>element.offsetWidth</code>), then re-add the class. Example: <code>el.classList.remove('animated'); el.offsetWidth; el.classList.add('animated');</code>. The reflow forces the browser to process the removal before re-adding, restarting the animation from the beginning.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I control CSS animations with JavaScript? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, several ways: (1) Toggle a CSS class that applies the animation. (2) Set <code>animation-play-state: paused/running</code> via <code>element.style.animationPlayState</code>. (3) Use the Web Animations API (<code>element.getAnimations()</code>) for fine-grained control — play, pause, reverse, change speed, and listen for animation events. (4) Listen to animation events: <code>animationstart</code>, <code>animationend</code>, <code>animationiteration</code>.</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/csslessons/effects/transitions.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">CSS Transitions</span>
+          </a>
+          <a href="/csslessons/effects/transforms.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">CSS Transforms</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

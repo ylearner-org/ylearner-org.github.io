@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Field Widgets in Odoo – OWL Widget Development | ylearner</title>
+  <meta name="description" content="Build custom field widgets for Odoo backend views using OWL. Learn the AbstractField class, widget registration, using widgets in XML views, and editing support.">
+  <meta name="keywords" content="Odoo custom field widget, AbstractField, widget registration, OWL widget, form view widget, Odoo 19 widget">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/owl/custom-widgets.html">
+  <meta property="og:title" content="Custom Field Widgets in Odoo – OWL Widget Development">
+  <meta property="og:description" content="Build custom field widgets for Odoo backend views using OWL. Learn the AbstractField class, widget registration, using widgets in XML views, and editing support.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/owl/custom-widgets.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Custom Field Widgets in Odoo – OWL Widget Development | ylearner">
+  <meta name="twitter:description" content="Build custom Odoo field widgets with OWL: AbstractField, registration, XML view usage, editing.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Custom Field Widgets in Odoo – OWL Widget Development",
+    "description": "Build custom field widgets for Odoo backend views using OWL. Learn the AbstractField class, widget registration, using widgets in XML views, and editing support.",
+    "educationalLevel": "Advanced",
+    "keywords": "Odoo custom widget, AbstractField, OWL widget, field widget registration, form view",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/owl/owl-in-odoo.html">OWL in Odoo</a><span class="separator">›</span>
+          <span class="current">Custom Field Widgets</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 OWL in Odoo</div>
+          <h1>Custom Field Widgets in Odoo – OWL Widget Development</h1>
+          <p class="lesson-intro">Custom field widgets let you render and edit model fields in a completely custom way in Odoo's backend views. Instead of the default text input or dropdown, you can show a color picker, a star rating, a progress bar, or a map widget — all powered by OWL components registered in the fields registry.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="deep-widget">Custom Field Widgets: Changing How a Field Looks</h2>
+          <p>A widget controls how a single field is <em>rendered and edited</em> in a view — a color picker instead of a text box, a progress bar instead of a number. Odoo ships many (<code>widget="badge"</code>, <code>widget="many2many_tags"</code>); when none fit, you build your own as an OWL component and register it.</p>
+          <pre><code class="language-javascript">import { Component } from "@odoo/owl";
+import { registry } from "@web/core/registry";
+import { standardFieldProps } from "@web/views/fields/standard_field_props";
+
+class StarRating extends Component {
+    static template = "my_module.StarRating";
+    static props = { ...standardFieldProps };
+
+    get value() { return this.props.record.data[this.props.name]; }
+    setRating(n) {
+        this.props.record.update({ [this.props.name]: n });   // write back
+    }
+}
+// register so views can use widget="star_rating"
+registry.category("fields").add("star_rating", { component: StarRating });</code></pre>
+          <p>Once registered, any view uses it declaratively: <code>&lt;field name="score" widget="star_rating"/&gt;</code>.</p>
+          <table>
+            <thead><tr><th>Piece</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td><code>props.record</code></td><td>the record being edited</td></tr>
+              <tr><td><code>props.name</code></td><td>which field this widget renders</td></tr>
+              <tr><td><code>record.update(...)</code></td><td>write the new value back to the form</td></tr>
+              <tr><td>registry <code>"fields"</code></td><td>maps a widget name to your component</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Key idea:</strong> a widget reads its value from <code>props.record.data[props.name]</code> and writes changes with <code>record.update()</code> so the form's dirty/save machinery keeps working. Spread <code>standardFieldProps</code> so your widget accepts the same props (readonly, required) every field widget gets. Prefer a standard widget when one exists — only build custom for genuinely new interactions.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create a custom field widget.</li>
+              <li>Register it in the fields registry.</li>
+              <li>Use it in a view with <code>widget=</code>.</li>
+              <li>Read the field value in the component.</li>
+              <li>Propagate updates back to the record.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a custom field widget (e.g. a colored badge for a status field), register it in the <code>fields</code> registry, and use it in a form view via <code>widget="..."</code>. Explain how field widgets receive the record and propagate changes back through the ORM.</p>
+          </div>
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>The widget contract: <code>props.value</code>, <code>props.update()</code>, <code>props.readonly</code></li>
+              <li>Building a read-only widget (e.g., color swatch)</li>
+              <li>Building an editable widget (e.g., star rating)</li>
+              <li>Registering the widget and using it in a view XML</li>
+              <li>Supporting list view columns</li>
+            </ul>
+          </div>
+
+          <h2 id="widget-contract">The Widget Contract</h2>
+          <p>A field widget receives standardized props from the view framework. The key props are:</p>
+          <table>
+            <thead><tr><th>Prop</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td>value</td><td>any</td><td>The current field value (Python type mapped to JS)</td></tr>
+              <tr><td>update(newValue)</td><td>Function</td><td>Call this to update the field value</td></tr>
+              <tr><td>readonly</td><td>Boolean</td><td>True when the field is not editable</td></tr>
+              <tr><td>record</td><td>Object</td><td>The full record object — access other field values</td></tr>
+              <tr><td>name</td><td>String</td><td>The field name</td></tr>
+              <tr><td>type</td><td>String</td><td>The field type (char, integer, selection, etc.)</td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="readonly-widget">Building a Read-Only Widget</h2>
+          <p>A color swatch widget that renders a hex color value as a colored circle:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { Component } from '@odoo/owl';
+import { registry } from '@web/core/registry';
+import { standardFieldProps } from '@web/views/fields/standard_field_props';
+
+export class ColorSwatchField extends Component {
+    static template = 'my_module.ColorSwatchField';
+
+    static props = {
+        ...standardFieldProps,  // includes value, update, readonly, etc.
+    };
+
+    get hexColor() {
+        return this.props.value || '#ffffff';
+    }
+}
+
+registry.category('fields').add('color_swatch', {
+    component: ColorSwatchField,
+    displayName: 'Color Swatch',
+    supportedTypes: ['char'],
+});</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (OWL template)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;templates&gt;
+  &lt;t t-name="my_module.ColorSwatchField"&gt;
+    &lt;div class="o_field_color_swatch"&gt;
+      &lt;span t-attf-style="background-color: #{hexColor}; display: inline-block;
+                          width: 20px; height: 20px; border-radius: 50%;
+                          border: 1px solid #ccc;"/&gt;
+      &lt;span class="o_color_value" t-esc="hexColor"/&gt;
+    &lt;/div&gt;
+  &lt;/t&gt;
+&lt;/templates&gt;</code></pre>
+          </div>
+
+          <h2 id="editable-widget">Building an Editable Widget</h2>
+          <p>A star rating widget for an integer field (0-5 stars). Calls <code>props.update()</code> on click:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { Component } from '@odoo/owl';
+import { registry } from '@web/core/registry';
+import { standardFieldProps } from '@web/views/fields/standard_field_props';
+
+export class StarRatingField extends Component {
+    static template = 'my_module.StarRatingField';
+    static props = {
+        ...standardFieldProps,
+        maxStars: { type: Number, optional: true },
+    };
+    static defaultProps = { maxStars: 5 };
+
+    get stars() {
+        const max = this.props.maxStars;
+        const val = this.props.value || 0;
+        return Array.from({ length: max }, (_, i) => ({
+            filled: i < val,
+            index: i + 1,
+        }));
+    }
+
+    onClick(star) {
+        if (!this.props.readonly) {
+            this.props.update(star.index);
+        }
+    }
+}
+
+registry.category('fields').add('star_rating', {
+    component: StarRatingField,
+    displayName: 'Star Rating',
+    supportedTypes: ['integer'],
+    extractProps: ({ options }) => ({
+        maxStars: options.max_stars || 5,
+    }),
+});</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (OWL template)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;t t-name="my_module.StarRatingField"&gt;
+  &lt;div class="o_field_star_rating"&gt;
+    &lt;t t-foreach="stars" t-as="star"&gt;
+      &lt;span t-attf-class="fa #{star.filled ? 'fa-star' : 'fa-star-o'}
+                           #{props.readonly ? '' : 'o_clickable'}"
+            t-on-click="() =&gt; onClick(star)"/&gt;
+    &lt;/t&gt;
+  &lt;/div&gt;
+&lt;/t&gt;</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="using-in-views">Using the Widget in XML Views</h2>
+          <p>Reference the widget by its registry key in your view XML:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Form view --&gt;
+&lt;field name="rating" widget="star_rating" options="{'max_stars': 5}"/&gt;
+&lt;field name="color" widget="color_swatch"/&gt;
+
+&lt;!-- List view column --&gt;
+&lt;field name="rating" widget="star_rating" optional="show"/&gt;</code></pre>
+          </div>
+          <p>The <code>options</code> attribute passes a JSON object to <code>extractProps()</code> in the registry definition. Use it to configure widget behavior per field usage.</p>
+
+          <h2 id="list-widget">Supporting List View Columns</h2>
+          <p>For list view support, the widget must handle <code>readonly=true</code> gracefully (list view is always readonly). The same component works in both form and list views — just ensure the template renders a compact representation when <code>props.readonly</code> is true.</p>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Widgets receive <code>props.value</code> (current value) and call <code>props.update(newVal)</code> to save changes</li>
+              <li>Always check <code>props.readonly</code> before enabling edit interactions</li>
+              <li>Register widgets in <code>registry.category('fields')</code> with <code>supportedTypes</code></li>
+              <li>Use <code>extractProps</code> in the registry entry to map XML <code>options</code> to component props</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a custom field widget?</li>
+            <li>How do you register a widget?</li>
+            <li>How do you use a widget in a view?</li>
+            <li>How does a widget read and write the field value?</li>
+            <li>When would you build a custom widget instead of using a built-in one?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/owl/owl-in-odoo.html" class="topic-tag odoo-topic-tag">🦉 OWL in Odoo</a>
+              <a href="/odoo/owl/owl-components.html" class="topic-tag odoo-topic-tag">🦉 OWL Components</a>
+              <a href="/odoo/owl/owl-services.html" class="topic-tag odoo-topic-tag">🦉 OWL Services</a>
+              <a href="/odoo/advanced/performance-caching.html" class="topic-tag odoo-topic-tag">⚡ Performance &amp; Caching</a>
+            </div>
+          </section>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">How do I make a widget that spans multiple fields? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>props.record</code> to access other field values: <code>this.props.record.data.other_field</code>. Your widget is still bound to one field (for the <code>props.update()</code> contract), but it can read any field from the record. To update multiple fields at once, use <code>props.record.update({ field1: val1, field2: val2 })</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use an existing widget as a base and extend it? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — import the existing widget class and extend it: <code>class MyCharField extends CharField</code>. Override <code>setup()</code> or <code>get displayValue()</code> to modify behavior. Re-register under a new key in the registry. Don't re-register under the existing key unless you want to replace the widget for ALL usages of that type.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I handle async data loading in a widget? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>useState()</code> for loading state and <code>onMounted()</code> to fetch data after the widget mounts. For data that depends on <code>props.value</code>, also use <code>onWillUpdateProps()</code> to refetch when the value changes. Always show a loading indicator while async data is being fetched to avoid blank renders.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a href="/odoo/owl/owl-services.html" class="lesson-nav-link">
+        <span class="nav-label">← Prev</span>
+        <span class="nav-title">OWL Services</span>
+        </a>
+        <a href="/odoo/owl/quiz.html" class="lesson-nav-link next">
+        <span class="nav-label">Next →</span>
+        <span class="nav-title">📝 Take a Quiz</span>
+        </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

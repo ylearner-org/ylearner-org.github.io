@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Match Case Statement – Structural Pattern Matching Guide | ylearner</title>
+  <meta name="description" content="Learn Python 3.10+ match-case statement: basic matching, patterns with guards, matching sequences and dicts, and when to use match-case over if-elif chains.">
+  <meta name="keywords" content="python match case, python pattern matching, python 3.10 match, python structural pattern matching, python switch case">
+  <link rel="canonical" href="https://ylearner.org/python/control-flow/match-case.html">
+  <meta property="og:title" content="Python Match Case Statement – Structural Pattern Matching Guide">
+  <meta property="og:description" content="Learn Python 3.10+ match-case statement: basic matching, patterns with guards, matching sequences and dicts, and when to use match-case over if-elif chains.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/control-flow/match-case.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Match Case Statement – Structural Pattern Matching Guide">
+  <meta name="twitter:description" content="Learn Python 3.10+ match-case statement: basic matching, patterns with guards, matching sequences and dicts, and when to use match-case over if-elif chains.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Python Match Case – Pattern Matching (Python 3.10+)","description":"Learn Python 3.10+ match-case statement: basic matching, patterns with guards, matching sequences and dicts, and when to use match-case over if-elif chains.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/control-flow/if-statements.html">Control Flow</a><span class="separator">›</span>
+          <span class="current">Match Case</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🔀 Control Flow</div>
+          <h1>Python Match Case – Pattern Matching (Python 3.10+)</h1>
+          <p class="lesson-intro">Python 3.10 introduced the <code>match</code> statement — Python's version of switch/case found in other languages, but far more powerful. It supports structural pattern matching: matching against values, types, sequences, mappings, and object attributes. It requires Python 3.10 or newer.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="basic">Basic Match-Case Syntax</h2>
+          <p>The match statement compares a value against multiple patterns. The first matching pattern executes its block. The <code>case _:</code> is the wildcard (matches anything — like "else").</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def describe_http_status(status):
+    match status:
+        case 200:
+            return "OK"
+        case 404:
+            return "Not Found"
+        case 500:
+            return "Server Error"
+        case _:              # wildcard - matches anything
+            return f"Unknown status: {status}"
+
+print(describe_http_status(200))
+print(describe_http_status(404))
+print(describe_http_status(999))</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+OK
+Not Found
+Unknown status: 999
+          </div>
+
+          <h2 id="or-patterns">OR Patterns – Multiple Values</h2>
+          <p>Use | to match multiple values in a single case.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def day_type(day):
+    match day:
+        case "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday":
+            return "Weekday"
+        case "Saturday" | "Sunday":
+            return "Weekend"
+        case _:
+            return "Invalid day"
+
+print(day_type("Monday"))    # Weekday
+print(day_type("Saturday"))  # Weekend</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Weekday
+Weekend
+          </div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="guard">Guard Conditions with if</h2>
+          <p>Add an if guard to a case for additional conditions.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def classify(value):
+    match value:
+        case x if x < 0:
+            return f"{x} is negative"
+        case 0:
+            return "zero"
+        case x if x > 0 and x <= 100:
+            return f"{x} is between 1 and 100"
+        case _:
+            return f"{value} is over 100"
+
+print(classify(-5))
+print(classify(0))
+print(classify(42))</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+-5 is negative
+zero
+42 is between 1 and 100
+          </div>
+
+          <h2 id="sequence">Matching Sequences and Dicts</h2>
+          <p>Match can destructure lists, tuples, and dicts directly.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Match sequences (lists/tuples)
+def describe_point(point):
+    match point:
+        case [0, 0]:
+            return "Origin"
+        case [x, 0]:
+            return f"On X-axis at {x}"
+        case [0, y]:
+            return f"On Y-axis at {y}"
+        case [x, y]:
+            return f"Point at ({x}, {y})"
+
+print(describe_point([0, 0]))
+print(describe_point([3, 0]))
+print(describe_point([4, 5]))</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Origin
+On X-axis at 3
+Point at (4, 5)
+          </div>
+
+          <h2 id="deep-matchcase">match/case: Structural Pattern Matching, Not Just a Switch</h2>
+          <p>Python 3.10's <code>match</code> looks like a switch, but it does far more — it can <strong>destructure</strong> data and bind variables while matching, which a chain of <code>if/elif</code> can't do cleanly.</p>
+          <pre><code class="language-python">def handle(command):
+    match command.split():
+        case ["go", direction]:            # unpacks a 2-item list, binds direction
+            return f"Moving {direction}"
+        case ["drop", *items]:             # captures the rest
+            return f"Dropping {items}"
+        case ["quit" | "exit"]:            # OR pattern
+            return "Bye"
+        case _:                            # wildcard = default
+            return "Unknown"</code></pre>
+          <h3>Match on shape, with guards</h3>
+          <pre><code class="language-python">match point:
+    case (0, 0):              return "origin"
+    case (x, 0):              return f"on x-axis at {x}"     # binds x
+    case (x, y) if x == y:    return "diagonal"              # guard condition
+    case Point(x=px, y=py):   return f"point {px},{py}"      # class pattern</code></pre>
+          <p><strong>Key distinction:</strong> a plain switch only compares equality; <code>match</code> matches <em>structure</em> — list/tuple shapes, dict keys, class attributes — and captures parts into variables in the same step. <strong>Gotcha:</strong> a bare name like <code>case x:</code> is a <em>capture</em> (matches anything, binds x), not a comparison — to match against a constant, use a dotted name (<code>case Color.RED</code>) or a literal. Reach for it when branching on the <em>shape</em> of data; simple value checks are still fine as <code>if/elif</code>.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Practice structural pattern matching (Python 3.10+):</p>
+            <ol>
+              <li>Write a <code>match</code> that maps HTTP status codes (200, 404, 500) to messages, with a wildcard <code>_</code> default.</li>
+              <li>Use an OR pattern (<code>case 401 | 403:</code>) to handle multiple values in one branch.</li>
+              <li>Add a guard condition (<code>case n if n &gt; 0</code>) to a branch.</li>
+              <li>Match a small tuple like <code>(x, y)</code> and unpack its parts inside the case.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a tiny command parser. Read commands such as <code>"go north"</code>, <code>"take key"</code>, or <code>"quit"</code>, split them into words, and use <code>match</code> with sequence patterns (e.g. <code>case ["go", direction]:</code>) to handle each command, capturing the variable parts. Add a guard so only valid directions are accepted, and a wildcard branch for unknown commands.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>match-case</code> was added in Python 3.10 for structural pattern matching.</li>
+              <li>It compares a subject against patterns, not just values — it can destructure sequences, mappings, and objects.</li>
+              <li>OR patterns (<code>case a | b:</code>) let several values share one branch.</li>
+              <li>Guard conditions (<code>case x if cond:</code>) add an extra boolean test to a pattern.</li>
+              <li>The wildcard <code>_</code> matches anything and acts as the default case.</li>
+              <li>For simple value checks, <code>if/elif</code> is fine; <code>match</code> shines when unpacking complex shapes.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Match-Case</h2>
+          <ul class="interview-list">
+            <li>What is the <code>match-case</code> statement and in which Python version was it introduced?</li>
+            <li>How is <code>match-case</code> different from a chain of <code>if/elif</code>?</li>
+            <li>What is structural pattern matching?</li>
+            <li>How do you match multiple values in a single case?</li>
+            <li>What is a guard condition in a <code>case</code> clause?</li>
+            <li>How does the wildcard <code>_</code> pattern work?</li>
+            <li>Can <code>match</code> destructure sequences and dictionaries?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/control-flow/if-statements.html" class="topic-tag">🔀 If Statements</a>
+            <a href="/python/control-flow/nested-if.html" class="topic-tag">🪹 Nested If</a>
+            <a href="/python/data-structures/tuples.html" class="topic-tag">📍 Tuples</a>
+            <a href="/python/data-structures/dictionaries.html" class="topic-tag">🗂️ Dictionaries</a>
+            <a href="/python/functions/function-basics.html" class="topic-tag">⚙️ Functions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Is <code>match-case</code> the same as a <code>switch</code> statement? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It is more powerful. A C-style <code>switch</code> only compares one value. Python’s <code>match</code> does structural pattern matching: it can unpack sequences, dicts, and objects, bind variables, and apply guard conditions.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Which Python version do I need for <code>match</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Python 3.10 or newer. On older versions the keyword does not exist and you must use <code>if/elif/else</code> instead.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What does the underscore <code>_</code> do in a case? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It is the wildcard pattern: it matches anything and binds nothing, so it works as the catch-all default branch, usually placed last.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When should I prefer <code>match</code> over <code>if/elif</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>match</code> when you are dispatching on the shape or structure of data — unpacking tuples, dicts, or classes. For a couple of simple equality or range checks, a plain <code>if/elif</code> chain is clearer.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/control-flow/nested-if.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Nested If</span>
+          </a>
+          <a href="/python/control-flow/for-loop.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">For Loop</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

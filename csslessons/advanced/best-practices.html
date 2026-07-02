@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Best Practices – Writing Clean Maintainable CSS | ylearner</title>
+  <meta name="description" content="CSS best practices: BEM naming convention, organizing stylesheets, avoiding specificity wars, CSS performance tips, accessibility in CSS, shorthand properties, and code maintainability.">
+  <meta name="keywords" content="CSS best practices, BEM CSS, CSS naming conventions, CSS organization, CSS performance, maintainable CSS, CSS architecture, CSS accessibility, CSS shorthand, SMACSS, OOCSS">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/csslessons/advanced/best-practices.html">
+  <meta property="og:title" content="CSS Best Practices – Writing Clean Maintainable CSS | ylearner">
+  <meta property="og:description" content="BEM naming, stylesheet organization, performance, accessibility, shorthand — the definitive CSS best practices guide.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/csslessons/advanced/best-practices.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CSS Best Practices Complete Guide | ylearner">
+  <meta name="twitter:description" content="BEM, organization, performance, accessibility — every CSS best practice explained with examples.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "CSS Best Practices",
+    "description": "Complete guide to CSS best practices — BEM naming, stylesheet organization, specificity management, performance optimization, accessibility in CSS, shorthand properties, and maintainability patterns.",
+    "educationalLevel": "Intermediate",
+    "keywords": "CSS best practices, BEM, CSS organization, CSS performance, CSS accessibility, shorthand",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/csslessons/what-is-css.html">CSS</a><span class="separator">›</span>
+          <a href="/csslessons/advanced/variables.html">Advanced CSS</a><span class="separator">›</span>
+          <span class="current">CSS Best Practices</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Advanced CSS</div>
+          <h1>CSS Best Practices – Writing Clean, Maintainable CSS</h1>
+          <p class="lesson-intro">Writing CSS that works is straightforward. Writing CSS that stays maintainable as a project grows — across teams, across years — requires intentional habits. This lesson covers the proven practices: BEM naming, organizing stylesheets logically, keeping specificity flat, writing accessible styles, using shorthands correctly, and setting up a custom-property-based design system that scales.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 5 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="naming">Naming Conventions – BEM</h2>
+          <p>BEM (Block–Element–Modifier) is the most widely adopted CSS naming convention. It makes the relationship between HTML and CSS explicit, keeps specificity to a single class, and prevents naming collisions.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – BEM naming</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Block — standalone component */
+.card { }
+
+/* Element — part of the block, separated by __ */
+.card__title { }
+.card__image { }
+.card__body  { }
+.card__footer { }
+
+/* Modifier — variation of block or element, separated by -- */
+.card--featured { }        /* block modifier */
+.card--dark     { }
+.card__title--large { }    /* element modifier */
+
+/* HTML usage */
+/* &lt;div class="card card--featured"&gt;
+     &lt;img class="card__image"&gt;
+     &lt;h2 class="card__title card__title--large"&gt;...&lt;/h2&gt;
+     &lt;div class="card__body"&gt;...&lt;/div&gt;
+   &lt;/div&gt; */
+
+/* Every class is flat — all (0,1,0) specificity — easy to override */
+</code></pre>
+          </div>
+
+          <h2 id="organization">Organizing Your Stylesheet</h2>
+          <p>Group rules logically so any developer can find the code they need. A common approach is the ITCSS (Inverted Triangle CSS) order from generic to specific:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Stylesheet structure</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* 1. Settings — custom properties, design tokens */
+:root {
+  --color-primary: #1572B6;
+  --spacing-md: 16px;
+}
+
+/* 2. Reset / Base — normalize browser defaults */
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; }
+
+/* 3. Typography — h1-h6, p, a, lists */
+h1 { font-size: 2rem; line-height: 1.2; }
+
+/* 4. Layout — page structure, grid, sidebar, header */
+.page-wrapper { max-width: 1200px; margin: 0 auto; padding: 0 var(--spacing-md); }
+
+/* 5. Components — buttons, cards, nav, forms */
+.btn { }
+.card { }
+
+/* 6. Utilities — single-purpose helper classes */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+.text-center { text-align: center !important; }
+.mt-0 { margin-top: 0 !important; }
+</code></pre>
+          </div>
+
+          <h2 id="specificity-management">Keeping Specificity Flat</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Specificity management</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* BAD — deeply nested, high specificity */
+#app .sidebar nav ul li a:hover { color: red; }   /* (1,1,3) */
+
+/* GOOD — single class */
+.nav-link:hover { color: red; }   /* (0,2,0) */
+
+/* BAD — ID selector in stylesheets */
+#hero-title { font-size: 3rem; }
+
+/* GOOD — use a class even on unique elements */
+.hero-title { font-size: 3rem; }
+
+/* BAD — overusing !important */
+.btn { color: blue !important; }
+.btn.primary { color: white !important; }
+
+/* GOOD — appropriate specificity */
+.btn          { color: blue; }
+.btn-primary  { color: white; background: #1572B6; }
+
+/* Use :where() for resets so they never block overrides */
+:where(ul, ol) { list-style: none; padding: 0; margin: 0; }
+</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="performance">CSS Performance Tips</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Performance</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* 1. Animate only transform and opacity — GPU compositor, no layout */
+.btn:hover {
+  transform: translateY(-2px);   /* GOOD */
+  opacity: 0.9;                  /* GOOD */
+}
+/* Avoid animating width, height, top, left, margin, padding — triggers layout */
+
+/* 2. Use will-change for elements you KNOW will animate */
+.modal {
+  will-change: transform, opacity;
+}
+/* Remove will-change after animation — it consumes GPU memory */
+
+/* 3. Contain layout thrash with contain */
+.widget {
+  contain: layout;   /* tells browser: changes inside don't affect outside */
+}
+
+/* 4. Avoid universal selector in hot paths */
+/* BAD */ * { box-sizing: border-box; }   /* fine in reset, not in component */
+/* OK as a one-time reset */
+
+/* 5. Use logical shorthand — fewer declarations */
+.card {
+  margin: 16px;           /* shorthand for all 4 sides */
+  padding: 12px 20px;     /* block / inline */
+  border: 1px solid #ccc; /* width style color */
+  font: 500 1rem/1.6 system-ui, sans-serif; /* weight size/line-height family */
+  background: #fff url('/img/bg.svg') no-repeat center / cover;
+}
+</code></pre>
+          </div>
+
+          <h2 id="accessibility">Accessibility in CSS</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Accessibility</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* 1. Never use display:none or visibility:hidden for screen-reader content */
+/* Use the sr-only pattern instead */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 2. Always style :focus — never just remove the outline */
+:focus-visible {
+  outline: 2px solid #1572B6;
+  outline-offset: 3px;
+}
+/* NOT: * { outline: none; }  ← breaks keyboard navigation */
+
+/* 3. Respect user motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 4. Ensure sufficient color contrast — WCAG AA requires 4.5:1 for normal text */
+/* Check with: https://webaim.org/resources/contrastchecker/ */
+body { color: #1a1a1a; background: #fff; }   /* 17:1 — excellent */
+
+/* 5. Respect user font size — use rem, not px for text */
+html { font-size: 100%; }   /* respects browser default (16px) */
+p    { font-size: 1rem; }   /* scales with user preferences */
+h1   { font-size: 2rem; }
+</code></pre>
+          </div>
+
+          <h2 id="custom-property-system">Design Token System</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Full design token setup</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">:root {
+  /* Colors */
+  --color-primary:    #1572B6;
+  --color-secondary:  #e44d26;
+  --color-text:       #1a1a1a;
+  --color-text-muted: #666;
+  --color-bg:         #ffffff;
+  --color-surface:    #f5f5f5;
+  --color-border:     #e0e0e0;
+
+  /* Spacing scale */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Typography */
+  --font-sans:  system-ui, -apple-system, Segoe UI, sans-serif;
+  --font-mono:  'Fira Code', 'Cascadia Code', Consolas, monospace;
+  --text-sm:    0.875rem;
+  --text-base:  1rem;
+  --text-lg:    1.125rem;
+  --text-xl:    1.25rem;
+  --text-2xl:   1.5rem;
+  --text-3xl:   2rem;
+  --leading:    1.7;
+
+  /* Radii */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.1);
+  --shadow-md:  0 4px 12px rgba(0,0,0,.12);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,.15);
+
+  /* Transitions */
+  --ease:     cubic-bezier(.4,0,.2,1);
+  --duration: 200ms;
+}
+</code></pre>
+          </div>
+
+          <h2 id="deep-cssbest">CSS That Scales: Habits That Prevent a Mess</h2>
+          <p>CSS is easy to write and easy to turn into an unmaintainable pile. A handful of disciplines keep a stylesheet sane as it grows.</p>
+          <table>
+            <thead><tr><th>Do</th><th>Instead of</th><th>Why</th></tr></thead>
+            <tbody>
+              <tr><td>style with classes</td><td>ids / deep selectors</td><td>low, predictable specificity</td></tr>
+              <tr><td>let the cascade work</td><td><code>!important</code></td><td>!important starts override wars</td></tr>
+              <tr><td>custom properties for tokens</td><td>hard-coded colors everywhere</td><td>change once, applies everywhere</td></tr>
+              <tr><td>mobile-first <code>min-width</code></td><td>desktop-first overrides</td><td>simpler base, less undoing</td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-css">:root { --brand: #0066ff; --space: 8px; }   /* design tokens in one place */
+.card { padding: calc(var(--space) * 2); color: var(--brand); }
+
+/* keep specificity flat and low */
+.card__title { font-weight: 600; }   /* one class, not .card h2 span */</code></pre>
+          <p><strong>The specificity principle:</strong> the flatter and lower your selectors, the easier everything is to override later. A rule matched by <code>#sidebar .widget h2 a</code> is nearly impossible to restyle without another equally ugly selector — or <code>!important</code>, which then infects the next person too. Favor single-class selectors (a naming convention like BEM — <code>block__element--modifier</code> — makes this systematic).</p>
+          <p><strong>Other wins:</strong> group related rules, comment non-obvious hacks, reuse spacing/color tokens via custom properties, and prefer <code>rem</code> for scalable sizing. Consistency beats cleverness.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Replace magic numbers with variables.</li>
+              <li>Order rules from general to specific.</li>
+              <li>Adopt a consistent naming convention such as BEM.</li>
+              <li>Remove an unnecessary <code>!important</code>.</li>
+              <li>Group related properties logically.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Refactor a messy stylesheet: extract repeated values into custom properties, adopt a BEM naming convention for one component, flatten over-specific selectors, and remove unnecessary <code>!important</code>. Explain three CSS best practices that keep stylesheets maintainable at scale.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>BEM naming</strong>: <code>.block__element--modifier</code>. Flat specificity, explicit relationships, no collisions.</li>
+              <li><strong>Stylesheet order</strong>: Settings → Reset → Typography → Layout → Components → Utilities.</li>
+              <li><strong>Specificity</strong>: avoid IDs in stylesheets, avoid <code>!important</code> outside utilities, use <code>:where()</code> for zero-specificity resets.</li>
+              <li><strong>Performance</strong>: animate only <code>transform</code> and <code>opacity</code>. Use <code>will-change</code> sparingly. Prefer shorthand.</li>
+              <li><strong>Accessibility</strong>: never remove <code>:focus</code> styling, use <code>.sr-only</code> for screen-reader content, respect <code>prefers-reduced-motion</code>, use <code>rem</code> for font sizes.</li>
+              <li><strong>Design tokens</strong>: all raw values in <code>:root</code> custom properties. Components reference tokens, not magic numbers.</li>
+              <li><strong>Shorthand</strong>: use <code>margin</code>, <code>padding</code>, <code>border</code>, <code>font</code>, <code>background</code> shorthand to reduce lines of CSS.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What are some CSS best practices for maintainability?</li>
+            <li>What is the BEM naming convention?</li>
+            <li>Why should you avoid overly specific selectors?</li>
+            <li>Why is <code>!important</code> discouraged?</li>
+            <li>How do CSS custom properties improve maintainability?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/csslessons/advanced/variables.html" class="topic-tag css-topic-tag">🔧 CSS Variables</a>
+            <a href="/csslessons/advanced/specificity.html" class="topic-tag css-topic-tag">🔧 CSS Specificity</a>
+            <a href="/csslessons/effects/transitions.html" class="topic-tag css-topic-tag">🎨 CSS Transitions</a>
+            <a href="/csslessons/interview/questions.html" class="topic-tag css-topic-tag">💼 CSS Interview Questions</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Should I use BEM, SMACSS, or utility-first (Tailwind)? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>All three are valid and used widely in production. BEM is best for hand-written CSS on medium/large projects — it gives structure without tooling. SMACSS is similar but less prescriptive about naming. Utility-first (Tailwind) generates all utility classes at build time — maximum flexibility, minimal custom CSS, but larger HTML. The right choice depends on team size, project complexity, and whether you have a build step. For learning CSS itself, BEM with custom properties is the best foundation to understand the language before adding a framework.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How many stylesheets should a project have? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For a small project, one well-organized stylesheet is fine. For larger projects, split into logical files: <code>tokens.css</code>, <code>reset.css</code>, <code>typography.css</code>, <code>components/button.css</code>, etc. With a build tool (Vite, Webpack), these get bundled into one HTTP request anyway. Without a build tool, use fewer files to minimize request overhead — the browser's cache will handle repeated visits efficiently.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When is it okay to use !important? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>!important</code> only in two scenarios: (1) utility classes like <code>.hidden { display: none !important }</code> where the rule must always win and shouldn't be overridden by component CSS, and (2) overriding third-party library CSS when you cannot modify the library's source and their selectors have high specificity. Never use <code>!important</code> to "fix" a specificity problem in your own code — solve the actual specificity issue instead.</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/csslessons/advanced/specificity.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">CSS Specificity</span>
+          </a>
+          <a href="/csslessons/advanced/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

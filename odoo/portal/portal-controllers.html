@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Portal Controllers – Routing and HTTP Responses | ylearner</title>
+  <meta name="description" content="Build Odoo portal pages by extending CustomerPortal. Learn @route, request object, listing and detail page controllers, pager, and access control.">
+  <meta name="keywords" content="Odoo portal controllers, CustomerPortal, @route, odoo http controller, portal listing page, portal detail page, odoo 19 portal">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/portal/portal-controllers.html">
+  <meta property="og:title" content="Odoo Portal Controllers – Routing and HTTP Responses">
+  <meta property="og:description" content="Build Odoo portal pages by extending CustomerPortal. Learn @route, request object, listing and detail page controllers, pager, and access control.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/portal/portal-controllers.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Portal Controllers – Routing and HTTP Responses | ylearner">
+  <meta name="twitter:description" content="Build Odoo portal pages by extending CustomerPortal. Learn @route, pager, and access control.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Portal Controllers – Routing and HTTP Responses",
+    "description": "Build Odoo portal pages by extending CustomerPortal. Learn @route, request object, listing and detail page controllers, pager, and access control.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo portal controller, CustomerPortal, @route, pager, detail page",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/portal/portal-overview.html">Portal Development</a><span class="separator">›</span>
+          <span class="current">Portal Controllers</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 Portal Development</div>
+          <h1>Odoo Portal Controllers – Routing and HTTP Responses</h1>
+          <p class="lesson-intro">Portal controllers are Python classes that handle HTTP requests for your portal pages. You extend Odoo's built-in <code>CustomerPortal</code> controller, add your routes with <code>@http.route</code>, query records from <code>request.env</code>, and return rendered QWeb templates.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="deep-portalctrl">Portal Controllers: The /my Pages Customers See</h2>
+          <p>The customer portal (the <code>/my/...</code> pages where clients view their orders, invoices, tickets) is built by extending Odoo's <code>CustomerPortal</code> controller. You add routes for your own records and reuse the portal's layout helpers.</p>
+          <pre><code class="language-python">from odoo.addons.portal.controllers.portal import CustomerPortal
+from odoo.http import request, route
+
+class MyPortal(CustomerPortal):
+
+    @route("/my/projects", auth="user", website=True)
+    def portal_projects(self, **kw):
+        projects = request.env["project.project"].search([])  # record rules apply
+        values = self._prepare_portal_layout_values()
+        values["projects"] = projects
+        return request.render("my_module.portal_projects", values)</code></pre>
+          <table>
+            <thead><tr><th>Piece</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td><code>auth="user"</code></td><td>logged-in customers only</td></tr>
+              <tr><td><code>_prepare_portal_layout_values()</code></td><td>breadcrumbs, counters, sidebar</td></tr>
+              <tr><td>record rules</td><td>auto-limit records to the current customer</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Why inherit <code>CustomerPortal</code>:</strong> you get the portal's consistent layout, the "Documents" home page counters, and pagination helpers for free — instead of rebuilding them. Override <code>_prepare_home_portal_values()</code> to add your model's count to the portal dashboard.</p>
+          <p><strong>Security is the crux:</strong> portal users are external, so a route must never trust an id from the URL blindly. Rely on <em>record rules</em> to scope <code>search()</code> to the current partner, and when fetching a single record by id, verify ownership (call <code>check_access_rule</code> or check <code>partner_id</code>) before rendering — otherwise one customer can read another's data by changing the URL number.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create a portal controller extending <code>CustomerPortal</code>.</li>
+              <li>Add a <code>/my/items</code> route.</li>
+              <li>List the current user’s records.</li>
+              <li>Add a counter to the portal home.</li>
+              <li>Restrict the query to the logged-in user’s data.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a portal controller (extending <code>portal.CustomerPortal</code>) exposing <code>/my/orders</code> that lists only the current user’s orders, and add the counter to the portal home. Explain how <code>_prepare_home_portal_values</code> and filtering by <code>partner_id</code> keep data private.</p>
+          </div>
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>How Odoo's HTTP controller layer works</li>
+              <li>The <code>@route</code> decorator and its parameters</li>
+              <li>Extending <code>CustomerPortal</code> to add your model to the portal home</li>
+              <li>Building listing and detail page controllers with pager and access checks</li>
+            </ul>
+          </div>
+
+          <h2 id="odoo-http-controllers">Odoo HTTP Controllers</h2>
+          <p>Odoo's web layer is built on Werkzeug. Controllers are Python classes that inherit from <code>odoo.http.Controller</code>. For portal pages specifically, you inherit from <code>CustomerPortal</code> which itself inherits <code>Controller</code> and adds helpers for access token validation, pager, and the portal home page.</p>
+          <p>File location in your module: <code>controllers/portal.py</code> (import it in <code>controllers/__init__.py</code>).</p>
+
+          <h2 id="route-decorator">The @route Decorator</h2>
+          <p>Every controller method that handles a URL is decorated with <code>@http.route</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">@http.route(
+    ['/my/loans', '/my/loans/page/&lt;int:page&gt;'],
+    type='http',        # HTTP request (not JSON-RPC)
+    auth='user',        # requires login (portal or internal user)
+    website=True,       # enables website context (multi-website, theme, etc.)
+    methods=['GET'],
+)
+def portal_my_loans(self, page=1, **kw):
+    ...</code></pre>
+          </div>
+          <p>Key <code>auth</code> values:</p>
+          <ul>
+            <li><code>'user'</code> — logged-in users only (portal or internal)</li>
+            <li><code>'public'</code> — anyone, including anonymous visitors</li>
+            <li><code>'none'</code> — no session required (raw access)</li>
+          </ul>
+
+          <h2 id="portal-base-controller">Portal Base Controller</h2>
+          <p>Import and extend <code>CustomerPortal</code>. Override <code>_prepare_home_portal_values</code> to add a counter for your model to the portal home page:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo import http
+from odoo.http import request
+from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
+
+class LibraryPortal(CustomerPortal):
+
+    def _prepare_home_portal_values(self, counters):
+        values = super()._prepare_home_portal_values(counters)
+        if 'loan_count' in counters:
+            values['loan_count'] = request.env['library.loan'].search_count(
+                self._get_loans_domain()
+            )
+        return values
+
+    def _get_loans_domain(self):
+        return [('member_id', '=', request.env.user.partner_id.id)]</code></pre>
+          </div>
+          <p>The counter appears on the portal home page (<code>/my/home</code>) as a link to your listing page.</p>
+
+          <h2 id="listing-page-controller">Listing Page Controller</h2>
+          <p>A listing page shows all records for the current user with pagination:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">    @http.route(
+        ['/my/loans', '/my/loans/page/&lt;int:page&gt;'],
+        type='http', auth='user', website=True,
+    )
+    def portal_my_loans(self, page=1, sortby=None, **kw):
+        Loan = request.env['library.loan']
+        domain = self._get_loans_domain()
+
+        # Sorting options
+        searchbar_sortings = {
+            'date': {'label': 'Loan Date', 'order': 'loan_date desc'},
+            'name': {'label': 'Book', 'order': 'book_id asc'},
+        }
+        if not sortby or sortby not in searchbar_sortings:
+            sortby = 'date'
+        order = searchbar_sortings[sortby]['order']
+
+        loan_count = Loan.search_count(domain)
+        pager = portal_pager(
+            url='/my/loans',
+            url_args={'sortby': sortby},
+            total=loan_count,
+            page=page,
+            step=10,
+        )
+        loans = Loan.search(domain, order=order,
+                            limit=10, offset=pager['offset'])
+
+        return request.render('my_module.portal_my_loans', {
+            'loans': loans,
+            'pager': pager,
+            'sortby': sortby,
+            'searchbar_sortings': searchbar_sortings,
+            'page_name': 'loan',
+        })</code></pre>
+          </div>
+
+          <h2 id="detail-page-controller">Detail Page Controller</h2>
+          <p>The detail page shows a single record. Use <code>_document_check_access</code> to verify ownership or a valid access token:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">    @http.route(
+        ['/my/loans/&lt;int:loan_id&gt;'],
+        type='http', auth='public', website=True,
+    )
+    def portal_loan_detail(self, loan_id, access_token=None, **kw):
+        try:
+            loan_sudo = self._document_check_access(
+                'library.loan', loan_id, access_token
+            )
+        except (AccessError, MissingError):
+            return request.redirect('/my')
+
+        return request.render('my_module.portal_loan_detail', {
+            'loan': loan_sudo,
+            'page_name': 'loan',
+        })</code></pre>
+          </div>
+          <p><code>_document_check_access</code> raises <code>AccessError</code> if the user doesn't own the record and the token is wrong or missing. Using <code>auth='public'</code> here allows shared token links to work for anonymous visitors.</p>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="handling-404s">Handling 404s and Access Control</h2>
+          <p>Useful patterns for error handling:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo.exceptions import AccessError, MissingError
+import werkzeug
+
+# Redirect to portal home on error
+return request.redirect('/my')
+
+# Return 404
+raise werkzeug.exceptions.NotFound()
+
+# Check ownership manually without access token
+loan = request.env['library.loan'].browse(loan_id)
+if loan.member_id != request.env.user.partner_id:
+    raise werkzeug.exceptions.Forbidden()</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Extend <code>CustomerPortal</code> and override <code>_prepare_home_portal_values</code> for the counter</li>
+              <li>Use <code>portal_pager</code> for pagination on listing pages</li>
+              <li>Use <code>_document_check_access</code> on detail pages — it validates ownership OR access token</li>
+              <li>Detail pages use <code>auth='public'</code> so shared token links work for anonymous visitors</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you add a page to the customer portal?</li>
+            <li>What class do portal controllers extend?</li>
+            <li>How do you show only the current user’s records?</li>
+            <li>What is <code>_prepare_home_portal_values</code>?</li>
+            <li>How do you add a counter to the portal home?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/portal/portal-overview.html" class="topic-tag odoo-topic-tag">🌐 Portal Overview</a>
+              <a href="/odoo/portal/portal-templates.html" class="topic-tag odoo-topic-tag">🌐 Portal Templates</a>
+              <a href="/odoo/portal/portal-security.html" class="topic-tag odoo-topic-tag">🌐 Portal Security</a>
+              <a href="/odoo/website/website-controllers.html" class="topic-tag odoo-topic-tag">💻 Website Controllers</a>
+            </div>
+          </section>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why use sudo() when querying records in portal controllers? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>After <code>_document_check_access</code> returns, the record is already fetched with sudo context. For listing pages, if your record rules are correctly configured you don't need sudo — <code>request.env['library.loan'].search(...)</code> will automatically filter to the current user's records. Only use sudo() when you need to bypass record rules intentionally.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the page_name value used for? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>page_name</code> is passed to the template and used by the portal layout to highlight the active item in the portal sidebar navigation. Match it to the key you use in <code>_prepare_home_portal_values</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I add search/filter to the listing page? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — add URL parameters (e.g., <code>?search=python</code>), read them from <code>**kw</code>, and incorporate them into the domain. Pass the search value back to the template to pre-fill the search input.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+            <a href="/odoo/portal/portal-overview.html" class="lesson-nav-link">
+              <span class="nav-label">← Prev</span>
+              <span class="nav-title">Portal Overview</span>
+            </a>
+            <a href="/odoo/portal/portal-templates.html" class="lesson-nav-link next">
+              <span class="nav-label">Next →</span>
+              <span class="nav-title">Portal Templates</span>
+            </a>
+          </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

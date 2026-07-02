@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Context Managers – with, contextlib & Custom Managers | ylearner | ylearner</title>
+  <meta name="description" content="Learn Python context managers: the with statement, __enter__ and __exit__ methods, contextlib.contextmanager decorator, and real-world resource management patterns.">
+  <meta name="keywords" content="python context manager, python with statement, python __enter__ __exit__, python contextlib, python resource management">
+  <link rel="canonical" href="https://ylearner.org/python/advanced/context-managers.html">
+  <meta property="og:title" content="Python Context Managers – with, contextlib & Custom Managers | ylearner">
+  <meta property="og:description" content="Learn Python context managers: the with statement, __enter__ and __exit__ methods, contextlib.contextmanager decorator, and real-world resource management patterns.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/advanced/context-managers.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Context Managers – with, contextlib & Custom Managers | ylearner">
+  <meta name="twitter:description" content="Learn Python context managers: the with statement, __enter__ and __exit__ methods, contextlib.contextmanager decorator, and real-world resource management patterns.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Context Managers – with Statement and __enter__/__exit__","description":"Learn Python context managers: the with statement, __enter__ and __exit__ methods, contextlib.contextmanager decorator, and real-world resource management patterns.","educationalLevel":"Advanced","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/advanced/generators.html">Advanced Python</a><span class="separator">›</span><span class="current">Context Managers</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Advanced Python</div>
+          <h1>Python Context Managers – with Statement and __enter__/__exit__</h1>
+          <p class="lesson-intro">Context managers handle setup and teardown of resources automatically — files, database connections, locks, network sockets. The <code>with</code> statement guarantees that cleanup code always runs, even if an exception occurs. This eliminates a whole class of resource-leak bugs.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Advanced</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="with">The with Statement</h2>
+          <p><code>with</code> ensures the resource is properly closed/released regardless of what happens.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># Without context manager (bad — file may not close on error)
+f = open("data.txt", "w")
+f.write("Hello")  # If this crashes, f.close() never runs!
+f.close()
+
+# With context manager (correct)
+with open("data.txt", "w") as f:
+    f.write("Hello")  # __exit__ calls f.close() automatically
+# File is closed here — always</code></pre></div>
+          <div class="callout callout-tip"><span class="callout-icon">💡</span><div class="callout-content"><strong>Tip</strong><p>Always use <code>with</code> for file operations. It is safer and more readable than manual open/close.</p></div></div>
+
+          <h2 id="protocol">The Context Manager Protocol</h2>
+          <p>Any class with <code>__enter__</code> and <code>__exit__</code> works as a context manager.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Timer:
+    import time as _time
+
+    def __enter__(self):
+        import time
+        self.start = time.time()
+        return self   # Bound to "as" variable
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        import time
+        elapsed = time.time() - self.start
+        print(f"Elapsed: {elapsed:.4f}s")
+        return False  # Don't suppress exceptions
+
+with Timer() as t:
+    total = sum(range(1_000_000))</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Elapsed: 0.0412s</div>
+
+          <h2 id="contextlib">contextlib.contextmanager – Generator Approach</h2>
+          <p>Use <code>@contextmanager</code> to write context managers as generator functions — less boilerplate.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from contextlib import contextmanager
+
+@contextmanager
+def managed_resource(name):
+    print(f"Opening {name}")
+    try:
+        yield name      # Everything before yield = __enter__
+    finally:
+        print(f"Closing {name}")  # Always runs = __exit__
+
+with managed_resource("database") as r:
+    print(f"Working with {r}")</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Opening database
+Working with database
+Closing database</div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="multiple">Multiple Context Managers</h2>
+          <p>Combine multiple managers in one <code>with</code> statement.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># Open two files simultaneously
+with open("input.txt", "r") as src, open("output.txt", "w") as dst:
+    for line in src:
+        dst.write(line.upper())
+
+# Both files auto-closed after block</code></pre></div>
+
+          <h2 id="suppress">contextlib.suppress – Ignore Specific Exceptions</h2>
+          <p>Cleanly suppress known safe exceptions without try/except.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from contextlib import suppress
+import os
+
+# Instead of:
+try:
+    os.remove("temp.txt")
+except FileNotFoundError:
+    pass
+
+# Use suppress:
+with suppress(FileNotFoundError):
+    os.remove("temp.txt")</code></pre></div>
+
+          <h2 id="deep-ctxmgr">Why <code>with</code> Guarantees Cleanup — Even When Code Crashes</h2>
+          <p>A context manager runs setup on entry and <strong>teardown on exit no matter what</strong> — normal finish, early <code>return</code>, or an exception all trigger the cleanup. That's why <code>with open(...)</code> is safer than a bare <code>open()</code>: the file closes even if the code inside blows up.</p>
+          <pre><code class="language-python"># Without: a crash before close() leaks the file handle
+f = open("data.txt")
+process(f)          # if this raises, f is never closed
+f.close()
+
+# With: __exit__ runs on the way out, exception or not
+with open("data.txt") as f:
+    process(f)      # file guaranteed closed afterward</code></pre>
+          <h3>Build your own two ways</h3>
+          <pre><code class="language-python"># 1) class with __enter__ / __exit__
+class Timer:
+    def __enter__(self): self.t = time.time(); return self
+    def __exit__(self, *exc): print(time.time() - self.t)
+
+# 2) the shortcut: contextlib
+from contextlib import contextmanager
+@contextmanager
+def timer():
+    t = time.time()
+    yield                 # everything before = enter, after = exit
+    print(time.time() - t)</code></pre>
+          <p><code>__exit__</code> receives the exception info; return <code>True</code> from it to swallow the error, or <code>None</code>/<code>False</code> to let it propagate. Stack multiple: <code>with A() as a, B() as b:</code> closes them in reverse order.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Work with the <code>with</code> statement:</p>
+            <ol>
+              <li>Open a file using <code>with open(...)</code> and confirm it closes automatically.</li>
+              <li>Write a class implementing <code>__enter__</code> and <code>__exit__</code> that prints on entry and exit.</li>
+              <li>Create the same context manager using <code>@contextlib.contextmanager</code> and <code>yield</code>.</li>
+              <li>Use <code>contextlib.suppress</code> to ignore a specific exception.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a <code>Timer</code> context manager that records how long the code inside its <code>with</code> block takes and prints the elapsed time on exit — implement it both as a class (<code>__enter__</code>/<code>__exit__</code>) and as a <code>@contextmanager</code> generator. Make sure the timer still reports correctly even if the block raises an exception, then use multiple context managers in one <code>with</code> line.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A context manager guarantees setup and cleanup around a block, even if an exception occurs.</li>
+              <li>The <code>with</code> statement calls <code>__enter__</code> on entry and <code>__exit__</code> on exit.</li>
+              <li>Implement the protocol with <code>__enter__</code> and <code>__exit__</code> methods on a class.</li>
+              <li>The <code>@contextlib.contextmanager</code> decorator turns a generator (with one <code>yield</code>) into a context manager.</li>
+              <li>Returning <code>True</code> from <code>__exit__</code> suppresses the exception; returning falsy lets it propagate.</li>
+              <li>You can manage several resources in one <code>with</code> by separating them with commas.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Context Managers</h2>
+          <ul class="interview-list">
+            <li>What is a context manager and what problem does it solve?</li>
+            <li>How does the <code>with</code> statement work under the hood?</li>
+            <li>What methods make up the context manager protocol?</li>
+            <li>How do you create a context manager using <code>contextlib.contextmanager</code>?</li>
+            <li>What does the return value of <code>__exit__</code> control?</li>
+            <li>How do you manage multiple resources in one <code>with</code> block?</li>
+            <li>What does <code>contextlib.suppress</code> do?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/intermediate/file-handling.html" class="topic-tag">📁 File Handling</a>
+            <a href="/python/intermediate/exception-handling.html" class="topic-tag">⚠️ Exception Handling</a>
+            <a href="/python/advanced/generators.html" class="topic-tag">🔁 Generators</a>
+            <a href="/python/advanced/decorators.html" class="topic-tag">🎁 Decorators</a>
+            <a href="/python/real-world/database.html" class="topic-tag">🗄️ Databases</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the main benefit of a context manager? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It guarantees cleanup. Resources like files, database connections, and locks are released automatically when the <code>with</code> block ends, even if an exception is raised — eliminating the need for manual <code>try/finally</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the easiest way to write a context manager? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use the <code>@contextlib.contextmanager</code> decorator on a generator function: put setup code before a single <code>yield</code> and cleanup code after it. This is much shorter than writing a class with <code>__enter__</code>/<code>__exit__</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What does returning <code>True</code> from <code>__exit__</code> do? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It tells Python the exception raised inside the block has been handled and should be suppressed. Returning a falsy value (the default) lets the exception propagate normally.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I open multiple files in one <code>with</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes: <code>with open("a") as a, open("b") as b:</code> manages both, closing each when the block ends. For a dynamic number of resources, use <code>contextlib.ExitStack</code>.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/advanced/iterators.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Iterators</span></a>
+          <a href="/python/advanced/multithreading.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Multithreading</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

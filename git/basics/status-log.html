@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>git status &amp; git log – Inspecting Your Repository | ylearner</title>
+  <meta name="description" content="Learn to read git status output, explore commit history with git log, filter logs by author and date, and inspect specific commits with git show. Essential inspection tools for every Git user.">
+  <meta name="keywords" content="git status, git log, git log oneline, git log graph, git show, inspect git repository, git history, git log filter">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/git/basics/status-log.html">
+  <meta property="og:title" content="git status &amp; git log – Inspecting Your Repository | ylearner">
+  <meta property="og:description" content="Learn to read git status output, explore commit history with git log, filter logs by author and date, and inspect specific commits with git show.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/git/basics/status-log.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="git status &amp; git log – Inspecting Your Repository | ylearner">
+  <meta name="twitter:description" content="Learn to read git status output, explore commit history with git log, filter logs by author and date, and inspect specific commits with git show.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"git status & git log – Inspecting Your Repository","description":"Learn to read git status, explore commit history with git log, filter logs, and inspect commits with git show.","educationalLevel":"Beginner","keywords":"git status, git log, git show, git history","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <span>Basics</span><span class="separator">›</span>
+          <span class="current">git status &amp; git log</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Getting Started</div>
+          <h1>git status &amp; git log – Inspecting Your Repository</h1>
+          <p class="lesson-intro">Before you can act on a repository, you need to <em>read</em> it. <code>git status</code> tells you what's happening <strong>right now</strong> — what's staged, what's changed, and what's new. <code>git log</code> shows the <strong>full history</strong> of commits. Together, these two commands are the ones you'll run dozens of times per day. Master them early.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="git-status">git status – What's Happening Right Now</h2>
+          <p><code>git status</code> is the first command to run whenever you're unsure about the state of your working directory. It never modifies anything — it only reports. Run it freely and often.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">git status</code></pre>
+          </div>
+
+          <h2 id="reading-status-output">Reading the Status Output</h2>
+          <p>The output is divided into three sections. Here is a real example with all three present at once:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Output</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes to be committed:
+  (use "git restore --staged &lt;file&gt;..." to unstage)
+        modified:   src/utils.py
+        new file:   src/helpers.py
+
+Changes not staged for commit:
+  (use "git add &lt;file&gt;..." to update what will be committed)
+  (use "git restore &lt;file&gt;..." to discard changes in working directory)
+        modified:   README.md
+
+Untracked files:
+  (use "git add &lt;file&gt;..." to include in what will be committed)
+        experiments/scratch.py</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Section</th><th>Meaning</th><th>Next action</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Changes to be committed</strong></td>
+                  <td>Files in the staging area — ready for the next commit</td>
+                  <td><code>git commit</code> to save, or <code>git restore --staged</code> to unstage</td>
+                </tr>
+                <tr>
+                  <td><strong>Changes not staged</strong></td>
+                  <td>Modified tracked files that are NOT yet staged</td>
+                  <td><code>git add</code> to stage, or <code>git restore</code> to discard</td>
+                </tr>
+                <tr>
+                  <td><strong>Untracked files</strong></td>
+                  <td>New files Git has never seen — Git ignores these until you add them</td>
+                  <td><code>git add</code> to start tracking, or add to <code>.gitignore</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Short status format</strong>
+              <p>Run <code>git status -s</code> (or <code>--short</code>) for a compact two-column view. Left column = staging area, right column = working tree. <code>M</code> = modified, <code>A</code> = added, <code>?</code> = untracked. Example: <code>M  src/utils.py</code> means modified and staged; <code> M README.md</code> means modified but not staged.</p>
+            </div>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="git-log">git log – Exploring Commit History</h2>
+          <p><code>git log</code> displays the repository's commit history, most recent first. Each entry shows the commit hash, author, date, and message.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">git log</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Output</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">commit a3f8c2d1b4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9 (HEAD -> main, origin/main)
+Author: Alex Kim &lt;alex@example.com&gt;
+Date:   Mon Jun 8 14:23:11 2026 +0600
+
+    Add input validation to calculate function
+
+commit 7b9e1a3c2d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8
+Author: Alex Kim &lt;alex@example.com&gt;
+Date:   Sun Jun 7 10:05:44 2026 +0600
+
+    Initial project setup</code></pre>
+          </div>
+
+          <p>Press <kbd>q</kbd> to exit the log pager when there are many commits.</p>
+
+          <h2 id="log-formats">Useful Log Formats</h2>
+
+          <h3>One-line format — most readable for quick review</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">git log --oneline</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Output</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">a3f8c2d (HEAD -> main, origin/main) Add input validation to calculate function
+7b9e1a3 Initial project setup</code></pre>
+          </div>
+
+          <h3>Visual branch graph — the most useful command for multi-branch work</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">git log --oneline --graph --all</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Output</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">* a3f8c2d (HEAD -> main) Add input validation
+| * f1e2d3c (feature/login) Add login form
+| * 9a8b7c6 Start login feature
+|/
+* 7b9e1a3 Initial project setup</code></pre>
+          </div>
+
+          <p>The ASCII art graph shows where branches diverged and merged. The <code>*</code> marks commits; <code>|</code>, <code>/</code>, and <code>\</code> draw the branch lines. This is invaluable when working with multiple branches.</p>
+
+          <div class="callout callout-success">
+            <span class="callout-icon">✅</span>
+            <div class="callout-content">
+              <strong>Save this as an alias</strong>
+              <p>Most developers create a short alias for the graph log: <code>git config --global alias.lg "log --oneline --graph --all"</code>. Then just type <code>git lg</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="filtering-log">Filtering the Log</h2>
+          <p>On large projects with thousands of commits, you'll need to filter the log output.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Show only the last 5 commits
+git log -n 5
+git log -5   # shorthand
+
+# Filter by author (partial match works)
+git log --author="Alex"
+
+# Filter by date range
+git log --since="2 weeks ago"
+git log --since="2026-01-01" --until="2026-06-01"
+
+# Search commit messages with a keyword
+git log --grep="login"
+
+# Show commits that changed a specific file
+git log -- src/utils.py
+
+# Combine filters
+git log --oneline --author="Alex" --since="1 month ago"</code></pre>
+          </div>
+
+          <h2 id="git-show">git show – Inspect a Specific Commit</h2>
+          <p><code>git show</code> displays the full details of a single commit: the metadata (author, date, message) plus the diff of every file it changed.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Show the most recent commit (HEAD)
+git show
+
+# Show a specific commit by its hash (first 7 chars is enough)
+git show a3f8c2d
+
+# Show a commit and only list the changed file names (no diff content)
+git show a3f8c2d --stat
+
+# Show the content of a specific file at a specific commit
+git show a3f8c2d:src/utils.py</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Output of git show --stat</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">commit a3f8c2d1b4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9
+Author: Alex Kim &lt;alex@example.com&gt;
+Date:   Mon Jun 8 14:23:11 2026 +0600
+
+    Add input validation to calculate function
+
+ src/utils.py | 3 +++
+ 1 file changed, 3 insertions(+)</code></pre>
+          </div>
+
+          <h2 id="deep-statuslog">Reading status and log: Your Two Situational-Awareness Tools</h2>
+          <p><code>git status</code> answers "where am I right now?" and <code>git log</code> answers "how did I get here?" Run <code>status</code> constantly — it shows which of the three trees each change sits in.</p>
+          <pre><code class="language-bash">git status              # branch, staged vs unstaged vs untracked
+git status -s           # short format: XY filename</code></pre>
+          <table>
+            <thead><tr><th>status shows</th><th>Means</th></tr></thead>
+            <tbody>
+              <tr><td>Changes to be committed</td><td>staged (added) — goes in next commit</td></tr>
+              <tr><td>Changes not staged</td><td>edited but not <code>git add</code>ed</td></tr>
+              <tr><td>Untracked files</td><td>brand new, Git isn't watching them yet</td></tr>
+            </tbody>
+          </table>
+          <h3>Making log readable</h3>
+          <pre><code class="language-bash">git log --oneline                 # one line per commit
+git log --oneline --graph --all   # visual branch/merge tree
+git log -3                        # last 3 commits
+git log --author="Ann" --since="1 week ago"</code></pre>
+          <p>Plain <code>git log</code> is verbose; <code>--oneline --graph --all</code> is the combo most people alias — it draws the actual branch structure so you can see where branches diverged and merged. <code>git log &lt;file&gt;</code> shows the history of just one file, and <code>git log -p</code> adds the diff of each commit. Together, <code>status</code> + a good <code>log</code> mean you never commit blind.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Run <code>git status</code>.</li>
+              <li>View history with <code>git log</code>.</li>
+              <li>Use <code>git log --oneline</code>.</li>
+              <li>Show a graph with <code>--graph</code>.</li>
+              <li>Limit the log to the last 3 commits.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Use <code>git status</code> to read the state of your working tree, then explore history with <code>git log --oneline --graph</code>. Explain what status shows (staged, unstaged, untracked) and how to read a commit’s hash, author, and message in the log.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>git status</strong> — the go-to command to see what's staged, unstaged, and untracked; run it before every commit.</li>
+              <li>Status output has three sections: <em>Changes to be committed</em> (staged), <em>Changes not staged</em> (modified but not staged), and <em>Untracked files</em> (new files).</li>
+              <li><strong>git log</strong> — shows full commit history; most recent first.</li>
+              <li><strong>git log --oneline</strong> — compact one-line per commit; <code>--graph --all</code> adds a visual branch diagram.</li>
+              <li>Filter logs with <code>--author</code>, <code>-n</code>, <code>--since</code>, <code>--grep</code>, or by filename.</li>
+              <li><strong>git show &lt;hash&gt;</strong> — show a specific commit's full diff; <code>--stat</code> for a file-level summary.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does <code>git status</code> show?</li>
+            <li>What does <code>git log</code> show?</li>
+            <li>What does <code>--oneline</code> do?</li>
+            <li>How do you view a commit graph?</li>
+            <li>What is a commit hash?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/git/basics/staging-committing.html" class="topic-tag git-topic-tag">🔀 Staging &amp; Committing</a>
+            <a href="/git/basics/undoing-changes.html" class="topic-tag git-topic-tag">🔀 Undoing Changes</a>
+            <a href="/git/basics/viewing-diffs.html" class="topic-tag git-topic-tag">🔀 Viewing Diffs</a>
+            <a href="/git/branching/branches-overview.html" class="topic-tag git-topic-tag">🔀 Branches Overview</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why does git status show "nothing to commit, working tree clean" even though I changed a file? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>This usually means your file is listed in <code>.gitignore</code>, so Git is intentionally ignoring it. Check with <code>git status --ignored</code> to see ignored files. Another possibility: the file might not actually be saved yet (the editor hasn't written it to disk). Rarely, on certain operating systems, line-ending conversion settings (<code>core.autocrlf</code>) can make a file appear unchanged even after editing — though this is uncommon.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I see who last changed a specific line in a file? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>git blame &lt;filename&gt;</code>. It annotates every line with the commit hash, author name, and date of the last change to that line. Example: <code>git blame src/utils.py</code>. Many Git GUI tools and VS Code's GitLens extension show blame information inline as you read code.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is HEAD in git log output? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>HEAD</code> is a pointer to your current position in the repository — usually the tip of your current branch. When you see <code>(HEAD -&gt; main)</code> in <code>git log</code>, it means you are on the <em>main</em> branch and its latest commit is the one marked HEAD. When HEAD points directly to a commit hash instead of a branch, you are in "detached HEAD" state — which is normal when checking out a specific commit, but you should create a branch before making new commits in that state.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I see the history of a deleted file? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — use <code>git log --all -- path/to/deleted-file.py</code>. The <code>--</code> separator tells Git to interpret what follows as a file path, not a branch name. This shows all commits that touched the file, even after deletion. To recover the file's last content, run <code>git show &lt;last-commit-hash&gt;:path/to/deleted-file.py</code> or restore it with <code>git checkout &lt;commit&gt; -- path/to/deleted-file.py</code>.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/basics/staging-committing.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Staging &amp; Committing</span>
+          </a>
+          <a href="/git/basics/undoing-changes.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Undoing Changes</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Dictionary Comprehensions – Syntax & Examples | ylearner | ylearner</title>
+  <meta name="description" content="Master Python dictionary comprehensions: basic syntax, filtering, transforming keys and values, nested comprehensions, and when to use dict comprehensions vs for loops.">
+  <meta name="keywords" content="python dictionary comprehension, python dict comprehension, python dict comprehension syntax, python comprehension examples">
+  <link rel="canonical" href="https://ylearner.org/python/data-structures/dict-comprehensions.html">
+  <meta property="og:title" content="Python Dictionary Comprehensions – Syntax & Examples | ylearner">
+  <meta property="og:description" content="Master Python dictionary comprehensions: basic syntax, filtering, transforming keys and values, nested comprehensions, and when to use dict comprehensions vs for loops.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/data-structures/dict-comprehensions.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Dictionary Comprehensions – Syntax & Examples | ylearner">
+  <meta name="twitter:description" content="Master Python dictionary comprehensions: basic syntax, filtering, transforming keys and values, nested comprehensions, and when to use dict comprehensions vs for loops.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Python Dictionary Comprehensions – Concise Dict Creation","description":"Master Python dictionary comprehensions: basic syntax, filtering, transforming keys and values, nested comprehensions, and when to use dict comprehensions vs for loops.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/data-structures/dictionaries.html">Data Structures</a><span class="separator">›</span>
+          <span class="current">Dict Comprehensions</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">📦 Data Structures</div>
+          <h1>Python Dictionary Comprehensions – Concise Dict Creation</h1>
+          <p class="lesson-intro">Dictionary comprehensions create dictionaries in a single, readable expression — similar to list comprehensions but producing key-value pairs. They are faster than equivalent for-loop dictionary creation and are considered the most Pythonic way to build dictionaries from existing data.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="syntax">Basic Dictionary Comprehension Syntax</h2>
+          <p>The syntax is: {key_expression: value_expression for item in iterable}.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Basic dict comprehension
+squares = {x: x**2 for x in range(1, 6)}
+print(squares)
+
+# Equivalent for-loop (more verbose):
+squares_loop = {}
+for x in range(1, 6):
+    squares_loop[x] = x**2</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+{1: 1, 2: 4, 3: 9, 4: 16, 5: 25}
+          </div>
+
+          <h2 id="filter">Dict Comprehension with Filtering</h2>
+          <p>Add an if condition to filter which items get included.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">numbers = range(1, 11)
+
+# Only even numbers
+even_squares = {x: x**2 for x in numbers if x % 2 == 0}
+print(even_squares)</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+{2: 4, 4: 16, 6: 36, 8: 64, 10: 100}
+          </div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="transform">Transforming an Existing Dict</h2>
+          <p>Apply transformations to keys or values of an existing dictionary.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">prices = {"apple": 1.50, "banana": 0.75, "cherry": 2.00}
+
+# Apply 20% discount to all prices
+discounted = {item: round(price * 0.8, 2) for item, price in prices.items()}
+print(discounted)
+
+# Make all keys uppercase
+upper_prices = {k.upper(): v for k, v in prices.items()}
+print(upper_prices)</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+{'apple': 1.2, 'banana': 0.6, 'cherry': 1.6}
+{'APPLE': 1.5, 'BANANA': 0.75, 'CHERRY': 2.0}
+          </div>
+
+          <h2 id="invert">Inverting a Dictionary</h2>
+          <p>Swap keys and values. Only works if values are unique and hashable.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">original = {"a": 1, "b": 2, "c": 3}
+inverted = {v: k for k, v in original.items()}
+print(inverted)</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+{1: 'a', 2: 'b', 3: 'c'}
+          </div>
+
+          <h2 id="from-lists">Building Dict from Two Lists</h2>
+          <p>Use zip() to pair two lists into a dictionary.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">keys = ["name", "age", "city"]
+values = ["Alice", 30, "London"]
+
+result = {k: v for k, v in zip(keys, values)}
+print(result)
+
+# Or even simpler:
+result2 = dict(zip(keys, values))
+print(result2)</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+{'name': 'Alice', 'age': 30, 'city': 'London'}
+{'name': 'Alice', 'age': 30, 'city': 'London'}
+          </div>
+
+          <h2 id="deep-dictcomp">Dict Comprehensions: Build Maps in One Expression</h2>
+          <p>A dict comprehension creates a dictionary from an iterable in a single readable line — the same idea as a list comprehension, but producing <code>key: value</code> pairs.</p>
+          <pre><code class="language-python">nums = [1, 2, 3, 4]
+squares = {n: n*n for n in nums}          # {1: 1, 2: 4, 3: 9, 4: 16}
+
+# filter while building
+evens = {n: n*n for n in nums if n % 2 == 0}   # {2: 4, 4: 16}
+
+# invert a dict (swap keys and values)
+inverted = {v: k for k, v in original.items()}
+
+# build from two lists
+dict(zip(keys, values))                    # pairs them up</code></pre>
+          <table>
+            <thead><tr><th>Task</th><th>Comprehension</th></tr></thead>
+            <tbody>
+              <tr><td>transform values</td><td><code>{k: f(v) for k, v in d.items()}</code></td></tr>
+              <tr><td>filter keys</td><td><code>{k: v for k, v in d.items() if cond}</code></td></tr>
+              <tr><td>invert</td><td><code>{v: k for k, v in d.items()}</code></td></tr>
+            </tbody>
+          </table>
+          <p><strong>Two common uses:</strong> transforming an existing dict (apply a function to every value, or keep only some keys) and building a lookup table from data. Iterate with <code>.items()</code> to get key and value together. <strong>Gotchas:</strong> keys must be unique — if your expression produces the same key twice, the later value silently wins. And keys must be <em>hashable</em>, so inverting a dict only works if the values were hashable (no lists as values → keys). For simple key/value pairing from two sequences, <code>dict(zip(keys, values))</code> is even shorter.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Practice building dicts concisely:</p>
+            <ol>
+              <li>Create a dict mapping numbers 1–5 to their squares with a comprehension.</li>
+              <li>Filter an existing prices dict to keep only items costing more than $10.</li>
+              <li>Build a dict from two lists (names and scores) using <code>zip()</code>.</li>
+              <li>Invert a dict so its values become keys and vice versa.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Given a sentence, build a dictionary that counts how many times each word appears, using a dict comprehension over the unique words. Then create a second comprehension that keeps only the words appearing more than once, and a third that maps each word to its length. Bonus: normalize case and strip punctuation before counting.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A dict comprehension builds a dictionary in one expression: <code>{k: v for item in iterable}</code>.</li>
+              <li>Add a filter with a trailing <code>if</code>: <code>{k: v for ... if condition}</code>.</li>
+              <li>Pair two lists into a dict with <code>{k: v for k, v in zip(keys, values)}</code>.</li>
+              <li>Invert a dict with <code>{v: k for k, v in d.items()}</code> (assuming values are unique).</li>
+              <li>They are usually more concise and slightly faster than an equivalent <code>for</code> loop.</li>
+              <li>Keep them readable — move complex logic into a loop or helper if a comprehension gets dense.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Dictionary Comprehensions</h2>
+          <ul class="interview-list">
+            <li>What is a dictionary comprehension and what is its syntax?</li>
+            <li>How do you add a condition (filter) to a dict comprehension?</li>
+            <li>How do you build a dictionary from two lists?</li>
+            <li>How do you invert a dictionary using a comprehension?</li>
+            <li>What is the difference between a dict comprehension and a list comprehension?</li>
+            <li>Are dict comprehensions faster than building a dict in a loop?</li>
+            <li>Can you nest dict comprehensions?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/data-structures/dictionaries.html" class="topic-tag">🗂️ Dictionaries</a>
+            <a href="/python/data-structures/list-comprehensions.html" class="topic-tag">📐 List Comprehensions</a>
+            <a href="/python/data-structures/lists.html" class="topic-tag">📚 Lists</a>
+            <a href="/python/data-structures/sets.html" class="topic-tag">🔣 Sets</a>
+            <a href="/python/control-flow/for-loop.html" class="topic-tag">🔁 For Loops</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">How is a dict comprehension different from a list comprehension? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A list comprehension uses square brackets and produces a list of single values. A dict comprehension uses curly braces and a <code>key: value</code> expression, producing key–value pairs. Otherwise the looping and filtering syntax is identical.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Are dict comprehensions faster than a loop? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Usually a little faster, because the work happens in optimized C internally and avoids repeated <code>dict[key] = value</code> calls. The bigger benefit is readability for simple transformations.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I invert a dictionary? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>{v: k for k, v in d.items()}</code>. Be aware that if two keys share the same value, the inverted dict keeps only the last one, since dict keys must be unique.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I filter and transform at the same time? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Put the transformation in the <code>key: value</code> part and the filter in a trailing <code>if</code>, e.g. <code>{k: v*2 for k, v in d.items() if v &gt; 0}</code>.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/data-structures/list-comprehensions.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">List Comprehensions</span>
+          </a>
+          <a href="/python/data-structures/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

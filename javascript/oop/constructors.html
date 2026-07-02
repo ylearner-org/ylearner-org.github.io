@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Constructors – new, this &amp; the 4 Steps of new | ylearner</title>
+  <meta name="description" content="Learn JavaScript constructors in depth: the new keyword, 4 steps of object creation, this binding, new.target, super() in derived classes, private fields, and factory functions.">
+  <meta name="keywords" content="javascript constructor, new keyword javascript, this in constructor, new.target javascript, super constructor, private class fields, factory function javascript, function constructor ES6">
+  <link rel="canonical" href="https://ylearner.org/javascript/oop/constructors.html">
+  <meta property="og:title" content="JavaScript Constructors – new, this &amp; the 4 Steps of new | ylearner">
+  <meta property="og:description" content="Learn JavaScript constructors in depth: the new keyword, 4 steps of object creation, this binding, new.target, super() in derived classes, private fields, and factory functions.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/oop/constructors.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Constructors – new, this &amp; the 4 Steps of new | ylearner">
+  <meta name="twitter:description" content="Learn JavaScript constructors in depth: the new keyword, 4 steps of object creation, this binding, new.target, super() in derived classes, private fields, and factory functions.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/oop/classes.html">OOP</a><span class="separator">›</span>
+          <span class="current">Constructors</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🏗️ OOP</div>
+          <h1>JavaScript Constructors – Building Objects with new</h1>
+          <p class="lesson-intro">The <code>constructor</code> method is the heartbeat of every JavaScript class. It runs automatically when you use <code>new</code>, wires up <code>this</code>, and lets you set initial state on every fresh instance. In this lesson you will see exactly what the four-step <code>new</code> algorithm does under the hood, how <code>new.target</code> lets you guard against misuse, how <code>super()</code> chains parent constructors, and when a factory function is a smarter alternative to a class.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-constructor">What Is a Constructor?</h2>
+          <p>A <strong>constructor</strong> is a special method inside a class that JavaScript calls automatically whenever you create a new instance with the <code>new</code> keyword. Its job is simple: receive arguments, set up instance properties, and leave <code>this</code> in a valid initial state.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Car {
+  constructor(make, model, year) {
+    this.make  = make;
+    this.model = model;
+    this.year  = year;
+    this.speed = 0;           // default – not passed in
+  }
+
+  accelerate(amount) {
+    this.speed += amount;
+    return this;              // enable chaining
+  }
+
+  toString() {
+    return `${this.year} ${this.make} ${this.model} @ ${this.speed} km/h`;
+  }
+}
+
+const tesla = new Car('Tesla', 'Model 3', 2024);
+tesla.accelerate(60).accelerate(20);
+console.log(tesla.toString());
+console.log(tesla instanceof Car);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>2024 Tesla Model 3 @ 80 km/h
+true</pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content"><strong>One constructor per class</strong><p>A class body can contain exactly one method named <code>constructor</code>. Defining a second one throws a <code>SyntaxError</code>. If you omit it entirely, JavaScript generates a default (empty) constructor automatically.</p></div>
+          </div>
+
+          <h2 id="four-steps-of-new">The 4 Steps the <code>new</code> Keyword Performs</h2>
+          <p>When you write <code>new Car('Tesla', 'Model 3', 2024)</code>, the JavaScript engine performs these four steps in order — every time, without exception:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Step</th><th>What happens</th><th>Equivalent code</th></tr></thead>
+              <tbody>
+                <tr><td>1. Create</td><td>A brand-new empty object is created in memory</td><td><code>const obj = Object.create(null)</code></td></tr>
+                <tr><td>2. Link prototype</td><td>The new object's <code>[[Prototype]]</code> is set to <code>Constructor.prototype</code></td><td><code>Object.setPrototypeOf(obj, Car.prototype)</code></td></tr>
+                <tr><td>3. Bind <code>this</code></td><td>Inside the constructor, <code>this</code> refers to the new object</td><td><code>constructor.call(obj, ...args)</code></td></tr>
+                <tr><td>4. Return</td><td>The new object is returned (unless the constructor returns a different object)</td><td><code>return obj</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Manually simulating what `new` does
+function simulateNew(Constructor, ...args) {
+  // Step 1 + 2: create object and link prototype
+  const obj = Object.create(Constructor.prototype);
+
+  // Step 3: call constructor with obj as this
+  const result = Constructor.apply(obj, args);
+
+  // Step 4: return object (or override if constructor returns an object)
+  return (typeof result === 'object' &amp;&amp; result !== null) ? result : obj;
+}
+
+function Point(x, y) {
+  this.x = x;
+  this.y = y;
+}
+Point.prototype.toString = function () {
+  return `(${this.x}, ${this.y})`;
+};
+
+const p1 = new Point(3, 4);
+const p2 = simulateNew(Point, 3, 4);
+
+console.log(p1.toString());          // (3, 4)
+console.log(p2.toString());          // (3, 4)
+console.log(p1 instanceof Point);    // true
+console.log(p2 instanceof Point);    // true</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>(3, 4)
+(3, 4)
+true
+true</pre>
+          </div>
+
+          <h2 id="return-from-constructor">Returning from a Constructor</h2>
+          <p>Normally you do not <code>return</code> anything from a constructor — JavaScript returns <code>this</code> automatically (step 4 above). But what if you explicitly return something?</p>
+          <ul>
+            <li>Returning a <strong>primitive</strong> (string, number, boolean, null, undefined) → ignored; <code>this</code> is returned as usual.</li>
+            <li>Returning an <strong>object</strong> → that object replaces <code>this</code> as the result of <code>new</code>.</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Quirky {
+  constructor() {
+    this.name = 'original';
+    return { name: 'replaced', bonus: true };  // returns a plain object
+  }
+}
+
+class Normal {
+  constructor() {
+    this.name = 'original';
+    return 42;   // returning a primitive — ignored
+  }
+}
+
+const q = new Quirky();
+console.log(q.name);          // 'replaced'
+console.log(q instanceof Quirky); // false — prototype not linked!
+
+const n = new Normal();
+console.log(n.name);          // 'original'  (return 42 was ignored)
+console.log(n instanceof Normal); // true</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>replaced
+false
+original
+true</pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content"><strong>Avoid returning objects from constructors</strong><p>Returning a plain object from a constructor breaks <code>instanceof</code> and loses the prototype chain. This is almost always a bug. The only legitimate use-case is enforcing a singleton pattern.</p></div>
+          </div>
+
+          <h2 id="new-target">new.target – Detecting How a Constructor Was Called</h2>
+          <p><code>new.target</code> is a meta-property available inside functions and constructors. It equals the constructor being called when invoked with <code>new</code>, and is <code>undefined</code> when called without <code>new</code>. This lets you enforce that a class is only ever instantiated with <code>new</code>, or create abstract base classes.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Guard: must be called with new
+function SafeCounter(start = 0) {
+  if (new.target === undefined) {
+    throw new TypeError('SafeCounter must be called with new');
+  }
+  this.count = start;
+}
+
+const c = new SafeCounter(10);
+console.log(c.count);   // 10
+
+try {
+  SafeCounter(5);       // throws
+} catch (e) {
+  console.log(e.message);
+}
+
+// Abstract base class pattern
+class Shape {
+  constructor(color) {
+    if (new.target === Shape) {
+      throw new Error('Shape is abstract – extend it, do not instantiate directly');
+    }
+    this.color = color;
+  }
+}
+
+class Circle extends Shape {
+  constructor(color, radius) {
+    super(color);
+    this.radius = radius;
+  }
+  area() { return Math.PI * this.radius ** 2; }
+}
+
+try {
+  new Shape('red');    // throws
+} catch (e) {
+  console.log(e.message);
+}
+
+const circle = new Circle('blue', 5);
+console.log(circle.area().toFixed(2));  // 78.54</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>10
+SafeCounter must be called with new
+Shape is abstract – extend it, do not instantiate directly
+78.54</pre>
+          </div>
+
+          <h2 id="super-in-derived-constructors">super() in Derived Class Constructors</h2>
+          <p>When a class uses <code>extends</code>, its constructor <strong>must</strong> call <code>super()</code> before accessing <code>this</code>. This is because the parent constructor is responsible for creating and initialising the <code>this</code> object — until <code>super()</code> returns, <code>this</code> is in a "dead zone" and any access to it throws a <code>ReferenceError</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Animal {
+  constructor(name, sound) {
+    this.name  = name;
+    this.sound = sound;
+  }
+  speak() {
+    return `${this.name} says ${this.sound}!`;
+  }
+}
+
+class Dog extends Animal {
+  constructor(name, breed) {
+    super(name, 'Woof');   // must come before any use of `this`
+    this.breed = breed;
+  }
+  fetch(item) {
+    return `${this.name} (${this.breed}) fetches the ${item}!`;
+  }
+}
+
+class GoldenRetriever extends Dog {
+  constructor(name) {
+    super(name, 'Golden Retriever');   // chains up two levels
+    this.friendly = true;
+  }
+}
+
+const buddy = new GoldenRetriever('Buddy');
+console.log(buddy.speak());
+console.log(buddy.fetch('ball'));
+console.log(buddy.friendly);
+console.log(buddy instanceof Animal);  // true – full prototype chain</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Buddy says Woof!
+Buddy (Golden Retriever) fetches the ball!
+true
+true</pre>
+          </div>
+
+          <h2 id="private-class-fields">Private Class Fields (#name Syntax)</h2>
+          <p>ES2022 introduced private class fields using the <code>#</code> prefix. Private fields are truly inaccessible outside the class — unlike the older convention of prefixing with <code>_</code>, which was never enforced by the runtime.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class BankAccount {
+  #balance;         // private field declaration (required before use)
+  #owner;
+
+  constructor(owner, initialBalance) {
+    this.#owner   = owner;
+    this.#balance = initialBalance >= 0 ? initialBalance : 0;
+  }
+
+  deposit(amount) {
+    if (amount &lt;= 0) throw new RangeError('Deposit must be positive');
+    this.#balance += amount;
+    return this;
+  }
+
+  withdraw(amount) {
+    if (amount &gt; this.#balance) throw new Error('Insufficient funds');
+    this.#balance -= amount;
+    return this;
+  }
+
+  get balance() { return this.#balance; }   // public read-only accessor
+
+  toString() {
+    return `${this.#owner}: $${this.#balance.toFixed(2)}`;
+  }
+}
+
+const acct = new BankAccount('Alice', 100);
+acct.deposit(50).withdraw(30);
+console.log(acct.toString());        // Alice: $120.00
+console.log(acct.balance);           // 120
+
+// Direct access is a SyntaxError at parse time:
+// console.log(acct.#balance);       // SyntaxError</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Alice: $120.00
+120</pre>
+          </div>
+
+          <h2 id="factory-functions">Factory Functions – An Alternative to Classes</h2>
+          <p>A <strong>factory function</strong> is a regular function that creates and returns an object without using <code>new</code> or <code>class</code>. Factories naturally support true private data via closures and avoid the pitfalls of <code>this</code> binding.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function createPerson(name, age) {
+  // `name` and `age` are closed over — truly private
+  let _age = age;
+
+  return {
+    getName() { return name; },
+    getAge()  { return _age; },
+    birthday() {
+      _age++;
+      console.log(`Happy birthday, ${name}! Now ${_age}.`);
+    },
+    toString() { return `${name} (age ${_age})`; }
+  };
+}
+
+const alice = createPerson('Alice', 29);
+alice.birthday();
+console.log(alice.toString());
+console.log(alice._age);           // undefined — truly private</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Happy birthday, Alice! Now 30.
+Alice (age 30)
+undefined</pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>Class vs Factory – when to choose</strong><p>Use a <strong>class</strong> when you need <code>instanceof</code> checks, inheritance hierarchies, or you are building a library with a well-defined public API. Use a <strong>factory</strong> when you want true closure-based privacy, functional composition (mixins), or you want to avoid <code>this</code> confusion entirely.</p></div>
+          </div>
+
+          <h2 id="function-constructors">Function Constructors (Pre-ES6 Pattern)</h2>
+          <p>Before ES6, the idiomatic way to create "classes" in JavaScript was to write a capitalised function and add methods to its <code>.prototype</code>. ES6 classes are syntactic sugar over this pattern — understanding it helps you read older codebases.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Pre-ES6 constructor function
+function Vehicle(make, model) {
+  this.make  = make;
+  this.model = model;
+}
+
+Vehicle.prototype.describe = function () {
+  return `${this.make} ${this.model}`;
+};
+
+// "Static" method on the constructor function itself
+Vehicle.compare = function (a, b) {
+  return a.make.localeCompare(b.make);
+};
+
+const v1 = new Vehicle('Ford',  'Mustang');
+const v2 = new Vehicle('Audi',  'A4');
+console.log(v1.describe());              // Ford Mustang
+console.log(Vehicle.compare(v1, v2));    // 1 (F comes after A)
+
+// ES6 class — identical runtime behaviour:
+class VehicleES6 {
+  constructor(make, model) {
+    this.make  = make;
+    this.model = model;
+  }
+  describe() { return `${this.make} ${this.model}`; }
+  static compare(a, b) { return a.make.localeCompare(b.make); }
+}
+
+console.log(v1 instanceof Vehicle);      // true
+console.log(typeof Vehicle);            // 'function'  (class is also 'function')</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Ford Mustang
+1
+true
+function</pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="deep-jsctor">What <code>new</code> Actually Does</h2>
+          <p>A constructor builds objects. Whether you write an old constructor function or a modern <code>class</code>, the <code>new</code> keyword runs the same four hidden steps — and knowing them demystifies <code>this</code>.</p>
+          <pre><code class="language-javascript">function User(name) {
+  // when called with `new`, JavaScript automatically:
+  //   1. creates a fresh empty object
+  //   2. links its prototype to User.prototype
+  //   3. binds `this` to that object
+  this.name = name;      // 4. runs the body, returns `this` implicitly
+}
+const u = new User("Ann");   // u = { name: "Ann" }</code></pre>
+          <p>The <code>class</code> version is the same machinery with cleaner syntax:</p>
+          <pre><code class="language-javascript">class User {
+  constructor(name) { this.name = name; }
+}</code></pre>
+          <p><strong>The forgotten-<code>new</code> bug:</strong> call a constructor function <em>without</em> <code>new</code> and <code>this</code> points at the global object (or is <code>undefined</code> in strict mode) — so <code>this.name = name</code> either pollutes globals or throws. This is exactly why ES6 <code>class</code> exists: calling a class without <code>new</code> is a hard error, catching the mistake immediately. Put shared methods on the prototype (or as class methods) so all instances share one copy instead of each getting its own.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Create a <code>Queue</code> class using private class fields that models a first-in-first-out queue:</p>
+            <ul>
+              <li>Private field <code>#items</code> initialised to an empty array in the constructor.</li>
+              <li>Public methods: <code>enqueue(item)</code>, <code>dequeue()</code> (throws if empty), <code>peek()</code> (returns front without removing), <code>get size()</code>.</li>
+              <li>Use <code>new.target</code> to throw an error if someone tries to call <code>Queue</code> without <code>new</code>.</li>
+              <li>Test: enqueue 3 items, peek, dequeue twice, log the remaining size.</li>
+            </ul>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Implement a <code>Singleton</code> pattern using a class constructor that caches the first instance and returns the same object on every subsequent <code>new</code> call. Hint: return the cached instance as an object from the constructor (step 4 of <code>new</code>). Verify that <code>new Singleton() === new Singleton()</code> is <code>true</code>.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>The <code>constructor</code> method runs automatically on <code>new</code> and sets up instance state.</li>
+              <li><code>new</code> performs 4 steps: create empty object → link prototype → bind <code>this</code> → return object.</li>
+              <li>Returning a primitive from a constructor is ignored; returning an object replaces <code>this</code>.</li>
+              <li><code>new.target</code> equals the constructor when called with <code>new</code>, <code>undefined</code> otherwise.</li>
+              <li>Derived class constructors must call <code>super()</code> before any use of <code>this</code>.</li>
+              <li>Private class fields (<code>#field</code>) are enforced by the runtime, not just by convention.</li>
+              <li>Factory functions provide closure-based privacy and avoid <code>this</code>-binding issues.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What are the four steps the <code>new</code> keyword performs when creating an object?</li>
+            <li>What happens if a constructor explicitly returns a primitive? What about an object?</li>
+            <li>Why must <code>super()</code> be called before <code>this</code> in a derived class constructor?</li>
+            <li>How does <code>new.target</code> help implement abstract base classes?</li>
+            <li>What is the difference between a private class field (<code>#field</code>) and a convention-only private property (<code>_field</code>)?</li>
+            <li>When would you choose a factory function over a class?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/javascript/oop/classes.html" class="topic-tag">Classes &amp; Objects</a>
+            <a href="/javascript/oop/inheritance.html" class="topic-tag">Inheritance</a>
+            <a href="/javascript/oop/encapsulation.html" class="topic-tag">Encapsulation</a>
+            <a href="/javascript/oop/prototypes.html" class="topic-tag">Prototypes</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I have multiple constructors in a JavaScript class? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. JavaScript class bodies allow exactly one <code>constructor</code> method. If you need optional parameters, use default parameter values or destructuring inside the single constructor.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the default constructor if I omit it? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For a base class the engine inserts <code>constructor() {}</code>. For a derived class it inserts <code>constructor(...args) { super(...args); }</code>, which forwards all arguments to the parent constructor.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Do private class fields work in all modern browsers? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Private class fields (the <code>#</code> syntax) are fully supported in Chrome 74+, Firefox 90+, Safari 14.1+, and Node.js 12+. They are part of the ES2022 specification.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is a class declaration hoisted like a function declaration? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Classes are hoisted (the binding is created) but not initialised — they sit in a temporal dead zone until the class declaration is evaluated. Accessing a class before its declaration throws a <code>ReferenceError</code>, unlike function declarations which are fully hoisted.</p></div>
+            </div>
+          </section>
+
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/oop/classes.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Classes &amp; Objects</span></a>
+          <a href="/javascript/oop/inheritance.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Inheritance</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

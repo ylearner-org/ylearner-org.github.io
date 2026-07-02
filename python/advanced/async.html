@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Async Programming – asyncio, async def, await | ylearner | ylearner</title>
+  <meta name="description" content="Master Python async programming: async def, await, asyncio.run(), gather, create_task, real async HTTP requests, and when to use async vs threads.">
+  <meta name="keywords" content="python async, python asyncio, python async await, python coroutine, python async programming, python aiohttp">
+  <link rel="canonical" href="https://ylearner.org/python/advanced/async.html">
+  <meta property="og:title" content="Python Async Programming – asyncio, async def, await | ylearner">
+  <meta property="og:description" content="Master Python async programming: async def, await, asyncio.run(), gather, create_task, real async HTTP requests, and when to use async vs threads.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/advanced/async.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Async Programming – asyncio, async def, await | ylearner">
+  <meta name="twitter:description" content="Master Python async programming: async def, await, asyncio.run(), gather, create_task, real async HTTP requests, and when to use async vs threads.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Async Programming – asyncio, async/await Explained","description":"Master Python async programming: async def, await, asyncio.run(), gather, create_task, real async HTTP requests, and when to use async vs threads.","educationalLevel":"Advanced","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/advanced/generators.html">Advanced Python</a><span class="separator">›</span><span class="current">Async Programming</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Advanced Python</div>
+          <h1>Python Async Programming – asyncio, async/await Explained</h1>
+          <p class="lesson-intro">Async programming lets a single thread handle thousands of concurrent I/O operations without blocking. Instead of waiting idle for a network request, an async program switches to other work. Python's <code>asyncio</code> library and <code>async/await</code> syntax make this efficient and readable.</p>
+          <div class="lesson-meta"><span>⏱️ 25 min read</span><span>🎯 Advanced</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="basics">async def and await – The Basics</h2>
+          <p><code>async def</code> creates a coroutine function. <code>await</code> suspends execution until the awaited operation completes.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import asyncio
+
+async def greet(name, delay):
+    await asyncio.sleep(delay)  # Non-blocking wait
+    print(f"Hello, {name}!")
+
+async def main():
+    # Run sequentially: takes 3s
+    await greet("Alice", 1)
+    await greet("Bob", 2)
+
+asyncio.run(main())</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Hello, Alice!
+Hello, Bob!</div>
+
+          <h2 id="gather">asyncio.gather – True Concurrency</h2>
+          <p>Run multiple coroutines concurrently with <code>asyncio.gather()</code>.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import asyncio
+import time
+
+async def fetch(url, delay):
+    await asyncio.sleep(delay)  # Simulate network I/O
+    return f"Response from {url}"
+
+async def main():
+    start = time.time()
+
+    # All three run concurrently — total ~2s not 6s
+    results = await asyncio.gather(
+        fetch("api.com/users", 2),
+        fetch("api.com/posts", 1),
+        fetch("api.com/data",  2)
+    )
+
+    for r in results:
+        print(r)
+    print(f"Done in {time.time()-start:.1f}s")
+
+asyncio.run(main())</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Response from api.com/users
+Response from api.com/posts
+Response from api.com/data
+Done in 2.0s</div>
+
+          <h2 id="tasks">asyncio.create_task – Background Tasks</h2>
+          <p>Tasks run in the background. Useful for fire-and-forget operations.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import asyncio
+
+async def background_worker():
+    while True:
+        print("Background: heartbeat")
+        await asyncio.sleep(5)
+
+async def main():
+    task = asyncio.create_task(background_worker())
+
+    # Do other work while background runs
+    await asyncio.sleep(0)   # Yield control
+    print("Main: doing work")
+    task.cancel()            # Stop background
+
+asyncio.run(main())</code></pre></div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="aiohttp">Real Async HTTP with aiohttp</h2>
+          <p>Use <code>aiohttp</code> for async HTTP requests. Dramatically faster than requests for concurrent fetching.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># pip install aiohttp
+import asyncio
+import aiohttp
+
+async def fetch_url(session, url):
+    async with session.get(url) as response:
+        return await response.json()
+
+async def main():
+    urls = [
+        "https://api.github.com/users/python",
+        "https://api.github.com/users/torvalds"
+    ]
+    async with aiohttp.ClientSession() as session:
+        tasks = [fetch_url(session, url) for url in urls]
+        results = await asyncio.gather(*tasks)
+    for r in results:
+        print(r["login"])
+
+asyncio.run(main())</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>python
+torvalds</div>
+
+          <h2 id="deep-pyasync">async/await: Concurrency Without Threads</h2>
+          <p><code>asyncio</code> runs many tasks on a <em>single thread</em> by letting each one pause at an <code>await</code> and hand control back to the event loop. It's <strong>cooperative</strong>: a task only yields when it hits <code>await</code>, so one CPU-heavy loop with no <code>await</code> blocks everything.</p>
+          <pre><code class="language-python">import asyncio
+
+async def fetch(name, delay):
+    await asyncio.sleep(delay)      # yields to the loop — other tasks run
+    return f"{name} done"
+
+async def main():
+    # run concurrently — total time ≈ the SLOWEST, not the sum
+    results = await asyncio.gather(fetch("a", 2), fetch("b", 1))
+    print(results)
+
+asyncio.run(main())</code></pre>
+          <table>
+            <thead><tr><th>Workload</th><th>Use</th></tr></thead>
+            <tbody>
+              <tr><td>I/O-bound (network, disk, DB)</td><td><code>asyncio</code> — huge win</td></tr>
+              <tr><td>CPU-bound (crunching numbers)</td><td><code>multiprocessing</code> — asyncio won't help</td></tr>
+            </tbody>
+          </table>
+          <p><strong>The catch:</strong> <code>async</code> only speeds up <em>waiting</em>. Because of the GIL and the single thread, CPU-bound work still runs serially — and a blocking call (<code>time.sleep</code>, a sync DB driver) freezes the whole loop. Use <code>await asyncio.sleep()</code> and async libraries throughout, or offload heavy work with <code>run_in_executor</code>.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Get comfortable with <code>asyncio</code>:</p>
+            <ol>
+              <li>Write an <code>async def</code> coroutine that <code>await</code>s <code>asyncio.sleep(1)</code> and prints a message.</li>
+              <li>Run it with <code>asyncio.run()</code>.</li>
+              <li>Use <code>asyncio.gather()</code> to run three such coroutines concurrently and time the total.</li>
+              <li>Schedule one coroutine as a background task with <code>asyncio.create_task()</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Simulate fetching data from five “endpoints”, each represented by a coroutine that sleeps a random amount and returns a result. Run them sequentially and time it, then run them concurrently with <code>asyncio.gather()</code> and compare the total time — demonstrating that concurrency overlaps the waiting. Bonus: add a timeout with <code>asyncio.wait_for()</code> so a slow endpoint is cancelled.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Async programming runs many I/O-bound tasks concurrently on a single thread via an event loop.</li>
+              <li>A coroutine is defined with <code>async def</code> and paused/resumed with <code>await</code>.</li>
+              <li><code>asyncio.run()</code> starts the event loop and runs a coroutine to completion.</li>
+              <li><code>asyncio.gather()</code> runs multiple coroutines concurrently and collects their results.</li>
+              <li><code>asyncio.create_task()</code> schedules a coroutine to run in the background.</li>
+              <li>Async helps with I/O-bound work (network, disk); for CPU-bound work use multiprocessing.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Async / Asyncio</h2>
+          <ul class="interview-list">
+            <li>What is asynchronous programming and how does it differ from threading?</li>
+            <li>What do the <code>async</code> and <code>await</code> keywords do?</li>
+            <li>What is a coroutine?</li>
+            <li>What is the difference between concurrency and parallelism?</li>
+            <li>What does <code>asyncio.gather()</code> do?</li>
+            <li>When is async I/O beneficial versus when does it not help?</li>
+            <li>What is an event loop?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/advanced/multithreading.html" class="topic-tag">🧵 Multithreading</a>
+            <a href="/python/advanced/multiprocessing.html" class="topic-tag">⚙️ Multiprocessing</a>
+            <a href="/python/advanced/generators.html" class="topic-tag">🔁 Generators</a>
+            <a href="/python/real-world/api-development.html" class="topic-tag">🌐 API Development</a>
+            <a href="/python/frameworks/fastapi.html" class="topic-tag">⚡ FastAPI</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between async and threading? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Async uses a single thread and an event loop that switches between tasks at <code>await</code> points — cooperative multitasking with no lock overhead. Threading uses multiple OS threads preempted by the scheduler. Async excels at many concurrent I/O waits; threads can run blocking code without rewriting it.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When does async actually make my code faster? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>When the work is I/O-bound — network requests, database calls, file access — where tasks spend most time waiting. Async overlaps that waiting. For CPU-bound work it gives no speedup because only one coroutine runs at a time.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why do I get “coroutine was never awaited”? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Calling an <code>async def</code> function returns a coroutine object; it does not run until awaited or scheduled. Use <code>await coro()</code>, <code>asyncio.run(coro())</code>, or <code>asyncio.create_task(coro())</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I mix blocking code with asyncio? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A blocking call inside a coroutine stalls the whole event loop. Offload it with <code>loop.run_in_executor()</code> or <code>asyncio.to_thread()</code> so the loop stays responsive.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/advanced/multiprocessing.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Multiprocessing</span></a>
+          <a href="/python/advanced/type-hinting.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Type Hinting</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Nested If Statements – Deep Conditionals | ylearner</title>
+  <meta name="description" content="Learn JavaScript nested if statements, when to use deep nesting vs. guard clauses, early return patterns, and how to refactor complex conditional logic for readability.">
+  <meta name="keywords" content="javascript nested if, nested conditionals, guard clause, early return, refactoring nested if, deep nesting javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/control-flow/nested-if.html">
+  <meta property="og:title" content="JavaScript Nested If Statements – Deep Conditionals | ylearner">
+  <meta property="og:description" content="Learn JavaScript nested if statements, when to use deep nesting vs. guard clauses, early return patterns, and how to refactor complex conditional logic for readability.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/control-flow/nested-if.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Nested If Statements – Deep Conditionals | ylearner">
+  <meta name="twitter:description" content="Learn JavaScript nested if statements, when to use deep nesting vs. guard clauses, early return patterns, and how to refactor complex conditional logic for readability.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/control-flow/if-statements.html">Control Flow</a><span class="separator">›</span>
+          <span class="current">Nested If Statements</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔀 Control Flow</div>
+          <h1>JavaScript Nested If Statements – Deep Conditional Logic</h1>
+          <p class="lesson-intro">Understand how to write nested conditional logic in JavaScript, when deep nesting harms readability, and how to use guard clauses and early returns to produce clean, maintainable code.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 16 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-nested-if">What Is a Nested If Statement?</h2>
+          <p>A <strong>nested if</strong> is an if statement placed inside another if (or else) block. This lets you check a second condition only after a first one has already passed.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">let isLoggedIn = true;
+let hasVerifiedEmail = true;
+let accountAge = 30; // days
+
+if (isLoggedIn) {
+  if (hasVerifiedEmail) {
+    if (accountAge >= 7) {
+      console.log("Full access granted.");
+    } else {
+      console.log("Account too new. Wait " + (7 - accountAge) + " more days.");
+    }
+  } else {
+    console.log("Please verify your email.");
+  }
+} else {
+  console.log("Please log in.");
+}</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Full access granted.</div>
+
+          <h2 id="readability-problem">The Readability Problem</h2>
+          <p>Each additional level of nesting indents your code further to the right, creating what developers call the <strong>Pyramid of Doom</strong>. With three or more levels this becomes genuinely hard to follow.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Pyramid of Doom — hard to read
+function processOrder(user, cart, payment) {
+  if (user) {
+    if (user.isActive) {
+      if (cart.items.length > 0) {
+        if (payment.isValid) {
+          if (payment.amount >= cart.total) {
+            console.log("Order placed!");
+          } else {
+            console.log("Insufficient payment.");
+          }
+        } else {
+          console.log("Invalid payment.");
+        }
+      } else {
+        console.log("Cart is empty.");
+      }
+    } else {
+      console.log("Account is deactivated.");
+    }
+  } else {
+    console.log("No user found.");
+  }
+}</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Maximum Recommended Nesting Depth: 2</strong>
+              <p>Most style guides (Google, Airbnb) recommend keeping nesting to a maximum of two levels. Beyond that, consider refactoring with guard clauses, helper functions, or early returns.</p>
+            </div>
+          </div>
+
+          <h2 id="guard-clauses">Guard Clauses — The Rescue Pattern</h2>
+          <p>A <strong>guard clause</strong> checks for an invalid (or undesirable) condition at the top of a function and returns early, so the rest of the function runs only in the "happy path".</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Refactored with guard clauses — flat and readable
+function processOrder(user, cart, payment) {
+  if (!user)             return "No user found.";
+  if (!user.isActive)    return "Account is deactivated.";
+  if (cart.items.length === 0) return "Cart is empty.";
+  if (!payment.isValid)  return "Invalid payment.";
+  if (payment.amount < cart.total) return "Insufficient payment.";
+
+  // Happy path — only runs when all guards pass
+  console.log("Order placed!");
+  return "success";
+}
+
+let result = processOrder(
+  { isActive: true },
+  { items: ["book"], total: 25 },
+  { isValid: true, amount: 25 }
+);
+console.log(result);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Order placed!
+success</div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Invert the Condition</strong>
+              <p>The guard clause pattern inverts the nested if condition. Instead of <code>if (valid) { … }</code>, write <code>if (!valid) return;</code>. This keeps the main logic at the leftmost indentation level.</p>
+            </div>
+          </div>
+
+          <h2 id="early-return">Early Return Pattern</h2>
+          <p>Return early as soon as you know the answer, rather than carrying a result variable through many branches.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Without early return
+function getDiscount(memberType) {
+  let discount;
+  if (memberType === "gold") {
+    discount = 0.20;
+  } else if (memberType === "silver") {
+    discount = 0.10;
+  } else if (memberType === "bronze") {
+    discount = 0.05;
+  } else {
+    discount = 0;
+  }
+  return discount;
+}
+
+// With early return — no dangling variable
+function getDiscountClean(memberType) {
+  if (memberType === "gold")   return 0.20;
+  if (memberType === "silver") return 0.10;
+  if (memberType === "bronze") return 0.05;
+  return 0;
+}
+
+console.log(getDiscountClean("gold"));    // 0.2
+console.log(getDiscountClean("silver"));  // 0.1
+console.log(getDiscountClean("guest"));   // 0</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>0.2
+0.1
+0</div>
+
+          <h2 id="practical-example-shipping">Practical Example: Shipping Cost Calculator</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function calculateShipping(weightKg, destination, isPremiumMember) {
+  // Guard clauses first
+  if (weightKg <= 0) return "Invalid weight.";
+  if (!destination)  return "Destination required.";
+
+  // Premium members always get free shipping
+  if (isPremiumMember) return 0;
+
+  const rates = {
+    local:        weightKg <= 5 ? 3.99 : 7.99,
+    national:     weightKg <= 5 ? 8.99 : 14.99,
+    international: weightKg <= 5 ? 19.99 : 34.99
+  };
+
+  return rates[destination] ?? "Unknown destination.";
+}
+
+console.log(calculateShipping(2, "local", false));         // 3.99
+console.log(calculateShipping(10, "national", false));     // 14.99
+console.log(calculateShipping(3, "international", true));  // 0
+console.log(calculateShipping(-1, "local", false));        // Invalid weight.</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>3.99
+14.99
+0
+Invalid weight.</div>
+
+          <h2 id="authentication-flow">Practical Example: Authentication Flow</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function authenticate(user, password, twoFACode) {
+  if (!user)     return { success: false, message: "User not found." };
+  if (user.locked) return { success: false, message: "Account locked." };
+  if (user.password !== password) {
+    user.failedAttempts = (user.failedAttempts || 0) + 1;
+    if (user.failedAttempts >= 3) {
+      user.locked = true;
+      return { success: false, message: "Account locked after 3 failures." };
+    }
+    return { success: false, message: "Wrong password." };
+  }
+  if (user.requires2FA && twoFACode !== user.twoFACode) {
+    return { success: false, message: "Invalid 2FA code." };
+  }
+  return { success: true, message: "Login successful." };
+}
+
+const user = { password: "abc123", requires2FA: false };
+console.log(authenticate(user, "abc123", null).message);  // Login successful.
+console.log(authenticate(null, "x", null).message);       // User not found.</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Login successful.
+User not found.</div>
+
+          <h2 id="when-nesting-is-ok">When Nesting Is Acceptable</h2>
+          <p>Not all nesting is bad. Two levels are often perfectly clear:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Two levels — still very readable
+function classifyTriangle(a, b, c) {
+  if (a === b && b === c) {
+    return "Equilateral";
+  } else if (a === b || b === c || a === c) {
+    return "Isosceles";
+  } else {
+    return "Scalene";
+  }
+}
+
+console.log(classifyTriangle(3, 3, 3)); // Equilateral
+console.log(classifyTriangle(3, 3, 5)); // Isosceles
+console.log(classifyTriangle(3, 4, 5)); // Scalene</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Equilateral
+Isosceles
+Scalene</div>
+
+          <h2 id="refactoring-deep-nesting">Refactoring Deep Nesting — Step by Step</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Technique</th><th>When to Use</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Guard clause + early return</td><td>Validate inputs/preconditions at the top</td></tr>
+                <tr><td>Extract helper function</td><td>When a nested block is reusable or complex</td></tr>
+                <tr><td>Logical operators (&amp;&amp;/||)</td><td>Combine two related conditions into one</td></tr>
+                <tr><td>Switch statement</td><td>Replace long if/else if chains on one variable</td></tr>
+                <tr><td>Object lookup table</td><td>Replace many if/else branches with a data map</td></tr>
+                <tr><td>Strategy pattern</td><td>Many complex branches that differ in behavior</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="deep-jsnestedif">Taming Nested Conditions</h2>
+          <p>Nesting <code>if</code>s inside <code>if</code>s quickly becomes an unreadable "pyramid of doom." Two techniques flatten it: guard clauses (early returns) and combined conditions with short-circuiting.</p>
+          <pre><code class="language-javascript">// ❌ nested pyramid
+function checkout(cart) {
+  if (cart) {
+    if (cart.items.length) {
+      if (cart.paid) {
+        return ship(cart);
+      }
+    }
+  }
+}
+
+// ✅ guard clauses — flat, each exit is obvious
+function checkout(cart) {
+  if (!cart) return;
+  if (!cart.items.length) return;
+  if (!cart.paid) return;
+  return ship(cart);
+}</code></pre>
+          <p><strong>Guard clauses</strong> handle the invalid cases first with early <code>return</code>s, so the main logic ends up unindented at the bottom — you read top to bottom instead of tracking nested braces. <strong>Combine related checks</strong> with <code>&&</code>: <code>if (user && user.active && user.isAdmin)</code>. Thanks to short-circuit evaluation, if <code>user</code> is <code>null</code>, JS stops and never touches <code>user.active</code>, avoiding a crash. <strong>Optional chaining</strong> flattens deep property access even further: <code>if (user?.profile?.verified)</code> safely returns <code>undefined</code> if any link is missing, replacing several nested existence checks. <strong>Rule of thumb:</strong> if you're more than two levels deep, refactor — guard clauses for early exits, <code>&&</code>/<code>?.</code> for combined conditions.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>The code below uses deeply nested ifs. Refactor it using guard clauses and early returns:</p>
+            <div class="code-block">
+              <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+              <pre><code class="language-javascript">function applyDiscount(user, coupon, cartTotal) {
+  if (user) {
+    if (user.isActive) {
+      if (coupon) {
+        if (coupon.isValid) {
+          if (cartTotal >= coupon.minOrder) {
+            return cartTotal - (cartTotal * coupon.discount);
+          } else {
+            return "Order too small for coupon.";
+          }
+        } else {
+          return "Coupon is expired.";
+        }
+      } else {
+        return cartTotal;
+      }
+    } else {
+      return "Account inactive.";
+    }
+  } else {
+    return "No user.";
+  }
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a <code>bookFlightSeat(passenger, flight, seatClass)</code> function with guard clauses that checks:</p>
+            <ul>
+              <li>passenger and flight must not be null</li>
+              <li>flight must not be departed</li>
+              <li>seatClass must be "economy", "business", or "first"</li>
+              <li>Available seats in that class must be > 0</li>
+              <li>If all pass, reduce available seats by 1 and return a booking confirmation object</li>
+            </ul>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Nested ifs let you check conditions within conditions.</li>
+              <li>Deep nesting (3+ levels) creates the "Pyramid of Doom" — hard to read and maintain.</li>
+              <li>Guard clauses check for failures early and return immediately, flattening the code.</li>
+              <li>Early return eliminates the need for a result variable thread through many branches.</li>
+              <li>Keep nesting to a maximum of two levels; extract helper functions beyond that.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the "Pyramid of Doom" and how do you avoid it?</li>
+            <li>Explain the guard clause pattern with an example.</li>
+            <li>When is nesting two levels deep acceptable vs. when should you refactor?</li>
+            <li>How does early return improve code readability?</li>
+            <li>Name three techniques to refactor deeply nested conditionals.</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/javascript/control-flow/if-statements.html" class="topic-tag">If Statements</a>
+            <a href="/javascript/control-flow/switch.html" class="topic-tag">Switch Statement</a>
+            <a href="/javascript/functions/return-values.html" class="topic-tag">Return Values</a>
+            <a href="/javascript/functions/function-basics.html" class="topic-tag">Functions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Is there a hard limit on how deeply I can nest ifs?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>JavaScript has no enforced limit, but most linting tools (ESLint, JSHint) warn when nesting exceeds a configurable depth (default 4). For human readability, keep it to 2 levels maximum.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Does early return affect performance?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Early return can improve performance by avoiding unnecessary work once an answer is known. Modern JavaScript engines optimize both patterns similarly, so the main benefit is readability.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between a guard clause and a precondition check?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>They are the same concept — guard clauses are a pattern for implementing precondition checks (assert inputs are valid before proceeding). They are sometimes called "bouncers" because they reject bad inputs at the door.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/control-flow/if-statements.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">If Statements</span></a>
+          <a href="/javascript/control-flow/switch.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Switch Statement</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

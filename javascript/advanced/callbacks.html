@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Callbacks – Async Patterns &amp; Callback Hell | ylearner</title>
+  <meta name="description" content="Master JavaScript callbacks: synchronous vs asynchronous callbacks, Node.js error-first convention, callback hell pyramid of doom, named functions to flatten nesting, and converting to Promises.">
+  <meta name="keywords" content="javascript callbacks, callback hell javascript, error-first callback, asynchronous javascript, setTimeout callback, promisify javascript, callback to promise, pyramid of doom javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/advanced/callbacks.html">
+  <meta property="og:title" content="JavaScript Callbacks – Async Patterns &amp; Callback Hell | ylearner">
+  <meta property="og:description" content="Master JavaScript callbacks: synchronous vs asynchronous callbacks, Node.js error-first convention, callback hell pyramid of doom, and converting to Promises.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/advanced/callbacks.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Callbacks – Async Patterns &amp; Callback Hell | ylearner">
+  <meta name="twitter:description" content="Master JavaScript callbacks: synchronous vs asynchronous callbacks, Node.js error-first convention, callback hell pyramid of doom, and converting to Promises.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/advanced/callbacks.html">Advanced JS</a><span class="separator">›</span>
+          <span class="current">Callbacks</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Advanced JS</div>
+          <h1>JavaScript Callbacks – Asynchronous Code with Functions</h1>
+          <p class="lesson-intro">A callback is simply a function passed as an argument to another function, to be called at a later point. Callbacks are JavaScript's oldest async pattern — they power <code>setTimeout</code>, DOM event listeners, <code>Array.forEach</code>, and Node.js file I/O. Understanding callbacks deeply — including their pitfalls like callback hell — is essential before learning Promises and async/await, which solve the same problems with better ergonomics.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-callback">What Is a Callback?</h2>
+          <p>A callback is a function you pass to another function as an argument. The receiving function decides <em>when</em> and <em>how</em> to call it. Callbacks can be synchronous (called immediately) or asynchronous (called after some delay or event).</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Synchronous callback — called immediately
+function greet(name, callback) {
+  const message = `Hello, ${name}!`;
+  callback(message);            // called right now
+}
+
+greet('Alice', (msg) => console.log(msg));
+// Hello, Alice!
+
+// Asynchronous callback — called later
+function fetchUserLater(userId, callback) {
+  console.log('Fetching user...');
+  setTimeout(() => {
+    const user = { id: userId, name: 'Bob' };
+    callback(null, user);     // error-first convention
+  }, 1000);
+}
+
+fetchUserLater(42, (err, user) => {
+  if (err) return console.error(err);
+  console.log('Got user:', user.name);
+});
+
+console.log('This runs BEFORE the callback');</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Hello, Alice!
+Fetching user...
+This runs BEFORE the callback
+Got user: Bob       ← (after ~1 second)</pre>
+          </div>
+
+          <h2 id="sync-callbacks">Synchronous Callbacks</h2>
+          <p>Many built-in array methods accept synchronous callbacks. The callback is called immediately, inline, as part of the method's execution.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const numbers = [5, 2, 8, 1, 9, 3];
+
+// forEach — callback for each element
+numbers.forEach((n, i) => console.log(`[${i}] = ${n}`));
+
+// sort — comparator callback
+const sorted = [...numbers].sort((a, b) => a - b);
+console.log('Sorted:', sorted);
+
+// filter + map chain
+const result = numbers
+  .filter(n => n > 3)          // [5, 8, 9]
+  .map(n => n * 2);            // [10, 16, 18]
+console.log('Filtered &amp; mapped:', result);
+
+// reduce — accumulator callback
+const sum = numbers.reduce((acc, n) => acc + n, 0);
+console.log('Sum:', sum);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>[0] = 5
+[1] = 2
+...
+Sorted: [1, 2, 3, 5, 8, 9]
+Filtered &amp; mapped: [10, 16, 18]
+Sum: 28</pre>
+          </div>
+
+          <h2 id="async-callbacks">Asynchronous Callbacks</h2>
+          <p>Asynchronous callbacks are deferred — they run after an I/O operation, timer, or event fires. The current call stack must finish before any async callback runs.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// setTimeout
+const timerId = setTimeout(() => {
+  console.log('Fired after 500ms');
+}, 500);
+
+// setInterval — repeated callback
+let count = 0;
+const intervalId = setInterval(() => {
+  count++;
+  console.log(`Tick #${count}`);
+  if (count === 3) clearInterval(intervalId);
+}, 200);
+
+// DOM event listener (browser)
+// document.querySelector('#btn').addEventListener('click', (e) => {
+//   console.log('Button clicked!', e.target);
+// });
+
+console.log('Synchronous code runs first');
+// Output order: synchronous → ticks → timeout</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Synchronous code runs first
+Tick #1   (after 200ms)
+Tick #2   (after 400ms)
+Tick #3   (after 600ms) → interval cleared
+Fired after 500ms</pre>
+          </div>
+
+          <h2 id="error-first">Node.js Error-First Callback Convention</h2>
+          <p>Node.js standardised the callback signature as <code>(err, data)</code> — the first parameter is always an error (or <code>null</code> if successful), the second is the result. This makes error handling consistent across APIs.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Simulating Node.js-style fs.readFile
+function readConfig(path, callback) {
+  setTimeout(() => {
+    if (!path.endsWith('.json')) {
+      callback(new Error(`Invalid config path: ${path}`), null);
+      return;
+    }
+    callback(null, { theme: 'dark', language: 'en' });
+  }, 100);
+}
+
+// Correct usage: always check err first
+readConfig('app.json', (err, config) => {
+  if (err) {
+    console.error('Failed to read config:', err.message);
+    return;                 // ← return early prevents using bad data
+  }
+  console.log('Config loaded:', config);
+});
+
+readConfig('app.yaml', (err, config) => {
+  if (err) {
+    console.error('Failed to read config:', err.message);
+    return;
+  }
+  console.log('Config:', config);
+});</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Config loaded: { theme: 'dark', language: 'en' }
+Failed to read config: Invalid config path: app.yaml</pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content"><strong>Always check err before using data</strong><p>A very common bug is accessing <code>data</code> without checking <code>err</code>. If <code>err</code> is not null, <code>data</code> will be <code>null</code> or undefined — and proceeding will cause a secondary error that obscures the root cause. Always <code>if (err) return handleError(err)</code> as the first line.</p></div>
+          </div>
+
+          <h2 id="callback-hell">Callback Hell – The Pyramid of Doom</h2>
+          <p>When you chain multiple async operations that depend on each other, nested callbacks create a deeply indented, hard-to-read structure called "callback hell" or the "pyramid of doom".</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// The pyramid of doom — each step nests inside the previous
+function login(username, password, cb) {
+  setTimeout(() => cb(null, { userId: 1, token: 'abc123' }), 100);
+}
+function getProfile(userId, cb) {
+  setTimeout(() => cb(null, { userId, name: 'Alice', role: 'admin' }), 100);
+}
+function getPermissions(role, cb) {
+  setTimeout(() => cb(null, ['read', 'write', 'delete']), 100);
+}
+function loadDashboard(permissions, cb) {
+  setTimeout(() => cb(null, `Dashboard with [${permissions.join(', ')}]`), 100);
+}
+
+// Deeply nested — hard to read, hard to maintain
+login('alice', 'pass', (err, session) => {
+  if (err) return console.error(err);
+  getProfile(session.userId, (err, profile) => {
+    if (err) return console.error(err);
+    getPermissions(profile.role, (err, permissions) => {
+      if (err) return console.error(err);
+      loadDashboard(permissions, (err, html) => {
+        if (err) return console.error(err);
+        console.log(html);
+        // ← code keeps moving to the right...
+      });
+    });
+  });
+});</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Dashboard with [read, write, delete]</pre>
+          </div>
+
+          <h2 id="flatten-with-named-functions">Flattening Callback Hell with Named Functions</h2>
+          <p>You can flatten the pyramid by extracting each callback into a named function. The logic becomes linear and each step is easy to test in isolation.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Same operations as above — but flat and readable
+function onDashboardLoaded(err, html) {
+  if (err) return console.error('Dashboard error:', err);
+  console.log(html);
+}
+
+function onPermissionsLoaded(err, permissions) {
+  if (err) return console.error('Permissions error:', err);
+  loadDashboard(permissions, onDashboardLoaded);
+}
+
+function onProfileLoaded(err, profile) {
+  if (err) return console.error('Profile error:', err);
+  getPermissions(profile.role, onPermissionsLoaded);
+}
+
+function onLogin(err, session) {
+  if (err) return console.error('Login error:', err);
+  getProfile(session.userId, onProfileLoaded);
+}
+
+// Clean entry point — reads top to bottom
+login('alice', 'pass', onLogin);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Dashboard with [read, write, delete]</pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>Converting callbacks to Promises</strong><p>Node.js's <code>util.promisify(fn)</code> wraps any error-first callback function into one that returns a Promise. You can then use <code>.then()</code> or <code>async/await</code> for clean sequential logic.</p></div>
+          </div>
+
+          <h2 id="promisify">Converting Callbacks to Promises</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Manual promisify wrapper
+function promisify(fn) {
+  return function (...args) {
+    return new Promise((resolve, reject) => {
+      fn(...args, (err, data) => {
+        if (err) reject(err);
+        else resolve(data);
+      });
+    });
+  };
+}
+
+const loginP       = promisify(login);
+const getProfileP  = promisify(getProfile);
+const getPermsP    = promisify(getPermissions);
+const loadDashP    = promisify(loadDashboard);
+
+// Now use async/await — clean, linear, easy error handling
+async function loadApp() {
+  try {
+    const session     = await loginP('alice', 'pass');
+    const profile     = await getProfileP(session.userId);
+    const permissions = await getPermsP(profile.role);
+    const html        = await loadDashP(permissions);
+    console.log(html);
+  } catch (err) {
+    console.error('App load failed:', err.message);
+  }
+}
+
+loadApp();</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>Dashboard with [read, write, delete]</pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Pattern</th><th>Readability</th><th>Error handling</th><th>Modern usage</th></tr></thead>
+              <tbody>
+                <tr><td>Nested callbacks</td><td>Poor (pyramid)</td><td>Manual at each level</td><td>Legacy code only</td></tr>
+                <tr><td>Named callbacks</td><td>Better (flat)</td><td>Manual at each level</td><td>Acceptable for simple flows</td></tr>
+                <tr><td>Promises (.then)</td><td>Good (chain)</td><td>.catch() once</td><td>Common</td></tr>
+                <tr><td>async/await</td><td>Best (linear)</td><td>try/catch once</td><td>Preferred</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="deep-callbacks">Callbacks, Callback Hell, and Why Promises Won</h2>
+          <p>A callback is a function you pass to another function to run <em>later</em> — the foundation of async JavaScript before promises. The pattern works, but nesting async steps quickly pyramids into "callback hell."</p>
+          <pre><code class="language-javascript">// The pyramid of doom — each step nests deeper
+getUser(id, (user) => {
+  getOrders(user, (orders) => {
+    getDetails(orders[0], (details) => {
+      // ...drifting off the right edge of the screen
+    });
+  });
+});</code></pre>
+          <h3>The error-first convention</h3>
+          <p>Node-style callbacks put the error <em>first</em> so you can't forget to check it:</p>
+          <pre><code class="language-javascript">fs.readFile("f.txt", (err, data) => {
+  if (err) return handle(err);   // always check first
+  use(data);
+});</code></pre>
+          <p><strong>Why promises replaced this:</strong> callbacks nest (hard to read), scatter error handling (an <code>err</code> check at every level), and suffer "inversion of control" — you hand your function to code that decides if/when/how many times to call it. Promises flatten the chain with <code>.then()</code> and centralize errors in one <code>.catch()</code>; <code>async/await</code> then makes it read like plain sequential code.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Simulate a multi-step file processing pipeline using error-first callbacks:</p>
+            <ul>
+              <li>Step 1 <code>readFile(path, cb)</code> — returns fake file content after 100ms (fail if path is empty).</li>
+              <li>Step 2 <code>parseData(content, cb)</code> — parses JSON after 50ms (fail if content is invalid JSON).</li>
+              <li>Step 3 <code>saveResult(data, cb)</code> — "saves" after 80ms.</li>
+              <li>Write the pipeline first with nested callbacks, then refactor to named functions, then promisify and use async/await.</li>
+            </ul>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Implement a <code>waterfall(tasks, finalCallback)</code> utility function that runs an array of async error-first callback functions in sequence, passing the result of each to the next. If any task errors, skip remaining tasks and call <code>finalCallback(err)</code>. This is similar to the classic <code>async.waterfall</code> pattern.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A callback is a function passed to another function to be invoked later.</li>
+              <li>Synchronous callbacks run immediately (forEach, sort); async callbacks run after a delay or event.</li>
+              <li>Node.js error-first convention: <code>(err, data)</code> — always check <code>err</code> before using <code>data</code>.</li>
+              <li>Callback hell arises from deeply nested async chains — fix with named functions or Promises.</li>
+              <li><code>promisify</code> wraps error-first callbacks into Promise-returning functions.</li>
+              <li>For new code, prefer Promises or async/await over raw callbacks for sequential async logic.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between a synchronous and asynchronous callback?</li>
+            <li>What is the Node.js error-first callback convention and why does it exist?</li>
+            <li>What is callback hell and what are the strategies to avoid it?</li>
+            <li>Why do Promises and async/await replace callbacks for complex async flows?</li>
+            <li>How would you manually convert an error-first callback API into a Promise?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/javascript/advanced/promises.html" class="topic-tag">Promises</a>
+            <a href="/javascript/advanced/async-await.html" class="topic-tag">Async/Await</a>
+            <a href="/javascript/advanced/event-loop.html" class="topic-tag">Event Loop</a>
+            <a href="/javascript/oop/prototypes.html" class="topic-tag">Prototypes</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Are callbacks always asynchronous? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. A callback is just a function passed as an argument. Whether it runs synchronously or asynchronously depends entirely on how the receiving function calls it. <code>Array.forEach</code> calls its callback synchronously; <code>setTimeout</code> calls it asynchronously.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use async/await inside a forEach callback? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>You can mark the callback <code>async</code>, but <code>forEach</code> will not await it — it will fire and forget each promise. Use <code>for...of</code> with <code>await</code> for sequential async iteration, or <code>Promise.all(array.map(async item => ...))</code> for parallel execution.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is util.promisify in Node.js? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>require('util').promisify(fn)</code> takes any function that follows the error-first callback convention and returns a new function that returns a Promise instead. Node.js's built-in <code>fs.promises</code> namespace provides pre-promisified versions of all file system methods.</p></div>
+            </div>
+          </section>
+
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/oop/quiz.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">📝 Section Quiz</span></a>
+          <a href="/javascript/advanced/promises.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Promises</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS RPC – Calling Python from OWL Components | ylearner</title>
+  <meta name="description" content="Complete guide to calling Python from OWL JS: orm service methods, domain syntax, JSON-RPC with rpc service, custom controllers, handling UserError and server errors, and best practices for Odoo 16/17/18.">
+  <meta name="keywords" content="OWL JS RPC, OWL call Python, Odoo ORM OWL, Odoo JSON-RPC OWL, orm.call OWL, Odoo domain syntax OWL, OWL server error handling, Odoo Web Library RPC tutorial">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/owljs/odoo/rpc-calls.html">
+  <meta property="og:title" content="OWL JS RPC – Calling Python from OWL | ylearner">
+  <meta property="og:description" content="orm service, domain syntax, custom controllers, UserError handling — complete guide to calling Python from OWL JS components.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/owljs/odoo/rpc-calls.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS RPC Calling Python Guide | ylearner">
+  <meta name="twitter:description" content="orm.call, rpc service, domains, UserError — complete Odoo Python-to-OWL communication tutorial.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS RPC – Calling Python",
+    "description": "Complete guide to calling Python from OWL JS: orm service methods, domain syntax, JSON-RPC with rpc service, custom controllers, and handling server errors including UserError.",
+    "educationalLevel": "Intermediate",
+    "keywords": "OWL JS RPC, orm.call, JSON-RPC, domain syntax, UserError, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/odoo/owl-in-odoo.html">Odoo Integration</a><span class="separator">›</span>
+          <span class="current">RPC – Calling Python</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Odoo Integration</div>
+          <h1>OWL JS RPC – Calling Python from Your OWL Components</h1>
+          <p class="lesson-intro">Every OWL component in Odoo eventually needs to communicate with the Python backend — fetching records, saving changes, triggering business logic, or calling custom methods. Odoo provides two paths for this: the <strong>orm service</strong> for all standard model operations (preferred), and the <strong>rpc service</strong> for custom controllers and non-ORM endpoints. This lesson covers both paths in depth: domain syntax, ORM method signatures, custom Python method calls, controller routes, and robust error handling for server-side errors.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 3 of 3</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="orm-overview">orm Service – The Right Tool for Model Calls</h2>
+          <p>The <code>orm</code> service wraps Odoo's JSON-RPC ORM endpoint (<code>/web/dataset/call_kw</code>) with a clean, typed API. Always prefer it over raw <code>rpc</code> for model operations.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – orm service setup</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { useService } from "@web/core/utils/hooks";
+
+setup() {
+  this.orm = useService("orm");
+}</code></pre>
+          </div>
+
+          <h2 id="domain-syntax">Odoo Domain Syntax in JavaScript</h2>
+          <p>Domains are arrays of conditions. Each condition is a 3-tuple: <code>[fieldName, operator, value]</code>. Conditions are AND'd by default; prefix with <code>"&amp;"</code> or <code>"|"</code> for explicit operators.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – domain examples</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Simple AND (default): all conditions must match
+const domain = [
+  ["is_company", "=", true],
+  ["active",     "=", true],
+  ["country_id", "=", 233],   // 233 = United States ID
+];
+
+// OR: either condition matches (prefix with "|")
+const orDomain = [
+  "|",
+    ["state", "=", "draft"],
+    ["state", "=", "sent"],
+];
+
+// Mixed AND/OR
+const mixedDomain = [
+  "&amp;",
+    ["is_company", "=", true],
+    "|",
+      ["country_id", "=", 233],
+      ["country_id", "=", 76],   // France
+];
+
+// Common operators
+// "="   "!="   "&lt;"   "&gt;"   "&lt;="   "&gt;="
+// "like"   "ilike"  (case-insensitive)
+// "in"     "not in"  — value is an array
+// "child_of"  "parent_of"  — hierarchical
+// "="  false  or  "=", []  — empty/unset many2many
+
+const searchDomain = [["name", "ilike", this.state.searchQuery]];
+const inDomain = [["id", "in", [1, 5, 12, 44]]];
+const dateDomain = [
+  ["date_order", "&gt;=", "2026-01-01"],
+  ["date_order", "&lt;",  "2027-01-01"],
+];</code></pre>
+          </div>
+
+          <h2 id="search-read">searchRead – The Most Common ORM Call</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – searchRead full signature</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const records = await this.orm.searchRead(
+  "sale.order",           // model technical name
+  [                       // domain (array of conditions)
+    ["state", "in", ["draft", "sent"]],
+    ["user_id", "=", this.user.userId],
+  ],
+  [                       // fields to fetch (empty array = all)
+    "name", "partner_id", "amount_total", "state", "date_order"
+  ],
+  {
+    limit:   50,           // max records (default: no limit in some contexts)
+    offset:  0,            // for pagination
+    order:   "date_order desc",  // sort
+    context: {},           // additional context dict
+  }
+);
+// Returns: [{ id: 1, name: "S001", partner_id: [5, "Alice"], ... }, ...]
+// Note: many2one fields return [id, display_name]</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="orm-call">Calling Custom Python Methods</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript + Python – orm.call</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// JavaScript: call a custom Python model method
+const result = await this.orm.call(
+  "sale.order",           // model
+  "action_confirm",       // Python method name
+  [[orderId]],            // positional args — first must be the IDs list
+  { context: {} }         // optional keyword args
+);
+
+// For a classmethod (no IDs):
+const stats = await this.orm.call(
+  "sale.order",
+  "get_sales_stats",
+  [],                     // empty ids list
+  { date_from: "2026-01-01", date_to: "2026-12-31" }
+);</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python – the matching model method</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo import models, api
+from odoo.exceptions import UserError
+
+class SaleOrder(models.Model):
+    _inherit = "sale.order"
+
+    def action_confirm(self):
+        # 'self' is a recordset of the IDs passed from JS
+        for order in self:
+            if not order.order_line:
+                raise UserError("Cannot confirm an order with no lines.")
+        return super().action_confirm()
+
+    @api.model
+    def get_sales_stats(self, date_from, date_to):
+        # @api.model: called without a recordset (empty IDs list from JS)
+        orders = self.search([
+            ("date_order", ">=", date_from),
+            ("date_order", "&lt;",  date_to),
+            ("state",      "=",  "sale"),
+        ])
+        return {
+            "count":   len(orders),
+            "revenue": sum(orders.mapped("amount_total")),
+        }</code></pre>
+          </div>
+
+          <h2 id="error-handling">Handling Server Errors</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – server error structure</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">async confirmOrder(orderId) {
+  try {
+    await this.orm.call("sale.order", "action_confirm", [[orderId]]);
+    this.notification.add("Order confirmed!", { type: "success" });
+  } catch (err) {
+    // Odoo error structure:
+    // err.message      — generic "Odoo Server Error"
+    // err.data.name    — "odoo.exceptions.UserError"
+    // err.data.message — human-readable message from Python
+
+    if (err.data?.name === "odoo.exceptions.UserError") {
+      // Show the message from the Python UserError
+      this.notification.add(err.data.message, { type: "warning" });
+    } else if (err.data?.name === "odoo.exceptions.AccessError") {
+      this.notification.add("You do not have permission for this action.", { type: "danger" });
+    } else {
+      // Unexpected server error — show generic message + log
+      console.error("Unexpected error:", err);
+      this.notification.add("An unexpected error occurred. Please contact your administrator.", {
+        type:   "danger",
+        sticky: true,
+      });
+    }
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="rpc-service">rpc Service – Custom Controllers</h2>
+          <p>For non-ORM endpoints — custom JSON/HTTP controllers you wrote — use the lower-level <code>rpc</code> service.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript + Python – custom controller call</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// JavaScript
+setup() {
+  this.rpc = useService("rpc");
+}
+
+async getDashboardData() {
+  const data = await this.rpc("/my_addon/dashboard_data", {
+    company_id: this.user.activeCompany.id,
+  });
+  this.state.stats = data;
+}</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python – matching controller</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo import http
+from odoo.http import request
+import json
+
+class DashboardController(http.Controller):
+
+    @http.route("/my_addon/dashboard_data", type="json", auth="user")
+    def dashboard_data(self, company_id=None, **kwargs):
+        env = request.env
+        orders = env["sale.order"].search_count([
+            ["company_id", "=", company_id],
+            ["state",      "=", "sale"],
+        ])
+        return {
+            "confirmed_orders": orders,
+            "revenue": env["sale.order"].search([
+                ["company_id", "=", company_id],
+                ["state",      "=", "sale"],
+            ]).mapped("amount_total"),
+        }</code></pre>
+          </div>
+
+          <h2 id="deep-rpc">Talking to the Server: ORM Calls from OWL</h2>
+          <p>To read or write Odoo data from an OWL component, use the <code>orm</code> service — a clean wrapper over the server's model methods. Every call is asynchronous, so you <code>await</code> it.</p>
+          <pre><code class="language-javascript">import { useService } from "@web/core/utils/hooks";
+
+class ContactList extends Component {
+    setup() {
+        this.orm = useService("orm");
+        this.state = useState({ partners: [] });
+        onWillStart(async () => {
+            this.state.partners = await this.orm.searchRead(
+                "res.partner",                 // model
+                [["is_company", "=", true]],   // domain (filter)
+                ["name", "email"],             // fields to fetch
+            );
+        });
+    }
+    async archive(id) {
+        await this.orm.write("res.partner", [id], { active: false });
+    }
+}</code></pre>
+          <table>
+            <thead><tr><th>Method</th><th>Does</th></tr></thead>
+            <tbody>
+              <tr><td><code>searchRead(model, domain, fields)</code></td><td>find + read in one call</td></tr>
+              <tr><td><code>read(model, ids, fields)</code></td><td>read known records</td></tr>
+              <tr><td><code>write(model, ids, vals)</code></td><td>update records</td></tr>
+              <tr><td><code>create(model, vals)</code></td><td>make a record</td></tr>
+              <tr><td><code>call(model, method, args)</code></td><td>call any model method</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Best practices:</strong> prefer the high-level <code>orm</code> service over the raw <code>rpc</code> service — it handles the Odoo protocol for you. Fetch initial data in <code>onWillStart</code> (before first render) so the component paints with data ready. Wrap calls in <code>try/catch</code> to surface server errors, and only request the fields you actually use — smaller payloads render faster.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a complete Odoo OWL component that reads and writes via the backend:</p>
+            <ol>
+              <li>Create a Python model method <code>get_overdue_invoices()</code> that returns a count and total amount of overdue invoices for the current user's company.</li>
+              <li>Create an OWL component that calls it via <code>orm.call</code> in <code>onWillStart</code> and displays the stats.</li>
+              <li>Add a "Send Reminder" button that calls <code>orm.call</code> with an <code>account.move</code> method to email reminders. Handle UserError gracefully.</li>
+              <li>Add a domain filter (All / This Month / Overdue) that changes the <code>searchRead</code> domain and re-fetches the list without remounting.</li>
+              <li>Use <code>notification.add</code> for success/failure feedback after every backend call.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>From an OWL component, fetch data by calling a Python model method via the <code>orm</code> service (<code>searchRead</code>/<code>call</code>), render the result, and handle loading and error states. Explain how OWL talks to the Odoo backend over RPC and why calls are async.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Use <code>orm</code> service for all standard model operations. Use <code>rpc</code> service only for custom controller routes.</li>
+              <li>Domains are arrays of <code>[field, operator, value]</code> triples. Use <code>"|"</code> prefix for OR, <code>"&amp;"</code> for explicit AND.</li>
+              <li><code>orm.searchRead(model, domain, fields, options)</code> — most common call. Many2one fields return <code>[id, name]</code> arrays.</li>
+              <li><code>orm.call(model, method, [ids], kwargs)</code> — first positional arg must be the IDs list; empty list for <code>@api.model</code> methods.</li>
+              <li>Server errors carry <code>err.data.name</code> (exception class) and <code>err.data.message</code> (human text). Always check <code>data.name</code> to distinguish UserError from access errors from unexpected errors.</li>
+              <li>Custom controllers: <code>type="json"</code>, <code>auth="user"</code>. Call via <code>rpc("/route", payload)</code>.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you call the Odoo backend from OWL?</li>
+            <li>What service handles RPC/ORM calls?</li>
+            <li>What is <code>orm.searchRead</code>?</li>
+            <li>Are RPC calls synchronous or async?</li>
+            <li>How do you handle RPC errors?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/owljs/odoo/services.html" class="topic-tag owl-topic-tag">🦉 Odoo Services</a>
+            <a href="/owljs/odoo/owl-in-odoo.html" class="topic-tag owl-topic-tag">🦉 OWL in Odoo</a>
+            <a href="/owljs/advanced/error-handling.html" class="topic-tag owl-topic-tag">🦉 Error Handling</a>
+            <a href="/owljs/advanced/concurrency.html" class="topic-tag owl-topic-tag">🦉 Concurrency Model</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between orm.call and rpc directly? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>orm.call</code> internally calls <code>/web/dataset/call_kw</code> with the model/method/args structure that Odoo's ORM expects. It handles authentication, CSRF tokens, and session cookies for you. Direct <code>rpc("/custom/route", data)</code> calls your custom URL with a raw POST — you control the route and response format. Use <code>orm.call</code> for everything that goes through the Odoo ORM. Use raw <code>rpc</code> only for non-ORM endpoints.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why do many2one field values come back as [id, name] arrays? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Odoo's ORM always returns many2one fields as a 2-tuple <code>[id, display_name]</code> — e.g., <code>partner_id: [5, "Alice Corp"]</code>. To get just the ID use <code>record.partner_id[0]</code>; for the name use <code>record.partner_id[1]</code>. If you request a field like <code>partner_id.name</code> (dot notation) in the fields list, Odoo returns it as a flat string instead of the tuple. This is useful when you only need the name.</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/odoo/services.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Odoo Services</span>
+          </a>
+          <a href="/owljs/odoo/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

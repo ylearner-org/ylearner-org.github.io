@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Pseudo-elements – ::before ::after ::placeholder and More | ylearner</title>
+  <meta name="description" content="Master CSS pseudo-elements: ::before, ::after, ::first-line, ::first-letter, ::placeholder, ::selection, ::marker, ::backdrop. Complete guide with practical examples.">
+  <meta name="keywords" content="CSS pseudo-elements, CSS ::before, CSS ::after, CSS ::placeholder, CSS ::selection, CSS ::first-letter, CSS ::marker, CSS content property, CSS generated content">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/csslessons/advanced/pseudo-elements.html">
+  <meta property="og:title" content="CSS Pseudo-elements – ::before ::after and More | ylearner">
+  <meta property="og:description" content="Complete guide to CSS pseudo-elements — ::before, ::after, ::placeholder, ::selection, ::first-letter, ::marker with practical examples.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/csslessons/advanced/pseudo-elements.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CSS Pseudo-elements Complete Guide | ylearner">
+  <meta name="twitter:description" content="::before, ::after, ::placeholder, ::selection, ::marker — every CSS pseudo-element with practical examples.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "CSS Pseudo-elements",
+    "description": "Complete guide to CSS pseudo-elements — ::before, ::after, content property, ::first-line, ::first-letter, ::placeholder, ::selection, ::marker, ::backdrop, and practical patterns.",
+    "educationalLevel": "Intermediate",
+    "keywords": "CSS pseudo-elements, ::before, ::after, content property, ::placeholder, ::selection, ::marker",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/csslessons/what-is-css.html">CSS</a><span class="separator">›</span>
+          <a href="/csslessons/advanced/variables.html">Advanced CSS</a><span class="separator">›</span>
+          <span class="current">CSS Pseudo-elements</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Advanced CSS</div>
+          <h1>CSS Pseudo-elements – Generated Content &amp; Styling Sub-parts</h1>
+          <p class="lesson-intro">A CSS pseudo-element targets a specific sub-part of an element — like the first letter of a paragraph, the placeholder text of an input, or virtual elements inserted before or after the content. Unlike pseudo-classes, which select existing elements in a state, pseudo-elements either target a portion of an element's rendering or create virtual nodes that exist only in CSS. The double-colon syntax (<code>::</code>) distinguishes them from pseudo-classes (<code>:</code>).</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 3 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="before-after">::before and ::after</h2>
+          <p>The most-used pseudo-elements. They insert a virtual child node before or after the element's content. Require a <code>content</code> property — even an empty string — to render.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – ::before and ::after basics</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Basic usage — content is required */
+.icon-label::before {
+  content: "★ ";
+  color: gold;
+}
+
+.external-link::after {
+  content: " ↗";
+  font-size: 0.75em;
+  color: #888;
+}
+
+/* Empty content — used for decorative shapes */
+.divider::after {
+  content: "";
+  display: block;
+  height: 2px;
+  background: linear-gradient(to right, #1572B6, transparent);
+  margin-top: 1rem;
+}
+
+/* Tooltip using ::after + :hover */
+[data-tooltip] { position: relative; }
+[data-tooltip]::after {
+  content: attr(data-tooltip);   /* read from HTML attribute */
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+[data-tooltip]:hover::after { opacity: 1; }
+</code></pre>
+          </div>
+
+          <h2 id="clearfix">Classic Clearfix with ::after</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Clearfix</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Modern approach — use display:flow-root or overflow:hidden */
+/* But the clearfix is still useful to understand */
+.clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+</code></pre>
+          </div>
+
+          <h2 id="decorative-patterns">Decorative Patterns with ::before / ::after</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Decorative pseudo-elements</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Underline accent on headings */
+h2 { position: relative; padding-bottom: 12px; }
+h2::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 48px;
+  height: 3px;
+  background: #1572B6;
+  border-radius: 2px;
+}
+
+/* Quote marks */
+blockquote::before {
+  content: "\201C";   /* left double quotation mark */
+  font-size: 4rem;
+  line-height: 0;
+  vertical-align: -1rem;
+  color: #1572B6;
+  margin-right: 4px;
+}
+
+/* Badge / required field marker */
+label.required::after {
+  content: " *";
+  color: #e44d26;
+  font-weight: bold;
+}
+
+/* Ribbon corner on a card */
+.card.ribbon { overflow: hidden; position: relative; }
+.card.ribbon::before {
+  content: "NEW";
+  position: absolute;
+  top: 14px;
+  right: -20px;
+  background: #e44d26;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 3px 28px;
+  transform: rotate(45deg);
+  letter-spacing: 0.05em;
+}
+</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="first-line-letter">::first-line and ::first-letter</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – ::first-line and ::first-letter</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* ::first-line — styles the first rendered line of a block */
+p::first-line {
+  font-weight: 600;
+  color: #1a1a1a;
+  letter-spacing: 0.03em;
+}
+/* Only certain properties work on ::first-line:
+   font properties, color, background, word-spacing,
+   letter-spacing, line-height, text-decoration, text-transform */
+
+/* ::first-letter — styles the first letter/character of a block */
+article > p:first-of-type::first-letter {
+  float: left;
+  font-size: 3.5rem;
+  line-height: 0.8;
+  margin: 4px 8px 0 0;
+  color: #1572B6;
+  font-weight: 700;
+}
+/* Drop cap effect — classic magazine-style opening letter */
+</code></pre>
+          </div>
+
+          <h2 id="placeholder-selection">::placeholder and ::selection</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – ::placeholder and ::selection</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* ::placeholder — styles the placeholder text of an input */
+input::placeholder,
+textarea::placeholder {
+  color: #aaa;
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+/* ::selection — styles the highlighted (selected) text */
+::selection {
+  background: #1572B6;
+  color: #ffffff;
+}
+
+/* Per-element selection color */
+.code-block::selection,
+.code-block *::selection {
+  background: #264f78;
+  color: #ffffff;
+}
+</code></pre>
+          </div>
+
+          <h2 id="marker">::marker</h2>
+          <p>Styles the bullet or number of a list item — no need to remove the default bullet and add your own with <code>::before</code> anymore.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – ::marker</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Style list bullets */
+li::marker {
+  color: #1572B6;
+  font-size: 1.2em;
+}
+
+/* Custom content for ordered lists */
+ol li::marker {
+  color: #e44d26;
+  font-weight: 700;
+}
+
+/* Emoji bullets */
+ul.checklist li::marker {
+  content: "✓ ";
+  color: #2e7d32;
+}
+</code></pre>
+          </div>
+
+          <h2 id="backdrop">::backdrop</h2>
+          <p>Styles the full-viewport backdrop that appears behind modal dialogs, fullscreen elements, and popover elements.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – ::backdrop</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Style the backdrop of a &lt;dialog&gt; element */
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+/* Fullscreen video backdrop */
+video::backdrop {
+  background: #000;
+}
+</code></pre>
+          </div>
+
+          <h2 id="deep-pseudoel">Pseudo-Elements: Style Parts That Aren't in Your HTML</h2>
+          <p>A pseudo-element (double colon <code>::</code>) styles a <em>part</em> of an element or injects generated content — without adding markup. <code>::before</code> and <code>::after</code> are the workhorses; they create a child element from CSS alone.</p>
+          <pre><code class="language-css">.note::before {
+  content: "💡 ";        /* content is REQUIRED — omit it and nothing renders */
+}
+.price::after {
+  content: " USD";
+  color: gray;
+}
+a[target="_blank"]::after { content: " ↗"; }   /* mark external links */</code></pre>
+          <table>
+            <thead><tr><th>Pseudo-element</th><th>Targets</th></tr></thead>
+            <tbody>
+              <tr><td><code>::before</code> / <code>::after</code></td><td>generated content at start/end</td></tr>
+              <tr><td><code>::first-line</code></td><td>first line of a block</td></tr>
+              <tr><td><code>::first-letter</code></td><td>drop-cap first letter</td></tr>
+              <tr><td><code>::placeholder</code></td><td>input placeholder text</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Two rules:</strong> <code>::before</code>/<code>::after</code> do nothing without the <code>content</code> property (even <code>content: ""</code> to make an empty decorative box). And their content is <em>decorative</em> — screen readers may skip it and you can't select/copy it, so never put essential text or meaning there. Don't confuse <code>::</code> pseudo-<em>elements</em> (style a part) with <code>:</code> pseudo-<em>classes</em> (match a state like <code>:hover</code>).</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Add content with <code>::before</code> and <code>::after</code>.</li>
+              <li>Style the first letter with <code>::first-letter</code>.</li>
+              <li>Style the first line with <code>::first-line</code>.</li>
+              <li>Change the highlight color with <code>::selection</code>.</li>
+              <li>Create a decorative shape with <code>::after</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Use <code>::before</code>/<code>::after</code> to add a decorative quote mark before a blockquote and a "required" asterisk after a label — without adding HTML. Explain why pseudo-elements use double colons, require a <code>content</code> property, and how they differ from pseudo-classes.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>::before / ::after</strong> — virtual nodes inserted inside the element. Require <code>content:</code>. Use for decorations, tooltips, clearfix, badges.</li>
+              <li><strong>content: attr(data-x)</strong> — reads HTML attribute value into generated content.</li>
+              <li><strong>::first-line / ::first-letter</strong> — style the first rendered line or first character of a block. Limited property support.</li>
+              <li><strong>::placeholder</strong> — style input placeholder text: color, font-style, font-size.</li>
+              <li><strong>::selection</strong> — change highlight color when user selects text.</li>
+              <li><strong>::marker</strong> — style list item bullets/numbers directly, including <code>content:</code> for emoji bullets.</li>
+              <li><strong>::backdrop</strong> — style the overlay behind <code>&lt;dialog&gt;</code> or fullscreen elements.</li>
+              <li>Double colon (<code>::</code>) is required in modern CSS. Single colon (<code>:</code>) still works for legacy reasons but avoid it for new code.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a pseudo-element?</li>
+            <li>Why do <code>::before</code>/<code>::after</code> require a <code>content</code> property?</li>
+            <li>What is the difference between single-colon and double-colon syntax?</li>
+            <li>Can pseudo-elements be selected by JavaScript?</li>
+            <li>Name three pseudo-elements.</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/csslessons/advanced/pseudo-classes.html" class="topic-tag css-topic-tag">🔧 CSS Pseudo-classes</a>
+            <a href="/csslessons/selectors/selectors-basics.html" class="topic-tag css-topic-tag">🌱 CSS Selectors</a>
+            <a href="/csslessons/advanced/specificity.html" class="topic-tag css-topic-tag">🔧 CSS Specificity</a>
+            <a href="/csslessons/advanced/variables.html" class="topic-tag css-topic-tag">🔧 CSS Variables</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why must ::before and ::after have a content property? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The <code>content</code> property is what makes the pseudo-element exist in the render tree. Without it, the browser does not generate the pseudo-element box at all — it's as if the rule doesn't exist. For decorative uses (shapes, dividers), set <code>content: ""</code> — an empty string still generates the box. For text, set <code>content: "your text"</code>. You can also use <code>content: attr(data-attribute)</code> to pull text from an HTML attribute.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I add event listeners to ::before / ::after elements? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — pseudo-elements are not part of the DOM. They exist only in the CSS render tree, so JavaScript cannot select them with <code>querySelector</code> or add event listeners. Clicks on a pseudo-element area are received by the real element, not the pseudo-element itself. If you need a clickable element, add a real DOM node.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between a pseudo-class and a pseudo-element? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A pseudo-class (single colon, e.g. <code>:hover</code>) selects a real element in a particular state. A pseudo-element (double colon, e.g. <code>::before</code>) either targets a sub-part of an element's rendering (like <code>::first-letter</code>) or creates a virtual element that doesn't exist in the HTML (like <code>::before</code> and <code>::after</code>). There is also a practical distinction: you can have multiple pseudo-classes stacked on one element, but only one pseudo-element per selector chain.</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/csslessons/advanced/pseudo-classes.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">CSS Pseudo-classes</span>
+          </a>
+          <a href="/csslessons/advanced/specificity.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">CSS Specificity</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Website Controllers – Building Public Web Pages | ylearner</title>
+  <meta name="description" content="Build public-facing pages in Odoo using website controllers. Learn @http.route with website=True, request.website, slugified URLs, and 404 handling.">
+  <meta name="keywords" content="Odoo website controller, http.route website=True, request.website, odoo slug, website page controller, Odoo 19 web">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/website/website-controllers.html">
+  <meta property="og:title" content="Odoo Website Controllers – Building Public Web Pages">
+  <meta property="og:description" content="Build public-facing pages in Odoo using website controllers. Learn @http.route with website=True, request.website, slugified URLs, and 404 handling.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/website/website-controllers.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Website Controllers – Building Public Web Pages | ylearner">
+  <meta name="twitter:description" content="Build public Odoo website pages with @http.route, request.website, slugified URLs, and 404 handling.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Website Controllers – Building Public Web Pages",
+    "description": "Build public-facing pages in Odoo using website controllers. Learn @http.route with website=True, request.website, slugified URLs, and 404 handling.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo website controller, @http.route website=True, slug, request.website, 404",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/website/website-overview.html">Website Development</a><span class="separator">›</span>
+          <span class="current">Website Controllers</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">💻 Website Development</div>
+          <h1>Odoo Website Controllers – Building Public Web Pages</h1>
+          <p class="lesson-intro">Website controllers are the Python layer that handles HTTP requests for public-facing pages. They differ from plain Odoo HTTP controllers in one key way: the <code>website=True</code> flag on <code>@http.route</code>, which activates website context, multi-website routing, and the theme layer.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="deep-webctrl">Website Controllers: Mapping URLs to Python</h2>
+          <p>A controller turns a URL into a Python method that returns a page. You subclass <code>http.Controller</code> and decorate methods with <code>@http.route</code> — this is how custom pages, form handlers, and JSON endpoints are built.</p>
+          <pre><code class="language-python">from odoo import http
+from odoo.http import request
+
+class MyWebsite(http.Controller):
+
+    @http.route("/products", auth="public", website=True)
+    def product_list(self, **kw):
+        products = request.env["product.template"].sudo().search([])
+        return request.render("mymod.product_list", {"products": products})
+
+    @http.route("/products/&lt;model('product.template'):prod&gt;", auth="public", website=True)
+    def product_detail(self, prod, **kw):
+        return request.render("mymod.product_detail", {"product": prod})</code></pre>
+          <table>
+            <thead><tr><th><code>auth=</code></th><th>Who can access</th></tr></thead>
+            <tbody>
+              <tr><td><code>public</code></td><td>anyone, even logged-out (runs as public user)</td></tr>
+              <tr><td><code>user</code></td><td>logged-in users only</td></tr>
+              <tr><td><code>none</code></td><td>no auth layer (special cases)</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Key pieces:</strong> <code>website=True</code> wraps the page in the site's theme/menu; <code>request.render(template, values)</code> feeds data to a QWeb template; and the <code>&lt;model(...):name&gt;</code> converter turns a URL segment straight into a record. <strong>Security caution:</strong> on a <code>public</code> route you often need <code>sudo()</code> to read data (the public user has few rights) — but never <code>sudo()</code> then trust user input blindly, or you expose private records. Validate access on anything user-specific.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create an HTTP controller with <code>@http.route</code>.</li>
+              <li>Return a rendered template.</li>
+              <li>Read a URL parameter.</li>
+              <li>Set <code>auth='public'</code>.</li>
+              <li>Pass data to the template.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a website controller mapping a URL (e.g. <code>/library/books</code>) to a method that returns a rendered QWeb template with data from a model. Explain the <code>@http.route</code> decorator, the <code>auth</code> and <code>website=True</code> options, and how the controller passes context to the template.</p>
+          </div>
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>How to write a website controller with <code>website=True</code></li>
+              <li>Using <code>request.website</code> and <code>request.env</code> in website context</li>
+              <li>Slugified URL patterns for SEO-friendly record pages</li>
+              <li>Handling 404 and unpublished records</li>
+              <li>Redirecting to canonical URLs</li>
+            </ul>
+          </div>
+
+          <h2 id="basic-website-controller">Basic Website Controller</h2>
+          <p>A website controller inherits from <code>odoo.http.Controller</code> and uses <code>website=True</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo import http
+from odoo.http import request
+
+class LibraryWebsite(http.Controller):
+
+    @http.route('/books', type='http', auth='public', website=True)
+    def book_listing(self, **kw):
+        books = request.env['library.book'].search([
+            ('website_published', '=', True),
+            ('website_id', 'in', [False, request.website.id]),
+        ])
+        return request.render('my_module.website_books_listing', {
+            'books': books,
+        })</code></pre>
+          </div>
+          <p>Key differences from a plain controller:</p>
+          <ul>
+            <li><code>website=True</code> — activates website context</li>
+            <li><code>auth='public'</code> — accessible without login</li>
+            <li><code>request.website</code> — the active <code>ir.website</code> record</li>
+          </ul>
+
+          <h2 id="slugified-urls">Slugified URLs</h2>
+          <p>SEO-friendly URLs like <code>/books/clean-code-42</code> combine a human-readable slug with the record ID. Odoo provides <code>slug()</code> to generate these and <code>unslug()</code> to parse them:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo.addons.http_routing.models.ir_http import slug, unslug
+
+class LibraryWebsite(http.Controller):
+
+    @http.route('/books/&lt;path:slug_str&gt;', type='http',
+                auth='public', website=True)
+    def book_detail(self, slug_str, **kw):
+        # slug_str = "clean-code-42"
+        slug_id = unslug(slug_str)[1]   # returns (name_part, id) tuple
+        if not slug_id:
+            raise werkzeug.exceptions.NotFound()
+
+        book = request.env['library.book'].browse(slug_id)
+        if not book.exists() or not book.website_published:
+            raise werkzeug.exceptions.NotFound()
+
+        # Redirect to canonical slug in case name changed
+        expected_slug = slug(book)
+        if slug_str != expected_slug:
+            return request.redirect(f'/books/{expected_slug}', 301)
+
+        return request.render('my_module.website_book_detail', {
+            'book': book,
+        })</code></pre>
+          </div>
+          <p><code>slug(record)</code> generates a string like <code>clean-code-42</code> using <code>record.name</code> and <code>record.id</code>. The 301 redirect to the canonical slug keeps URLs consistent after a name change.</p>
+
+          <h2 id="request-website">Using request.website</h2>
+          <p><code>request.website</code> exposes the active website record and its helpers:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">website = request.website
+
+# Current website info
+website.name           # "My Library Website"
+website.domain         # "library.example.com"
+website.company_id     # linked res.company
+website.default_lang_id  # default language
+
+# Useful helpers
+website.get_current_pricelist()     # website_sale
+website.is_publisher()              # True if current user can publish pages
+website.viewref('my_module.tmpl')   # ir.ui.view lookup by key</code></pre>
+          </div>
+
+          <h2 id="handling-404">Handling 404 and Unpublished Records</h2>
+          <p>Always validate existence and publication status before rendering a detail page:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import werkzeug.exceptions
+
+book = request.env['library.book'].browse(book_id)
+
+# Not found
+if not book.exists():
+    raise werkzeug.exceptions.NotFound()
+
+# Unpublished — allow website editors to preview
+if not book.website_published and not request.website.is_publisher():
+    raise werkzeug.exceptions.NotFound()
+
+return request.render('my_module.website_book_detail', {'book': book})</code></pre>
+          </div>
+          <p>Website editors (users with <code>website.group_website_publisher</code>) should be able to preview unpublished pages, so check <code>request.website.is_publisher()</code> before raising 404.</p>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="controller-inheritance">Extending Existing Website Controllers</h2>
+          <p>Odoo website controllers can be extended using Python class inheritance. Since Odoo uses a registry, subclassing a controller in your module overrides the parent's routes:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo.addons.website.controllers.main import Website as WebsiteMain
+
+class ExtendedWebsite(WebsiteMain):
+
+    @http.route('/contactus', type='http', auth='public', website=True)
+    def contactus(self, **kw):
+        # Add extra context to the existing contact page
+        response = super().contactus(**kw)
+        response.qcontext['custom_message'] = 'Welcome!'
+        return response</code></pre>
+          </div>
+
+          <h2 id="json-routes">JSON Routes for AJAX</h2>
+          <p>For AJAX calls from website pages, use <code>type='json'</code>. These routes accept JSON bodies and return JSON automatically:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">@http.route('/books/availability', type='json',
+            auth='public', website=True)
+def book_availability(self, book_id, **kw):
+    book = request.env['library.book'].browse(book_id)
+    return {'available': book.available_copies > 0}</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Add <code>website=True</code> to <code>@http.route</code> to activate website context and <code>request.website</code></li>
+              <li>Use <code>slug(record)</code> / <code>unslug(slug_str)</code> for SEO-friendly record URLs</li>
+              <li>Always check existence and publication status before rendering detail pages</li>
+              <li>Allow website publishers to preview unpublished records via <code>request.website.is_publisher()</code></li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a controller in Odoo?</li>
+            <li>What does <code>@http.route</code> do?</li>
+            <li>What does <code>auth='public'</code> mean?</li>
+            <li>How do you pass data to a website template?</li>
+            <li>What does <code>website=True</code> on a route do?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/website/website-overview.html" class="topic-tag odoo-topic-tag">💻 Website Overview</a>
+              <a href="/odoo/website/qweb-templates.html" class="topic-tag odoo-topic-tag">💻 QWeb Templates</a>
+              <a href="/odoo/website/website-forms.html" class="topic-tag odoo-topic-tag">💻 Website Forms</a>
+              <a href="/odoo/portal/portal-controllers.html" class="topic-tag odoo-topic-tag">🌐 Portal Controllers</a>
+            </div>
+          </section>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What's the difference between auth='public' and auth='user' for website routes? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>auth='public'</code> allows access without login — anonymous visitors see the page. <code>auth='user'</code> requires a logged-in session (portal or internal user). Most public website pages use <code>auth='public'</code>. Portal pages use <code>auth='user'</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How does Odoo generate slugs from record names? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>slug(record)</code> calls <code>record.sudo().read(['name', 'id'])</code>, lowercases the name, replaces spaces and special characters with hyphens, and appends <code>-{id}</code>. The ID at the end ensures uniqueness even if two records share the same name.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I add URL query parameters to a website route? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — declare them as keyword arguments in the controller method signature. Odoo maps URL parameters to kwargs automatically: <code>def book_listing(self, page=1, search='', **kw)</code> reads <code>?page=2&search=python</code> from the URL.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a href="/odoo/website/website-overview.html" class="lesson-nav-link">
+        <span class="nav-label">← Prev</span>
+        <span class="nav-title">Website Overview</span>
+        </a>
+        <a href="/odoo/website/qweb-templates.html" class="lesson-nav-link next">
+        <span class="nav-label">Next →</span>
+        <span class="nav-title">QWeb Templates</span>
+        </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

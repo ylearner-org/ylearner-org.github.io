@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git Branches – What Are Branches and Why Use Them? | ylearner</title>
+  <meta name="description" content="Understand what Git branches are, why they matter, and how the main branch and HEAD pointer work. Includes ASCII diagrams and beginner-friendly explanations.">
+  <meta name="keywords" content="git branches, what is a git branch, git branch pointer, git HEAD, git main branch, branching in git, git branch tutorial">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/git/branching/branches-overview.html">
+  <meta property="og:title" content="Git Branches – What Are Branches and Why Use Them? | ylearner">
+  <meta property="og:description" content="Learn what a Git branch really is under the hood — a lightweight 41-byte pointer — and why branches are the key to safe, parallel development.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/git/branching/branches-overview.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Git Branches – What Are Branches and Why Use Them? | ylearner">
+  <meta name="twitter:description" content="Learn what a Git branch really is under the hood — a lightweight 41-byte pointer — and why branches are the key to safe, parallel development.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Git Branches – What Are Branches and Why Use Them?","description":"Understand what Git branches are under the hood, why branches enable safe parallel development, and how HEAD and the main branch work.","educationalLevel":"Beginner","keywords":"git branches, git branch pointer, git HEAD, branching in git","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <a href="/git/branching/branches-overview.html">Branching &amp; Merging</a><span class="separator">›</span>
+          <span class="current">Branches Overview</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌿 Branching &amp; Merging</div>
+          <h1>Git Branches – What Are Branches and Why Use Them?</h1>
+          <p class="lesson-intro">Branches are one of Git's most powerful features — and one of its most misunderstood. Under the hood, a branch is nothing more than a 41-byte text file containing a commit hash. Yet this tiny file enables you to work on multiple features simultaneously, experiment without risk, and collaborate with an entire team without stepping on each other's code.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-branch">What Is a Git Branch?</h2>
+          <p>A Git branch is a <strong>lightweight, movable pointer to a specific commit</strong>. That's it. When you look inside <code>.git/refs/heads/</code>, you'll find one small text file per branch, each containing a single SHA-1 hash (40 characters + newline = 41 bytes).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># A branch is literally just a file containing a commit hash
+cat .git/refs/heads/main
+# a3f8c2d7e91b4a567890abcdef1234567890abcd
+
+# List all branch files
+ls .git/refs/heads/
+# main  feature/login  bugfix/404</code></pre>
+          </div>
+
+          <p>Because a branch is just a file with a hash, creating a new branch is instantaneous regardless of your project size. Git doesn't copy files or duplicate history — it simply writes a new 41-byte file.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Branches vs. other VCS</strong>
+              <p>In older version control systems like SVN, creating a branch meant copying the entire project directory — an operation that could take minutes. In Git, creating a branch takes milliseconds. This is why Git developers use branches constantly for even small tasks.</p>
+            </div>
+          </div>
+
+          <h2 id="why-branches">Why Use Branches?</h2>
+          <p>Branches solve a fundamental problem in software development: <em>how do you work on new things without breaking what already works?</em></p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Use Case</th><th>Without Branches</th><th>With Branches</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>New feature development</td>
+                  <td>Risk breaking main codebase for entire team</td>
+                  <td>Develop in isolation, merge when ready</td>
+                </tr>
+                <tr>
+                  <td>Bug fixes</td>
+                  <td>Partially written fixes mix with new feature code</td>
+                  <td>Clean, focused fix on its own branch</td>
+                </tr>
+                <tr>
+                  <td>Experimentation</td>
+                  <td>Have to undo changes manually if experiment fails</td>
+                  <td>Just delete the branch — nothing is lost</td>
+                </tr>
+                <tr>
+                  <td>Parallel work</td>
+                  <td>Team members block each other</td>
+                  <td>Each developer works on their own branch</td>
+                </tr>
+                <tr>
+                  <td>Code review</td>
+                  <td>Hard to isolate what changed</td>
+                  <td>PR contains only branch changes vs main</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="main-branch">The main (or master) Branch</h2>
+          <p>When you run <code>git init</code> or <code>git clone</code>, Git automatically creates a default branch. This branch is conventionally named <code>main</code> (modern default) or <code>master</code> (older default). <strong>Git does not treat this branch specially</strong> — it has no built-in significance beyond being the starting point. The convention is that <code>main</code> contains stable, production-ready code.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Check which branch name git init will use by default
+git config --global init.defaultBranch
+# main
+
+# If you're on an older Git version (pre-2.28) you can set it:
+git config --global init.defaultBranch main</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>main vs master</strong>
+              <p>GitHub changed its default from <code>master</code> to <code>main</code> in October 2020. Git itself changed its default in version 2.28 (July 2020). If you see <code>master</code> in older tutorials or repositories, it is the same concept — just a naming convention. You can rename either branch at any time.</p>
+            </div>
+          </div>
+
+          <h2 id="branch-as-pointer">A Branch Is a Moving Pointer</h2>
+          <p>Here's the key insight: when you make a new commit while on a branch, <strong>the branch pointer automatically moves forward</strong> to point at the new commit. You don't do anything — Git updates the branch file for you.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Before commit:
+  main → C2 → C1
+
+After "git commit":
+  main → C3 → C2 → C1
+
+The branch pointer moved from C2 to C3 automatically.</code></pre>
+          </div>
+
+          <p>HEAD is a special pointer that tells Git <em>which branch you're currently on</em>. When you commit, Git moves the branch that HEAD points to forward.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># HEAD is also just a file
+cat .git/HEAD
+# ref: refs/heads/main
+# This means: "I'm on the main branch"
+
+# When HEAD points directly to a commit (detached HEAD state):
+# HEAD → a3f8c2d7e91b...  (no branch name — just a hash)</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Detached HEAD state</strong>
+              <p>If you check out a specific commit hash (not a branch name), HEAD points directly to that commit instead of a branch. You're in "detached HEAD" state. Any commits you make won't belong to any branch and can be lost. To save your work, create a branch: <code>git switch -c new-branch-name</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="visualizing-branches">Visualizing Branches</h2>
+          <p>Let's trace through a real branching scenario with ASCII diagrams to make this concrete.</p>
+
+          <h3>Starting point: commits on main</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">C1 ← C2 ← C3
+              ↑
+             main
+              ↑
+             HEAD</code></pre>
+          </div>
+
+          <h3>Create a feature branch and make commits</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">After: git switch -c feature/login
+       (make 2 commits on feature/login)
+
+C1 ← C2 ← C3
+              ↑
+             main
+
+              ↖ C4 ← C5
+                       ↑
+               feature/login
+                       ↑
+                      HEAD
+
+main still points at C3.
+feature/login moved forward to C5.
+HEAD follows feature/login.</code></pre>
+          </div>
+
+          <h3>Merge feature/login back into main</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">After: git switch main && git merge feature/login
+       (fast-forward — see Merging lesson)
+
+C1 ← C2 ← C3 ← C4 ← C5
+                       ↑
+                      main  (moved forward)
+                       ↑
+              feature/login
+                       ↑
+                      HEAD</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h3>Checking branch state from the command line</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># See a text graph of branches and commits
+git log --oneline --graph --all
+
+# Example output:
+# * a1b2c3d (HEAD -> main, feature/login) Add login validation
+# * 9f8e7d6 Add login form
+# * 5c4b3a2 Initial project setup</code></pre>
+          </div>
+
+          <h2 id="deep-branchov">Branches: Parallel Lines of Work, Almost Free</h2>
+          <p>A branch lets you develop a feature or fix in isolation without disturbing the stable <code>main</code> line. The reason branching is instant in Git: a branch is just a <strong>movable pointer to a commit</strong> — creating one writes a single tiny file, it doesn't copy your project.</p>
+          <pre><code class="language-bash">git switch -c feature/login    # create + switch
+# ...commit work on the feature...
+git switch main
+git merge feature/login        # bring it back into main
+git branch -d feature/login    # delete the merged pointer</code></pre>
+          <p>As you commit on a branch, its pointer advances while other branches stay put. All branches share the same commit history underneath — a branch just marks one tip of it. <code>HEAD</code> points to the branch you're currently on.</p>
+          <table>
+            <thead><tr><th>Command</th><th>Does</th></tr></thead>
+            <tbody>
+              <tr><td><code>git branch</code></td><td>list branches (<code>*</code> = current)</td></tr>
+              <tr><td><code>git switch name</code></td><td>move to a branch</td></tr>
+              <tr><td><code>git merge name</code></td><td>combine a branch into current</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Why branch at all:</strong> it isolates in-progress work so <code>main</code> always stays deployable, lets several people work in parallel without stepping on each other, and makes code review possible (one branch = one pull request). <strong>The one rule:</strong> keep branches <em>short-lived</em> — merge within days, not weeks. Long-lived branches drift far from <code>main</code> and turn merging into a conflict nightmare. Name them descriptively (<code>fix/login-crash</code>, <code>feature/checkout</code>).</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>List branches with <code>git branch</code>.</li>
+              <li>Note the default branch name (main).</li>
+              <li>Understand that a branch is a movable pointer.</li>
+              <li>See the current branch in <code>git status</code>.</li>
+              <li>Visualize branches in a <code>git log --graph</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Explain what a Git branch actually is (a movable pointer to a commit) and why branching is cheap in Git. List your branches, identify the current one, and describe how HEAD relates to the active branch.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A branch is a <strong>lightweight movable pointer</strong> to a commit — stored as a 41-byte file in <code>.git/refs/heads/</code>.</li>
+              <li>Creating a branch is <strong>instantaneous</strong> — Git doesn't copy files or history.</li>
+              <li>Branches let you <strong>work in isolation</strong>: new features, bug fixes, and experiments stay separate from stable code.</li>
+              <li><strong>main</strong> (or <code>master</code>) is the default branch by convention — Git doesn't treat it specially.</li>
+              <li>When you commit, the <strong>current branch pointer moves forward</strong> automatically.</li>
+              <li><strong>HEAD</strong> points to the current branch (or directly to a commit in "detached HEAD" state).</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a branch in Git?</li>
+            <li>Why are Git branches lightweight?</li>
+            <li>What is the default branch name?</li>
+            <li>How does HEAD relate to a branch?</li>
+            <li>How do you list all branches?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/git/branching/creating-switching.html" class="topic-tag git-topic-tag">🔀 Creating &amp; Switching Branches</a>
+            <a href="/git/branching/merging.html" class="topic-tag git-topic-tag">🔀 Merging Branches</a>
+            <a href="/git/branching/merge-conflicts.html" class="topic-tag git-topic-tag">🔀 Merge Conflicts</a>
+            <a href="/git/branching/rebase.html" class="topic-tag git-topic-tag">🔀 Rebase</a>
+            <a href="/git/basics/status-log.html" class="topic-tag git-topic-tag">🔀 git status &amp; log</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can you have an unlimited number of branches? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, practically unlimited. Each branch is just a 41-byte file on disk, so you could have thousands of branches with almost no storage overhead. In practice, teams typically keep a modest number of active branches at any time and delete feature branches after merging. Long-lived stale branches become confusing and are considered bad practice.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens to a branch after you merge it? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The branch pointer still exists after merging — Git does not delete it automatically. The commits from the merged branch are now reachable from the target branch, but the merged branch label remains until you explicitly delete it with <code>git branch -d branch-name</code>. It's good practice to delete feature branches after merging to keep the branch list clean.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is the main branch special in any way? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not to Git itself — <code>main</code> is just a branch name like any other. What makes it special is <em>convention</em> and <em>tooling</em>. GitHub, GitLab, and most CI/CD tools use the default branch as the deployment target. Your team's workflow decides which branch is "protected" and requires pull requests. You could name your primary branch anything, though deviating from <code>main</code> creates unnecessary friction with tooling.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is a detached HEAD and should I be worried? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Detached HEAD means HEAD is pointing directly to a commit hash instead of a branch name. It happens when you run <code>git checkout &lt;commit-hash&gt;</code> or check out a tag. You can look around safely in this state, but any new commits you make won't be tracked by any branch. If you want to keep those commits, run <code>git switch -c my-new-branch</code> while still in detached HEAD state. Git will warn you clearly when you're in this state.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/basics/quiz.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+          <a href="/git/branching/creating-switching.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Creating &amp; Switching Branches</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

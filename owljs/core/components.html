@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS Components – Class-Based Component Model Explained | ylearner</title>
+  <meta name="description" content="Deep dive into OWL JS components: class syntax, static properties, component registration, mount(), rendering pipeline, component tree, and real-world patterns. Complete tutorial for Odoo developers.">
+  <meta name="keywords" content="OWL JS components, OWL component class, OWL JS Component extends, OWL static template, OWL mount, OWL component tree, Odoo Web Library components, OWL JS tutorial, owl js component example">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/owljs/core/components.html">
+  <meta property="og:title" content="OWL JS Components – Class-Based Component Model | ylearner">
+  <meta property="og:description" content="Complete guide to OWL JS components: class anatomy, static properties, registration, mount(), rendering pipeline, and component composition.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/owljs/core/components.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS Components Complete Guide | ylearner">
+  <meta name="twitter:description" content="OWL component class anatomy, static template, mount(), component tree, registration, and rendering — full tutorial.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS Components",
+    "description": "Complete guide to OWL JS class-based components: anatomy, static properties, component registration, mount(), rendering pipeline, and component tree composition.",
+    "educationalLevel": "Beginner",
+    "keywords": "OWL JS components, OWL component class, OWL static template, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/core/components.html">Core Concepts</a><span class="separator">›</span>
+          <span class="current">Components &amp; Classes</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Core Concepts</div>
+          <h1>OWL JS Components – The Class-Based Component Model</h1>
+          <p class="lesson-intro">Everything in an OWL JS application is a <strong>component</strong>. A component is a JavaScript class that extends <code>Component</code>, declares a QWeb template, and optionally owns reactive state, lifecycle hooks, and child components. This lesson covers the complete anatomy of an OWL component — from the minimal skeleton to the full set of static properties — so you understand exactly what each part does and when to use it.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 1 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="minimal-component">The Minimal Component</h2>
+          <p>Every OWL component has exactly two required pieces: a class that <code>extends Component</code>, and a <code>static template</code> property that holds the QWeb XML template string.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – minimal component</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml } from "@odoo/owl";
+
+class Greeting extends Component {
+  static template = xml`
+    &lt;div&gt;Hello, World!&lt;/div&gt;
+  `;
+}
+
+export default Greeting;</code></pre>
+          </div>
+
+          <p>The <code>xml</code> helper is a tagged template literal that registers the QWeb template string with the OWL template engine and returns a unique template name. Without it, OWL would not know how to compile or look up your template.</p>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Why <code>xml</code> is a tagged template literal, not just a string</strong>
+              <p>OWL needs to compile QWeb templates exactly once. The <code>xml``</code> tag records the template under a stable internal key and returns that key. Passing a plain string would not register it. Think of <code>xml``</code> as "compile this template and give me a handle to it."</p>
+            </div>
+          </div>
+
+          <h2 id="component-anatomy">Full Component Anatomy</h2>
+          <p>A real component uses several static class properties. Here is every one you will encounter, with a brief description of each:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – full anatomy</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml, useState } from "@odoo/owl";
+import ChildComponent from "./ChildComponent";
+
+class UserCard extends Component {
+  // ── Static properties ──────────────────────────────────────────────
+
+  // 1. Template (required) — the QWeb XML for this component
+  static template = xml`
+    &lt;div class="user-card" t-att-class="{ active: state.isActive }"&gt;
+      &lt;h2 t-esc="props.name"/&gt;
+      &lt;p t-esc="props.email"/&gt;
+      &lt;ChildComponent count="state.clicks"/&gt;
+      &lt;button t-on-click="toggle"&gt;Toggle&lt;/button&gt;
+    &lt;/div&gt;
+  `;
+
+  // 2. components — child components used in the template (must be registered here)
+  static components = { ChildComponent };
+
+  // 3. props — prop type declarations (optional but strongly recommended)
+  static props = {
+    name:  { type: String },
+    email: { type: String, optional: true },
+  };
+
+  // 4. defaultProps — default values for optional props
+  static defaultProps = {
+    email: "not provided",
+  };
+
+  // ── Instance members ───────────────────────────────────────────────
+
+  // Reactive state — changes here trigger re-render
+  state = useState({ isActive: false, clicks: 0 });
+
+  // Instance method (event handler)
+  toggle() {
+    this.state.isActive = !this.state.isActive;
+    this.state.clicks++;
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="static-properties">Static Properties Reference</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Static Property</th>
+                  <th>Type</th>
+                  <th>Required?</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>template</code></td><td>template key (from <code>xml``</code>)</td><td>Yes</td><td>The QWeb template to render for this component</td></tr>
+                <tr><td><code>components</code></td><td><code>{ [name]: ComponentClass }</code></td><td>Only if template uses sub-components</td><td>Registers child components so OWL can instantiate them by name in the template</td></tr>
+                <tr><td><code>props</code></td><td>props definition object</td><td>No (recommended)</td><td>Declares and type-checks props passed to this component. OWL throws in dev mode if a prop violates the spec.</td></tr>
+                <tr><td><code>defaultProps</code></td><td>plain object</td><td>No</td><td>Default values for optional props. Merged with <code>this.props</code> at construction time.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="mount">Mounting a Component</h2>
+          <p>To render the root component of your app into the DOM, use <code>mount()</code>. This is only called once — for the root. All child components are instantiated by OWL internally when the parent template renders them.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – mounting the root component</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { mount } from "@odoo/owl";
+import App from "./App";
+
+// Mount to a DOM node
+mount(App, document.getElementById("app"));
+
+// mount() also accepts an options object (second positional arg replaced by options in OWL 2)
+mount(App, document.getElementById("app"), {
+  props: { title: "My OWL App" },  // props to pass to the root
+  dev: true,                        // enable dev mode (prop checks, warnings)
+  translateFn: (str) => str,        // i18n translation function
+});</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>mount() vs manual instantiation</strong>
+              <p><code>mount()</code> creates the root component instance, sets up the rendering environment, and performs the first render. Never instantiate a component with <code>new MyComponent()</code> — OWL manages component lifecycles internally. Only call <code>mount()</code> for the single root component of your app.</p>
+            </div>
+          </div>
+
+          <h2 id="component-tree">Component Trees</h2>
+          <p>OWL applications are a tree of components, with one root component at the top. Parent components pass data down via props; child components communicate back via custom events. Each component manages its own template and state.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – parent/child component tree</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml, useState } from "@odoo/owl";
+
+// ── Child component ────────────────────────────────────────────────
+class TodoItem extends Component {
+  static template = xml`
+    &lt;li&gt;
+      &lt;span t-esc="props.text"/&gt;
+      &lt;button t-on-click="() =&gt; props.onDelete(props.id)"&gt;✕&lt;/button&gt;
+    &lt;/li&gt;
+  `;
+
+  static props = {
+    id:       { type: Number },
+    text:     { type: String },
+    onDelete: { type: Function },  // callback prop
+  };
+}
+
+// ── Parent component ───────────────────────────────────────────────
+class TodoList extends Component {
+  static components = { TodoItem };
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;h1&gt;Todos&lt;/h1&gt;
+      &lt;ul&gt;
+        &lt;TodoItem
+          t-foreach="state.todos"
+          t-as="todo"
+          t-key="todo.id"
+          id="todo.id"
+          text="todo.text"
+          onDelete.bind="deleteTodo"
+        /&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  `;
+
+  state = useState({
+    todos: [
+      { id: 1, text: "Learn OWL JS" },
+      { id: 2, text: "Build an Odoo module" },
+    ],
+  });
+
+  deleteTodo(id) {
+    const idx = this.state.todos.findIndex(t => t.id === id);
+    if (idx !== -1) this.state.todos.splice(idx, 1);
+  }
+}</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Register sub-components in <code>static components</code></strong>
+              <p>If your template uses <code>&lt;TodoItem .../&gt;</code> but <code>TodoItem</code> is not listed in <code>static components = { TodoItem }</code>, OWL will throw an error at render time. Every component used in a template must be registered by its parent.</p>
+            </div>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="props-brief">Passing Props</h2>
+          <p>Props are passed in the template using attribute-like syntax. There are three syntaxes depending on the value type:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – three ways to pass props</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- 1. String literal — value in quotes is a plain string --&gt;
+&lt;UserCard name="'Alice'" /&gt;
+
+&lt;!-- 2. JavaScript expression — quotes contain any JS expression --&gt;
+&lt;UserCard name="user.firstName + ' ' + user.lastName" /&gt;
+
+&lt;!-- 3. Shorthand for boolean true --&gt;
+&lt;UserCard isAdmin /&gt;     &lt;!-- equivalent to isAdmin="true" --&gt;
+
+&lt;!-- 4. Bound method (preserves 'this') --&gt;
+&lt;UserCard onSave.bind="saveUser" /&gt;</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>String vs expression — the common pitfall</strong>
+              <p><code>name="Alice"</code> is a JavaScript expression — it evaluates the variable <code>Alice</code>. <code>name="'Alice'"</code> is a string literal because the inner quotes make it a JS string. This trips up almost every OWL beginner at least once.</p>
+            </div>
+          </div>
+
+          <h2 id="props-access">Accessing Props and State in Templates</h2>
+          <p>Inside a QWeb template, the component instance is the implicit scope. You access <code>props</code> directly and <code>state</code> directly (without <code>this</code>):</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – template scope</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- In template: no 'this.' needed --&gt;
+&lt;div&gt;
+  &lt;span t-esc="props.username"/&gt;
+  &lt;span t-esc="state.count"/&gt;
+  &lt;span t-esc="computedValue"/&gt;   &lt;!-- JS getter on the class --&gt;
+&lt;/div&gt;</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – in methods you use 'this'</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class MyComponent extends Component {
+  state = useState({ count: 0 });
+
+  get computedValue() {
+    // 'this' works in getters and methods
+    return this.state.count * 2;
+  }
+
+  increment() {
+    this.state.count++;  // direct mutation — OWL detects it
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="rendering-pipeline">How OWL Re-renders a Component</h2>
+          <p>OWL uses a virtual DOM (vdom) diffing algorithm. When reactive state changes, OWL queues a re-render for the affected component, performs the diff between old and new vdom, and applies only the minimal DOM patches needed. You never call a render function manually.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Trigger</th><th>What happens</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Mutation on a <code>useState</code> object</td><td>OWL schedules a micro-task re-render for the owning component</td></tr>
+                <tr><td>Parent re-renders and passes new props</td><td>Child re-renders automatically if props changed</td></tr>
+                <tr><td>Child receives same prop values</td><td>Child does NOT re-render (shallow prop comparison)</td></tr>
+                <tr><td>Manual <code>this.render()</code></td><td>Forces a re-render — almost never needed</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="naming-conventions">Naming Conventions</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Thing</th><th>Convention</th><th>Example</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Component class</td><td>PascalCase</td><td><code>UserCard</code>, <code>TodoList</code>, <code>InvoiceLine</code></td></tr>
+                <tr><td>Template tag in parent template</td><td>PascalCase (same as class name)</td><td><code>&lt;UserCard .../&gt;</code></td></tr>
+                <tr><td>Component file</td><td>PascalCase or kebab-case</td><td><code>UserCard.js</code> or <code>user-card.js</code></td></tr>
+                <tr><td>Props</td><td>camelCase</td><td><code>userName</code>, <code>onDelete</code>, <code>isActive</code></td></tr>
+                <tr><td>Event handler methods</td><td>verb + noun</td><td><code>handleClick</code>, <code>toggleMenu</code>, <code>submitForm</code></td></tr>
+                <tr><td>State fields</td><td>camelCase</td><td><code>isLoading</code>, <code>errorMessage</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="odoo-context">Components in Odoo Modules</h2>
+          <p>In real Odoo modules, components are not mounted with <code>mount()</code> — they are registered in Odoo's component registry instead. OWL picks them up from the registry when the backend renders a view.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – Odoo module component registration</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { Component, xml } from "@odoo/owl";
+import { registry } from "@web/core/registry";
+
+class MyWidget extends Component {
+  static template = xml`
+    &lt;div class="my-widget"&gt;
+      &lt;span t-esc="props.record.data.name"/&gt;
+    &lt;/div&gt;
+  `;
+
+  static props = {
+    record: Object,
+  };
+}
+
+// Register in the "fields" registry to use as a custom field widget
+registry.category("fields").add("my_widget", {
+  component: MyWidget,
+});
+
+export default MyWidget;</code></pre>
+          </div>
+
+          <h2 id="deep-comp">Anatomy of an OWL Component</h2>
+          <p>An OWL component is a JavaScript class extending <code>Component</code>, tied to an XML template. This class-plus-template pairing is the fundamental building block of every OWL app.</p>
+          <pre><code class="language-javascript">import { Component, xml, useState } from "@odoo/owl";
+
+class Greeting extends Component {
+    static template = xml`
+        &lt;div&gt;Hello, &lt;t t-esc="props.name"/&gt;! Clicked &lt;t t-esc="state.n"/&gt;
+             &lt;button t-on-click="inc"&gt;+&lt;/button&gt;
+        &lt;/div&gt;`;
+    static props = ["name"];
+
+    setup() {
+        this.state = useState({ n: 0 });   // reactive
+    }
+    inc() { this.state.n++; }              // mutation re-renders
+}</code></pre>
+          <table>
+            <thead><tr><th>Part</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>static template</code></td><td>the XML markup (inline via <code>xml`` </code> or by name)</td></tr>
+              <tr><td><code>static props</code></td><td>declares expected inputs from parent</td></tr>
+              <tr><td><code>setup()</code></td><td>init logic + hooks — the constructor replacement</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Why <code>setup()</code> and not <code>constructor()</code>?</strong> Hooks like <code>useState</code> and <code>onMounted</code> need the component's internal context, which OWL wires up right before calling <code>setup</code>. Put hook calls anywhere else and they throw. Template expressions read from <code>this</code> — so <code>props</code>, <code>state</code>, and your methods are all reachable as <code>props.x</code>, <code>state.y</code>.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a three-component tree to practice the concepts from this lesson:</p>
+            <ol>
+              <li>Create a <strong><code>Badge</code></strong> component that accepts a <code>label</code> (String) prop and a <code>color</code> (String, optional, default <code>"blue"</code>) prop. Render <code>&lt;span class="badge"&gt;{label}&lt;/span&gt;</code> with an inline style for the color.</li>
+              <li>Create a <strong><code>UserCard</code></strong> component that accepts <code>name</code>, <code>role</code>, and <code>tags</code> (Array) props. Use <code>t-foreach</code> to render a <code>&lt;Badge&gt;</code> for each tag.</li>
+              <li>Create a <strong><code>UserList</code></strong> root component with a hard-coded array of 3 users in <code>useState</code>. Render a <code>&lt;UserCard&gt;</code> for each user. Add a "Remove" button that splices the user out of the array.</li>
+            </ol>
+            <p>Focus on: <code>static components</code> at each level, correct prop passing syntax, and prop type declarations.</p>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Create a component with a <code>setup()</code> that initializes data, a template that renders it, and a child registered via <code>static components</code>. Explain the component class structure and the role of <code>setup()</code> (OWL’s constructor-like hook).</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Every OWL component is a class that <code>extends Component</code> with a <code>static template = xml`...`</code>.</li>
+              <li><code>static components</code> registers child components used in the template — required for every sub-component.</li>
+              <li><code>static props</code> declares and type-checks incoming props. OWL validates them in dev mode.</li>
+              <li><code>static defaultProps</code> provides fallback values for optional props.</li>
+              <li><code>mount()</code> bootstraps the root component — use only once per app.</li>
+              <li>In templates, access <code>props</code> and <code>state</code> without <code>this</code>. In methods and getters, use <code>this</code>.</li>
+              <li>Mutations to <code>useState</code> objects automatically schedule a re-render — no explicit render calls needed.</li>
+              <li>In Odoo, components are registered in the Odoo registry rather than mounted directly.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you define an OWL component?</li>
+            <li>What is the <code>setup()</code> method for?</li>
+            <li>How do you register child components?</li>
+            <li>What is <code>static template</code>?</li>
+            <li>How does a component render?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/owljs/core/templates.html" class="topic-tag owl-topic-tag">🦉 Template Syntax (QWeb)</a>
+            <a href="/owljs/core/props.html" class="topic-tag owl-topic-tag">🦉 Props</a>
+            <a href="/owljs/core/state.html" class="topic-tag owl-topic-tag">🦉 State &amp; useState</a>
+            <a href="/owljs/core/events.html" class="topic-tag owl-topic-tag">🦉 Event Handling</a>
+            <a href="/owljs/advanced/sub-components.html" class="topic-tag owl-topic-tag">🦉 Sub-components</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I use functional components in OWL? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — OWL only supports class-based components. There is no functional component API like React's function components or Vue's <code>defineComponent</code>. This is by design: OWL is purpose-built for Odoo, where the class model aligns with Odoo's existing patterns (models, controllers). Every OWL component must be a class that extends <code>Component</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why do I get "Template … not found" even though I wrote the template? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Most common cause: you forgot the <code>xml``</code> tag. <code>static template = `&lt;div&gt;...&lt;/div&gt;`</code> (without <code>xml</code>) assigns a plain string, not a registered template key. OWL looks up templates by key, so it cannot find a plain string. Fix: <code>static template = xml`&lt;div&gt;...&lt;/div&gt;`</code>. Another cause: the component is not listed in the parent's <code>static components</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can a component have multiple root elements in its template? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — an OWL QWeb template must have exactly one root element. If you need multiple elements at the top level, wrap them in a <code>&lt;div&gt;</code> or use the <code>&lt;t&gt;</code> invisible wrapper: <code>&lt;t&gt;&lt;div/&gt;&lt;p/&gt;&lt;/t&gt;</code>. The <code>&lt;t&gt;</code> tag is a structural node — it does not produce any DOM element but allows multiple children in the template.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When should I split one component into multiple? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Split when: (1) a piece of UI is reused in multiple places, (2) a template grows beyond ~30–40 lines and logical sections are clear, (3) a sub-section has its own independent state, or (4) you want to isolate re-renders — OWL only re-renders components whose state or props changed. One big monolithic component re-renders entirely on any state change; splitting lets only the affected part re-render.</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/getting-started/quiz.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+          <a href="/owljs/core/templates.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Template Syntax (QWeb)</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

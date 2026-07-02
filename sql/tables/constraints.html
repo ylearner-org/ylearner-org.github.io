@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Constraints – PRIMARY KEY, FOREIGN KEY, UNIQUE, CHECK | ylearner</title>
+  <meta name="description" content="Learn all SQL constraints — PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, DEFAULT, and CHECK — with syntax examples and ON DELETE CASCADE behavior.">
+  <meta name="keywords" content="SQL constraints, SQL PRIMARY KEY, SQL FOREIGN KEY, SQL UNIQUE constraint, SQL NOT NULL, SQL DEFAULT, SQL CHECK constraint, ON DELETE CASCADE">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/tables/constraints.html">
+  <meta property="og:title" content="SQL Constraints – PRIMARY KEY, FOREIGN KEY, UNIQUE, CHECK | ylearner">
+  <meta property="og:description" content="Master all six SQL constraints with real-world examples. Covers PRIMARY KEY, FOREIGN KEY with CASCADE, UNIQUE, NOT NULL, DEFAULT, and CHECK.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/tables/constraints.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL Constraints – PRIMARY KEY, FOREIGN KEY, UNIQUE, CHECK | ylearner">
+  <meta name="twitter:description" content="Master all six SQL constraints with real-world examples. Covers PRIMARY KEY, FOREIGN KEY with CASCADE, UNIQUE, NOT NULL, DEFAULT, and CHECK.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Constraints – PRIMARY KEY, FOREIGN KEY, UNIQUE, CHECK","description":"Learn all SQL constraints — PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, DEFAULT, and CHECK — with inline and table-level syntax examples.","educationalLevel":"Beginner","keywords":"SQL constraints, PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, DEFAULT, CHECK","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/tables/constraints.html">Tables &amp; Schema</a><span class="separator">›</span>
+          <span class="current">Constraints</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🏗️ Tables &amp; Schema</div>
+          <h1>SQL Constraints – PRIMARY KEY, FOREIGN KEY, UNIQUE, CHECK</h1>
+          <p class="lesson-intro">Constraints are rules enforced by the database engine to guarantee data integrity. They prevent bad data from entering your tables in the first place — no application-level validation can replace them. This lesson covers all six standard SQL constraints: PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, DEFAULT, and CHECK, with both inline and table-level syntax.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-are-constraints">What Are Constraints?</h2>
+          <p>A constraint is a rule attached to a column or table that the database engine enforces on every INSERT and UPDATE. If a statement would violate a constraint, it is rejected with an error. Constraints are defined in <code>CREATE TABLE</code> or added later with <code>ALTER TABLE</code>.</p>
+
+          <p>Constraints can be <strong>inline</strong> (defined on the column) or <strong>table-level</strong> (defined after all columns, required for multi-column constraints).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Inline constraint (on the column definition)
+email VARCHAR(255) NOT NULL UNIQUE
+
+-- Named table-level constraint (after all columns)
+CONSTRAINT uq_users_email UNIQUE (email)</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Name your constraints</strong>
+              <p>Unnamed constraints get auto-generated names like <code>users_ibfk_1</code> that are hard to reference later when dropping or modifying them. Use <code>CONSTRAINT constraint_name</code> with a clear naming convention, e.g. <code>fk_orders_user_id</code>, <code>uq_users_email</code>, <code>chk_products_price_positive</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="primary-key">PRIMARY KEY</h2>
+          <p>The primary key uniquely identifies each row. It implicitly enforces <code>NOT NULL</code> and <code>UNIQUE</code>. A table can have <strong>only one</strong> primary key (but it can span multiple columns — a composite PK).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Single-column primary key (inline)
+CREATE TABLE users (
+  id    INT           PRIMARY KEY AUTO_INCREMENT,
+  email VARCHAR(255)  NOT NULL
+);
+
+-- Composite primary key (table-level — required for multi-column)
+CREATE TABLE order_items (
+  order_id   INT NOT NULL,
+  product_id INT NOT NULL,
+  quantity   INT NOT NULL DEFAULT 1,
+  CONSTRAINT pk_order_items PRIMARY KEY (order_id, product_id)
+);</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="foreign-key">FOREIGN KEY</h2>
+          <p>A foreign key creates a link between two tables — the value in the FK column must either match a value in the referenced primary key column, or be <code>NULL</code>. This is called <strong>referential integrity</strong>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">CREATE TABLE orders (
+  id         INT  PRIMARY KEY AUTO_INCREMENT,
+  user_id    INT  NOT NULL,
+  total      DECIMAL(10,2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_orders_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);</code></pre>
+          </div>
+
+          <p>The <code>ON DELETE</code> and <code>ON UPDATE</code> clauses control what happens when the referenced row in the parent table changes:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Action</th><th>Effect on child rows</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>CASCADE</code></td><td>Automatically delete/update child rows to match</td></tr>
+                <tr><td><code>SET NULL</code></td><td>Set the FK column to NULL in child rows</td></tr>
+                <tr><td><code>RESTRICT</code></td><td>Refuse the parent delete/update if child rows exist (default in most DBs)</td></tr>
+                <tr><td><code>NO ACTION</code></td><td>Similar to RESTRICT; checked at end of statement (PostgreSQL)</td></tr>
+                <tr><td><code>SET DEFAULT</code></td><td>Set FK column to its default value (limited support)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="unique">UNIQUE</h2>
+          <p>A <code>UNIQUE</code> constraint ensures that all values in a column (or column combination) are distinct across all rows. Unlike <code>PRIMARY KEY</code>, a table can have multiple <code>UNIQUE</code> constraints, and a unique column <strong>allows multiple NULL values</strong> (since NULL ≠ NULL in SQL).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Inline UNIQUE
+CREATE TABLE users (
+  id       INT         PRIMARY KEY AUTO_INCREMENT,
+  email    VARCHAR(255) NOT NULL UNIQUE,
+  username VARCHAR(50)  NOT NULL UNIQUE
+);
+
+-- Named UNIQUE constraint (table-level)
+CREATE TABLE products (
+  id  INT PRIMARY KEY AUTO_INCREMENT,
+  sku VARCHAR(50) NOT NULL,
+  CONSTRAINT uq_products_sku UNIQUE (sku)
+);
+
+-- Composite UNIQUE (unique combination, not each column individually)
+CREATE TABLE team_memberships (
+  user_id INT NOT NULL,
+  team_id INT NOT NULL,
+  CONSTRAINT uq_team_membership UNIQUE (user_id, team_id)
+);</code></pre>
+          </div>
+
+          <h2 id="not-null">NOT NULL</h2>
+          <p><code>NOT NULL</code> is the simplest constraint — it prevents a column from storing <code>NULL</code>. By default, all columns allow <code>NULL</code> unless you explicitly add <code>NOT NULL</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">CREATE TABLE employees (
+  id         INT           PRIMARY KEY AUTO_INCREMENT,
+  first_name VARCHAR(100)  NOT NULL,   -- required
+  last_name  VARCHAR(100)  NOT NULL,   -- required
+  manager_id INT,                      -- optional — NULL allowed (top-level managers)
+  notes      TEXT                      -- optional — NULL allowed
+);
+
+-- Attempting to insert without a NOT NULL column fails:
+INSERT INTO employees (last_name) VALUES ('Smith');
+-- ERROR: Column 'first_name' cannot be null</code></pre>
+          </div>
+
+          <h2 id="default">DEFAULT</h2>
+          <p>The <code>DEFAULT</code> constraint specifies a value to use when the column is omitted from an <code>INSERT</code> statement. It does not prevent <code>NULL</code> — it only provides a fallback when no value is supplied.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">CREATE TABLE posts (
+  id         INT           PRIMARY KEY AUTO_INCREMENT,
+  title      VARCHAR(255)  NOT NULL,
+  status     VARCHAR(20)   NOT NULL DEFAULT 'draft',
+  view_count INT           NOT NULL DEFAULT 0,
+  created_at TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Omitting status and view_count uses their defaults:
+INSERT INTO posts (title) VALUES ('My First Post');
+-- Result: status='draft', view_count=0, created_at=NOW()</code></pre>
+          </div>
+
+          <h2 id="check-constraint">CHECK</h2>
+          <p>A <code>CHECK</code> constraint enforces a custom condition on column values. The row is rejected if the condition evaluates to <code>FALSE</code> (it passes if <code>TRUE</code> or <code>NULL</code>).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">CREATE TABLE employees (
+  id         INT           PRIMARY KEY AUTO_INCREMENT,
+  name       VARCHAR(100)  NOT NULL,
+  salary     DECIMAL(10,2) NOT NULL,
+  status     VARCHAR(20)   NOT NULL DEFAULT 'active',
+  birth_date DATE,
+  CONSTRAINT chk_salary_positive
+    CHECK (salary >= 0),
+  CONSTRAINT chk_status_valid
+    CHECK (status IN ('active', 'inactive', 'terminated')),
+  CONSTRAINT chk_birth_date
+    CHECK (birth_date IS NULL OR birth_date < CURRENT_DATE)
+);
+
+-- This insert fails the CHECK constraint:
+INSERT INTO employees (name, salary) VALUES ('Alice', -5000);
+-- ERROR: Check constraint 'chk_salary_positive' is violated.</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>CHECK constraint support by database</strong>
+              <p>PostgreSQL fully enforces <code>CHECK</code> constraints. MySQL 8.0.16+ enforces them — earlier MySQL versions parsed <code>CHECK</code> syntax but silently ignored it. SQLite 3.25+ enforces <code>CHECK</code> constraints. Always verify your database version supports <code>CHECK</code> enforcement if you rely on it for data integrity.</p>
+            </div>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-constraints">Constraints: Let the Database Enforce Your Rules</h2>
+          <p>Constraints are rules the database itself guarantees — no bad row can slip in, even from a buggy app or a manual query. Enforcing integrity at the database level is far safer than trusting every piece of code that writes to it.</p>
+          <table>
+            <thead><tr><th>Constraint</th><th>Guarantees</th></tr></thead>
+            <tbody>
+              <tr><td><code>PRIMARY KEY</code></td><td>unique + not null — the row's identity</td></tr>
+              <tr><td><code>FOREIGN KEY</code></td><td>value must exist in another table</td></tr>
+              <tr><td><code>UNIQUE</code></td><td>no duplicates in this column</td></tr>
+              <tr><td><code>NOT NULL</code></td><td>value is required</td></tr>
+              <tr><td><code>CHECK</code></td><td>custom rule (e.g. <code>age &gt;= 0</code>)</td></tr>
+              <tr><td><code>DEFAULT</code></td><td>value used when none supplied</td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-sql">CREATE TABLE orders (
+  id       SERIAL PRIMARY KEY,
+  email    TEXT    NOT NULL,
+  qty      INT     CHECK (qty > 0),
+  status   TEXT    DEFAULT 'pending',
+  user_id  INT     REFERENCES users(id) ON DELETE CASCADE
+);</code></pre>
+          <p><strong>Foreign keys prevent orphans:</strong> you can't insert an order for a user that doesn't exist, and <code>ON DELETE CASCADE</code> auto-removes an order's rows when its user is deleted (use carefully — it's a chain reaction). A violated constraint <em>rejects the write</em> rather than corrupting data — exactly what you want.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Add a PRIMARY KEY constraint.</li>
+              <li>Add a UNIQUE constraint.</li>
+              <li>Add a NOT NULL constraint.</li>
+              <li>Add a FOREIGN KEY.</li>
+              <li>Add a CHECK constraint.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Create an <code>orders</code> table with a primary key, a foreign key to <code>customers</code>, a CHECK that <code>amount &gt; 0</code>, and a NOT NULL date. Explain how each constraint protects data integrity and what referential integrity means.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>PRIMARY KEY</strong>: unique + NOT NULL, one per table. Use composite PKs for junction tables.</li>
+              <li><strong>FOREIGN KEY</strong>: enforces referential integrity between tables. <code>ON DELETE CASCADE</code> auto-removes orphaned child rows; <code>RESTRICT</code> (default) prevents deletion of referenced rows.</li>
+              <li><strong>UNIQUE</strong>: no duplicate values in the column (or column combination). Allows multiple NULLs.</li>
+              <li><strong>NOT NULL</strong>: column must always have a value. The most common constraint after PRIMARY KEY.</li>
+              <li><strong>DEFAULT</strong>: fallback value when column is omitted from INSERT. Does not prevent NULL if you explicitly insert NULL.</li>
+              <li><strong>CHECK</strong>: custom condition. Fully supported in PostgreSQL, MySQL 8.0.16+, SQLite 3.25+.</li>
+              <li>Name your constraints with <code>CONSTRAINT name</code> for easier maintenance.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What are SQL constraints?</li>
+            <li>What is the difference between PRIMARY KEY and UNIQUE?</li>
+            <li>What does a FOREIGN KEY enforce?</li>
+            <li>What is a CHECK constraint?</li>
+            <li>What is referential integrity?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/tables/create-table.html" class="topic-tag sql-topic-tag">🗄️ CREATE TABLE</a>
+            <a href="/sql/tables/alter-table.html" class="topic-tag sql-topic-tag">🗄️ ALTER TABLE</a>
+            <a href="/sql/tables/data-types.html" class="topic-tag sql-topic-tag">🗄️ SQL Data Types</a>
+            <a href="/sql/filtering/comparison-operators.html" class="topic-tag sql-topic-tag">🗄️ Comparison Operators</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between UNIQUE and PRIMARY KEY? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Both enforce uniqueness, but there are three key differences. (1) A table can have only <em>one</em> PRIMARY KEY, but multiple UNIQUE constraints. (2) PRIMARY KEY implies NOT NULL — a null value is never allowed. UNIQUE allows multiple NULL values because <code>NULL != NULL</code> in SQL logic. (3) The PRIMARY KEY is used as the clustered index in MySQL InnoDB and is the default join target for FOREIGN KEY references. UNIQUE constraints create secondary indexes. In most cases, use PRIMARY KEY for the main row identifier and UNIQUE for natural keys like email addresses.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens when ON DELETE CASCADE is triggered? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>When you delete a row in the parent table, the database automatically deletes all child rows in the table with the <code>CASCADE</code> foreign key. For example, if you delete a user with <code>id = 42</code>, and <code>orders.user_id</code> has <code>ON DELETE CASCADE</code>, all orders with <code>user_id = 42</code> are also deleted. This cascade can chain — if <code>order_items</code> also has <code>ON DELETE CASCADE</code> on <code>order_id</code>, the items are deleted too. This is powerful but can cause large unintended deletes. Use <code>RESTRICT</code> when you want the database to refuse the parent delete if child rows exist.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can a FOREIGN KEY reference a UNIQUE column instead of a PRIMARY KEY? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — a FOREIGN KEY can reference any column (or combination of columns) that has a UNIQUE constraint, not just the PRIMARY KEY. For example, you could have <code>orders.user_email</code> referencing <code>users.email</code> where <code>email</code> has a UNIQUE constraint. In practice, it is almost always better to reference the primary key (an integer ID) because integer comparisons are faster and IDs never change. Referencing email means if a user changes their email, you must update all FK references too.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I enforce business rules with CHECK constraints or in the application? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Both. Database-level constraints are the last line of defence — they cannot be bypassed regardless of how data enters the database (via the application, a migration script, a direct SQL query, a third-party tool). Application-level validation gives better error messages and can enforce complex rules that span multiple tables. A good rule of thumb: put simple, column-level rules (non-negative salary, valid status enum) in CHECK constraints; put complex multi-table or business-logic rules in the application. Never rely solely on the application for data integrity.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/tables/drop-table.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">DROP TABLE</span>
+          </a>
+          <a href="/sql/tables/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

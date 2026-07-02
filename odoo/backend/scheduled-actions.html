@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Scheduled Actions – ir.cron and Automated Jobs | ylearner</title>
+  <meta name="description" content="Create and manage Odoo scheduled actions (ir.cron) in Odoo 19: XML data records, Python cron methods, interval configuration, debugging, and practical examples.">
+  <meta name="keywords" content="Odoo scheduled actions, ir.cron, Odoo cron jobs, automated jobs, Odoo 19, cron method, nextcall, Odoo backend automation">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/backend/scheduled-actions.html">
+  <meta property="og:title" content="Odoo Scheduled Actions – ir.cron and Automated Jobs">
+  <meta property="og:description" content="Create and manage Odoo scheduled actions (ir.cron) in Odoo 19: XML data records, Python cron methods, interval configuration, debugging, and practical examples.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/backend/scheduled-actions.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Scheduled Actions – ir.cron and Automated Jobs | ylearner">
+  <meta name="twitter:description" content="Create and manage Odoo scheduled actions (ir.cron) in Odoo 19: XML data records, Python cron methods, interval configuration, debugging, and practical examples.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Scheduled Actions – ir.cron and Automated Jobs",
+    "description": "Create and manage Odoo scheduled actions (ir.cron) in Odoo 19: XML data records, Python cron methods, interval configuration, debugging, and practical examples.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo scheduled actions, ir.cron, cron jobs, automated jobs, nextcall, Odoo backend",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">Backend Development</span><span class="separator">›</span>
+          <span class="current">Scheduled Actions</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Backend Development</div>
+          <h1>Odoo Scheduled Actions – ir.cron and Automated Jobs</h1>
+          <p class="lesson-intro">Scheduled actions (backed by <code>ir.cron</code> records) let you run Python methods automatically on a time-based schedule — without any user interaction. They are the right tool for background jobs such as sending reminder emails, flagging overdue records, syncing data with external systems, or generating nightly reports. This page covers everything from the XML data record to the Python method and debugging in Odoo 19.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="deep-cron">Scheduled Actions (Cron): Run Code on a Timer</h2>
+          <p>A scheduled action (<code>ir.cron</code>) runs a model method automatically on an interval — nightly cleanups, reminder emails, syncing external data. It's Odoo's built-in cron, configured as data (no server crontab needed).</p>
+          <pre><code class="language-xml">&lt;record id="cron_expire_quotes" model="ir.cron"&gt;
+    &lt;field name="name"&gt;Expire old quotations&lt;/field&gt;
+    &lt;field name="model_id" ref="sale.model_sale_order"/&gt;
+    &lt;field name="state"&gt;code&lt;/field&gt;
+    &lt;field name="code"&gt;model._cron_expire_quotes()&lt;/field&gt;
+    &lt;field name="interval_number"&gt;1&lt;/field&gt;
+    &lt;field name="interval_type"&gt;days&lt;/field&gt;
+    &lt;field name="active"&gt;True&lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          <pre><code class="language-python"># the method it calls — lives on the model
+def _cron_expire_quotes(self):
+    old = self.search([("state", "=", "draft"),
+                       ("create_date", "&lt;", fields.Datetime.now() - timedelta(days=30))])
+    old.write({"state": "cancel"})</code></pre>
+          <table>
+            <thead><tr><th>Field</th><th>Controls</th></tr></thead>
+            <tbody>
+              <tr><td><code>interval_number</code> + <code>interval_type</code></td><td>how often (e.g. 1 day)</td></tr>
+              <tr><td><code>nextcall</code></td><td>next run time</td></tr>
+              <tr><td><code>active</code></td><td>on/off switch</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Design tips:</strong> the cron method runs unattended, so it must be <em>idempotent</em> and handle empty results gracefully — never assume records exist. Keep each run bounded (process in batches for large data) so it doesn't hog the worker. <code>model</code> in the code refers to the target model; <code>env</code> is available for reaching others.</p>
+
+<div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create an <code>ir.cron</code> record.</li>
+              <li>Set the run interval.</li>
+              <li>Point it to a model method.</li>
+              <li>Make the method safe to re-run.</li>
+              <li>Enable and disable the cron.</li>
+            </ol>
+          </div>
+
+<div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Create a scheduled action (<code>ir.cron</code>) that runs a model method nightly — for example, send reminders for overdue tasks. Explain how the interval is configured, why the method should be safe to re-run, and how to test it manually.</p>
+          </div>
+
+<div class="summary-box">
+            <h3>📋 What You Will Learn</h3>
+            <ul>
+              <li>How Odoo scheduled actions work internally</li>
+              <li>Defining a scheduled action in an XML data file</li>
+              <li>Writing the Python cron method with proper decorators</li>
+              <li>Configuring interval, next execution time, and active state</li>
+              <li>Manually triggering and debugging cron jobs</li>
+            </ul>
+          </div>
+
+          <!-- Section 1 -->
+          <h2 id="what-are-scheduled-actions">What are Scheduled Actions?</h2>
+          <p>Odoo's scheduler is a background process that wakes up every minute (by default) and checks the <code>ir.cron</code> table for jobs whose <code>nextcall</code> timestamp has passed. For each due job, it calls the specified Python method on the specified model, running as the specified user, inside a fresh database transaction.</p>
+          <p>This is analogous to a Unix cron job, but defined entirely within Odoo's data layer rather than the operating system. This means scheduled actions are:</p>
+          <ul>
+            <li>Visible and configurable by administrators in the UI (Settings &gt; Technical &gt; Scheduled Actions)</li>
+            <li>Deployable as part of your module — defined in an XML data file</li>
+            <li>Runnable manually for testing without waiting for the schedule</li>
+            <li>Multi-tenant aware — they run per-database</li>
+          </ul>
+
+          <!-- Section 2 -->
+          <h2 id="creating-a-scheduled-action-xml">Creating a Scheduled Action (XML)</h2>
+          <p>Define the scheduled action as an <code>ir.cron</code> record in a data file (typically under <code>data/cron.xml</code>). Use <code>noupdate="1"</code> so that administrators can change the schedule without your module overwriting it on upgrade:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;
+    &lt;data noupdate="1"&gt;
+
+        &lt;record id="ir_cron_library_overdue_notifications" model="ir.cron"&gt;
+            &lt;field name="name"&gt;Library: Send Overdue Notifications&lt;/field&gt;
+            &lt;field name="model_id" ref="model_library_loan"/&gt;
+            &lt;field name="state"&gt;code&lt;/field&gt;
+            &lt;field name="code"&gt;model._cron_send_overdue_notifications()&lt;/field&gt;
+            &lt;field name="user_id" ref="base.user_root"/&gt;
+            &lt;field name="interval_number"&gt;1&lt;/field&gt;
+            &lt;field name="interval_type"&gt;days&lt;/field&gt;
+            &lt;field name="numbercall"&gt;-1&lt;/field&gt;       &lt;!-- -1 = run indefinitely --&gt;
+            &lt;field name="active"&gt;True&lt;/field&gt;
+            &lt;field name="nextcall"&gt;2026-01-01 08:00:00&lt;/field&gt;
+        &lt;/record&gt;
+
+        &lt;!-- A second cron — runs every hour --&gt;
+        &lt;record id="ir_cron_library_update_overdue_status" model="ir.cron"&gt;
+            &lt;field name="name"&gt;Library: Mark Overdue Loans&lt;/field&gt;
+            &lt;field name="model_id" ref="model_library_loan"/&gt;
+            &lt;field name="state"&gt;code&lt;/field&gt;
+            &lt;field name="code"&gt;model._cron_update_overdue_status()&lt;/field&gt;
+            &lt;field name="user_id" ref="base.user_root"/&gt;
+            &lt;field name="interval_number"&gt;1&lt;/field&gt;
+            &lt;field name="interval_type"&gt;hours&lt;/field&gt;
+            &lt;field name="numbercall"&gt;-1&lt;/field&gt;
+            &lt;field name="active"&gt;True&lt;/field&gt;
+            &lt;field name="nextcall"&gt;2026-01-01 00:00:00&lt;/field&gt;
+        &lt;/record&gt;
+
+    &lt;/data&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Field</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>model_id</code></td><td>The model whose method will be called (use <code>ref="model_your_model_name"</code>)</td></tr>
+                <tr><td><code>code</code></td><td>Python snippet to run — typically <code>model._cron_method_name()</code></td></tr>
+                <tr><td><code>user_id</code></td><td>Which user the job runs as — use <code>base.user_root</code> (Administrator) for system tasks</td></tr>
+                <tr><td><code>interval_number</code></td><td>Numeric part of the interval (e.g. 1, 5, 30)</td></tr>
+                <tr><td><code>interval_type</code></td><td>Unit: <code>minutes</code>, <code>hours</code>, <code>days</code>, <code>weeks</code>, <code>months</code></td></tr>
+                <tr><td><code>numbercall</code></td><td>How many times to run: <code>-1</code> = unlimited, <code>1</code> = run once then disable</td></tr>
+                <tr><td><code>nextcall</code></td><td>Datetime of the first/next execution (UTC)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- AD BLOCK -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <!-- Section 3 -->
+          <h2 id="the-python-method">The Python Method</h2>
+          <p>The cron method lives on the model specified in <code>model_id</code>. It must be decorated with <code>@api.model</code> (it runs without a specific recordset — it operates on the model class). The method should be defensive — handle exceptions internally and log progress:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">from odoo import models, fields, api
+import logging
+from datetime import timedelta
+
+_logger = logging.getLogger(__name__)
+
+class LibraryLoan(models.Model):
+    _name = 'library.loan'
+    _description = 'Library Loan'
+
+    @api.model
+    def _cron_update_overdue_status(self):
+        """Mark loans as overdue when their due date has passed.
+        Called hourly by the ir.cron scheduler.
+        """
+        today = fields.Date.today()
+        _logger.info("Running overdue status update cron. Today: %s", today)
+
+        overdue_loans = self.search([
+            ('state', '=', 'active'),
+            ('due_date', '&lt;', today),
+        ])
+
+        if overdue_loans:
+            overdue_loans.write({'state': 'overdue'})
+            _logger.info("Marked %d loans as overdue", len(overdue_loans))
+        else:
+            _logger.info("No loans to mark as overdue")
+
+    @api.model
+    def _cron_send_overdue_notifications(self):
+        """Send email notifications for overdue loans.
+        Called daily at 8:00 AM UTC.
+        """
+        _logger.info("Running overdue notification cron")
+
+        overdue_loans = self.search([
+            ('state', '=', 'overdue'),
+            ('notification_sent', '=', False),
+        ])
+
+        template = self.env.ref(
+            'library_management.email_template_overdue_notice',
+            raise_if_not_found=False,
+        )
+        if not template:
+            _logger.warning("Overdue notice email template not found. Skipping.")
+            return
+
+        sent_count = 0
+        for loan in overdue_loans:
+            try:
+                template.send_mail(loan.id, force_send=True)
+                loan.notification_sent = True
+                sent_count += 1
+            except Exception as exc:
+                # Don't let one failure abort all other notifications
+                _logger.error(
+                    "Failed to send overdue notice for loan %d: %s",
+                    loan.id, exc
+                )
+
+        _logger.info(
+            "Overdue notification cron complete. Sent: %d, Skipped: %d",
+            sent_count, len(overdue_loans) - sent_count
+        )</code></pre>
+          </div>
+
+          <!-- Section 4 -->
+          <h2 id="interval-and-next-execution">Interval and Next Execution</h2>
+          <p>After each run, Odoo automatically advances <code>nextcall</code> by the configured interval. You can view and modify both fields in the UI at Settings &gt; Technical &gt; Automation &gt; Scheduled Actions (developer mode required).</p>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>nextcall is always UTC</strong>
+              <p>The <code>nextcall</code> field stores UTC time. If you want a job to run at "8 AM local time", you need to account for your timezone offset. For example, UTC+3 means 5:00 AM UTC for an 8:00 AM local run. Also note that <code>noupdate="1"</code> means your XML definition of <code>nextcall</code> is only used on first install — subsequent module upgrades won't reset the time.</p>
+            </div>
+          </div>
+
+          <!-- Section 5 -->
+          <h2 id="passing-arguments">Passing Arguments</h2>
+          <p>The <code>code</code> field in the cron record runs in a Python sandbox with access to <code>model</code>, <code>env</code>, and <code>datetime</code>. You can pass arguments inline:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- Passing arguments via the code field --&gt;
+&lt;field name="code"&gt;model._cron_archive_old_loans(days_threshold=365)&lt;/field&gt;
+
+&lt;!-- Using env for multi-company aware operations --&gt;
+&lt;field name="code"&gt;
+    for company in env['res.company'].search([]):
+        env['library.loan'].with_company(company)._cron_update_overdue_status()
+&lt;/field&gt;</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">@api.model
+def _cron_archive_old_loans(self, days_threshold: int = 365):
+    """Archive loans older than days_threshold days."""
+    cutoff = fields.Date.today() - timedelta(days=days_threshold)
+    old_loans = self.search([
+        ('state', 'in', ['returned', 'lost']),
+        ('return_date', '&lt;=', cutoff),
+    ])
+    old_loans.write({'active': False})
+    _logger.info("Archived %d old loans (threshold: %d days)", len(old_loans), days_threshold)</code></pre>
+          </div>
+
+          <!-- Section 6 -->
+          <h2 id="debugging-cron-jobs">Debugging Cron Jobs</h2>
+          <p>Cron jobs run asynchronously without a user session, which makes debugging harder. Here are the key techniques:</p>
+
+          <h3 id="manual-trigger">Manual Trigger from the UI</h3>
+          <p>In developer mode, go to Settings &gt; Technical &gt; Automation &gt; Scheduled Actions, open your action, and click the "Run Manually" button. Any exception or log output will be shown immediately.</p>
+
+          <h3 id="call-from-shell">Call from Shell</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Odoo shell — test a cron method directly
+./odoo-bin shell -d my_database --no-http
+# Then in the Python shell:
+# env['library.loan']._cron_send_overdue_notifications()
+# env.cr.commit()</code></pre>
+          </div>
+
+          <h3 id="logging">Logging</h3>
+          <p>Always use <code>_logger</code> inside cron methods. Set the log level for your module to <code>DEBUG</code> in Settings &gt; Technical &gt; Logging to see all output. Odoo also records the last execution result (success/failure and traceback) in the <code>ir.cron</code> record itself.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import logging
+_logger = logging.getLogger(__name__)
+
+@api.model
+def _cron_my_job(self):
+    _logger.info("Cron started: _cron_my_job")
+    # ... work ...
+    _logger.debug("Processed %d records", count)
+    _logger.info("Cron complete: _cron_my_job")</code></pre>
+          </div>
+
+          <!-- Section 7 -->
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li>Scheduled actions are <code>ir.cron</code> records — define them in an XML data file with <code>noupdate="1"</code></li>
+              <li>The <code>code</code> field contains a Python snippet that calls <code>model._cron_method_name()</code></li>
+              <li>Cron methods use <code>@api.model</code> and iterate over records found with <code>self.search()</code></li>
+              <li><code>interval_number</code> + <code>interval_type</code> define the schedule; <code>nextcall</code> is always in UTC</li>
+              <li>Use <code>numbercall=-1</code> for indefinitely repeating jobs</li>
+              <li>Always use <code>_logger</code> and wrap per-record logic in try/except so one failure doesn't stop the batch</li>
+              <li>Test by clicking "Run Manually" in the UI (developer mode) or calling the method from the Odoo shell</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a scheduled action (cron) in Odoo?</li>
+            <li>How do you define an <code>ir.cron</code>?</li>
+            <li>How is the run interval configured?</li>
+            <li>How do you test a cron without waiting?</li>
+            <li>Why should cron methods be idempotent?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+<div class="related-topics">
+            <a href="/odoo/backend/qweb-reports.html" class="topic-tag odoo-topic-tag">🐍 QWeb Reports</a>
+            <a href="/odoo/backend/server-actions.html" class="topic-tag odoo-topic-tag">🐍 Server Actions</a>
+            <a href="/odoo/backend/email-templates.html" class="topic-tag odoo-topic-tag">🐍 Email Templates</a>
+            <a href="/odoo/backend/computed-fields.html" class="topic-tag odoo-topic-tag">🐍 Computed Fields</a>
+            <a href="/odoo/module/models-fields.html" class="topic-tag odoo-topic-tag">🐍 Models &amp; Fields</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">How often does the Odoo scheduler actually check for due cron jobs? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The Odoo scheduler process checks every minute by default. This means the minimum practical schedule interval is 1 minute. The actual execution time may vary by up to one minute from the configured <code>nextcall</code> time. For jobs needing sub-minute precision, you would need an external cron or a different approach.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens if a cron job takes longer than its interval? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Odoo acquires a database advisory lock before running a cron job. If the previous execution is still running when the next trigger fires, the new trigger is skipped. This prevents overlapping executions of the same job. However, if a job consistently takes longer than its interval, it will never run at full frequency — you need to either optimise the job or increase the interval.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I disable a cron job for specific databases in a multi-database setup? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Set <code>active=False</code> on the <code>ir.cron</code> record in that database from the UI. Since you used <code>noupdate="1"</code> in the XML, module upgrades won't re-enable it. You can also programmatically deactivate it with <code>env.ref('module.cron_id').write({'active': False})</code> in a post-install hook or migration script.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I commit the transaction inside a cron method? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — never call <code>self.env.cr.commit()</code> inside a module method. Odoo handles transaction commit/rollback at the framework level. If your cron processes many records and you want partial saves (so that a failure on record 900 doesn't roll back records 1–899), use <code>self.env.cr.savepoint()</code> context managers around each record's processing block.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/backend/qweb-reports.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">QWeb Reports</span>
+          </a>
+          <a href="/odoo/backend/server-actions.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Server Actions</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

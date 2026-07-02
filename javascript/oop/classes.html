@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Classes – ES6 Class Syntax &amp; OOP Concepts | ylearner</title>
+  <meta name="description" content="Master JavaScript classes: ES6 class syntax, constructor method, class fields, static methods, getters and setters, class inheritance, and practical OOP patterns in JavaScript.">
+  <meta name="keywords" content="javascript classes, ES6 class syntax, javascript OOP, class constructor javascript, static methods javascript, getters setters javascript, javascript class vs function constructor, class fields javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/oop/classes.html">
+  <meta property="og:title" content="JavaScript Classes – ES6 Class Syntax &amp; OOP Concepts | ylearner">
+  <meta property="og:description" content="Master JavaScript classes: ES6 class syntax, constructor method, class fields, static methods, getters and setters, class inheritance, and practical OOP patterns in JavaScript.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/oop/classes.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Classes – ES6 Class Syntax &amp; OOP Concepts | ylearner">
+  <meta name="twitter:description" content="Master JavaScript classes: ES6 class syntax, constructor method, class fields, static methods, getters and setters, class inheritance, and practical OOP patterns in JavaScript.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/oop/classes.html">OOP</a><span class="separator">›</span>
+          <span class="current">Classes</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🏗️ OOP</div>
+          <h1>JavaScript Classes – Object-Oriented Programming in JS</h1>
+          <p class="lesson-intro">ES6 introduced the <code>class</code> keyword as a clean, readable syntax for creating objects and handling inheritance in JavaScript. Under the hood classes are still built on prototypes, but the syntax makes object-oriented patterns much easier to write and understand. This lesson covers everything from basic class declarations to static members, getters/setters, and public class fields.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="class-declaration">Class Declaration vs Class Expression</h2>
+          <p>You can define a class in two ways: a <strong>class declaration</strong> uses the <code>class</code> keyword followed by a name, while a <strong>class expression</strong> assigns the class to a variable. Both create the same result.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Class declaration
+class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+  greet() {
+    return `Hi, I'm ${this.name} and I'm ${this.age} years old.`;
+  }
+}
+
+// Class expression (anonymous)
+const Animal = class {
+  constructor(species) {
+    this.species = species;
+  }
+};
+
+// Class expression (named – name is only visible inside the class body)
+const Vehicle = class VehicleClass {
+  constructor(make) {
+    this.make = make;
+  }
+};
+
+const p = new Person('Alice', 30);
+console.log(p.greet());
+
+const dog = new Animal('Canis lupus familiaris');
+console.log(dog.species);</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>Hi, I'm Alice and I'm 30 years old.
+Canis lupus familiaris</pre>
+          </div>
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Classes Are NOT Hoisted</strong>
+              <p>Unlike function declarations, class declarations are <em>not</em> hoisted. Trying to use a class before it is declared throws a <code>ReferenceError</code>. Always declare your classes before using them.</p>
+            </div>
+          </div>
+
+          <h2 id="constructor-method">The constructor() Method</h2>
+          <p>The <code>constructor</code> is a special method that runs automatically when you use <code>new</code>. It initialises instance properties and can accept any number of parameters. A class can only have one constructor; having more than one throws a <code>SyntaxError</code>.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Rectangle {
+  constructor(width, height) {
+    // Validate inputs inside the constructor
+    if (width <= 0 || height <= 0) {
+      throw new Error('Dimensions must be positive numbers');
+    }
+    this.width = width;
+    this.height = height;
+  }
+
+  area() {
+    return this.width * this.height;
+  }
+
+  perimeter() {
+    return 2 * (this.width + this.height);
+  }
+
+  toString() {
+    return `Rectangle(${this.width} × ${this.height})`;
+  }
+}
+
+const rect = new Rectangle(5, 3);
+console.log(rect.area());       // 15
+console.log(rect.perimeter());  // 16
+console.log(rect.toString());   // Rectangle(5 × 3)
+console.log(typeof rect);       // object
+
+// What typeof tells you about a class itself:
+console.log(typeof Rectangle);  // function  (classes ARE functions under the hood)</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>15
+16
+Rectangle(5 × 3)
+object
+function</pre>
+          </div>
+
+          <h2 id="class-fields">Public Class Fields</h2>
+          <p>Class fields let you declare and initialise instance properties directly in the class body — without putting them in the constructor. They run before the constructor body and make the shape of an instance immediately obvious.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Counter {
+  // Public class fields (initialised to default values)
+  count = 0;
+  step = 1;
+  label = 'counter';
+
+  constructor(label = 'counter', step = 1) {
+    this.label = label;
+    this.step = step;
+  }
+
+  increment() { this.count += this.step; }
+  decrement() { this.count -= this.step; }
+  reset()     { this.count = 0; }
+
+  toString() {
+    return `[${this.label}] count = ${this.count}`;
+  }
+}
+
+const c = new Counter('clicks', 2);
+c.increment();
+c.increment();
+c.increment();
+console.log(c.toString()); // [clicks] count = 6
+
+// Fields are own properties, not on the prototype
+console.log(Object.hasOwn(c, 'count'));  // true
+console.log(Object.hasOwn(c, 'increment')); // false (method is on prototype)</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>[clicks] count = 6
+true
+false</pre>
+          </div>
+
+          <h2 id="static-members">Static Methods and Properties</h2>
+          <p>Static members belong to the class itself, not to instances. You call them on the class directly. They are commonly used for utility functions, factory methods, and shared configuration.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class MathUtils {
+  // Static property
+  static PI = 3.14159265358979;
+  static instanceCount = 0;
+
+  constructor() {
+    MathUtils.instanceCount++;
+  }
+
+  // Static methods – no access to 'this' (instance)
+  static circleArea(r) {
+    return MathUtils.PI * r * r;
+  }
+
+  static clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  // Factory method – a common static pattern
+  static fromDegrees(degrees) {
+    return (degrees * MathUtils.PI) / 180;
+  }
+}
+
+console.log(MathUtils.circleArea(5));      // 78.539...
+console.log(MathUtils.clamp(150, 0, 100)); // 100
+console.log(MathUtils.fromDegrees(180));   // 3.14159...
+
+new MathUtils();
+new MathUtils();
+console.log(MathUtils.instanceCount);      // 2</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>78.53981633974483
+100
+3.14159265358979
+2</pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>When to Use Static Methods</strong>
+              <p>Use static methods for operations that are logically related to the class but don't need access to instance data — things like validation helpers, factory methods, or utility calculations. If the function needs <code>this</code>, it should be an instance method.</p>
+            </div>
+          </div>
+
+          <h2 id="getters-setters">Getters and Setters</h2>
+          <p>Getters (<code>get</code>) and setters (<code>set</code>) let you define computed properties and add validation when reading or writing a value. They look like properties from the outside but run functions internally.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Temperature {
+  #celsius = 0; // private field (covered in Encapsulation lesson)
+
+  constructor(celsius) {
+    this.celsius = celsius; // goes through the setter
+  }
+
+  get celsius() {
+    return this.#celsius;
+  }
+
+  set celsius(value) {
+    if (typeof value !== 'number') throw new TypeError('Temperature must be a number');
+    if (value < -273.15) throw new RangeError('Below absolute zero!');
+    this.#celsius = value;
+  }
+
+  get fahrenheit() {
+    return this.#celsius * 9/5 + 32;
+  }
+
+  set fahrenheit(value) {
+    this.celsius = (value - 32) * 5/9; // delegates to celsius setter
+  }
+
+  get kelvin() {
+    return this.#celsius + 273.15;
+  }
+
+  toString() {
+    return `${this.#celsius}°C / ${this.fahrenheit}°F / ${this.kelvin}K`;
+  }
+}
+
+const temp = new Temperature(100);
+console.log(temp.toString());    // 100°C / 212°F / 373.15K
+
+temp.fahrenheit = 32;
+console.log(temp.celsius);       // 0
+console.log(temp.toString());    // 0°C / 32°F / 273.15K</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>100°C / 212°F / 373.15K
+0
+0°C / 32°F / 273.15K</pre>
+          </div>
+
+          <h2 id="class-vs-object-literal">Class vs Object Literal</h2>
+          <table>
+            <thead><tr><th>Feature</th><th>Class</th><th>Object Literal</th></tr></thead>
+            <tbody>
+              <tr><td>Multiple instances</td><td>Yes – use <code>new</code></td><td>No – single object</td></tr>
+              <tr><td>Inheritance</td><td>Yes – <code>extends</code></td><td>Manual prototype wiring</td></tr>
+              <tr><td>Private fields</td><td>Yes – <code>#field</code></td><td>No native support</td></tr>
+              <tr><td>Static members</td><td>Yes – <code>static</code></td><td>Add directly to object</td></tr>
+              <tr><td>Getters/Setters</td><td>Yes</td><td>Yes (get/set keywords)</td></tr>
+              <tr><td>Use case</td><td>Blueprints for many objects</td><td>One-off singleton config</td></tr>
+              <tr><td><code>typeof</code></td><td><code>"function"</code> (class itself)</td><td><code>"object"</code></td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="class-vs-constructor">Class vs Function Constructor</h2>
+          <p>Before ES6, objects were created with function constructors and <code>new</code>. Classes are syntactic sugar over this pattern — they compile down to nearly the same prototype-based code.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Pre-ES6: Function constructor pattern
+function PersonOld(name, age) {
+  this.name = name;
+  this.age = age;
+}
+PersonOld.prototype.greet = function() {
+  return `Hi, I'm ${this.name}`;
+};
+PersonOld.create = function(name, age) { // static-like
+  return new PersonOld(name, age);
+};
+
+// ES6+ Class – same result, cleaner syntax
+class PersonNew {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+  greet() {
+    return `Hi, I'm ${this.name}`;
+  }
+  static create(name, age) {
+    return new PersonNew(name, age);
+  }
+}
+
+// Both produce the same prototype chain
+const a = new PersonOld('Alice', 30);
+const b = new PersonNew('Bob', 25);
+console.log(a.greet()); // Hi, I'm Alice
+console.log(b.greet()); // Hi, I'm Bob
+
+// Key difference: classes CANNOT be called without new
+// PersonNew('Eve', 20); // TypeError: Cannot call a class as a function</code></pre>
+          </div>
+
+          <h2 id="practical-example">Practical Example – BankAccount Class</h2>
+          <p>Let's bring it all together with a realistic <code>BankAccount</code> class that uses fields, a constructor, instance methods, a static method, and getters.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class BankAccount {
+  // Public class field
+  currency = 'USD';
+  // Transaction history
+  #transactions = [];
+  static #nextId = 1000;
+
+  constructor(owner, initialBalance = 0) {
+    this.owner = owner;
+    this.#transactions.push({ type: 'open', amount: initialBalance });
+    this.id = `ACC-${BankAccount.#nextId++}`;
+  }
+
+  get balance() {
+    return this.#transactions.reduce((sum, t) => {
+      return t.type === 'credit' ? sum + t.amount
+           : t.type === 'debit'  ? sum - t.amount
+           : t.type === 'open'   ? sum + t.amount
+           : sum;
+    }, 0);
+  }
+
+  deposit(amount) {
+    if (amount <= 0) throw new Error('Deposit must be positive');
+    this.#transactions.push({ type: 'credit', amount, date: new Date() });
+    return this;
+  }
+
+  withdraw(amount) {
+    if (amount <= 0) throw new Error('Amount must be positive');
+    if (amount > this.balance) throw new Error('Insufficient funds');
+    this.#transactions.push({ type: 'debit', amount, date: new Date() });
+    return this;
+  }
+
+  getStatement() {
+    return this.#transactions.map(t =>
+      `${t.type.padEnd(6)}: ${t.amount} ${this.currency}`
+    ).join('\n');
+  }
+
+  static transfer(from, to, amount) {
+    from.withdraw(amount);
+    to.deposit(amount);
+    console.log(`Transferred ${amount} ${from.currency} from ${from.id} to ${to.id}`);
+  }
+}
+
+const alice = new BankAccount('Alice', 500);
+const bob   = new BankAccount('Bob', 100);
+
+alice.deposit(200).deposit(50); // chaining
+alice.withdraw(100);
+BankAccount.transfer(alice, bob, 75);
+
+console.log('Alice balance:', alice.balance); // 575
+console.log('Bob balance:',   bob.balance);   // 175
+console.log(alice.getStatement());</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>Transferred 75 USD from ACC-1000 to ACC-1001
+Alice balance: 575
+Bob balance: 175
+open  : 500 USD
+credit: 200 USD
+credit: 50 USD
+debit : 100 USD
+debit : 75 USD</pre>
+          </div>
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Method Chaining</strong>
+              <p>Notice <code>deposit</code> and <code>withdraw</code> return <code>this</code>. This enables fluent method chaining: <code>alice.deposit(200).deposit(50).withdraw(100)</code>. It's a common pattern in well-designed class APIs.</p>
+            </div>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="deep-jsclass">JS Classes: Sugar Over Prototypes, With Real Private Fields</h2>
+          <p><code>class</code> is syntax sugar — under the hood it still wires up prototypes. But it reads cleanly and, since ES2022, gives genuinely private fields with <code>#</code>.</p>
+          <pre><code class="language-javascript">class Account {
+  #balance = 0;                 // # = truly private, not accessible outside
+  static bank = "Acme";         // shared across all instances
+
+  constructor(owner) { this.owner = owner; }
+
+  deposit(n) { this.#balance += n; return this; }   // methods live on the prototype
+  get balance() { return this.#balance; }            // getter
+}
+
+const a = new Account("Ann").deposit(50);
+a.balance;    // 50
+a.#balance;   // SyntaxError — private, genuinely inaccessible</code></pre>
+          <table>
+            <thead><tr><th>Feature</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><code>constructor</code></td><td>runs on <code>new</code>, sets instance fields</td></tr>
+              <tr><td><code>#field</code></td><td>private — enforced by the engine</td></tr>
+              <tr><td><code>static</code></td><td>belongs to the class, not instances</td></tr>
+              <tr><td><code>get</code>/<code>set</code></td><td>property that runs a function</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Gotcha:</strong> methods aren't bound. Pass <code>a.deposit</code> as a callback and <code>this</code> is lost — bind it (<code>a.deposit.bind(a)</code>) or use an arrow field. And unlike function declarations, classes are <em>not</em> hoisted for use.</p>
+
+          <div class="exercise-box">
+            <h3>Exercise</h3>
+            <p>Create a <code>ShoppingCart</code> class with:</p>
+            <ul>
+              <li>A <code>items</code> array field initialised to <code>[]</code></li>
+              <li>An <code>addItem(name, price, qty)</code> method</li>
+              <li>A <code>removeItem(name)</code> method</li>
+              <li>A <code>total</code> getter that returns the sum of <code>price * qty</code></li>
+              <li>A static <code>merge(...carts)</code> method that combines multiple carts</li>
+            </ul>
+          </div>
+
+          <div class="challenge-box">
+            <h3>Challenge</h3>
+            <p>Extend the <code>BankAccount</code> example above to add:</p>
+            <ul>
+              <li>A <code>transactionLimit</code> field capping individual withdrawals</li>
+              <li>A <code>freeze()</code> / <code>unfreeze()</code> method pair using a private boolean</li>
+              <li>A <code>history</code> getter that returns a copy (not a reference) of the transactions array</li>
+              <li>Ensure <code>withdraw</code> throws if the account is frozen</li>
+            </ul>
+          </div>
+
+          <div class="summary-box">
+            <h3>Summary</h3>
+            <ul>
+              <li><code>class</code> is syntactic sugar over prototype-based inheritance.</li>
+              <li>The <code>constructor()</code> method initialises instance properties and runs when <code>new</code> is called.</li>
+              <li>Public class fields declare instance properties directly in the class body.</li>
+              <li>Static methods/properties belong to the class, not instances — call them as <code>ClassName.method()</code>.</li>
+              <li>Getters (<code>get</code>) and setters (<code>set</code>) let you compute values and validate writes.</li>
+              <li>Classes are <em>not hoisted</em> — declare them before use.</li>
+              <li><code>typeof ClassName</code> returns <code>"function"</code> because classes are functions.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <div class="interview-list">
+            <h3>Common Interview Questions</h3>
+            <ul>
+              <li>What is the difference between a class declaration and a class expression?</li>
+              <li>What does <code>typeof MyClass</code> return and why?</li>
+              <li>Are classes hoisted in JavaScript?</li>
+              <li>What is the difference between a static method and an instance method?</li>
+              <li>When would you use a getter instead of a regular method?</li>
+            </ul>
+          </div>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <h3>Related Topics</h3>
+            <ul>
+              <li><a href="/javascript/oop/constructors.html">JavaScript Constructors – new, this, and Function Constructors</a></li>
+              <li><a href="/javascript/oop/inheritance.html">JavaScript Inheritance – extends and super</a></li>
+              <li><a href="/javascript/oop/encapsulation.html">JavaScript Encapsulation – Private Fields, Getters &amp; Setters</a></li>
+              <li><a href="/javascript/oop/prototypes.html">JavaScript Prototypes – The Prototype Chain</a></li>
+            </ul>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can a class have multiple constructors? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. A class body can only contain one method named <code>constructor</code>. Attempting to define two throws a <code>SyntaxError</code>. To handle different argument shapes, use default parameters or conditional logic inside the single constructor.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Are class methods enumerable? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — methods defined in a class body are non-enumerable by default, which means they won't appear in <code>for...in</code> loops. This is different from manually assigning to a prototype where properties are enumerable.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can you add new methods to a class after it's defined? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, by adding to <code>ClassName.prototype</code>: <code>MyClass.prototype.newMethod = function() {...}</code>. However, this is generally discouraged because it makes the code harder to follow. For production code, define all methods in the class body.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between class fields and constructor assignments? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Class fields are always initialised first (before the constructor body runs) and are syntactically concise. Constructor assignments give you more flexibility (conditionals, parameters), but both create own properties on the instance. For simple defaults, class fields are preferred.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Do static fields get inherited? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. When a class <code>extends</code> another, the subclass inherits static methods and properties through the prototype chain of the class objects themselves. <code>SubClass.staticMethod()</code> will find the method on the parent class if not overridden.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/intermediate/quiz.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">📝 Section Quiz</span></a>
+          <a href="/javascript/oop/constructors.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Constructors</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

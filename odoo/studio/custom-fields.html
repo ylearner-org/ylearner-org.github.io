@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adding Custom Fields in Odoo Studio – No Python Required | ylearner</title>
+  <meta name="description" content="Learn how to add custom fields in Odoo Studio without writing Python. Covers all field types, properties, relational fields, formula/computed fields, and how Studio stores custom fields.">
+  <meta name="keywords" content="Odoo Studio custom fields, add field Odoo Studio, Odoo field types, Odoo Many2one Studio, Odoo formula field, x_ prefix Odoo, ir.model.fields Studio">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/studio/custom-fields.html">
+  <meta property="og:title" content="Adding Custom Fields in Odoo Studio – No Python Required">
+  <meta property="og:description" content="Learn how to add custom fields in Odoo Studio without writing Python. Covers all field types, properties, relational fields, formula/computed fields, and how Studio stores custom fields.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/studio/custom-fields.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Adding Custom Fields in Odoo Studio – No Python Required | ylearner">
+  <meta name="twitter:description" content="Learn how to add custom fields in Odoo Studio without writing Python. Covers all field types, properties, relational fields, formula/computed fields, and how Studio stores custom fields.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Adding Custom Fields in Odoo Studio – No Python Required",
+    "description": "Learn how to add custom fields in Odoo Studio without writing Python. Covers all field types, properties, relational fields, formula/computed fields, and how Studio stores custom fields.",
+    "educationalLevel": "Beginner",
+    "keywords": "Odoo Studio, custom fields, field types, Many2one, formula fields, ir.model.fields, x_ prefix",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/studio/what-is-studio.html">Odoo Studio</a><span class="separator">›</span>
+          <span class="current">Custom Fields</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🎨 Odoo Studio</div>
+          <h1>Adding Custom Fields in Odoo Studio – No Python Required</h1>
+          <p class="lesson-intro">One of Studio's most practical capabilities is adding new fields to any existing Odoo model without touching Python. You choose the field type, configure its properties in the right panel, and Studio creates the underlying database column and field definition automatically. This page covers all available field types, their properties, relational fields, formula (computed) fields, and where your custom fields are stored.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="adding-a-field-with-studio">Adding a Field with Studio</h2>
+          <p>To add a new custom field to a model:</p>
+          <ol>
+            <li>Open Studio on the relevant app and navigate to the form view of the model you want to extend.</li>
+            <li>In the left panel, click the <strong>Components</strong> tab.</li>
+            <li>Drag the <strong>New Field</strong> component onto the form canvas and drop it at the position where you want the field to appear.</li>
+            <li>A dialog appears asking you to choose the <strong>field type</strong>. Select the appropriate type and click <strong>Confirm</strong>.</li>
+            <li>The new field appears on the form. Click it to open its properties in the right panel and set the label, technical name, and other options.</li>
+          </ol>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Field technical name</strong>
+              <p>Studio automatically prepends <code>x_studio_</code> to the technical name of custom fields (e.g., <code>x_studio_internal_ref</code>). You can rename it during creation but the <code>x_</code> prefix is mandatory for all custom fields — it distinguishes them from Odoo's built-in fields.</p>
+            </div>
+          </div>
+
+          <h2 id="available-field-types">Available Field Types</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Studio Label</th><th>Odoo Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td>Text</td><td><code>Char</code></td><td>Single-line text string</td></tr>
+                <tr><td>Multi-line Text</td><td><code>Text</code></td><td>Multi-line text area</td></tr>
+                <tr><td>Integer</td><td><code>Integer</code></td><td>Whole numbers only</td></tr>
+                <tr><td>Decimal</td><td><code>Float</code></td><td>Floating-point number with configurable precision</td></tr>
+                <tr><td>Monetary</td><td><code>Monetary</code></td><td>Currency-aware decimal linked to a currency field</td></tr>
+                <tr><td>Date</td><td><code>Date</code></td><td>Date only (no time)</td></tr>
+                <tr><td>Date &amp; Time</td><td><code>Datetime</code></td><td>Date with time component</td></tr>
+                <tr><td>Checkbox</td><td><code>Boolean</code></td><td>True/False toggle</td></tr>
+                <tr><td>Selection</td><td><code>Selection</code></td><td>Dropdown with fixed options you define</td></tr>
+                <tr><td>Many2one</td><td><code>Many2one</code></td><td>Link to one record in another model</td></tr>
+                <tr><td>Tags (Many2many)</td><td><code>Many2many</code></td><td>Link to multiple records (tag-style)</td></tr>
+                <tr><td>One2many</td><td><code>One2many</code></td><td>List of related records (e.g., order lines)</td></tr>
+                <tr><td>File</td><td><code>Binary</code></td><td>File upload / attachment</td></tr>
+                <tr><td>Image</td><td><code>Binary</code> (image widget)</td><td>Image upload with thumbnail preview</td></tr>
+                <tr><td>HTML</td><td><code>Html</code></td><td>Rich text editor field</td></tr>
+                <tr><td>Formula</td><td><code>Integer/Float/Char/Date</code> (computed)</td><td>Computed field — value derived from an expression</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="field-properties-and-options">Field Properties and Options</h2>
+          <p>After adding a field, click it on the canvas to open the <strong>Properties</strong> panel on the right. Common properties include:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Property</th><th>Effect</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Label</strong></td><td>The user-facing name shown next to the field on the form</td></tr>
+                <tr><td><strong>Technical Name</strong></td><td>The field's internal name (must start with <code>x_</code>). Cannot be changed after saving.</td></tr>
+                <tr><td><strong>Help Tooltip</strong></td><td>Explanatory text shown when the user hovers over the field's question mark icon</td></tr>
+                <tr><td><strong>Required</strong></td><td>Prevents saving the record without a value in this field</td></tr>
+                <tr><td><strong>Read-only</strong></td><td>Field is visible but cannot be edited by users</td></tr>
+                <tr><td><strong>Copied</strong></td><td>Whether the value is copied when the record is duplicated</td></tr>
+                <tr><td><strong>Default Value</strong></td><td>Pre-filled value for new records</td></tr>
+                <tr><td><strong>Index</strong></td><td>Creates a database index for faster search on this field</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="relational-fields-in-studio">Relational Fields in Studio</h2>
+          <p>Setting up a Many2one field in Studio is straightforward:</p>
+          <ol>
+            <li>Add a <strong>Many2one</strong> field as described above.</li>
+            <li>In the Properties panel, find the <strong>Related Model</strong> dropdown.</li>
+            <li>Type to search for the target model name (e.g., "res.partner" for contacts, "product.product" for products).</li>
+            <li>Select the model and click outside to save.</li>
+          </ol>
+          <p>The field will now display a searchable dropdown pointing to records of the chosen model. You can optionally set a <strong>Domain</strong> to filter which records appear in the dropdown.</p>
+
+          <h3>Tags (Many2many) fields</h3>
+          <p>For a Many2many (Tags) field, Studio either creates a new model automatically to hold the tags, or lets you point to an existing model. If you create a new tags model, Studio names it <code>x_&lt;model&gt;_&lt;field&gt;_tag</code> and generates a basic form for managing the tags.</p>
+
+          <h2 id="formula-fields-computed">Formula Fields (Computed)</h2>
+          <p>Studio calls computed fields "Formula" fields. To create one:</p>
+          <ol>
+            <li>Add a <strong>Formula</strong> field from the Components tab.</li>
+            <li>Choose the return type: Integer, Float, Char, or Date.</li>
+            <li>In the Properties panel, enter the <strong>Expression</strong>. Studio uses Python-like syntax with access to the current record via <code>record</code>.</li>
+          </ol>
+
+          <p>Example expressions:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python Expression</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># Total after discount (on a sale order line)
+record.price_unit * record.product_uom_qty * (1 - record.discount / 100)
+
+# Days since record creation
+(fields.Date.today() - record.create_date.date()).days
+
+# Concatenate two text fields
+(record.partner_id.name or '') + ' – ' + (record.x_studio_department or '')</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Formula field limitations</strong>
+              <p>Studio formula fields are stored computed fields with <code>store=False</code> by default — they are not written to the database and cannot be searched or grouped by in list/pivot views. For searchable computed fields, you need a custom module with <code>store=True</code> and a <code>@api.depends</code> trigger.</p>
+            </div>
+          </div>
+
+          <h2 id="where-custom-fields-are-stored">Where Custom Fields Are Stored</h2>
+          <p>Every field you create via Studio is stored as a record in the <code>ir.model.fields</code> model in the Odoo database. You can inspect them in developer mode:</p>
+          <ol>
+            <li>Go to <strong>Settings → Technical → Database Structure → Fields</strong>.</li>
+            <li>Filter by model to see all fields including your custom ones.</li>
+            <li>Custom fields added by Studio have the <code>x_</code> prefix in their technical name (e.g., <code>x_studio_custom_note</code>).</li>
+          </ol>
+          <p>Because they live in <code>ir.model.fields</code>, custom fields are tied to the database, not to any file on disk. They survive upgrades but are not version-controlled unless you export to a module.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell (Odoo shell)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># List all Studio custom fields on sale.order
+env['ir.model.fields'].search([
+    ('model', '=', 'sale.order'),
+    ('name', 'like', 'x_'),
+]).mapped('name')
+# e.g. ['x_studio_internal_ref', 'x_studio_approval_note']</code></pre>
+          </div>
+
+          <h2 id="deep-studiofields">Adding Custom Fields in Studio</h2>
+          <p>The most common Studio task is adding a field to an existing model — a checkbox, a date, a link to another record. Studio does this visually, but a few decisions carry real consequences.</p>
+          <table>
+            <thead><tr><th>Field type</th><th>Stores</th></tr></thead>
+            <tbody>
+              <tr><td>Text / Number / Date</td><td>simple values</td></tr>
+              <tr><td>Many2one</td><td>link to one record</td></tr>
+              <tr><td>Selection</td><td>a dropdown of fixed choices</td></tr>
+              <tr><td>Computed</td><td>a value derived from other fields</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Studio-added fields get an <code>x_</code> prefix</strong> (e.g. <code>x_studio_priority</code>) — this namespaces them so they never clash with Odoo's own or a module's fields. That prefix is how you recognize a Studio field later. <strong>Pick the right type up front:</strong> the type is hard to change once data exists, and it determines behavior — a <code>Selection</code> enforces valid choices, a <code>Many2one</code> creates a real relationship (a foreign key) to another model, a <code>Computed</code> field derives its value automatically. Choosing "Text" for something that should be a relation or a selection means messy, unvalidated data. <strong>Computed fields in Studio</strong> let you write a small Python expression for the value — but complex logic quickly outgrows Studio and belongs in a module. <strong>The trade-off reminder:</strong> a field added via Studio lives in the database, not in code — fine for a one-off, but a field that's part of a larger feature or must deploy across environments is better defined in a module (where it's version-controlled). <strong>Also set access/visibility:</strong> decide whether the field is required, its default, and which views/groups see it — Studio exposes all of this in the field's properties.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Add a new field via Studio.</li>
+              <li>Choose a field type.</li>
+              <li>Set field properties (required, default).</li>
+              <li>Place the field on the form.</li>
+              <li>Note the technical field name.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Use Studio to add several custom fields (text, selection, many2one) to an existing model and place them on the form. Explain how Studio names technical fields (the <code>x_</code> prefix) and what happens in the database when you add a field.</p>
+          </div>
+
+          <div class="summary-box" id="summary">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li>Drag a New Field component from the Components tab to add a custom field to any model.</li>
+              <li>All custom fields created by Studio get an <code>x_</code> prefix (e.g., <code>x_studio_my_field</code>).</li>
+              <li>Available types include Text, Integer, Float, Date, Checkbox, Selection, Many2one, Tags, File, Image, HTML, and Formula.</li>
+              <li>Set properties (required, readonly, help tooltip, default, index) in the right Properties panel.</li>
+              <li>Many2one fields: pick the related model from a dropdown — optionally add a domain filter.</li>
+              <li>Formula fields are computed on-the-fly using Python expressions; not stored by default (not searchable).</li>
+              <li>All custom fields are <code>ir.model.fields</code> records — inspect them via Settings → Technical → Fields.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you add a custom field in Studio?</li>
+            <li>What prefix do Studio fields get?</li>
+            <li>What field types can Studio create?</li>
+            <li>Where are Studio fields stored?</li>
+            <li>Can you delete a Studio field safely?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/odoo/studio/what-is-studio.html" class="topic-tag odoo-topic-tag">🎨 What is Odoo Studio?</a>
+            <a href="/odoo/studio/customizing-views.html" class="topic-tag odoo-topic-tag">🎨 Customizing Views</a>
+            <a href="/odoo/studio/custom-models.html" class="topic-tag odoo-topic-tag">🎨 Custom Models</a>
+            <a href="/odoo/studio/studio-vs-module.html" class="topic-tag odoo-topic-tag">🎨 Studio vs Module</a>
+            <a href="/odoo/backend/computed-fields.html" class="topic-tag odoo-topic-tag">🐍 Computed Fields (Python)</a>
+            <a href="/odoo/module/models-fields.html" class="topic-tag odoo-topic-tag">🐍 Models &amp; Fields</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I rename or delete a custom field after creating it? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>You can change the <strong>label</strong> (display name) at any time. However, you cannot rename the technical name (e.g., <code>x_studio_my_field</code>) after the field is created because renaming it would require migrating database column data. To delete a custom field, go to <strong>Settings → Technical → Fields</strong>, find the field, and delete it. Warning: this will delete all data stored in that column.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I add a custom field to Odoo's built-in models like sale.order or res.partner? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Studio can add custom fields to any model in Odoo, including core models like <code>sale.order</code>, <code>res.partner</code>, <code>account.move</code>, etc. Open Studio on the relevant app and add the field — it becomes part of that model across all views.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between a Formula field and a regular computed field? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Studio's Formula field is a simplified computed field created without Python code. It is always <code>store=False</code> (not in the database) and <code>compute</code> runs each time the record is read. A Python computed field (in a custom module) can be <code>store=True</code>, have <code>@api.depends</code> for caching, and can be searched or grouped in views. Use Formula for display-only derived values; use Python computed fields for everything else.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Will my custom fields survive an Odoo upgrade? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Custom fields stored as <code>ir.model.fields</code> records are preserved during Odoo upgrades because they are treated as data, not code. The underlying database columns persist as well. However, always test on a staging database before upgrading production.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/studio/customizing-views.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Customizing Views</span>
+          </a>
+          <a href="/odoo/studio/custom-models.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Custom Models</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

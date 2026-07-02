@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulate Team Collaboration with Git – Two-Developer Workflow | ylearner</title>
+  <meta name="description" content="Simulate two developers collaborating on the same Git repository: feature branches, pushing, pulling, creating and resolving merge conflicts, and reading git log --graph.">
+  <meta name="keywords" content="git team workflow, git collaboration tutorial, git merge conflict simulation, two developer git, git pull conflict, git team project, git collaboration practice">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/git/projects/team-workflow.html">
+  <meta property="og:title" content="Simulate Team Collaboration with Git – Two-Developer Workflow | ylearner">
+  <meta property="og:description" content="Simulate two developers working on the same Git repo using two local clones. Practice feature branches, push/pull, conflict resolution, and reading history.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/git/projects/team-workflow.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Simulate Team Collaboration with Git – Two-Developer Workflow | ylearner">
+  <meta name="twitter:description" content="Simulate two developers working on the same Git repo using two local clones. Practice feature branches, push/pull, conflict resolution, and reading history.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Simulate Team Collaboration with Git – Two-Developer Workflow","description":"Simulate two developers working on the same Git repository using local clones to practice the full team collaboration workflow.","educationalLevel":"Intermediate","keywords":"git team workflow, merge conflict, git collaboration practice","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <span>Projects</span><span class="separator">›</span>
+          <span class="current">Team Workflow Project</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🛠️ Projects</div>
+          <h1>Simulate Team Collaboration with Git – Two-Developer Workflow</h1>
+          <p class="lesson-intro">The best way to understand team Git workflows is to simulate them yourself. In this project, you'll play both "Developer A" and "Developer B" using two separate local clones of the same repository. You'll experience pushing and pulling, dealing with diverged history, creating and resolving a real merge conflict — all the challenges that happen every day on real development teams. No second computer needed.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 60 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="project-overview">Project Overview</h2>
+          <p>Architecture of this simulation:</p>
+          <ul>
+            <li><strong>Origin repo</strong> (bare repository) — acts as the shared remote server (like GitHub)</li>
+            <li><strong>Dev A's clone</strong> — Developer A's local workspace</li>
+            <li><strong>Dev B's clone</strong> — Developer B's local workspace</li>
+          </ul>
+          <p>Both developers work on the same project — a simple web app config file. They'll add different features, push, pull, and eventually hit a conflict they need to resolve.</p>
+
+          <h2 id="setup">Step 1 – Set Up the Shared Origin</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Create our workspace
+mkdir ~/team-sim && cd ~/team-sim
+
+# Create the "remote" — a bare repository (no working tree)
+# This simulates a GitHub/GitLab remote
+git init --bare origin.git
+
+# Create the initial project and push to origin
+mkdir seed-project && cd seed-project
+git init
+git commit --allow-empty -m "chore: initial commit"
+
+# Create the app config file
+cat &gt; config.json &lt;&lt; 'EOF'
+{
+  "app": "TeamApp",
+  "version": "1.0.0",
+  "port": 3000,
+  "database": {
+    "host": "localhost",
+    "port": 5432
+  }
+}
+EOF
+
+git add config.json
+git commit -m "feat: add initial app config"
+git remote add origin ~/team-sim/origin.git
+git push origin main
+cd ~/team-sim</code></pre>
+          </div>
+
+          <h2 id="developer-a">Step 2 – Developer A: Add Auth Feature</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash (Developer A's terminal)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Developer A clones the origin
+git clone ~/team-sim/origin.git dev-a
+cd dev-a
+
+# Verify the starting point
+git log --oneline
+# a1b2c3d (HEAD -> main, origin/main) feat: add initial app config
+
+# Create a feature branch for auth configuration
+git switch -c feature/auth-config
+
+# Update config.json to add auth settings
+cat &gt; config.json &lt;&lt; 'EOF'
+{
+  "app": "TeamApp",
+  "version": "1.0.0",
+  "port": 3000,
+  "database": {
+    "host": "localhost",
+    "port": 5432
+  },
+  "auth": {
+    "jwtSecret": "change-in-production",
+    "tokenExpiry": "24h",
+    "bcryptRounds": 12
+  }
+}
+EOF
+
+git add config.json
+git commit -m "feat(auth): add JWT authentication configuration"
+
+# Push the feature branch to origin
+git push -u origin feature/auth-config
+
+# Merge to main (simulating a PR merge)
+git switch main
+git merge --no-ff feature/auth-config -m "feat(auth): merge auth configuration"
+git push origin main
+
+cd ~/team-sim</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="developer-b">Step 3 – Developer B: Add Dashboard Feature</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash (Developer B's terminal)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Developer B clones the origin (at the same time as Dev A was working)
+git clone ~/team-sim/origin.git dev-b
+cd dev-b
+
+# Note: Dev B cloned before Dev A pushed!
+# Dev B's main only has the initial commit.
+git log --oneline
+# a1b2c3d (HEAD -> main, origin/main) feat: add initial app config
+
+# Dev B creates their feature branch
+git switch -c feature/dashboard-config
+
+# Dev B also modifies config.json (adding dashboard settings)
+# This WILL create a conflict since Dev A also modified config.json
+cat &gt; config.json &lt;&lt; 'EOF'
+{
+  "app": "TeamApp",
+  "version": "1.0.0",
+  "port": 3000,
+  "database": {
+    "host": "localhost",
+    "port": 5432
+  },
+  "dashboard": {
+    "refreshInterval": 30,
+    "maxCharts": 10,
+    "theme": "light"
+  }
+}
+EOF
+
+git add config.json
+git commit -m "feat(dashboard): add dashboard configuration"
+cd ~/team-sim</code></pre>
+          </div>
+
+          <h2 id="conflict-scenario">Step 4 – The Conflict Scenario</h2>
+          <p>Developer B tries to push their work to main, but Developer A already pushed. This is the classic "diverged branch" scenario.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash (Developer B continues)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">cd ~/team-sim/dev-b
+
+# Developer B tries to merge to main and push
+git switch main
+git merge --no-ff feature/dashboard-config -m "feat(dashboard): merge dashboard config"
+git push origin main
+# ! [rejected]        main -&gt; main (fetch first)
+# error: failed to push some refs to '~/team-sim/origin.git'
+# hint: Updates were rejected because the remote contains work that you do
+# hint: not have locally.
+
+# Dev B needs to fetch and integrate Dev A's changes first
+git fetch origin
+git log --oneline --all --graph
+# * b4c5d6e (HEAD -> main) feat(dashboard): merge dashboard config
+# * c3d4e5f feat(dashboard): add dashboard configuration
+# | * 9f8a7b6 (origin/main) feat(auth): merge auth configuration
+# | * 8e7d6c5 feat(auth): add JWT authentication configuration
+# |/
+# * a1b2c3d (origin/main before fetch) feat: add initial app config</code></pre>
+          </div>
+
+          <h2 id="resolve">Step 5 – Resolve the Conflict</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash (Developer B resolves)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Rebase Dev B's main on top of origin/main
+git rebase origin/main
+
+# CONFLICT (content): Merge conflict in config.json
+# error: could not apply b4c5d6e... feat(dashboard): merge dashboard config
+
+# Open config.json — it contains conflict markers:
+# &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD (Dev A's version with auth)
+#   "auth": { "jwtSecret": "...", ... }
+# =======
+#   "dashboard": { "refreshInterval": 30, ... }
+# &gt;&gt;&gt;&gt;&gt;&gt;&gt; feat(dashboard): merge dashboard config</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JSON (resolved config.json)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-json">{
+  "app": "TeamApp",
+  "version": "1.0.0",
+  "port": 3000,
+  "database": {
+    "host": "localhost",
+    "port": 5432
+  },
+  "auth": {
+    "jwtSecret": "change-in-production",
+    "tokenExpiry": "24h",
+    "bcryptRounds": 12
+  },
+  "dashboard": {
+    "refreshInterval": 30,
+    "maxCharts": 10,
+    "theme": "light"
+  }
+}</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># After editing the file to include BOTH auth and dashboard:
+git add config.json
+git rebase --continue
+
+# Now push successfully
+git push origin main
+
+# View the final history
+git log --oneline --graph --all
+# * e5f6a7b (HEAD -> main, origin/main) feat(dashboard): merge dashboard config
+# * d4e5f6a feat(dashboard): add dashboard configuration
+# * 9f8a7b6 feat(auth): merge auth configuration
+# * 8e7d6c5 feat(auth): add JWT authentication configuration
+# * a1b2c3d feat: add initial app config</code></pre>
+          </div>
+
+          <h2 id="best-practices">Best Practices Discovered</h2>
+          <p>Lessons learned from this simulation:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Practice</th><th>Why it matters</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Always <code>git pull</code> before starting new work</td><td>Start from the latest state; smaller conflicts</td></tr>
+                <tr><td>Use short-lived feature branches</td><td>Less divergence = smaller conflicts</td></tr>
+                <tr><td>Communicate when editing shared files</td><td>Coordinate with teammates before changing the same file</td></tr>
+                <tr><td>Fetch and rebase frequently</td><td>Catch conflicts early when they're small</td></tr>
+                <tr><td>Write clear commit messages</td><td>Helps teammates understand what changed and why</td></tr>
+                <tr><td>Use PRs for code review before merging</td><td>A second pair of eyes catches issues early</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Clone the shared repo.</li>
+              <li>Branch for your task.</li>
+              <li>Push and open a Pull Request.</li>
+              <li>Pull teammates’ merged changes.</li>
+              <li>Resolve a conflict while updating your branch.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Simulate a team workflow: clone a shared repo, create a task branch, push and open a PR, then pull in a teammate’s merged work and rebase or merge your branch, resolving any conflict. Explain how branch protection and PR reviews keep main stable.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A bare repository (<code>git init --bare</code>) simulates a shared remote server — it has no working tree, only Git internals.</li>
+              <li>Developer A and B cloned the same origin and worked on separate feature branches simultaneously.</li>
+              <li>The classic team problem: Developer B's push was rejected because Developer A had already pushed.</li>
+              <li>Solution: <strong>git fetch origin</strong> → <strong>git rebase origin/main</strong> → resolve conflict → <strong>git push</strong>.</li>
+              <li>The resolved config.json kept BOTH teams' changes — this is always the goal when resolving conflicts.</li>
+              <li><code>git log --oneline --graph --all</code> is your go-to command for visualizing complex multi-branch history.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does a typical team Git workflow look like?</li>
+            <li>Why use Pull Requests in a team?</li>
+            <li>How do you keep your branch up to date with main?</li>
+            <li>What is branch protection?</li>
+            <li>How do you handle a conflict when updating your branch?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/git/branching/merge-conflicts.html" class="topic-tag git-topic-tag">🔀 Merge Conflicts</a>
+            <a href="/git/remotes/push-pull-fetch.html" class="topic-tag git-topic-tag">🔀 Push, Pull, Fetch</a>
+            <a href="/git/workflows/feature-branch-workflow.html" class="topic-tag git-topic-tag">🔀 Feature Branch Workflow</a>
+            <a href="/git/projects/open-source-contribution.html" class="topic-tag git-topic-tag">🛠️ Open Source Contribution</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why use rebase instead of merge when integrating remote changes? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Both work. <code>git pull --rebase</code> (or <code>git fetch + git rebase origin/main</code>) creates a linear history — your commits appear "on top of" the remote's commits as if you wrote them after. This avoids extra merge commits and makes the history cleaner and easier to read. <code>git pull</code> (merge) creates a merge commit, preserving the exact timeline of events. Many teams use rebase for their own feature branches but merge for integrating features to main via PRs. Neither approach is universally better — it depends on your team's preferences.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What if I push to the wrong branch by accident? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>If only you have the branch (feature branch): you can force-push after resetting — <code>git reset HEAD~1</code> then <code>git push --force origin &lt;branch&gt;</code>. If others might have pulled: don't force-push. Instead, create a revert commit: <code>git revert HEAD</code> and push that. For pushing to main by accident (when you should have used a PR), talk to your team immediately. If the commit hasn't been pulled by anyone yet, a force-push may be acceptable — but always coordinate first.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do teams prevent merge conflicts in the first place? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Complete prevention isn't possible, but frequency can be reduced: (1) Keep branches short-lived (less than a day or two). (2) Communicate ownership of files — if two people need to change the same file, coordinate. (3) Pull from main frequently during development. (4) Use feature flags to merge incomplete features early (reducing branch lifetime). (5) Modular architecture — design the codebase so different features touch different files. (6) Small, focused PRs — less chance of overlap with other work in progress.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/projects/version-your-project.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Version Your First Project</span>
+          </a>
+          <a href="/git/projects/open-source-contribution.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Open Source Contribution</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

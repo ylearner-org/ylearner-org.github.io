@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Email Templates – mail.template and Dynamic Emails | ylearner</title>
+  <meta name="description" content="Create dynamic email templates in Odoo 19 using mail.template and Jinja2 syntax: send_mail(), dynamic recipients, report attachments, and the mail.thread chatter mixin.">
+  <meta name="keywords" content="Odoo email templates, mail.template, send_mail, Jinja2 Odoo, message_post, mail.thread, dynamic email, Odoo 19 email">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/backend/email-templates.html">
+  <meta property="og:title" content="Odoo Email Templates – mail.template and Dynamic Emails">
+  <meta property="og:description" content="Create dynamic email templates in Odoo 19 using mail.template and Jinja2 syntax: send_mail(), dynamic recipients, report attachments, and the mail.thread chatter mixin.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/backend/email-templates.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Email Templates – mail.template and Dynamic Emails | ylearner">
+  <meta name="twitter:description" content="Create dynamic email templates in Odoo 19 using mail.template and Jinja2 syntax: send_mail(), dynamic recipients, report attachments, and the mail.thread chatter mixin.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Email Templates – mail.template and Dynamic Emails",
+    "description": "Create dynamic email templates in Odoo 19 using mail.template and Jinja2 syntax: send_mail(), dynamic recipients, report attachments, and the mail.thread chatter mixin.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo email templates, mail.template, send_mail, Jinja2, message_post, mail.thread, Odoo backend",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">Backend Development</span><span class="separator">›</span>
+          <span class="current">Email Templates</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Backend Development</div>
+          <h1>Odoo Email Templates – mail.template and Dynamic Emails</h1>
+          <p class="lesson-intro">Odoo's email system is built around <code>mail.template</code> records — reusable, data-driven email definitions that support Jinja2 expressions to personalise subject lines, body content, and recipients based on the record being processed. Combined with <code>mail.thread</code>, which provides the chatter for tracking all communications on a record, Odoo gives you a complete outbound email framework you can use from module code, scheduled actions, and server actions alike.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="deep-emailtmpl">Email Templates: Dynamic Mail with QWeb + Jinja</h2>
+          <p>Odoo sends templated email via <code>mail.template</code> records. The body is QWeb/HTML with placeholders that pull live values from the record being mailed — so one template produces personalized messages for every customer.</p>
+          <pre><code class="language-xml">&lt;record id="email_order_confirm" model="mail.template"&gt;
+    &lt;field name="name"&gt;Order Confirmation&lt;/field&gt;
+    &lt;field name="model_id" ref="sale.model_sale_order"/&gt;
+    &lt;field name="subject"&gt;Order {{ object.name }}&lt;/field&gt;
+    &lt;field name="email_to"&gt;{{ object.partner_id.email }}&lt;/field&gt;
+    &lt;field name="body_html" type="html"&gt;
+        &lt;p&gt;Hi &lt;t t-out="object.partner_id.name"/&gt;,&lt;/p&gt;
+        &lt;p&gt;Your order total is &lt;t t-out="object.amount_total"/&gt;.&lt;/p&gt;
+    &lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          <p>Two placeholder styles coexist: <strong>Jinja-style</strong> <code>{{ object.field }}</code> in short fields (subject, recipient), and <strong>QWeb</strong> <code>t-out</code>/<code>t-esc</code> in the HTML body. <code>object</code> is the record the mail is about.</p>
+          <table>
+            <thead><tr><th>Field</th><th>Holds</th></tr></thead>
+            <tbody>
+              <tr><td><code>model_id</code></td><td>which model the template applies to</td></tr>
+              <tr><td><code>email_to</code></td><td>recipient (can be dynamic)</td></tr>
+              <tr><td><code>body_html</code></td><td>the QWeb message body</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Sending:</strong> call <code>template.send_mail(record.id)</code> from Python, or trigger it from a server action / automation rule. Use <code>t-out</code> for body values (it renders record data), and remember mail goes through Odoo's outgoing mail server config — test with a real SMTP setup.</p>
+
+<div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create a <code>mail.template</code>.</li>
+              <li>Use record fields in the subject and body.</li>
+              <li>Add dynamic placeholders.</li>
+              <li>Send it from Python with <code>send_mail</code>.</li>
+              <li>Attach a report to the email.</li>
+            </ol>
+          </div>
+
+<div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Create an email template (<code>mail.template</code>) with dynamic placeholders for a customer’s name and order, and send it from a button method. Explain how templates use QWeb/inline expressions for dynamic content and how to attach a QWeb report as a PDF.</p>
+          </div>
+
+<div class="summary-box">
+            <h3>📋 What You Will Learn</h3>
+            <ul>
+              <li>How Odoo processes and sends emails</li>
+              <li>Defining an email template with <code>mail.template</code> in XML</li>
+              <li>Using Jinja2 syntax for dynamic content</li>
+              <li>Sending email from Python with <code>send_mail()</code></li>
+              <li>Attaching QWeb PDF reports to emails</li>
+              <li>Using <code>message_post()</code> for chatter messages</li>
+            </ul>
+          </div>
+
+          <!-- Section 1 -->
+          <h2 id="how-odoo-sends-emails">How Odoo Sends Emails</h2>
+          <p>Odoo's email flow has two layers:</p>
+          <ol>
+            <li><strong>mail.template:</strong> A template record holds the subject, body (Jinja2 HTML), sender, and recipient expressions. When you call <code>template.send_mail(record_id)</code>, Odoo renders the template against that specific record and creates a <code>mail.mail</code> record.</li>
+            <li><strong>mail.mail / ir.mail_server:</strong> A background scheduler (or immediate send if <code>force_send=True</code>) picks up <code>mail.mail</code> records and sends them via the configured outgoing mail server (SMTP). The sent message is also logged in the record's chatter if the model has <code>mail.thread</code>.</li>
+          </ol>
+
+          <!-- Section 2 -->
+          <h2 id="creating-an-email-template-xml">Creating an Email Template (XML)</h2>
+          <p>Define <code>mail.template</code> records in a data file — typically under <code>data/email_templates.xml</code>. Use <code>noupdate="1"</code> so that administrators can customise the template from the UI without your module overwriting their changes on upgrade:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;
+    &lt;data noupdate="1"&gt;
+
+        &lt;record id="email_template_overdue_notice" model="mail.template"&gt;
+            &lt;field name="name"&gt;Library: Overdue Notice&lt;/field&gt;
+
+            &lt;!-- The model this template is for --&gt;
+            &lt;field name="model_id" ref="model_library_loan"/&gt;
+
+            &lt;!-- Subject with Jinja2 expression --&gt;
+            &lt;field name="subject"&gt;
+                Overdue Notice: ${object.book_id.title or 'Your Loan'} is Past Due
+            &lt;/field&gt;
+
+            &lt;!-- Sender — can be static or dynamic --&gt;
+            &lt;field name="email_from"&gt;${user.email or 'library@example.com'}&lt;/field&gt;
+
+            &lt;!-- Recipient — from the related partner --&gt;
+            &lt;field name="email_to"&gt;${object.borrower_id.email}&lt;/field&gt;
+
+            &lt;!-- Copy to library manager --&gt;
+            &lt;!-- &lt;field name="email_cc"&gt;library-manager@example.com&lt;/field&gt; --&gt;
+
+            &lt;!-- Reply-To address --&gt;
+            &lt;field name="reply_to"&gt;library@example.com&lt;/field&gt;
+
+            &lt;!-- Automatically log the sent message in the record's chatter --&gt;
+            &lt;field name="auto_delete"&gt;False&lt;/field&gt;
+
+            &lt;!-- HTML body with Jinja2 --&gt;
+            &lt;field name="body_html"&gt;&lt;![CDATA[
+&lt;div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;"&gt;
+    &lt;h2 style="color: #714B67;"&gt;Library Overdue Notice&lt;/h2&gt;
+    &lt;p&gt;Dear ${object.borrower_id.name or 'Library Member'},&lt;/p&gt;
+    &lt;p&gt;
+        Our records show that the following book is overdue:
+    &lt;/p&gt;
+    &lt;table style="border-collapse: collapse; width: 100%;"&gt;
+        &lt;tr style="background: #f5f5f5;"&gt;
+            &lt;td style="padding: 8px; border: 1px solid #ddd;"&gt;&lt;strong&gt;Book Title&lt;/strong&gt;&lt;/td&gt;
+            &lt;td style="padding: 8px; border: 1px solid #ddd;"&gt;${object.book_id.title}&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td style="padding: 8px; border: 1px solid #ddd;"&gt;&lt;strong&gt;Due Date&lt;/strong&gt;&lt;/td&gt;
+            &lt;td style="padding: 8px; border: 1px solid #ddd;"&gt;${object.due_date}&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr style="background: #f5f5f5;"&gt;
+            &lt;td style="padding: 8px; border: 1px solid #ddd;"&gt;&lt;strong&gt;Days Overdue&lt;/strong&gt;&lt;/td&gt;
+            &lt;td style="padding: 8px; border: 1px solid #ddd; color: #dc3545;"&gt;
+                ${object.days_overdue} day(s)
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    % if object.days_overdue &gt; 14:
+    &lt;p style="color: #dc3545;"&gt;
+        &lt;strong&gt;Your borrowing privileges may be suspended if the book is not returned promptly.&lt;/strong&gt;
+    &lt;/p&gt;
+    % endif
+
+    &lt;p&gt;Please return the book to the library at your earliest convenience.&lt;/p&gt;
+    &lt;p&gt;Thank you,&lt;br/&gt;The Library Team&lt;/p&gt;
+&lt;/div&gt;
+            ]]&gt;&lt;/field&gt;
+        &lt;/record&gt;
+
+    &lt;/data&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <!-- AD BLOCK -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <!-- Section 3 -->
+          <h2 id="dynamic-content-with-jinja2">Dynamic Content with Jinja2</h2>
+          <p>Email templates use a Jinja2-like syntax for expressions. The key variable is <code>object</code> — the record being processed. Other variables include <code>user</code> (current user), <code>ctx</code> (context dict), and <code>format_date</code> (date formatting helper).</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Syntax</th><th>Purpose</th><th>Example</th></tr></thead>
+              <tbody>
+                <tr><td><code>${expression}</code></td><td>Output a Python expression value</td><td><code>${object.name}</code>, <code>${object.partner_id.email}</code></td></tr>
+                <tr><td><code>% if condition:</code> ... <code>% endif</code></td><td>Conditional block</td><td><code>% if object.days_overdue &gt; 7:</code></td></tr>
+                <tr><td><code>% for item in iterable:</code> ... <code>% endfor</code></td><td>Loop</td><td><code>% for book in object.book_ids:</code></td></tr>
+                <tr><td><code>${object.field | safe}</code></td><td>Render HTML content without escaping</td><td>For fields containing HTML markup</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Jinja2 (email body)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-html">&lt;!-- Access related record fields --&gt;
+&lt;p&gt;Dear ${object.borrower_id.name},&lt;/p&gt;
+&lt;p&gt;Your loan of &lt;strong&gt;${object.book_id.title}&lt;/strong&gt; is due on ${object.due_date}.&lt;/p&gt;
+
+&lt;!-- Conditional block --&gt;
+% if object.borrower_id.country_id:
+&lt;p&gt;Country: ${object.borrower_id.country_id.name}&lt;/p&gt;
+% endif
+
+&lt;!-- Format dates nicely --&gt;
+&lt;p&gt;Due: ${format_date(object.due_date, date_format='MMMM d, yyyy')}&lt;/p&gt;
+
+&lt;!-- Loop over a One2many --&gt;
+% for loan_line in object.line_ids:
+&lt;li&gt;${loan_line.book_id.title} — due ${loan_line.due_date}&lt;/li&gt;
+% endfor
+
+&lt;!-- Access current user info --&gt;
+&lt;p&gt;Contact: ${user.name} &lt;${user.email}&gt;&lt;/p&gt;</code></pre>
+          </div>
+
+          <!-- Section 4 -->
+          <h2 id="sending-email-from-python">Sending Email from Python</h2>
+          <p>The most common way to send an email from Python code is to look up the template by XML ID and call <code>send_mail()</code>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">from odoo import models, api
+import logging
+
+_logger = logging.getLogger(__name__)
+
+class LibraryLoan(models.Model):
+    _name = 'library.loan'
+
+    def action_send_overdue_notice(self):
+        """Send overdue notice email to borrower for each selected loan."""
+        template = self.env.ref(
+            'library_management.email_template_overdue_notice',
+            raise_if_not_found=False,
+        )
+        if not template:
+            _logger.warning("Overdue notice template not found")
+            return
+
+        for loan in self:
+            if not loan.borrower_id.email:
+                _logger.warning("Loan %d: borrower has no email address, skipping", loan.id)
+                continue
+
+            # force_send=True: send immediately instead of queuing
+            # raise_exception=False: don't crash if SMTP fails
+            template.send_mail(
+                loan.id,
+                force_send=True,
+                raise_exception=False,
+            )
+            _logger.info("Sent overdue notice for loan %d to %s", loan.id, loan.borrower_id.email)
+
+    @api.model
+    def _cron_send_overdue_notifications(self):
+        """Called by the scheduled action daily."""
+        overdue = self.search([
+            ('state', '=', 'overdue'),
+            ('notification_sent', '=', False),
+        ])
+        overdue.action_send_overdue_notice()
+        overdue.write({'notification_sent': True})</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>force_send=True vs queue</strong>
+              <p>Without <code>force_send=True</code>, <code>send_mail()</code> creates a <code>mail.mail</code> record and lets the email scheduler send it in the background. With <code>force_send=True</code>, the email is dispatched immediately in the current transaction. Use <code>force_send=True</code> for user-triggered sends where the user expects immediate confirmation; let the queue handle batch/cron sends for better performance.</p>
+            </div>
+          </div>
+
+          <!-- Section 5 -->
+          <h2 id="email-from-automated-action">Email from Automated Action</h2>
+          <p>You can wire an email template directly to an automated action (<code>ir.base.automation</code>) without writing any Python code — Odoo handles the template rendering and sending automatically:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;
+    &lt;record id="automation_send_overdue_email" model="ir.base.automation"&gt;
+        &lt;field name="name"&gt;Library: Email on Overdue&lt;/field&gt;
+        &lt;field name="model_id" ref="model_library_loan"/&gt;
+        &lt;field name="trigger"&gt;on_write&lt;/field&gt;
+        &lt;field name="filter_pre_domain"&gt;[('state','!=','overdue')]&lt;/field&gt;
+        &lt;field name="filter_domain"&gt;[('state','=','overdue')]&lt;/field&gt;
+
+        &lt;!-- Use a server action with state=code to send the email --&gt;
+        &lt;field name="action_server_ids" eval="[(0, 0, {
+            'name': 'Send Overdue Notice',
+            'model_id': ref('model_library_loan'),
+            'state': 'email',
+            'template_id': ref('email_template_overdue_notice'),
+        })]"/&gt;
+    &lt;/record&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <!-- Section 6 -->
+          <h2 id="attachments-and-reports">Attachments and Reports</h2>
+          <p>You can automatically attach a QWeb PDF report to an email template using <code>report_template_ids</code>. Odoo renders the report for the relevant record and attaches the PDF to the outgoing email:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="email_template_overdue_notice" model="mail.template"&gt;
+    &lt;!-- ... other fields ... --&gt;
+
+    &lt;!-- Attach the loan receipt PDF to this email --&gt;
+    &lt;field name="report_template_ids" eval="[(4, ref('action_report_library_loan_receipt'))]"/&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <p>You can also attach files manually from Python using <code>send_mail()</code>'s context:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">def action_send_with_attachment(self):
+    """Send email with a dynamically generated PDF attachment."""
+    self.ensure_one()
+    template = self.env.ref('library_management.email_template_overdue_notice')
+
+    # Render the PDF and create an attachment
+    report = self.env.ref('library_management.action_report_library_loan_receipt')
+    pdf_content, _ = self.env['ir.actions.report']._render_qweb_pdf(
+        report, res_ids=self.ids,
+    )
+    import base64
+    attachment = self.env['ir.attachment'].create({
+        'name': f'LoanReceipt-{self.name}.pdf',
+        'type': 'binary',
+        'datas': base64.b64encode(pdf_content),
+        'mimetype': 'application/pdf',
+    })
+
+    # Send email with the attachment IDs in context
+    template.with_context(attachment_ids=[attachment.id]).send_mail(
+        self.id, force_send=True
+    )</code></pre>
+          </div>
+
+          <!-- Section 7 -->
+          <h2 id="mail-thread-mixin">mail.thread Mixin — Chatter Messages</h2>
+          <p>If your model inherits from <code>mail.thread</code>, you can post internal messages (notes) or external emails directly to the record's chatter using <code>message_post()</code>. These are logged on the record and visible to followers:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">class LibraryLoan(models.Model):
+    _name = 'library.loan'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+
+    def action_mark_returned(self):
+        self.ensure_one()
+        self.write({'state': 'returned', 'return_date': fields.Date.today()})
+
+        # Post an internal log note to the chatter (not sent as email)
+        self.message_post(
+            body=f"Book returned on {self.return_date} in {self.return_condition} condition.",
+            message_type='comment',
+            subtype_xmlid='mail.mt_note',  # 'note' = internal; 'comment' = external
+        )
+
+    def action_send_reminder(self):
+        """Send an email message AND log it in the chatter."""
+        self.ensure_one()
+        # message_type='email' → sends to followers via email AND logs in chatter
+        self.message_post(
+            body=f"Reminder: your loan of '{self.book_id.title}' is due on {self.due_date}.",
+            message_type='email',
+            subject=f"Loan Reminder: {self.book_id.title}",
+            partner_ids=[self.borrower_id.id],  # explicitly specify recipients
+        )</code></pre>
+          </div>
+
+          <!-- Section 8 -->
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li>Define email templates as <code>mail.template</code> records in XML with <code>noupdate="1"</code></li>
+              <li>Use <code>${object.field_name}</code> Jinja2 syntax for dynamic content; <code>% if</code> / <code>% for</code> for control flow</li>
+              <li><code>template.send_mail(record_id, force_send=True)</code> sends the email immediately from Python</li>
+              <li>Without <code>force_send=True</code>, emails are queued and sent by the background mail scheduler</li>
+              <li>Attach QWeb PDF reports via <code>report_template_ids</code> on the template record</li>
+              <li><code>mail.thread</code> mixin adds chatter; use <code>message_post()</code> for internal notes and outgoing emails</li>
+              <li>Always check that the recipient has an email address before calling <code>send_mail()</code></li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a <code>mail.template</code>?</li>
+            <li>How do you insert dynamic values into an email template?</li>
+            <li>How do you send a templated email from Python?</li>
+            <li>How do you attach a report to an email?</li>
+            <li>What is the mail thread (<code>mail.thread</code>)?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+<div class="related-topics">
+            <a href="/odoo/backend/server-actions.html" class="topic-tag odoo-topic-tag">🐍 Server Actions</a>
+            <a href="/odoo/backend/scheduled-actions.html" class="topic-tag odoo-topic-tag">🐍 Scheduled Actions</a>
+            <a href="/odoo/backend/qweb-reports.html" class="topic-tag odoo-topic-tag">🐍 QWeb Reports</a>
+            <a href="/odoo/backend/model-inheritance.html" class="topic-tag odoo-topic-tag">🐍 Model Inheritance</a>
+            <a href="/odoo/module/models-fields.html" class="topic-tag odoo-topic-tag">🐍 Models &amp; Fields</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between message_type='comment' and 'email' in message_post()? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>message_type='comment'</code> creates an internal message that is logged in the chatter but not sent as an email (unless followers have notification settings enabled). <code>message_type='email'</code> sends the message as an actual email to the specified <code>partner_ids</code> and also logs it in the chatter. Use <code>message_type='comment'</code> with <code>subtype_xmlid='mail.mt_note'</code> for private internal notes that should never be emailed.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I preview an email template before sending? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In developer mode, go to Settings &gt; Technical &gt; Email &gt; Templates. Open your template and use the "Send Test Email" button to send a preview to yourself. Alternatively, you can use the "Preview" option in the compose dialog. From Python, you can render the body without sending using <code>template._render_template(template.body_html, template.model, record.ids)</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I send an email without defining a mail.template record? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Use <code>self.env['mail.mail'].create({...}).send()</code> for a one-off email, or use <code>message_post()</code> on a mail.thread model with <code>message_type='email'</code> and <code>partner_ids</code>. For recurring, admin-editable, record-personalised emails, a <code>mail.template</code> record is strongly recommended because it's configurable from the UI without a code deploy.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does my email end up in the outbound queue instead of sending immediately? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>By default, <code>send_mail()</code> without <code>force_send=True</code> creates a <code>mail.mail</code> record in the "outgoing" state and lets the scheduler send it. The scheduler runs every minute. If emails are stuck in the queue (not "sent"), check your outgoing mail server configuration under Settings &gt; Technical &gt; Outgoing Mail Servers and look at the email's error message in Settings &gt; Technical &gt; Email &gt; Emails.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/backend/server-actions.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Server Actions</span>
+          </a>
+          <a href="/odoo/backend/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Take a Quiz</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

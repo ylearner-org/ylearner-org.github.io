@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Closures – How Functions Remember Their Scope | ylearner</title>
+  <meta name="description" content="Master JavaScript closures: what they are, how they form, data privacy, factory functions, module pattern, memoization, partial application, the classic loop bug, and memory considerations.">
+  <meta name="keywords" content="javascript closures, closure example, data privacy javascript, factory functions closure, module pattern javascript, memoization javascript, partial application closure">
+  <link rel="canonical" href="https://ylearner.org/javascript/functions/closures.html">
+  <meta property="og:title" content="JavaScript Closures – How Functions Remember Their Scope | ylearner">
+  <meta property="og:description" content="Master JavaScript closures: what they are, how they form, data privacy, factory functions, module pattern, memoization, partial application, the classic loop bug, and memory considerations.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/functions/closures.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Closures – How Functions Remember Their Scope | ylearner">
+  <meta name="twitter:description" content="Master JavaScript closures: what they are, how they form, data privacy, factory functions, module pattern, memoization, partial application, the classic loop bug, and memory considerations.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/functions/function-basics.html">Functions</a><span class="separator">›</span>
+          <span class="current">Closures</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Functions</div>
+          <h1>JavaScript Closures – Functions That Remember</h1>
+          <p class="lesson-intro">A closure is a function bundled together with its lexical environment — the variables from the scope where it was defined. Closures are one of JavaScript's most powerful features and the foundation of private state, factory functions, the module pattern, memoization, and much more.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-a-closure">What Is a Closure?</h2>
+          <p>A closure forms when an inner function references a variable from its outer function's scope, and that inner function survives (is returned, stored, or passed) beyond the outer function's execution.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function makeCounter() {
+  let count = 0; // This variable "lives on" in the closure
+
+  return function() {
+    count++;       // Accesses the outer 'count'
+    return count;
+  };
+}
+
+const counter = makeCounter(); // makeCounter's execution is DONE
+// But 'count' is still alive because 'counter' closes over it
+
+console.log(counter()); // 1
+console.log(counter()); // 2
+console.log(counter()); // 3
+
+// Each call to makeCounter creates a NEW closure with its own count
+const counter2 = makeCounter();
+console.log(counter2()); // 1 — independent from counter</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>1
+2
+3
+1</div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>The Lexical Environment</strong>
+              <p>Every function in JavaScript carries a hidden reference to its lexical environment — the scope where it was created. When the function is called later (even after the outer function has returned), it still has access to that environment. This is a closure.</p>
+            </div>
+          </div>
+
+          <h2 id="data-privacy">Data Privacy and Encapsulation</h2>
+          <p>Closures let you create "private" variables that cannot be accessed directly from outside — only through the returned interface.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function createBankAccount(initialBalance) {
+  let balance = initialBalance; // Private — inaccessible from outside
+
+  return {
+    deposit(amount) {
+      if (amount <= 0) throw new Error("Amount must be positive");
+      balance += amount;
+      return balance;
+    },
+    withdraw(amount) {
+      if (amount > balance) throw new Error("Insufficient funds");
+      balance -= amount;
+      return balance;
+    },
+    getBalance() {
+      return balance;
+    }
+  };
+}
+
+const account = createBankAccount(100);
+console.log(account.deposit(50));      // 150
+console.log(account.withdraw(30));     // 120
+console.log(account.getBalance());     // 120
+
+// Cannot access balance directly
+console.log(account.balance); // undefined — it's private!</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>150
+120
+120
+undefined</div>
+
+          <h2 id="factory-functions">Factory Functions with Closures</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function createLogger(prefix) {
+  let logCount = 0;
+
+  return {
+    log(message) {
+      logCount++;
+      console.log(`[${prefix}] #${logCount}: ${message}`);
+    },
+    getCount() { return logCount; }
+  };
+}
+
+const appLogger  = createLogger("APP");
+const authLogger = createLogger("AUTH");
+
+appLogger.log("Server started");
+appLogger.log("Listening on port 3000");
+authLogger.log("User logged in");
+authLogger.log("Session created");
+appLogger.log("Request received");
+
+console.log("App logs:", appLogger.getCount());   // 3
+console.log("Auth logs:", authLogger.getCount());  // 2</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>[APP] #1: Server started
+[APP] #2: Listening on port 3000
+[AUTH] #1: User logged in
+[AUTH] #2: Session created
+[APP] #3: Request received
+App logs: 3
+Auth logs: 2</div>
+
+          <h2 id="module-pattern">Module Pattern</h2>
+          <p>The module pattern uses an IIFE + closure to create a module with private state and a public API — the precursor to ES6 modules.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const cartModule = (function() {
+  // Private state
+  const items = [];
+  let total = 0;
+
+  // Private function
+  function recalculate() {
+    total = items.reduce((sum, item) => sum + item.price * item.qty, 0);
+  }
+
+  // Public API
+  return {
+    addItem(item) {
+      items.push(item);
+      recalculate();
+    },
+    removeItem(name) {
+      const idx = items.findIndex(i => i.name === name);
+      if (idx !== -1) { items.splice(idx, 1); recalculate(); }
+    },
+    getTotal() { return total; },
+    getItems() { return [...items]; } // Return copy, not reference
+  };
+})();
+
+cartModule.addItem({ name: "Book", price: 15, qty: 2 });
+cartModule.addItem({ name: "Pen", price: 3, qty: 5 });
+console.log("Total: $" + cartModule.getTotal()); // Total: $45</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Total: $45</div>
+
+          <h2 id="memoization">Memoization with Closures</h2>
+          <p>Memoization caches function results — the cache is stored in a closure variable.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function memoize(fn) {
+  const cache = {}; // Closed over by the returned function
+
+  return function(...args) {
+    const key = JSON.stringify(args);
+    if (key in cache) {
+      console.log("Cache hit for:", key);
+      return cache[key];
+    }
+    console.log("Computing for:", key);
+    cache[key] = fn(...args);
+    return cache[key];
+  };
+}
+
+const slowSquare = memoize(n => {
+  // Simulate slow computation
+  return n * n;
+});
+
+console.log(slowSquare(5));  // Computing, then 25
+console.log(slowSquare(5));  // Cache hit, then 25
+console.log(slowSquare(6));  // Computing, then 36</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Computing for: [5]
+25
+Cache hit for: [5]
+25
+Computing for: [6]
+36</div>
+
+          <h2 id="partial-application">Partial Application</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function multiply(a, b) {
+  return a * b;
+}
+
+// Partial application — fix the first argument
+function partial(fn, firstArg) {
+  return function(secondArg) {
+    return fn(firstArg, secondArg); // firstArg is closed over
+  };
+}
+
+const double = partial(multiply, 2);
+const triple = partial(multiply, 3);
+
+console.log(double(5));  // 10
+console.log(triple(5));  // 15
+console.log(double(10)); // 20</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>10
+15
+20</div>
+
+          <h2 id="event-handlers-with-state">Event Handlers with State</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Simulating a button click tracker (browser pattern)
+function createClickTracker(buttonId) {
+  let clicks = 0;
+
+  function handleClick() {
+    clicks++;
+    console.log(`Button ${buttonId} clicked ${clicks} time(s)`);
+  }
+
+  // In a browser: document.getElementById(buttonId).addEventListener('click', handleClick);
+  // Here we simulate:
+  return handleClick;
+}
+
+const btn1Handler = createClickTracker("btn-1");
+const btn2Handler = createClickTracker("btn-2");
+
+btn1Handler(); // Button btn-1 clicked 1 time(s)
+btn1Handler(); // Button btn-1 clicked 2 time(s)
+btn2Handler(); // Button btn-2 clicked 1 time(s) — independent</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Button btn-1 clicked 1 time(s)
+Button btn-1 clicked 2 time(s)
+Button btn-2 clicked 1 time(s)</div>
+
+          <h2 id="classic-loop-bug">The Classic Loop Closure Bug</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// BUG: var creates one shared 'i' across all iterations
+const printFuncsVar = [];
+for (var i = 0; i < 3; i++) {
+  printFuncsVar.push(() => console.log("var i:", i));
+}
+printFuncsVar[0](); // var i: 3 — not 0!
+printFuncsVar[1](); // var i: 3
+printFuncsVar[2](); // var i: 3
+
+// FIX 1: Use let — each iteration gets a NEW binding
+const printFuncsLet = [];
+for (let j = 0; j < 3; j++) {
+  printFuncsLet.push(() => console.log("let j:", j));
+}
+printFuncsLet[0](); // let j: 0
+printFuncsLet[1](); // let j: 1
+printFuncsLet[2](); // let j: 2
+
+// FIX 2: IIFE to capture the value (older workaround)
+const printFuncsIIFE = [];
+for (var k = 0; k < 3; k++) {
+  printFuncsIIFE.push((function(captured) {
+    return () => console.log("IIFE k:", captured);
+  })(k));
+}
+printFuncsIIFE[0](); // IIFE k: 0</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>var i: 3
+var i: 3
+var i: 3
+let j: 0
+let j: 1
+let j: 2
+IIFE k: 0</div>
+
+          <h2 id="memory-considerations">Memory Considerations</h2>
+          <p>Closures keep the outer scope's variables alive as long as the closure exists. This is intentional but can cause memory leaks if closures are not properly released.</p>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Closure Memory Leaks</strong>
+              <p>If a closure captures a reference to a large object (e.g., a DOM node or a big array), that object stays in memory as long as the closure exists. Set variables to <code>null</code> when done, or remove event listeners to allow garbage collection.</p>
+            </div>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="deep-loopbug">The Closure-in-a-Loop Bug Every JS Dev Hits</h2>
+          <p>This snippet looks like it should print 0, 1, 2 — but with <code>var</code> it prints <strong>3, 3, 3</strong>:</p>
+          <pre><code class="language-javascript">for (var i = 0; i &lt; 3; i++) {
+  setTimeout(() =&gt; console.log(i), 100);
+}
+// 3  3  3</code></pre>
+          <p>Why? <code>var</code> is function-scoped, so all three callbacks close over the <em>same</em> <code>i</code>. By the time the timeouts fire, the loop finished and <code>i</code> is 3. The one-character fix is <code>let</code>, which creates a fresh binding <em>per iteration</em>:</p>
+          <pre><code class="language-javascript">for (let i = 0; i &lt; 3; i++) {
+  setTimeout(() =&gt; console.log(i), 100);
+}
+// 0  1  2</code></pre>
+          <p>This is the clearest practical reason <code>let</code>/<code>const</code> replaced <code>var</code> in modern code.</p>
+          <h3>Closures aren't a trick question — they're a tool</h3>
+          <p>A closure is a function that remembers the variables from where it was created. That gives you private state without classes:</p>
+          <pre><code class="language-javascript">function counter() {
+  let count = 0;                 // private — no one outside can touch it
+  return {
+    inc: () =&gt; ++count,
+    value: () =&gt; count,
+  };
+}
+const c = counter();
+c.inc(); c.inc();
+console.log(c.value());          // 2</code></pre>
+          <p>Same idea powers memoization, event handlers that remember data, and module-style encapsulation.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Create a <code>createRateLimiter(maxCalls, windowMs)</code> function using a closure that:</p>
+            <ul>
+              <li>Tracks how many times the returned function has been called within the time window</li>
+              <li>Allows the call if under the limit</li>
+              <li>Blocks with "Rate limit exceeded" otherwise</li>
+              <li>Resets the counter after <code>windowMs</code> milliseconds</li>
+            </ul>
+            <p>The counter must be private (closure variable).</p>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Implement an <code>observable(initialValue)</code> function using closures that:</p>
+            <ul>
+              <li>Stores a private value</li>
+              <li>Returns an object with <code>get()</code>, <code>set(newVal)</code>, and <code>subscribe(fn)</code></li>
+              <li>When <code>set</code> is called, notifies all subscribed functions with <code>(newVal, oldVal)</code></li>
+              <li>Returns an unsubscribe function from <code>subscribe</code></li>
+            </ul>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A closure = a function + its lexical environment (the variables from its defining scope).</li>
+              <li>Inner functions close over outer variables, keeping them alive even after the outer function returns.</li>
+              <li>Use closures for: private state, factory functions, module pattern, memoization, partial application.</li>
+              <li>The classic var loop bug is fixed by using <code>let</code> (block-scoped per iteration).</li>
+              <li>Be mindful of memory: closures prevent garbage collection of captured variables.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a closure in JavaScript? Provide a definition and example.</li>
+            <li>How do closures enable data privacy/encapsulation?</li>
+            <li>Explain the classic for-loop closure bug with var and how let fixes it.</li>
+            <li>What is the module pattern and how does it use closures?</li>
+            <li>Can closures cause memory leaks? How do you prevent them?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/javascript/functions/scope.html" class="topic-tag">Scope</a>
+            <a href="/javascript/functions/higher-order-functions.html" class="topic-tag">Higher-Order Functions</a>
+            <a href="/javascript/functions/arrow-functions.html" class="topic-tag">Arrow Functions</a>
+            <a href="/javascript/functions/return-values.html" class="topic-tag">Return Values</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Are all functions closures in JavaScript?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Technically yes — every JavaScript function closes over its surrounding scope. But we typically say a function "is a closure" when it actually makes use of variables from an outer scope that has already returned, making the concept meaningful and visible.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between a closure and a class?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Both provide private state and a public interface. Classes use prototype-based inheritance and the <code>class</code> keyword. Closures are simpler (functions + variables) and don't require <code>this</code> or <code>new</code>. Closures are better for functional style; classes for object-oriented patterns with inheritance.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Do closures work with const variables?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Closures capture the variable binding (reference), not the value. With <code>const</code>, you can't reassign the binding, but if the const holds an object or array, you can still mutate its contents via the closure.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/functions/scope.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Scope</span></a>
+          <a href="/javascript/functions/higher-order-functions.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Higher-Order Functions</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

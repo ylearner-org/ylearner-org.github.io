@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>.gitignore &amp; .gitattributes – Controlling What Git Tracks | ylearner</title>
+  <meta name="description" content="Learn how to use .gitignore to exclude files from Git tracking, understand pattern syntax, untrack already-committed files, use .gitattributes for line endings, and set up a global gitignore.">
+  <meta name="keywords" content="gitignore, .gitignore tutorial, gitignore patterns, git rm cached, gitattributes, global gitignore, git check-ignore, gitignore templates">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/git/workflows/gitignore.html">
+  <meta property="og:title" content=".gitignore &amp; .gitattributes – Controlling What Git Tracks | ylearner">
+  <meta property="og:description" content="Learn .gitignore pattern syntax, how to untrack already-committed files, .gitattributes for line endings, and global gitignore setup.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/git/workflows/gitignore.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content=".gitignore &amp; .gitattributes – Controlling What Git Tracks | ylearner">
+  <meta name="twitter:description" content="Learn .gitignore pattern syntax, how to untrack already-committed files, .gitattributes for line endings, and global gitignore setup.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":".gitignore & .gitattributes – Controlling What Git Tracks","description":"Learn how to use .gitignore to exclude files from Git tracking and .gitattributes to control line endings and merge strategies.","educationalLevel":"Beginner","keywords":"gitignore, gitattributes, global gitignore, git ignore patterns","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <span>Workflows</span><span class="separator">›</span>
+          <span class="current">.gitignore &amp; .gitattributes</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔀 Workflows</div>
+          <h1>.gitignore &amp; .gitattributes – Controlling What Git Tracks</h1>
+          <p class="lesson-intro">Not everything in your project folder belongs in Git. Log files, build artifacts, environment secrets, IDE settings, OS-generated files — these should never be committed. <strong>.gitignore</strong> tells Git to completely ignore specified files and patterns. <strong>.gitattributes</strong> controls how Git handles line endings, binary files, and merge strategies. These two files are essential configuration for any professional project.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-gitignore">What Is .gitignore?</h2>
+          <p>A <code>.gitignore</code> file lists patterns. Any file or directory matching a pattern is invisible to Git — it won't appear in <code>git status</code>, won't be staged by <code>git add .</code>, and won't be committed. Place the file in the root of your repository and commit it — everyone who clones your repo gets the same ignore rules.</p>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Never commit .env files or secrets</strong>
+              <p>Environment files containing API keys, database passwords, or OAuth secrets must always be in <code>.gitignore</code>. Once a secret is committed, it's in Git history forever — even if you delete the file later. If you accidentally commit a secret, rotate it immediately and consider the old key compromised.</p>
+            </div>
+          </div>
+
+          <h2 id="pattern-syntax">Pattern Syntax</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">.gitignore</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text"># Comments start with #
+
+# Ignore all .log files anywhere in the project
+*.log
+
+# Ignore a specific directory (trailing slash = directory only)
+node_modules/
+dist/
+build/
+.cache/
+
+# Ignore a specific file
+.env
+.env.local
+.env.production
+
+# Negate a pattern (do NOT ignore this, even if a previous rule matches)
+!important.log
+!src/generated/keep-this.js
+
+# Ignore files in a specific directory
+logs/*.log
+
+# Double-star = match any number of directories
+**/temp/
+**/*.pyc
+
+# Ignore files only in the root directory (leading slash = root-relative)
+/config.local.json
+
+# Ignore all files in any directory named "coverage"
+coverage/</code></pre>
+          </div>
+
+          <h2 id="common-patterns">Common .gitignore Patterns</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">.gitignore (starter template)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text"># Dependencies
+node_modules/
+vendor/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+out/
+.next/
+.nuxt/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# IDE / Editor
+.idea/
+.vscode/settings.json
+*.sublime-project
+*.sublime-workspace
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="nested-gitignore">Nested .gitignore Files</h2>
+          <p>You can have multiple <code>.gitignore</code> files — one in the root and additional ones in subdirectories. A nested <code>.gitignore</code> applies rules only to files in its directory and below:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Directory structure</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">my-project/
+  .gitignore          ← rules for entire project
+  src/
+    .gitignore        ← rules only for src/ and its subdirs
+  tests/
+    .gitignore        ← rules only for tests/ and its subdirs</code></pre>
+          </div>
+
+          <h2 id="already-tracked">What If the File Is Already Tracked?</h2>
+          <p>Adding a file to <code>.gitignore</code> does NOT untrack it if Git is already tracking it. You must explicitly remove it from Git's tracking (without deleting the actual file):</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Untrack a single file (remove from Git index, keep on disk)
+git rm --cached .env
+
+# Untrack an entire directory recursively
+git rm --cached -r node_modules/
+
+# Untrack all files that now match .gitignore (nuclear option)
+git rm --cached -r .
+git add .
+# Now only unignored files are staged
+
+# Commit the change
+git commit -m "chore: remove tracked files that should be ignored"
+
+# Verify it worked
+git ls-files | grep .env  # should return nothing</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Debug why a file is being ignored (or not)</strong>
+              <p><code>git check-ignore -v &lt;file&gt;</code> tells you exactly which line in which <code>.gitignore</code> file is responsible for ignoring a particular path. Invaluable for debugging unexpected behavior.</p>
+            </div>
+          </div>
+
+          <h2 id="gitattributes">.gitattributes</h2>
+          <p><code>.gitattributes</code> gives Git metadata about files. The most important use case is controlling line endings across Windows, macOS, and Linux developers:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">.gitattributes</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text"># Ensure all text files use LF line endings in the repo
+# (converts CRLF → LF on commit, converts back on Windows checkout)
+* text=auto
+
+# Force specific file types to LF
+*.js text eol=lf
+*.ts text eol=lf
+*.jsx text eol=lf
+*.tsx text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.sh text eol=lf
+
+# Mark binary files (prevents Git from mangling them)
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.woff2 binary
+*.pdf binary
+
+# Custom merge strategy for generated files (never conflict, always use ours)
+package-lock.json merge=ours
+yarn.lock merge=ours</code></pre>
+          </div>
+
+          <h2 id="global-gitignore">Global .gitignore</h2>
+          <p>Machine-specific ignores (your IDE, your OS) shouldn't be in the project's <code>.gitignore</code> — that forces your preferences on the whole team. Use a global gitignore for personal machine-level patterns:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Create and configure a global gitignore
+touch ~/.gitignore_global
+git config --global core.excludesFile ~/.gitignore_global
+
+# Add your machine-specific patterns
+echo ".DS_Store" >> ~/.gitignore_global
+echo ".idea/" >> ~/.gitignore_global
+echo "*.swp" >> ~/.gitignore_global
+echo "Thumbs.db" >> ~/.gitignore_global
+
+# Verify the setting
+git config --global core.excludesFile</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Use gitignore.io for project templates</strong>
+              <p>Visit <a href="https://www.toptal.com/developers/gitignore" target="_blank" rel="noopener">gitignore.io</a> (also <code>gitignore.io</code>) and enter your tech stack (e.g., "Node, React, macOS, Windows, VS Code") to get a comprehensive, pre-built <code>.gitignore</code> file. GitHub also provides templates when creating a new repository — select your language to get a starter file.</p>
+            </div>
+          </div>
+
+          <h2 id="deep-gitignore">.gitignore: Keep Junk Out — and the Trap That Confuses Everyone</h2>
+          <p><code>.gitignore</code> lists patterns Git should refuse to track: build output, dependencies, secrets, OS cruft. It keeps your repo clean and stops you leaking an <code>.env</code> file full of API keys.</p>
+          <pre><code class="language-text"># dependencies &amp; build
+node_modules/
+dist/
+*.log
+
+# secrets — never commit these
+.env
+
+# OS / editor noise
+.DS_Store
+.vscode/</code></pre>
+          <h3>The #1 trap: it only ignores <em>untracked</em> files</h3>
+          <p>Add a file to <code>.gitignore</code> <strong>after</strong> Git is already tracking it, and nothing happens — Git keeps tracking it. You must untrack it first:</p>
+          <pre><code class="language-bash"># stop tracking but keep the local file
+git rm --cached .env
+git commit -m "Stop tracking .env"</code></pre>
+          <table>
+            <thead><tr><th>Pattern</th><th>Matches</th></tr></thead>
+            <tbody>
+              <tr><td><code>*.log</code></td><td>any <code>.log</code> file, any folder</td></tr>
+              <tr><td><code>build/</code></td><td>a directory named build</td></tr>
+              <tr><td><code>/secret.txt</code></td><td>only at repo root</td></tr>
+              <tr><td><code>!keep.log</code></td><td>exception — un-ignore this one</td></tr>
+            </tbody>
+          </table>
+          <p>For personal tooling (editor configs) use a <strong>global</strong> ignore via <code>git config --global core.excludesfile</code> so you don't clutter every project's <code>.gitignore</code>.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create a <code>.gitignore</code> file.</li>
+              <li>Ignore a folder such as <code>node_modules/</code>.</li>
+              <li>Ignore a pattern such as <code>*.log</code>.</li>
+              <li>Un-ignore a file with <code>!</code>.</li>
+              <li>Stop tracking an already-committed file.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a <code>.gitignore</code> for a typical project (ignore <code>node_modules/</code>, build output, <code>.env</code>, <code>*.log</code>), then stop tracking a file committed by mistake using <code>git rm --cached</code>. Explain why <code>.gitignore</code> does not affect already-tracked files.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>.gitignore</strong> lists patterns for files Git should never track — always commit this file.</li>
+              <li>Pattern syntax: <code>*.log</code> (wildcard), <code>dir/</code> (directory), <code>!file</code> (negate), <code>**/temp</code> (any depth).</li>
+              <li>Never ignore: <code>node_modules/</code>, <code>.env</code>, <code>dist/</code>, <code>__pycache__/</code>, <code>.DS_Store</code>.</li>
+              <li>Already tracked? Use <strong>git rm --cached &lt;file&gt;</strong> to untrack without deleting.</li>
+              <li>Debug ignore rules: <strong>git check-ignore -v &lt;file&gt;</strong></li>
+              <li><strong>.gitattributes</strong> controls line endings (<code>text=auto</code>, <code>eol=lf</code>) and marks binary files.</li>
+              <li><strong>~/.gitignore_global</strong> for machine-specific ignores — configure with <code>git config --global core.excludesFile</code>.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does a <code>.gitignore</code> file do?</li>
+            <li>Why doesn’t <code>.gitignore</code> remove already-tracked files?</li>
+            <li>How do you ignore a whole directory?</li>
+            <li>How do you un-ignore a file?</li>
+            <li>How do you stop tracking a committed file?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/git/workflows/conventional-commits.html" class="topic-tag git-topic-tag">🔀 Conventional Commits</a>
+            <a href="/git/basics/staging-committing.html" class="topic-tag git-topic-tag">⚙️ Staging &amp; Committing</a>
+            <a href="/git/interview/questions.html" class="topic-tag git-topic-tag">🎯 Interview Questions</a>
+            <a href="/git/projects/version-your-project.html" class="topic-tag git-topic-tag">🛠️ Version Your Project</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">I added a file to .gitignore but git status still shows it. Why? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Because Git is already tracking the file. <code>.gitignore</code> only prevents <em>untracked</em> files from being added. Once a file is tracked (i.e., it has been committed at least once), Git continues tracking it regardless of <code>.gitignore</code>. The fix: run <code>git rm --cached &lt;file&gt;</code> to remove it from the index (without deleting it from disk), then commit the change. The file will then be properly ignored going forward.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should .vscode/ be in .gitignore? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It depends on what's in it. Personal settings like <code>settings.json</code> (themes, font size, personal keybindings) should be in your global gitignore, not the project's. However, project-specific settings like <code>.vscode/launch.json</code> (debug configurations) and <code>.vscode/extensions.json</code> (recommended extensions) can be valuable to share with the team and should be committed. A common approach: <code>.vscode/*</code> in <code>.gitignore</code> with <code>!.vscode/extensions.json</code> and <code>!.vscode/launch.json</code> negation rules.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why is .gitattributes important for cross-platform teams? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Windows uses CRLF (\r\n) line endings, while macOS and Linux use LF (\n). Without <code>.gitattributes</code>, a Windows developer who edits a file changes every line (from LF to CRLF), creating a huge diff even if only one character was logically changed. <code>* text=auto</code> in <code>.gitattributes</code> tells Git to normalize line endings in the repository to LF and convert for checkout based on the OS. This keeps diffs clean and prevents "noise" in pull requests caused purely by line ending differences.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use wildcards to ignore files at any depth? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — use <code>**</code> to match any number of directory levels. For example, <code>**/*.log</code> ignores all <code>.log</code> files anywhere in the project tree, while <code>*.log</code> (without <code>**</code>) at the root of a <code>.gitignore</code> file also ignores them at any depth when placed in the root <code>.gitignore</code>. For directories: <code>**/node_modules/</code> ignores a <code>node_modules</code> directory at any depth — useful in monorepos with nested packages.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/workflows/conventional-commits.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Conventional Commits</span>
+          </a>
+          <a href="/git/workflows/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

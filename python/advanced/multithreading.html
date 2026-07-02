@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Multithreading – threading Module, GIL & Thread Safety | ylearner | ylearner</title>
+  <meta name="description" content="Learn Python multithreading: creating threads, Thread class, daemon threads, the GIL, thread safety with locks, and when to use threads vs multiprocessing.">
+  <meta name="keywords" content="python multithreading, python threading, python thread, python GIL, python thread safety, python lock, python concurrent">
+  <link rel="canonical" href="https://ylearner.org/python/advanced/multithreading.html">
+  <meta property="og:title" content="Python Multithreading – threading Module, GIL & Thread Safety | ylearner">
+  <meta property="og:description" content="Learn Python multithreading: creating threads, Thread class, daemon threads, the GIL, thread safety with locks, and when to use threads vs multiprocessing.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/advanced/multithreading.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Multithreading – threading Module, GIL & Thread Safety | ylearner">
+  <meta name="twitter:description" content="Learn Python multithreading: creating threads, Thread class, daemon threads, the GIL, thread safety with locks, and when to use threads vs multiprocessing.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Multithreading – Concurrent Execution with Threads","description":"Learn Python multithreading: creating threads, Thread class, daemon threads, the GIL, thread safety with locks, and when to use threads vs multiprocessing.","educationalLevel":"Advanced","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/advanced/generators.html">Advanced Python</a><span class="separator">›</span><span class="current">Multithreading</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Advanced Python</div>
+          <h1>Python Multithreading – Concurrent Execution with Threads</h1>
+          <p class="lesson-intro">Multithreading lets your program do multiple things at the same time. Python threads are ideal for I/O-bound tasks: network requests, file operations, database queries. Understanding the GIL (Global Interpreter Lock) helps you choose between threads and processes for different workloads.</p>
+          <div class="lesson-meta"><span>⏱️ 25 min read</span><span>🎯 Advanced</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="basics">Creating Threads</h2>
+          <p>Use <code>threading.Thread</code> to create and start threads.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import threading
+import time
+
+def download(site):
+    print(f"Downloading {site}...")
+    time.sleep(2)   # Simulate network I/O
+    print(f"Done: {site}")
+
+# Without threads: takes 6 seconds
+# With threads: takes ~2 seconds
+threads = []
+for site in ["google.com", "github.com", "python.org"]:
+    t = threading.Thread(target=download, args=(site,))
+    threads.append(t)
+    t.start()
+
+for t in threads:
+    t.join()   # Wait for all to complete
+print("All downloads done")</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Downloading google.com...
+Downloading github.com...
+Downloading python.org...
+Done: google.com
+Done: github.com
+Done: python.org
+All downloads done</div>
+
+          <h2 id="gil">The GIL – Global Interpreter Lock</h2>
+          <p>The GIL prevents multiple threads from executing Python bytecode simultaneously. This means threads DO NOT speed up CPU-bound tasks (computation). They DO help I/O-bound tasks because threads release the GIL while waiting for I/O.</p>
+          <div class="callout callout-warning"><span class="callout-icon">⚠️</span><div class="callout-content"><strong>Note</strong><p>Use threading for I/O-bound tasks (HTTP, files, databases). Use multiprocessing for CPU-bound tasks (calculations, image processing). Using threads for heavy computation will NOT improve performance due to the GIL.</p></div></div>
+
+          <h2 id="safety">Thread Safety – Using Locks</h2>
+          <p>When threads share data, use a Lock to prevent race conditions.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import threading
+
+counter = 0
+lock = threading.Lock()
+
+def increment():
+    global counter
+    for _ in range(100_000):
+        with lock:      # Only one thread at a time
+            counter += 1
+
+threads = [threading.Thread(target=increment) for _ in range(5)]
+for t in threads: t.start()
+for t in threads: t.join()
+
+print(f"Counter: {counter}")  # Always 500000 with lock</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Counter: 500000</div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="concurrent">ThreadPoolExecutor – High-Level API</h2>
+          <p><code>concurrent.futures.ThreadPoolExecutor</code> is the modern, higher-level threading API.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from concurrent.futures import ThreadPoolExecutor
+import time
+
+def fetch(url):
+    time.sleep(1)   # Simulate I/O
+    return f"Data from {url}"
+
+urls = ["api.com/1", "api.com/2", "api.com/3"]
+
+with ThreadPoolExecutor(max_workers=3) as executor:
+    results = list(executor.map(fetch, urls))
+
+for r in results:
+    print(r)</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Data from api.com/1
+Data from api.com/2
+Data from api.com/3</div>
+
+          <h2 id="deep-gil">The GIL: Why Python Threads Don't Speed Up Math</h2>
+          <p>CPython has a <strong>Global Interpreter Lock</strong> — only one thread executes Python bytecode at a time. So threads give you <em>concurrency</em> (overlapping waits) but not <em>parallelism</em> (using multiple cores) for pure-Python computation.</p>
+          <table>
+            <thead><tr><th>Task</th><th>Threads help?</th><th>Why</th></tr></thead>
+            <tbody>
+              <tr><td>Download 100 URLs</td><td>✅ yes</td><td>threads wait on I/O — GIL released during the wait</td></tr>
+              <tr><td>Sum a huge list of numbers</td><td>❌ no</td><td>CPU-bound — GIL serializes it anyway</td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-python">from concurrent.futures import ThreadPoolExecutor
+# I/O-bound → threads shine
+with ThreadPoolExecutor() as pool:
+    pages = list(pool.map(download, urls))
+
+from concurrent.futures import ProcessPoolExecutor
+# CPU-bound → separate processes, each its OWN GIL/core
+with ProcessPoolExecutor() as pool:
+    results = list(pool.map(heavy_math, chunks))</code></pre>
+          <p><strong>The rule of thumb:</strong> I/O-bound → <code>threading</code> or <code>asyncio</code>; CPU-bound → <code>multiprocessing</code> (dodges the GIL by running real separate processes). Also watch shared state: because threads interleave, unguarded shared variables cause race conditions — protect them with a <code>threading.Lock</code>.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Work with threads:</p>
+            <ol>
+              <li>Create and start two <code>Thread</code> objects running the same function, then <code>join()</code> them.</li>
+              <li>Show that a shared counter without a lock can produce wrong results.</li>
+              <li>Fix it using a <code>threading.Lock</code>.</li>
+              <li>Use <code>ThreadPoolExecutor</code> to download (simulate) several URLs concurrently.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Simulate downloading 10 web pages where each “download” sleeps for a second. Run them serially and time it, then run them with a <code>ThreadPoolExecutor</code> and show the dramatic speedup for this I/O-bound work. Add a shared results dictionary protected by a <code>Lock</code> to demonstrate thread-safe updates. Bonus: explain why the same approach would NOT speed up a CPU-bound version (the GIL).</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Threads run within a single process and share memory.</li>
+              <li>The Global Interpreter Lock (GIL) lets only one thread execute Python bytecode at a time.</li>
+              <li>Because of the GIL, threading helps I/O-bound tasks but not CPU-bound ones.</li>
+              <li>Shared mutable state can cause race conditions; protect it with a <code>threading.Lock</code>.</li>
+              <li><code>ThreadPoolExecutor</code> from <code>concurrent.futures</code> offers a clean high-level API.</li>
+              <li>For CPU-bound parallelism, use multiprocessing instead.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Multithreading</h2>
+          <ul class="interview-list">
+            <li>What is a thread and what is multithreading?</li>
+            <li>What is the GIL and how does it affect Python threads?</li>
+            <li>When is threading beneficial in Python despite the GIL?</li>
+            <li>What is a race condition and how do locks prevent it?</li>
+            <li>What is the difference between <code>Lock</code> and <code>RLock</code>?</li>
+            <li>What does <code>ThreadPoolExecutor</code> provide?</li>
+            <li>What is the difference between threading and multiprocessing?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/advanced/multiprocessing.html" class="topic-tag">⚙️ Multiprocessing</a>
+            <a href="/python/advanced/async.html" class="topic-tag">⚡ Async</a>
+            <a href="/python/real-world/web-scraping.html" class="topic-tag">🕸️ Web Scraping</a>
+            <a href="/python/functions/function-basics.html" class="topic-tag">⚙️ Functions</a>
+            <a href="/python/real-world/api-development.html" class="topic-tag">🌐 API Development</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the GIL? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The Global Interpreter Lock is a mutex in CPython that allows only one thread to run Python bytecode at a time. It simplifies memory management but prevents threads from running CPU-bound Python code in true parallel.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">If the GIL exists, is threading useless? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. The GIL is released during blocking I/O (network, disk), so threads still overlap waiting and speed up I/O-bound work significantly. It only limits CPU-bound parallelism, where multiprocessing is the answer.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is a race condition? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It is a bug where the result depends on the unpredictable timing of threads accessing shared data — for example, two threads incrementing the same counter and losing updates. A <code>Lock</code> serializes access to prevent it.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between threading and multiprocessing? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Threads share memory within one process and are limited by the GIL; great for I/O. Processes have separate memory and their own GIL, giving true CPU parallelism at the cost of higher overhead.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/advanced/context-managers.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Context Managers</span></a>
+          <a href="/python/advanced/multiprocessing.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Multiprocessing</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

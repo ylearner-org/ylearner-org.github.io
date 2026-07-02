@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS Slots – Content Projection and Composition | ylearner</title>
+  <meta name="description" content="Master OWL JS slots: default slots, named slots, slots with fallback content, scoped slots with t-set-slot, and real-world layout component patterns for Odoo development.">
+  <meta name="keywords" content="OWL JS slots, OWL content projection, OWL t-slot, OWL named slots, OWL slot default content, OWL scoped slots, Odoo Web Library slots tutorial, OWL JS layout components">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/owljs/advanced/slots.html">
+  <meta property="og:title" content="OWL JS Slots – Content Projection | ylearner">
+  <meta property="og:description" content="OWL JS slots: default and named slots, fallback content, scoped slots, and real-world Modal, Card, and Layout component examples.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/owljs/advanced/slots.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS Slots Complete Guide | ylearner">
+  <meta name="twitter:description" content="t-slot, named slots, scoped slots — complete OWL JS content projection tutorial.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS Slots",
+    "description": "Complete guide to OWL JS slots: default slot, named slots, fallback content, scoped slots with t-set-slot, and real-world layout component patterns.",
+    "educationalLevel": "Intermediate",
+    "keywords": "OWL JS slots, content projection, t-slot, named slots, scoped slots, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/advanced/sub-components.html">Advanced OWL</a><span class="separator">›</span>
+          <span class="current">Slots</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Advanced OWL</div>
+          <h1>OWL JS Slots – Content Projection and Layout Composition</h1>
+          <p class="lesson-intro">Slots allow a parent component to inject its own content into a child component's template. Instead of passing content as a string prop, the parent writes real template markup that the child renders inside a designated <code>t-slot</code> placeholder. This enables powerful layout components — modals, cards, panels, tabs — whose structure is defined by the child but whose content is provided by the caller. Slots are OWL's equivalent of Vue's slots and React's <code>children</code> prop.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 2 of 6</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="default-slot">Default Slot</h2>
+          <p>The default slot is the simplest form. The child uses <code>&lt;t t-slot="default"/&gt;</code> as the injection point. The parent writes content between the child's opening and closing tags.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – default slot</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// ── Child: defines where slot content goes ─────────────────────────
+class Card extends Component {
+  static template = xml`
+    &lt;div class="card"&gt;
+      &lt;div class="card-body"&gt;
+        &lt;!-- Parent content is injected here --&gt;
+        &lt;t t-slot="default"/&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  `;
+}
+
+// ── Parent: provides slot content ──────────────────────────────────
+class App extends Component {
+  static components = { Card };
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;Card&gt;
+        &lt;!-- Everything between &lt;Card&gt;...&lt;/Card&gt; goes into the default slot --&gt;
+        &lt;h2&gt;Welcome!&lt;/h2&gt;
+        &lt;p&gt;This is the card content.&lt;/p&gt;
+        &lt;button&gt;Click me&lt;/button&gt;
+      &lt;/Card&gt;
+    &lt;/div&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <h2 id="named-slots">Named Slots</h2>
+          <p>Named slots allow multiple injection points in the same component. The child defines multiple <code>t-slot="slotName"</code> points; the parent fills each using <code>t-set-slot="slotName"</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – named slots (Modal)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// ── Child: Modal with header, body, footer slots ───────────────────
+class Modal extends Component {
+  static template = xml`
+    &lt;div class="modal-overlay" t-on-click.self="() =&gt; props.onClose()"&gt;
+      &lt;div class="modal" role="dialog" t-att-aria-label="props.title"&gt;
+
+        &lt;div class="modal-header"&gt;
+          &lt;!-- Named slot: header --&gt;
+          &lt;t t-slot="header"&gt;
+            &lt;!-- Fallback content if no header slot provided --&gt;
+            &lt;h2 t-esc="props.title"/&gt;
+          &lt;/t&gt;
+          &lt;button class="modal-close" t-on-click="() =&gt; props.onClose()"&gt;×&lt;/button&gt;
+        &lt;/div&gt;
+
+        &lt;div class="modal-body"&gt;
+          &lt;!-- Default slot: body content --&gt;
+          &lt;t t-slot="default"/&gt;
+        &lt;/div&gt;
+
+        &lt;div class="modal-footer"&gt;
+          &lt;!-- Named slot: footer --&gt;
+          &lt;t t-slot="footer"&gt;
+            &lt;!-- Fallback: simple close button --&gt;
+            &lt;button t-on-click="() =&gt; props.onClose()"&gt;Close&lt;/button&gt;
+          &lt;/t&gt;
+        &lt;/div&gt;
+
+      &lt;/div&gt;
+    &lt;/div&gt;
+  `;
+
+  static props = {
+    title:   { type: String, optional: true },
+    onClose: { type: Function },
+  };
+}
+
+// ── Parent: fills the named slots ──────────────────────────────────
+class ConfirmDialog extends Component {
+  static components = { Modal };
+
+  static template = xml`
+    &lt;Modal onClose.bind="close"&gt;
+
+      &lt;!-- Fill the header slot --&gt;
+      &lt;t t-set-slot="header"&gt;
+        &lt;h2 class="text-danger"&gt;⚠️ Confirm Delete&lt;/h2&gt;
+      &lt;/t&gt;
+
+      &lt;!-- Default slot (body) --&gt;
+      &lt;p&gt;Are you sure you want to delete &lt;strong t-esc="props.itemName"/&gt;?&lt;/p&gt;
+      &lt;p class="text-muted"&gt;This action cannot be undone.&lt;/p&gt;
+
+      &lt;!-- Fill the footer slot --&gt;
+      &lt;t t-set-slot="footer"&gt;
+        &lt;button class="btn-secondary" t-on-click="close"&gt;Cancel&lt;/button&gt;
+        &lt;button class="btn-danger"    t-on-click="confirm"&gt;Delete&lt;/button&gt;
+      &lt;/t&gt;
+
+    &lt;/Modal&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="fallback-content">Slot Fallback Content</h2>
+          <p>Content placed inside <code>&lt;t t-slot="name"&gt;...fallback...&lt;/t&gt;</code> in the child renders only when the parent does not provide content for that slot.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – fallback content</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- In the child template: --&gt;
+&lt;div class="panel"&gt;
+  &lt;div class="panel-header"&gt;
+    &lt;t t-slot="title"&gt;
+      &lt;!-- Shown ONLY when parent does not provide a "title" slot --&gt;
+      &lt;span&gt;Untitled Panel&lt;/span&gt;
+    &lt;/t&gt;
+  &lt;/div&gt;
+  &lt;div class="panel-content"&gt;
+    &lt;t t-slot="default"&gt;
+      &lt;p class="empty-state"&gt;No content provided.&lt;/p&gt;
+    &lt;/t&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+          </div>
+
+          <h2 id="scoped-slots">Scoped Slots – Data from Child to Parent</h2>
+          <p>Scoped slots let the child pass data back to the parent's slot content. The child provides variables when rendering the slot; the parent can use those variables inside its slot template.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – scoped slots</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// ── Child: VirtualList — passes each item + index to slot ──────────
+class VirtualList extends Component {
+  static template = xml`
+    &lt;div class="virtual-list"&gt;
+      &lt;t t-foreach="props.items" t-as="item" t-key="item.id"&gt;
+        &lt;!-- Slot with scope: passes item and item_index to parent --&gt;
+        &lt;t t-slot="item" item="item" index="item_index"/&gt;
+      &lt;/t&gt;
+    &lt;/div&gt;
+  `;
+
+  static props = {
+    items: { type: Array },
+  };
+}
+
+// ── Parent: uses scoped slot variables ─────────────────────────────
+class ProductPage extends Component {
+  static components = { VirtualList };
+
+  static template = xml`
+    &lt;VirtualList items="state.products"&gt;
+      &lt;t t-set-slot="item" t-slot-scope="slotProps"&gt;
+        &lt;!-- slotProps.item and slotProps.index are available here --&gt;
+        &lt;div class="product-row"&gt;
+          &lt;span t-esc="slotProps.index + 1"/&gt;.
+          &lt;strong t-esc="slotProps.item.name"/&gt;
+          &lt;span&gt;$&lt;t t-esc="slotProps.item.price"/&gt;&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/t&gt;
+    &lt;/VirtualList&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <h2 id="real-world-layouts">Real-World Layout Patterns</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – Page layout with slots</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class PageLayout extends Component {
+  static template = xml`
+    &lt;div class="page"&gt;
+      &lt;header class="page-header"&gt;
+        &lt;t t-slot="header"&gt;
+          &lt;h1&gt;Page&lt;/h1&gt;
+        &lt;/t&gt;
+      &lt;/header&gt;
+
+      &lt;div class="page-body"&gt;
+        &lt;aside t-if="hasLeftPanel" class="page-sidebar"&gt;
+          &lt;t t-slot="sidebar"/&gt;
+        &lt;/aside&gt;
+        &lt;main class="page-main"&gt;
+          &lt;t t-slot="default"/&gt;
+        &lt;/main&gt;
+      &lt;/div&gt;
+
+      &lt;footer class="page-footer"&gt;
+        &lt;t t-slot="footer"&gt;
+          &lt;p&gt;© 2026 ylearner&lt;/p&gt;
+        &lt;/t&gt;
+      &lt;/footer&gt;
+    &lt;/div&gt;
+  `;
+
+  // Check if parent provided a sidebar slot
+  get hasLeftPanel() {
+    return !!this.slots.sidebar;
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="deep-slots">Slots: Letting the Parent Inject Content</h2>
+          <p>Props pass <em>data</em> down. <strong>Slots</strong> pass <em>markup</em> down — they let a parent drop arbitrary template content into a hole the child defines. This is how you build reusable wrappers like cards, modals, and layouts that don't know their contents ahead of time.</p>
+          <pre><code class="language-javascript">// Child: Card defines a slot placeholder
+class Card extends Component {
+    static template = xml`
+        &lt;div class="card"&gt;
+            &lt;t t-slot="default"/&gt;     &lt;!-- parent content lands here --&gt;
+        &lt;/div&gt;`;
+}
+
+// Parent: everything between the tags fills the default slot
+xml`&lt;Card&gt;&lt;h2&gt;Title&lt;/h2&gt;&lt;p&gt;Body text&lt;/p&gt;&lt;/Card&gt;`;</code></pre>
+          <h3>Named slots for multiple holes</h3>
+          <pre><code class="language-javascript">// Child template
+xml`&lt;div class="modal"&gt;
+       &lt;header&gt;&lt;t t-slot="title"/&gt;&lt;/header&gt;
+       &lt;main&gt;&lt;t t-slot="default"/&gt;&lt;/main&gt;
+    &lt;/div&gt;`;
+
+// Parent fills each by name
+xml`&lt;Modal&gt;
+       &lt;t t-set-slot="title"&gt;Confirm&lt;/t&gt;
+       Are you sure?
+    &lt;/Modal&gt;`;</code></pre>
+          <p><strong>Why it matters:</strong> without slots, a reusable <code>Card</code> would need a prop for every possible piece of content. Slots invert that — the child owns the <em>structure</em> (borders, spacing), the parent owns the <em>content</em>. Clean separation, infinite reuse.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a <code>Tabs</code> component using named slots:</p>
+            <ol>
+              <li><code>Tabs</code> receives a <code>tabs</code> array prop of <code>{ id, label }</code> and renders tab buttons. State: <code>activeId</code>.</li>
+              <li>For each tab, render a named slot <code>t-slot="[tab.id]"</code> — only show the active tab's slot.</li>
+              <li>In a parent, provide content for each tab: <code>&lt;t t-set-slot="tab1"&gt;...&lt;/t&gt;</code>.</li>
+              <li>Add a scoped slot variant: each tab slot receives an <code>isActive</code> prop from the child so parent content can style itself differently when active.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a reusable <code>Card</code> component that accepts content via a default slot and a named <code>header</code> slot, with fallback content. Explain what slots are (content projection) and how named and scoped slots work.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Default slot: child writes <code>&lt;t t-slot="default"/&gt;</code>; parent provides content between component tags.</li>
+              <li>Named slots: child uses <code>&lt;t t-slot="name"/&gt;</code>; parent fills with <code>&lt;t t-set-slot="name"&gt;...&lt;/t&gt;</code>.</li>
+              <li>Fallback content: body of <code>&lt;t t-slot="name"&gt;fallback&lt;/t&gt;</code> renders when parent provides no content for that slot.</li>
+              <li>Scoped slots: child passes props into the slot with <code>&lt;t t-slot="name" key="value"/&gt;</code>; parent accesses them via <code>t-slot-scope="scope"</code> then <code>scope.key</code>.</li>
+              <li>Check if a slot was provided with <code>this.slots.slotName</code> (truthy when content was given).</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What are slots in OWL?</li>
+            <li>How do you define and use a slot?</li>
+            <li>What are named slots?</li>
+            <li>What is a scoped slot?</li>
+            <li>How do slots enable reusable layout components?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/owljs/advanced/sub-components.html" class="topic-tag owl-topic-tag">🦉 Sub-components</a>
+            <a href="/owljs/advanced/hooks.html" class="topic-tag owl-topic-tag">🦉 Custom Hooks</a>
+            <a href="/owljs/core/props.html" class="topic-tag owl-topic-tag">🦉 Props</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can slot content access parent state? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — slot content is evaluated in the parent's scope, not the child's. The template code you write between the child's tags has access to the parent's <code>state</code>, <code>props</code>, and methods. This is the key feature of slots: the child provides structure (CSS, layout), while the parent provides content with full access to its own data.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How is slots different from passing HTML as a prop? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Props carry data (strings, numbers, objects, functions). Slots carry rendered template fragments — they can include other components, event listeners, reactive expressions, and full OWL template syntax. Passing HTML as a string prop would require <code>t-raw</code> (XSS risk) and loses all reactivity. Slots are the right tool for injecting structured UI.</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/advanced/sub-components.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Sub-components</span>
+          </a>
+          <a href="/owljs/advanced/hooks.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Custom Hooks</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

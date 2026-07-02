@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Date & Time Functions – NOW, DATEDIFF, DATE_FORMAT | ylearner</title>
+  <meta name="description" content="Learn SQL date and time functions: NOW, CURDATE, EXTRACT, DATE_ADD, DATEDIFF, DATE_FORMAT, DATE_TRUNC. Covers MySQL, PostgreSQL, and SQLite with practical examples.">
+  <meta name="keywords" content="SQL date functions, NOW SQL, DATEDIFF SQL, DATE_FORMAT SQL, EXTRACT SQL, DATE_ADD SQL, SQL time functions, SQL tutorial">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/functions/date-functions.html">
+  <meta property="og:title" content="SQL Date & Time Functions – NOW, DATEDIFF, DATE_FORMAT | ylearner">
+  <meta property="og:description" content="Master SQL date and time functions: NOW, EXTRACT, DATE_ADD, DATEDIFF, DATE_FORMAT with cross-dialect examples.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/functions/date-functions.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL Date & Time Functions – NOW, DATEDIFF, DATE_FORMAT | ylearner">
+  <meta name="twitter:description" content="Master SQL date and time functions: NOW, EXTRACT, DATE_ADD, DATEDIFF, DATE_FORMAT with cross-dialect examples.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Date and Time Functions","description":"Learn SQL date functions including NOW, CURDATE, EXTRACT, DATE_ADD, DATEDIFF, DATE_FORMAT, and DATE_TRUNC across MySQL and PostgreSQL.","educationalLevel":"Intermediate","keywords":"SQL date functions, NOW, DATEDIFF, DATE_FORMAT, EXTRACT","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/functions/date-functions.html">Functions</a><span class="separator">›</span>
+          <span class="current">Date & Time Functions</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ SQL Functions</div>
+          <h1>SQL Date &amp; Time Functions – NOW, DATEDIFF, DATE_FORMAT</h1>
+          <p class="lesson-intro">Working with dates is one of the most common SQL tasks — filtering orders from the last 30 days, calculating customer tenure, grouping sales by month, or formatting timestamps for reports. This lesson covers the essential date and time functions with cross-dialect notes for MySQL and PostgreSQL.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="current-datetime">Current Date and Time</h2>
+          <p>SQL provides functions to get the current date and time from the database server — not from the client application. This ensures consistency when multiple applications write to the same database.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Full timestamp (date + time)
+SELECT NOW();               -- '2026-06-08 14:30:00' (MySQL / PostgreSQL)
+SELECT CURRENT_TIMESTAMP;   -- same, ANSI SQL standard
+
+-- Date only
+SELECT CURDATE();           -- '2026-06-08' (MySQL)
+SELECT CURRENT_DATE;        -- '2026-06-08' (ANSI / PostgreSQL)
+
+-- Time only
+SELECT CURTIME();           -- '14:30:00' (MySQL)
+SELECT CURRENT_TIME;        -- '14:30:00' (ANSI)
+
+-- Practical: stamp records on insert
+INSERT INTO audit_log (event, created_at)
+VALUES ('user_login', NOW());
+
+-- Filter records from today
+SELECT * FROM orders
+WHERE DATE(created_at) = CURDATE();</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Store dates in UTC</strong>
+              <p>Always store timestamps in UTC in the database. Use <code>UTC_TIMESTAMP()</code> (MySQL) or <code>NOW() AT TIME ZONE 'UTC'</code> (PostgreSQL) when inserting. Convert to local time zones only for display purposes. This avoids daylight saving time bugs and makes cross-timezone queries consistent.</p>
+            </div>
+          </div>
+
+          <h2 id="extract">EXTRACT()</h2>
+          <p><code>EXTRACT(part FROM date)</code> pulls out a specific component of a date. It is ANSI SQL and works in both MySQL and PostgreSQL.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT EXTRACT(YEAR  FROM '2026-06-08');   -- 2026
+SELECT EXTRACT(MONTH FROM '2026-06-08');   -- 6
+SELECT EXTRACT(DAY   FROM '2026-06-08');   -- 8
+SELECT EXTRACT(HOUR  FROM NOW());          -- current hour
+SELECT EXTRACT(DOW   FROM NOW());          -- day of week (PostgreSQL: 0=Sunday)
+
+-- MySQL shortcuts (non-standard but common)
+SELECT YEAR(order_date), MONTH(order_date), DAY(order_date)
+FROM orders;
+
+-- Group sales by month and year
+SELECT
+  EXTRACT(YEAR  FROM order_date) AS yr,
+  EXTRACT(MONTH FROM order_date) AS mo,
+  SUM(total_amount)              AS monthly_revenue
+FROM orders
+GROUP BY yr, mo
+ORDER BY yr, mo;</code></pre>
+          </div>
+
+          <h2 id="date-arithmetic">Date Arithmetic</h2>
+          <p>Add or subtract time intervals from dates using <code>DATE_ADD</code> / <code>DATE_SUB</code> (MySQL) or the <code>INTERVAL</code> keyword (PostgreSQL).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- MySQL
+SELECT DATE_ADD('2026-06-08', INTERVAL 30 DAY);    -- '2026-07-08'
+SELECT DATE_ADD(NOW(), INTERVAL 1 MONTH);           -- one month from now
+SELECT DATE_SUB(NOW(), INTERVAL 7 DAY);             -- 7 days ago
+
+-- PostgreSQL
+SELECT '2026-06-08'::date + INTERVAL '30 days';
+SELECT NOW() - INTERVAL '7 days';
+
+-- ANSI (works in many databases)
+SELECT CURRENT_DATE + INTERVAL '30' DAY;
+
+-- Practical: find orders placed in the last 30 days
+SELECT order_id, customer_id, order_date
+FROM orders
+WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY);
+
+-- Find subscriptions expiring within the next 7 days
+SELECT subscription_id, user_id, expires_at
+FROM subscriptions
+WHERE expires_at BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 7 DAY);</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="date-formatting">Date Formatting</h2>
+          <p>Format dates as strings for display or reporting. MySQL uses <code>DATE_FORMAT()</code>; PostgreSQL uses <code>TO_CHAR()</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- MySQL: DATE_FORMAT(date, format_string)
+SELECT DATE_FORMAT(NOW(), '%Y-%m-%d');         -- '2026-06-08'
+SELECT DATE_FORMAT(NOW(), '%d/%m/%Y');         -- '08/06/2026'
+SELECT DATE_FORMAT(NOW(), '%M %d, %Y');        -- 'June 08, 2026'
+SELECT DATE_FORMAT(NOW(), '%W');               -- 'Monday' (day name)
+SELECT DATE_FORMAT(NOW(), '%H:%i:%s');         -- '14:30:00'
+
+-- PostgreSQL: TO_CHAR(date, format_string)
+SELECT TO_CHAR(NOW(), 'YYYY-MM-DD');           -- '2026-06-08'
+SELECT TO_CHAR(NOW(), 'DD/MM/YYYY');           -- '08/06/2026'
+SELECT TO_CHAR(NOW(), 'Month DD, YYYY');       -- 'June      08, 2026'
+SELECT TO_CHAR(NOW(), 'HH24:MI:SS');           -- '14:30:00'
+
+-- Convert string to date
+SELECT STR_TO_DATE('08/06/2026', '%d/%m/%Y');  -- MySQL: '2026-06-08'
+SELECT TO_DATE('08/06/2026', 'DD/MM/YYYY');    -- PostgreSQL</code></pre>
+          </div>
+
+          <h2 id="datediff">DATEDIFF()</h2>
+          <p>Calculate the number of days between two dates.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- MySQL: DATEDIFF(date1, date2) → date1 minus date2 in days
+SELECT DATEDIFF('2026-07-08', '2026-06-08');   -- 30
+SELECT DATEDIFF(NOW(), '2025-01-01');           -- days since 2025-01-01
+
+-- PostgreSQL: subtract dates directly
+SELECT '2026-07-08'::date - '2026-06-08'::date;  -- 30 (integer)
+SELECT NOW()::date - '2025-01-01'::date;          -- days since
+
+-- Calculate customer tenure in days
+SELECT
+  customer_id,
+  DATEDIFF(CURDATE(), created_at) AS days_as_customer
+FROM customers
+ORDER BY days_as_customer DESC;
+
+-- Find how many days until a subscription expires
+SELECT
+  subscription_id,
+  DATEDIFF(expires_at, CURDATE()) AS days_remaining
+FROM subscriptions
+WHERE expires_at > CURDATE();</code></pre>
+          </div>
+
+          <h2 id="date-trunc">DATE_TRUNC() (PostgreSQL)</h2>
+          <p><code>DATE_TRUNC(precision, timestamp)</code> truncates a timestamp to the given precision. This is a PostgreSQL-specific function invaluable for grouping data by week, month, quarter, or year.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- PostgreSQL DATE_TRUNC
+SELECT DATE_TRUNC('month', NOW());   -- '2026-06-01 00:00:00'
+SELECT DATE_TRUNC('year',  NOW());   -- '2026-01-01 00:00:00'
+SELECT DATE_TRUNC('week',  NOW());   -- start of current week (Monday)
+SELECT DATE_TRUNC('day',   NOW());   -- today at midnight
+
+-- Group revenue by month (PostgreSQL)
+SELECT
+  DATE_TRUNC('month', order_date) AS month_start,
+  SUM(total_amount)               AS monthly_revenue
+FROM orders
+GROUP BY month_start
+ORDER BY month_start;
+
+-- MySQL equivalent: use DATE_FORMAT to group by month
+SELECT
+  DATE_FORMAT(order_date, '%Y-%m-01') AS month_start,
+  SUM(total_amount)                   AS monthly_revenue
+FROM orders
+GROUP BY month_start
+ORDER BY month_start;</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-datefn">Date Functions: Filtering and Bucketing by Time</h2>
+          <p>Dates power most real reports ("this month's sales", "users older than 30 days"). SQL gives you the current time, ways to pull out parts, and date arithmetic.</p>
+          <pre><code class="language-sql">SELECT NOW();                         -- current timestamp
+SELECT CURRENT_DATE;                  -- today's date
+SELECT EXTRACT(YEAR FROM order_date); -- pull out year / month / day
+SELECT order_date + INTERVAL '7 days';-- date arithmetic
+SELECT DATE_TRUNC('month', order_date); -- bucket to start of month</code></pre>
+          <table>
+            <thead><tr><th>Need</th><th>Tool</th></tr></thead>
+            <tbody>
+              <tr><td>Part of a date</td><td><code>EXTRACT(part FROM d)</code></td></tr>
+              <tr><td>Add/subtract time</td><td><code>d + INTERVAL '1 month'</code></td></tr>
+              <tr><td>Group by month/day</td><td><code>DATE_TRUNC('month', d)</code></td></tr>
+              <tr><td>Difference</td><td><code>AGE(a, b)</code> / <code>a - b</code></td></tr>
+            </tbody>
+          </table>
+          <p><strong>The performance trap:</strong> wrapping the column in a function kills index use — <code>WHERE EXTRACT(YEAR FROM order_date) = 2026</code> scans the whole table. Use a <em>range</em> instead so the index works: <code>WHERE order_date &gt;= '2026-01-01' AND order_date &lt; '2027-01-01'</code>. <strong>Timezones:</strong> store timestamps in UTC (<code>timestamptz</code>) and convert for display — mixing local times across servers is a classic source of off-by-hours bugs. Exact names differ by database, but every engine has these capabilities.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Get the current date and time.</li>
+              <li>Extract the year, month, and day.</li>
+              <li>Add an interval to a date.</li>
+              <li>Compute the difference between two dates.</li>
+              <li>Format a date for display.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>On an <code>orders</code> table, find orders from the current month, compute each order’s age in days, and extract the order year. Explain why date functions vary across databases and the value of storing dates in a proper DATE/TIMESTAMP type.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>NOW() / CURRENT_TIMESTAMP</strong> — Current date and time from the server.</li>
+              <li><strong>CURDATE() / CURRENT_DATE</strong> — Today's date (no time).</li>
+              <li><strong>EXTRACT(part FROM date)</strong> — Pull out year, month, day, hour, etc. ANSI standard.</li>
+              <li><strong>DATE_ADD(date, INTERVAL n unit)</strong> — Add time to a date. MySQL. PostgreSQL uses <code>+ INTERVAL</code>.</li>
+              <li><strong>DATEDIFF(d1, d2)</strong> — Days between two dates (MySQL). PostgreSQL: <code>d1 - d2</code>.</li>
+              <li><strong>DATE_FORMAT() / TO_CHAR()</strong> — Format a date as a string. MySQL / PostgreSQL respectively.</li>
+              <li><strong>DATE_TRUNC(precision, ts)</strong> — Truncate to month/week/year. PostgreSQL only.</li>
+              <li><strong>Best practice</strong> — Store all timestamps in UTC. Convert to local time for display only.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you get the current date and time?</li>
+            <li>How do you extract parts of a date?</li>
+            <li>How do you add or subtract time intervals?</li>
+            <li>How do you compute the difference between two dates?</li>
+            <li>Why store dates as DATE/TIMESTAMP instead of text?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/functions/numeric-functions.html" class="topic-tag sql-topic-tag">🗄️ Numeric Functions</a>
+            <a href="/sql/functions/aggregate-functions.html" class="topic-tag sql-topic-tag">🗄️ Aggregate Functions</a>
+            <a href="/sql/functions/null-functions.html" class="topic-tag sql-topic-tag">🗄️ NULL Handling</a>
+            <a href="/sql/grouping/group-by.html" class="topic-tag sql-topic-tag">🗄️ GROUP BY</a>
+            <a href="/sql/filtering/where-clause.html" class="topic-tag sql-topic-tag">🗄️ WHERE Clause</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between NOW() and CURDATE()?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>NOW()</code> returns both the date and time (e.g. <code>2026-06-08 14:30:00</code>). <code>CURDATE()</code> returns only the date (e.g. <code>2026-06-08</code>). When filtering records for "today", prefer comparing with <code>CURDATE()</code> or wrapping with <code>DATE()</code> to avoid time component issues: <code>WHERE DATE(created_at) = CURDATE()</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I calculate the number of months between two dates?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>MySQL provides <code>TIMESTAMPDIFF(MONTH, start_date, end_date)</code>. PostgreSQL: <code>EXTRACT(YEAR FROM AGE(end_date, start_date)) * 12 + EXTRACT(MONTH FROM AGE(end_date, start_date))</code>. For approximate months, <code>DATEDIFF(end, start) / 30.0</code> works across databases but is imprecise.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why should I store dates in UTC?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Storing dates in UTC prevents bugs caused by daylight saving time transitions, avoids ambiguity when servers are in different timezones, and makes it straightforward to convert to any local timezone at query time. Once you store in local time, correcting it later is painful and risky.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I filter records from the current month?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>MySQL: <code>WHERE YEAR(order_date) = YEAR(CURDATE()) AND MONTH(order_date) = MONTH(CURDATE())</code>. PostgreSQL: <code>WHERE DATE_TRUNC('month', order_date) = DATE_TRUNC('month', CURRENT_DATE)</code>. An even simpler approach that works in both: <code>WHERE order_date >= DATE_FORMAT(CURDATE(), '%Y-%m-01')</code> (MySQL) or <code>WHERE order_date &gt;= DATE_TRUNC('month', CURRENT_DATE)</code> (PostgreSQL).</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/functions/numeric-functions.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Numeric Functions</span>
+          </a>
+          <a href="/sql/functions/aggregate-functions.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Aggregate Functions</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

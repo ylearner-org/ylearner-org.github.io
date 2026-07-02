@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Generators – yield, Generator Expressions &amp; Lazy Evaluation | ylearner</title>
+  <meta name="description" content="Master Python generators: learn the yield keyword, generator functions, generator expressions, lazy evaluation, infinite sequences, and real-world data pipeline use cases.">
+  <meta name="keywords" content="python generators, yield keyword, generator expressions, lazy evaluation, python itertools, infinite sequences, python generator tutorial">
+  <link rel="canonical" href="https://ylearner.org/python/advanced/generators.html">
+  <meta property="og:title" content="Python Generators – yield, Generator Expressions &amp; Lazy Evaluation | ylearner">
+  <meta property="og:description" content="Master Python generators: learn the yield keyword, generator functions, generator expressions, lazy evaluation, infinite sequences, and real-world data pipeline use cases.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/advanced/generators.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Generators – yield, Generator Expressions &amp; Lazy Evaluation | ylearner">
+  <meta name="twitter:description" content="Master Python generators: learn the yield keyword, generator functions, generator expressions, lazy evaluation, infinite sequences, and real-world data pipeline use cases.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/advanced/">Advanced Python</a><span class="separator">›</span>
+          <span class="current">Generators</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Advanced Python</div>
+          <h1>Python Generators – yield, Generator Expressions &amp; Lazy Evaluation</h1>
+          <p class="lesson-intro">Generators are one of Python's most powerful and memory-efficient features. Instead of building an entire list in memory, a generator <em>produces values on demand</em> — one at a time, only when asked. This "lazy evaluation" model makes generators indispensable for processing large files, infinite sequences, and high-performance data pipelines. In this lesson you will master generators from the ground up.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="what-are-generators">What Are Generators?</h2>
+          <p>A <strong>generator</strong> is a special kind of iterator that <em>generates</em> values lazily. "Lazily" means it computes the next value only when you request it, rather than computing all values upfront and storing them in memory.</p>
+
+          <p>Consider the difference between these two approaches to producing one million numbers:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import sys
+
+# ❌ List — builds ALL 1,000,000 numbers in memory immediately
+big_list = [x * 2 for x in range(1_000_000)]
+print(f"List size: {sys.getsizeof(big_list):,} bytes")  # ~8,000,056 bytes (~8 MB)
+
+# ✅ Generator — holds virtually no data; computes on demand
+big_gen = (x * 2 for x in range(1_000_000))
+print(f"Generator size: {sys.getsizeof(big_gen):,} bytes")  # 104 bytes</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+List size: 8,448,728 bytes
+Generator size: 104 bytes
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>The Core Idea</strong>
+              <p>A generator is like a recipe, not a finished meal. The recipe describes <em>how</em> to produce a value, but no food is made until someone actually asks for it.</p>
+            </div>
+          </div>
+
+          <h2 id="yield-vs-return">yield vs return</h2>
+          <p>The <code>yield</code> keyword is what turns a regular function into a generator function. The difference between <code>return</code> and <code>yield</code> is fundamental:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Feature</th><th><code>return</code></th><th><code>yield</code></th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Produces</td><td>One value, then exits</td><td>One value, then <em>pauses</em></td></tr>
+                <tr><td>Function state</td><td>Destroyed after return</td><td>Preserved (local vars kept)</td></tr>
+                <tr><td>Resumable</td><td>No</td><td>Yes — resumes from yield point</td></tr>
+                <tr><td>Returns type</td><td>The value itself</td><td>A generator object</td></tr>
+                <tr><td>Memory</td><td>All values at once</td><td>One value at a time</td></tr>
+                <tr><td>Iteration</td><td>Must build full list first</td><td>Lazily evaluated</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Regular function with return — builds entire list
+def count_up_list(n):
+    result = []
+    for i in range(n):
+        result.append(i)
+    return result  # returns ALL at once
+
+# Generator function with yield — produces one at a time
+def count_up_gen(n):
+    for i in range(n):
+        yield i  # pauses here, returns i, resumes next call
+
+# Using them
+normal = count_up_list(5)
+print(type(normal))  # &lt;class 'list'&gt;
+print(normal)        # [0, 1, 2, 3, 4]
+
+gen = count_up_gen(5)
+print(type(gen))     # &lt;class 'generator'&gt;
+print(gen)           # &lt;generator object count_up_gen at 0x...></code></pre>
+          </div>
+
+          <h2 id="generator-functions">Generator Functions in Depth</h2>
+          <p>Any function containing at least one <code>yield</code> statement is a generator function. Calling it does <strong>not</strong> execute the body — it returns a generator object. The body runs only when you iterate over that object.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def my_generator():
+    print("-- Step 1: Before first yield --")
+    yield 10
+    print("-- Step 2: Between yields --")
+    yield 20
+    print("-- Step 3: Before last yield --")
+    yield 30
+    print("-- Step 4: Generator exhausted --")
+
+gen = my_generator()          # Nothing printed yet!
+print("Generator created")
+
+value = next(gen)             # Runs until first yield
+print(f"Got: {value}")
+
+value = next(gen)             # Resumes from after first yield
+print(f"Got: {value}")
+
+value = next(gen)             # Resumes from after second yield
+print(f"Got: {value}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Generator created
+-- Step 1: Before first yield --
+Got: 10
+-- Step 2: Between yields --
+Got: 20
+-- Step 3: Before last yield --
+Got: 30
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Execution Pauses at yield</strong>
+              <p>Each time <code>yield</code> is hit, the function freezes in place — local variables, loop counters, everything — until <code>next()</code> is called again. This is the magic of generators.</p>
+            </div>
+          </div>
+
+          <h2 id="next-and-stopiteration">next() and StopIteration</h2>
+          <p>The built-in <code>next()</code> function advances a generator by one step. When the generator function returns (or falls off the end), Python raises a <code>StopIteration</code> exception to signal exhaustion.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def three_values():
+    yield "a"
+    yield "b"
+    yield "c"
+
+gen = three_values()
+
+print(next(gen))   # a
+print(next(gen))   # b
+print(next(gen))   # c
+
+try:
+    print(next(gen))  # Generator is exhausted
+except StopIteration:
+    print("Generator exhausted — no more values!")
+
+# Provide a default to avoid the exception
+gen2 = three_values()
+print(next(gen2, "default"))  # a
+print(next(gen2, "default"))  # b
+print(next(gen2, "default"))  # c
+print(next(gen2, "default"))  # default  (no exception)</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+a
+b
+c
+Generator exhausted — no more values!
+a
+b
+c
+default
+          </div>
+
+          <p>In practice, you rarely call <code>next()</code> directly. A <code>for</code> loop calls it automatically and catches <code>StopIteration</code> for you:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def squares(n):
+    for i in range(1, n + 1):
+        yield i ** 2
+
+# for loop handles next() and StopIteration automatically
+for sq in squares(5):
+    print(sq, end=" ")  # 1 4 9 16 25</code></pre>
+          </div>
+
+          <h2 id="generator-expressions">Generator Expressions</h2>
+          <p>Just as list comprehensions create lists, <strong>generator expressions</strong> create generators using a similar syntax — but with parentheses instead of square brackets. They are the fastest way to write a simple generator.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># List comprehension — eagerly builds the full list
+squares_list = [x**2 for x in range(10)]
+
+# Generator expression — lazy, computes on demand
+squares_gen = (x**2 for x in range(10))
+
+print(type(squares_list))  # &lt;class 'list'&gt;
+print(type(squares_gen))   # &lt;class 'generator'&gt;
+
+# Consume the generator
+print(list(squares_gen))   # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+
+# Generator expressions work directly in function calls
+total = sum(x**2 for x in range(10))   # No extra parentheses needed
+print(total)  # 285
+
+# Filtering with a condition
+evens = (x for x in range(20) if x % 2 == 0)
+print(list(evens))  # [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="infinite-generators">Infinite Generators</h2>
+          <p>One of the most compelling uses of generators is producing <strong>infinite sequences</strong>. Because values are computed on demand, you can define a generator that never ends — and simply stop iterating when you have enough values.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def integers_from(start=0):
+    """Infinite counter starting from `start`."""
+    n = start
+    while True:         # This loop never ends!
+        yield n
+        n += 1
+
+def fibonacci():
+    """Infinite Fibonacci sequence."""
+    a, b = 0, 1
+    while True:
+        yield a
+        a, b = b, a + b
+
+# Take only the first 10 integers from 5
+counter = integers_from(5)
+first_ten = [next(counter) for _ in range(10)]
+print(first_ten)  # [5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+
+# First 10 Fibonacci numbers
+fib = fibonacci()
+fib_list = [next(fib) for _ in range(10)]
+print(fib_list)  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+
+# Use itertools.islice to slice infinite generators
+from itertools import islice
+primes_of_fib = list(islice(fibonacci(), 15))
+print(primes_of_fib)  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377]</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Never call list() on an infinite generator</strong>
+              <p>Doing <code>list(fibonacci())</code> will run forever (or until your RAM is exhausted). Always use <code>islice()</code>, a limited loop, or a <code>break</code> condition when consuming infinite generators.</p>
+            </div>
+          </div>
+
+          <h2 id="memory-efficiency">Memory Efficiency – Why It Matters</h2>
+          <p>The real power of generators shows up when processing large datasets. Here is a concrete comparison of reading a large log file:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import tracemalloc
+
+# ❌ Memory-hungry approach — loads ENTIRE file into RAM
+def read_errors_list(filepath):
+    with open(filepath) as f:
+        lines = f.readlines()          # All lines in memory at once
+    return [line for line in lines if "ERROR" in line]
+
+# ✅ Generator approach — processes one line at a time
+def read_errors_gen(filepath):
+    with open(filepath) as f:
+        for line in f:                 # Python iterates lines lazily
+            if "ERROR" in line:
+                yield line.strip()
+
+# Measure memory for each
+tracemalloc.start()
+errors = read_errors_list("server.log")   # hypothetical 500 MB log
+current, peak = tracemalloc.get_traced_memory()
+print(f"List peak memory: {peak / 1024 / 1024:.1f} MB")  # ~500 MB
+tracemalloc.stop()
+
+tracemalloc.start()
+for error in read_errors_gen("server.log"):
+    pass  # process one line at a time
+current, peak = tracemalloc.get_traced_memory()
+print(f"Generator peak memory: {peak / 1024:.1f} KB")    # ~a few KB
+tracemalloc.stop()</code></pre>
+          </div>
+
+          <h2 id="real-world-large-files">Real-World Use Case: Processing Large Files</h2>
+          <p>Generators are the standard way to process CSV, JSON-lines, or log files that are too large to fit in memory:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import csv
+
+def csv_reader(filepath):
+    """Yield one row at a time from a CSV file."""
+    with open(filepath, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            yield row
+
+def filter_rows(rows, key, value):
+    """Yield only rows where row[key] == value."""
+    for row in rows:
+        if row[key] == value:
+            yield row
+
+def transform_rows(rows):
+    """Yield rows with additional computed fields."""
+    for row in rows:
+        row["full_name"] = f"{row['first_name']} {row['last_name']}"
+        yield row
+
+# Build a pipeline — nothing runs until you iterate!
+pipeline = transform_rows(
+    filter_rows(
+        csv_reader("users.csv"),
+        key="country",
+        value="US"
+    )
+)
+
+# Process without ever loading the whole file
+for user in pipeline:
+    print(user["full_name"])</code></pre>
+          </div>
+
+          <h2 id="data-pipelines">Data Pipelines with Generators</h2>
+          <p>Generators compose naturally into <strong>processing pipelines</strong> — each stage reads from the previous generator without buffering intermediate results. This is the generator equivalent of Unix pipes.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def source(data):
+    """Stage 1: produce items."""
+    for item in data:
+        yield item
+
+def double(items):
+    """Stage 2: transform each item."""
+    for item in items:
+        yield item * 2
+
+def only_above(items, threshold):
+    """Stage 3: filter items."""
+    for item in items:
+        if item > threshold:
+            yield item
+
+def batch(items, size):
+    """Stage 4: group items into batches."""
+    batch_list = []
+    for item in items:
+        batch_list.append(item)
+        if len(batch_list) == size:
+            yield batch_list
+            batch_list = []
+    if batch_list:
+        yield batch_list  # yield remaining items
+
+# Wire up the pipeline
+numbers = range(1, 21)
+pipeline = batch(only_above(double(source(numbers)), threshold=20), size=3)
+
+for chunk in pipeline:
+    print(chunk)
+
+# Output:
+# [22, 24, 26]
+# [28, 30, 32]
+# [34, 36, 38]
+# [40]</code></pre>
+          </div>
+
+          <h2 id="send-and-close">Advanced: send() and close()</h2>
+          <p>Generators also support <strong>two-way communication</strong>. The <code>send()</code> method resumes the generator <em>and</em> passes a value back in, which becomes the result of the <code>yield</code> expression. The <code>close()</code> method throws a <code>GeneratorExit</code> exception into the generator to shut it down cleanly.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def accumulator():
+    """Running total that accepts new values via send()."""
+    total = 0
+    while True:
+        value = yield total   # yield current total, receive next value
+        if value is None:
+            break
+        total += value
+
+acc = accumulator()
+next(acc)         # Prime the generator (advance to first yield)
+
+print(acc.send(10))   # 10
+print(acc.send(25))   # 35
+print(acc.send(5))    # 40
+acc.close()           # Clean shutdown</code></pre>
+          </div>
+
+          <h2 id="itertools">itertools – The Generator Toolkit</h2>
+          <p>The <code>itertools</code> module is Python's standard library of generator-based tools. They are all lazy and composable:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from itertools import (
+    islice, chain, count, cycle, repeat,
+    takewhile, dropwhile, groupby, accumulate
+)
+
+# islice — slice any iterable lazily
+first_5 = list(islice(count(100), 5))
+print(first_5)   # [100, 101, 102, 103, 104]
+
+# chain — concatenate iterables without copying
+combined = list(chain([1, 2], [3, 4], [5, 6]))
+print(combined)  # [1, 2, 3, 4, 5, 6]
+
+# cycle — repeat an iterable forever
+colors = cycle(["red", "green", "blue"])
+palette = [next(colors) for _ in range(7)]
+print(palette)   # ['red', 'green', 'blue', 'red', 'green', 'blue', 'red']
+
+# takewhile / dropwhile — conditional slicing
+nums = count(0)
+small = list(takewhile(lambda x: x < 5, nums))
+print(small)     # [0, 1, 2, 3, 4]
+
+# accumulate — running totals
+data = [1, 2, 3, 4, 5]
+running_sum = list(accumulate(data))
+print(running_sum)  # [1, 3, 6, 10, 15]
+
+# groupby — group consecutive elements
+words = ["apple", "avocado", "banana", "blueberry", "cherry"]
+for letter, group in groupby(words, key=lambda w: w[0]):
+    print(f"{letter}: {list(group)}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+a: ['apple', 'avocado']
+b: ['banana', 'blueberry']
+c: ['cherry']
+          </div>
+
+          <h2 id="yield-from">yield from — Delegating to Sub-generators</h2>
+          <p>Python 3.3 introduced <code>yield from</code> to cleanly delegate to another iterable or generator, avoiding a manual inner loop:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def flatten(nested):
+    """Flatten arbitrarily nested lists using yield from."""
+    for item in nested:
+        if isinstance(item, list):
+            yield from flatten(item)   # delegate to recursive call
+        else:
+            yield item
+
+data = [1, [2, 3], [4, [5, 6]], 7, [8, [9, [10]]]]
+print(list(flatten(data)))
+# [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+# yield from with any iterable
+def chained_ranges():
+    yield from range(1, 4)   # 1, 2, 3
+    yield from range(10, 13) # 10, 11, 12
+    yield from ["a", "b"]    # a, b
+
+print(list(chained_ranges()))
+# [1, 2, 3, 10, 11, 12, 'a', 'b']</code></pre>
+          </div>
+
+          <h2 id="deep-gen">Lazy Evaluation: Why Generators Save Memory</h2>
+          <p>A list builds every element up front and holds them all in RAM. A generator produces one value at a time, on demand, remembering only where it paused. For big or infinite streams that's the difference between running and crashing.</p>
+          <table>
+            <thead><tr><th></th><th>List <code>[x for x in ...]</code></th><th>Generator <code>(x for x in ...)</code></th></tr></thead>
+            <tbody>
+              <tr><td>Memory</td><td>All items at once</td><td>One item at a time</td></tr>
+              <tr><td>Reusable</td><td>Yes, iterate many times</td><td>No — exhausted after one pass</td></tr>
+              <tr><td>Infinite data</td><td>Impossible</td><td>Fine (<code>while True: yield</code>)</td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-python">def read_big(path):
+    with open(path) as f:
+        for line in f:      # yields lazily — file never fully loaded
+            yield line.strip()
+
+# sum a billion numbers using ~no memory
+total = sum(n for n in range(1_000_000_000))</code></pre>
+          <p><strong>The exhaustion gotcha:</strong> a generator runs once. After the first full loop it's empty — looping again yields nothing, no error. Need the data twice? Materialize with <code>list(gen)</code> first.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercises</h3>
+            <ol>
+              <li>Write a generator <code>primes()</code> that yields prime numbers indefinitely. Use it to get the first 20 primes.</li>
+              <li>Create a generator <code>read_in_chunks(filepath, chunk_size)</code> that yields chunks of <code>chunk_size</code> bytes from a file without loading the whole file.</li>
+              <li>Build a pipeline: generate integers 1–100, keep only those divisible by 3, square each one, and sum the results using <code>sum()</code> with a generator expression.</li>
+              <li>Rewrite Python's built-in <code>enumerate()</code> as a generator function.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge: Log Analysis Pipeline</h3>
+            <p>Build a complete log-analysis pipeline using generators only (no lists). Given a large log file with lines like <code>"2024-01-15 ERROR: disk full"</code>: (1) yield lines lazily, (2) parse each line into a dict with keys <code>date</code>, <code>level</code>, <code>message</code>, (3) filter only <code>ERROR</code> lines, (4) group by date using <code>itertools.groupby</code>, and (5) count errors per day. No intermediate list should be created at any stage.</p>
+          </div>
+
+          <h2 id="generator-vs-iterator">Generator vs Iterator vs Iterable</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Term</th><th>Definition</th><th>Example</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Iterable</strong></td><td>Any object you can loop over (has <code>__iter__</code>)</td><td>list, str, dict, range</td></tr>
+                <tr><td><strong>Iterator</strong></td><td>Object with <code>__iter__</code> and <code>__next__</code></td><td>file object, zip object</td></tr>
+                <tr><td><strong>Generator</strong></td><td>An iterator created by a generator function or expression</td><td><code>(x for x in ...)</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>All generators are iterators, and all iterators are iterables. A generator is just the most convenient way to create a custom iterator in Python.</p>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A generator produces values one at a time using <code>yield</code>, pausing execution between each value.</li>
+              <li><code>yield</code> differs from <code>return</code> in that it preserves function state and can be resumed.</li>
+              <li>Call a generator function to get a generator object; advance it with <code>next()</code> or a <code>for</code> loop.</li>
+              <li>When exhausted, generators raise <code>StopIteration</code>; the second argument to <code>next()</code> provides a default.</li>
+              <li>Generator expressions use <code>( )</code> instead of <code>[ ]</code> and are lazy equivalents of list comprehensions.</li>
+              <li>Infinite generators are safe because values are only computed when requested.</li>
+              <li>Generators are ideal for large file processing, infinite sequences, and data pipelines.</li>
+              <li><code>yield from</code> delegates to a sub-iterable cleanly without a manual inner loop.</li>
+              <li>The <code>itertools</code> module provides a rich library of composable generator utilities.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between <code>yield</code> and <code>return</code> in a generator function?</li>
+            <li>What is lazy evaluation and how do generators implement it?</li>
+            <li>What exception does a generator raise when it is exhausted?</li>
+            <li>How do generator expressions differ from list comprehensions syntactically and in behaviour?</li>
+            <li>When would you choose a generator over a list?</li>
+            <li>What does <code>yield from</code> do and when is it useful?</li>
+            <li>How do you send data <em>into</em> a generator?</li>
+            <li>Name three functions from <code>itertools</code> and explain their use.</li>
+            <li>Can a generator be reused after it is exhausted?</li>
+            <li>What happens to local variables when a generator is paused at a <code>yield</code>?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/advanced/iterators.html" class="topic-tag">🔄 Iterators</a>
+            <a href="/python/advanced/decorators.html" class="topic-tag">✨ Decorators</a>
+            <a href="/python/advanced/context-managers.html" class="topic-tag">📦 Context Managers</a>
+            <a href="/python/functions/closures.html" class="topic-tag">🔒 Closures</a>
+            <a href="/python/data-science/pandas.html" class="topic-tag">📊 Pandas</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I iterate over a generator more than once? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Once a generator is exhausted it stays empty — calling <code>next()</code> again just raises <code>StopIteration</code>. To iterate again, you must create a new generator by calling the generator function again.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is a generator expression always better than a list comprehension? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not always. If you need to iterate over the results multiple times, or use indexing, a list is better. Use a generator when you process each item exactly once and especially when memory matters.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between a generator and a coroutine? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Generators produce values (data flows out). Coroutines consume values (data flows in via <code>send()</code>). In modern Python, <code>async def</code> coroutines are preferred for async I/O, while generators remain the standard tool for lazy iteration.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I convert a generator to a list? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>list(gen)</code>. Be careful with infinite generators — only do this when you are sure the generator will terminate.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/advanced/decorators.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Decorators</span>
+          </a>
+          <a href="/python/advanced/iterators.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Iterators</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

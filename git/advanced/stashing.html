@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>git stash – Temporarily Saving Uncommitted Work | ylearner</title>
+  <meta name="description" content="Learn how to use git stash to temporarily save uncommitted work, switch context without losing changes, and manage multiple stashes efficiently.">
+  <meta name="keywords" content="git stash, git stash pop, git stash apply, git stash list, temporarily save changes, git stash push, git stash branch">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/git/advanced/stashing.html">
+  <meta property="og:title" content="git stash – Temporarily Saving Uncommitted Work | ylearner">
+  <meta property="og:description" content="Learn how to use git stash to temporarily save uncommitted work, switch context without losing changes, and manage multiple stashes efficiently.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/git/advanced/stashing.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="git stash – Temporarily Saving Uncommitted Work | ylearner">
+  <meta name="twitter:description" content="Learn how to use git stash to temporarily save uncommitted work, switch context without losing changes, and manage multiple stashes efficiently.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"git stash – Temporarily Saving Uncommitted Work","description":"Learn how to use git stash to temporarily save uncommitted work and switch context without losing changes.","educationalLevel":"Intermediate","keywords":"git stash, git stash pop, git stash apply","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <span>Advanced Git</span><span class="separator">›</span>
+          <span class="current">git stash</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Advanced Git</div>
+          <h1>git stash – Temporarily Saving Uncommitted Work</h1>
+          <p class="lesson-intro">You're halfway through building a new feature when an urgent bug report lands in your inbox. You can't commit half-done work, and you can't just throw it away. <strong>git stash</strong> is your escape hatch — it saves all your uncommitted changes to a temporary stack so you can switch context instantly, fix the bug, and come right back to where you left off.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-stash">What Is git stash?</h2>
+          <p>A stash is a snapshot of your working directory and staging area saved onto a stack. The stack persists across branch switches and is stored in <code>.git/refs/stash</code>. Stashing lets you:</p>
+          <ul>
+            <li>Save work-in-progress without creating a messy commit</li>
+            <li>Switch to another branch with a clean working tree</li>
+            <li>Carry half-done changes across branches</li>
+            <li>Store multiple independent sets of changes (named stashes)</li>
+          </ul>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>The scenario</strong>
+              <p>You're building <code>feature/login-form</code> and have modified 4 files. Your team lead calls — there's a critical bug on <code>main</code>. You need a clean working tree to switch branches. Don't panic, just stash.</p>
+            </div>
+          </div>
+
+          <h2 id="git-stash">Basic Stash Commands</h2>
+          <p>The simplest form saves all tracked changes (both staged and unstaged) and reverts your working tree to match HEAD:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Stash all tracked changes (staged + unstaged)
+git stash
+
+# Stash with a descriptive message (highly recommended)
+git stash push -m "WIP: login form validation"
+
+# Stash including untracked files (new files not yet staged)
+git stash push --include-untracked -m "WIP: login form + new helpers"
+
+# Stash everything including ignored files
+git stash push --all -m "full working tree backup"</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            Saved working directory and index state On feature/login-form: WIP: login form validation
+          </div>
+
+          <p>After stashing, <code>git status</code> shows a clean working tree. You can now safely switch branches.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Now you can safely switch branches
+git switch main
+git switch -c hotfix/null-pointer
+# ... fix the bug, commit, merge ...
+# Come back to your feature branch
+git switch feature/login-form</code></pre>
+          </div>
+
+          <h2 id="list-stashes">Listing Your Stashes</h2>
+          <p>Stashes are numbered from newest (0) to oldest. Use <code>git stash list</code> to see all saved stashes:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">git stash list</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            stash@{0}: On feature/login-form: WIP: login form validation<br>
+            stash@{1}: On feature/dashboard: WIP: chart component<br>
+            stash@{2}: WIP on main: 3f2a1b9 Fix typo in README
+          </div>
+
+          <p>You can inspect the contents of a specific stash:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Show a summary of what's in stash@{0}
+git stash show
+
+# Show the full diff of stash@{1}
+git stash show -p stash@{1}</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="apply-pop">Applying a Stash Back</h2>
+          <p>There are two ways to re-apply a stash:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Command</th><th>What it does</th><th>Stash entry afterwards</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>git stash pop</code></td><td>Apply most recent stash</td><td>Removed from stash list</td></tr>
+                <tr><td><code>git stash apply</code></td><td>Apply most recent stash</td><td>Kept in stash list</td></tr>
+                <tr><td><code>git stash pop stash@{2}</code></td><td>Apply specific stash</td><td>Removed from stash list</td></tr>
+                <tr><td><code>git stash apply stash@{1}</code></td><td>Apply specific stash</td><td>Kept in stash list</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Apply the most recent stash and remove it from the stash list
+git stash pop
+
+# Apply a specific stash but KEEP it in the list (useful for applying to multiple branches)
+git stash apply stash@{1}
+
+# Create a new branch from a stash — branch out AND pop at once
+git stash branch feature/continuation stash@{0}</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>When to use apply vs pop</strong>
+              <p>Use <code>git stash apply</code> when you want to apply the same stash to multiple branches (e.g., applying a common fix to both <code>main</code> and a release branch). Use <code>git stash pop</code> for the normal flow: apply once and clean up.</p>
+            </div>
+          </div>
+
+          <h2 id="partial-stash">Partial Stash — Choose What to Save</h2>
+          <p>Sometimes you only want to stash part of your changes. The <code>-p</code> (patch) flag lets you interactively choose which hunks to stash:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Interactive mode — choose which hunks to stash
+git stash push -p -m "only stash the auth changes"
+
+# Git will show each changed hunk and ask:
+# y = stash this hunk
+# n = keep this hunk in working tree
+# s = split hunk into smaller pieces
+# q = quit (stash what's been selected so far)
+# ? = help</code></pre>
+          </div>
+
+          <p>You can also stash specific files only:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Stash only specific files
+git stash push -m "WIP: auth only" -- src/auth.js src/login.js</code></pre>
+          </div>
+
+          <h2 id="drop-clear">Cleaning Up Stashes</h2>
+          <p>The stash stack can grow messy over time. Prune it regularly:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Delete a specific stash entry
+git stash drop stash@{0}
+
+# Delete ALL stashes at once (no undo!)
+git stash clear
+
+# Verify the stash list is empty
+git stash list
+# (no output = stash list is empty)</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>git stash clear is permanent</strong>
+              <p><code>git stash clear</code> deletes all stash entries and cannot be undone with a simple command. If you accidentally clear stashes, they may still be recoverable via <code>git fsck --unreachable</code> followed by <code>git stash apply &lt;dangling-blob-hash&gt;</code> — but only if garbage collection hasn't run yet.</p>
+            </div>
+          </div>
+
+          <h2 id="deep-stash">git stash: Park Unfinished Work Without Committing</h2>
+          <p>You're mid-change when an urgent fix lands on another branch. You don't want a half-baked commit, but Git won't let you switch with dirty files. <code>git stash</code> shelves your changes, restoring a clean tree — then hands them back later.</p>
+          <pre><code class="language-bash">git stash              # shelve tracked changes, tree goes clean
+git switch main        # deal with the urgent thing
+git switch feature
+git stash pop          # bring changes back, remove from stash list</code></pre>
+          <table>
+            <thead><tr><th>Command</th><th>Does</th></tr></thead>
+            <tbody>
+              <tr><td><code>git stash list</code></td><td>show all stashes (stack)</td></tr>
+              <tr><td><code>git stash pop</code></td><td>reapply newest + delete it</td></tr>
+              <tr><td><code>git stash apply</code></td><td>reapply but keep it in the list</td></tr>
+              <tr><td><code>git stash -u</code></td><td>include <strong>untracked</strong> files</td></tr>
+              <tr><td><code>git stash drop</code></td><td>delete a stash</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Two gotchas:</strong> plain <code>git stash</code> ignores untracked (new) files — add <code>-u</code> or they stay behind. And the stash is a local stack, not saved to any remote; a forgotten <code>pop</code> can surface conflicts later. For anything you want to keep more than an hour, a real commit on a branch is safer.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Stash changes with <code>git stash</code>.</li>
+              <li>List stashes with <code>git stash list</code>.</li>
+              <li>Re-apply with <code>git stash pop</code>.</li>
+              <li>Stash with a descriptive message.</li>
+              <li>Drop a stash you no longer need.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>While mid-edit, stash your uncommitted work to switch branches for an urgent fix, then return and <code>git stash pop</code> to resume. Explain what the stash is, the difference between <code>stash apply</code> and <code>stash pop</code>, and when stashing beats committing work-in-progress.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>git stash</strong> saves all tracked changes and reverts your working tree to HEAD — perfect for urgent context switches.</li>
+              <li>Use <strong>git stash push -m "message"</strong> to always label your stashes for clarity.</li>
+              <li><strong>git stash list</strong> shows stash@{0} (newest) through stash@{N} (oldest).</li>
+              <li><strong>git stash pop</strong> applies the most recent stash and removes it; <strong>git stash apply stash@{N}</strong> applies and keeps it.</li>
+              <li><strong>git stash push -p</strong> lets you interactively pick which hunks to stash (partial stash).</li>
+              <li><strong>--include-untracked</strong> is needed to stash new files not yet staged.</li>
+              <li><strong>git stash branch &lt;name&gt;</strong> creates a new branch from the stash — clean way to continue work in a dedicated branch.</li>
+              <li><strong>git stash drop / git stash clear</strong> — clean up old stashes regularly.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does <code>git stash</code> do?</li>
+            <li>What is the difference between <code>stash apply</code> and <code>stash pop</code>?</li>
+            <li>How do you list and inspect stashes?</li>
+            <li>Does stash include untracked files by default?</li>
+            <li>When would you stash instead of committing?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/git/branching/branches-overview.html" class="topic-tag git-topic-tag">🔀 Branches Overview</a>
+            <a href="/git/branching/rebase.html" class="topic-tag git-topic-tag">🔀 Rebase</a>
+            <a href="/git/advanced/cherry-pick.html" class="topic-tag git-topic-tag">⚙️ Cherry-Pick</a>
+            <a href="/git/basics/undoing-changes.html" class="topic-tag git-topic-tag">⚙️ Undoing Changes</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does git stash work across branches? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Stashes are stored in a repository-wide stack and are not tied to any specific branch. You can stash on <code>feature/login</code>, switch to <code>main</code>, and pop the stash there. However, if the stashed changes conflict with the target branch's files, you'll need to resolve merge conflicts just like a normal merge.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why are my new (untracked) files not being stashed? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>By default, <code>git stash</code> only saves changes to <em>tracked</em> files. Newly created files that haven't been staged with <code>git add</code> are untracked and are ignored by the default stash. Use <code>git stash push --include-untracked</code> (or <code>-u</code> shorthand) to include them. Use <code>--all</code> to also include files listed in <code>.gitignore</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What's the difference between git stash pop and git stash apply? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>git stash pop</code> applies the stash and immediately removes it from the stash list — it's the most common operation. <code>git stash apply</code> applies the stash but leaves it in the list, so you can apply it again to another branch if needed. If <code>pop</code> encounters a conflict, it still removes the stash entry, so you may want to use <code>apply</code> when conflicts are likely, giving you a chance to keep the stash as a safety net.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I have a stash conflict? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. If the stashed changes conflict with the current branch state, Git will mark the files with conflict markers just like a merge conflict. Resolve the conflicts manually, then <code>git add</code> the resolved files. You do not need to run any "continue" command — the stash application is complete once you resolve the files.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is git stash a good substitute for commits? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Stashes are temporary and local — they are not pushed to remote repositories and they can be accidentally lost with <code>git stash clear</code>. For saving work at end-of-day or sharing work-in-progress, prefer a <code>WIP:</code> commit on your feature branch that you can amend or squash later. Stashes are best for very short context switches (minutes to hours).</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/remotes/quiz.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+          <a href="/git/advanced/tags-releases.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Tags &amp; Releases</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

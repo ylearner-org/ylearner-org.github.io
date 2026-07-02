@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creating &amp; Switching Git Branches – branch, switch, checkout | ylearner</title>
+  <meta name="description" content="Learn how to create, switch, delete, and rename Git branches using git branch, git switch, and git checkout commands with practical examples.">
+  <meta name="keywords" content="git branch, git switch, git checkout, create branch, switch branch, delete branch, rename branch, git branch tutorial">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/git/branching/creating-switching.html">
+  <meta property="og:title" content="Creating &amp; Switching Git Branches – branch, switch, checkout | ylearner">
+  <meta property="og:description" content="Master the commands for creating, switching, deleting, and renaming Git branches. Covers both modern git switch and the classic git checkout approach.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/git/branching/creating-switching.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Creating &amp; Switching Git Branches – branch, switch, checkout | ylearner">
+  <meta name="twitter:description" content="Master the commands for creating, switching, deleting, and renaming Git branches. Covers both modern git switch and the classic git checkout approach.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Creating & Switching Git Branches","description":"Learn to create, switch, delete, and rename Git branches using git branch, git switch, and git checkout commands.","educationalLevel":"Beginner","keywords":"git branch, git switch, git checkout, create branch git","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <a href="/git/branching/branches-overview.html">Branching &amp; Merging</a><span class="separator">›</span>
+          <span class="current">Creating &amp; Switching Branches</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌿 Branching &amp; Merging</div>
+          <h1>Creating &amp; Switching Git Branches – branch, switch, checkout</h1>
+          <p class="lesson-intro">You know what branches are. Now let's work with them. This lesson covers the full set of everyday branch commands: listing branches, creating them, switching between them, and cleaning up with delete and rename. You'll see both the modern <code>git switch</code> commands and the classic <code>git checkout</code> equivalents — because you'll encounter both in the wild.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="list-branches">Listing Branches</h2>
+          <p>Before creating or switching branches, it's useful to see which branches exist. The current branch is marked with <code>*</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># List all local branches (* marks current branch)
+git branch
+# * main
+#   feature/login
+#   bugfix/navbar
+
+# List local + remote-tracking branches
+git branch -a
+# * main
+#   feature/login
+#   remotes/origin/main
+#   remotes/origin/feature/login
+
+# List branches with last commit info
+git branch -v
+# * main        a1b2c3d Fix navbar padding
+#   feature/login 9f8e7d6 Add login form</code></pre>
+          </div>
+
+          <h2 id="create-branch">Creating a Branch</h2>
+          <p><code>git branch &lt;name&gt;</code> creates a new branch pointing to the current commit but <strong>does NOT switch to it</strong>. You stay on your current branch.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Create a new branch (stays on current branch)
+git branch feature/login
+
+# Create branch from a specific commit or tag
+git branch hotfix/crash v2.1.0
+git branch hotfix/crash a3f8c2d
+
+# Verify it was created (without switching)
+git branch
+# * main          ← still on main
+#   feature/login ← new branch exists</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Branch naming conventions</strong>
+              <p>Common patterns: <code>feature/description</code>, <code>bugfix/issue-123</code>, <code>hotfix/critical-bug</code>, <code>chore/update-deps</code>, <code>release/v2.0</code>. Slashes create a visual grouping in GUIs and on GitHub. Avoid spaces — use hyphens or slashes instead.</p>
+            </div>
+          </div>
+
+          <h2 id="switch-branch">Switching Branches</h2>
+          <p>Use <code>git switch</code> to move to an existing branch. Git updates your working directory to match that branch's state.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Modern way: git switch (Git 2.23+)
+git switch feature/login
+
+# Classic way: git checkout (still works, still common)
+git checkout feature/login
+
+# After switching, HEAD now points to feature/login
+git branch
+#   main
+# * feature/login</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Uncommitted changes when switching</strong>
+              <p>If you have uncommitted changes, Git may refuse to switch branches if those changes would be overwritten. Either commit your changes first, or use <code>git stash</code> to temporarily save them, switch branches, do your work, then <code>git stash pop</code> to restore them.</p>
+            </div>
+          </div>
+
+          <h2 id="create-and-switch">Create AND Switch (One Command)</h2>
+          <p>The most common workflow is to create a branch and immediately switch to it. Both modern and classic commands offer a shorthand for this.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Modern: git switch -c (create and switch)
+git switch -c feature/user-profile
+
+# Classic: git checkout -b (create and switch)
+git checkout -b feature/user-profile
+
+# Both commands do the same thing.
+# Result: branch created, HEAD switched to it
+git branch
+#   main
+# * feature/user-profile</code></pre>
+          </div>
+
+          <div class="callout callout-success">
+            <span class="callout-icon">✅</span>
+            <div class="callout-content">
+              <strong>Prefer <code>git switch</code> over <code>git checkout</code></strong>
+              <p><code>git checkout</code> is a Swiss Army knife — it does many things: switch branches, restore files, check out commits. This makes it confusing for beginners. <code>git switch</code> (added in Git 2.23) does only one thing: manage branches. Use <code>git switch</code> for branch operations and <code>git restore</code> for file operations. Your future self will thank you.</p>
+            </div>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="delete-branch">Deleting a Branch</h2>
+          <p>After merging a feature branch, delete it to keep your branch list clean.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Safe delete: only works if branch is fully merged
+git branch -d feature/login
+# Deleted branch feature/login (was a1b2c3d).
+
+# Force delete: deletes even if NOT merged (use with care!)
+git branch -D feature/experiment
+# Deleted branch feature/experiment (was 9f8e7d6).
+
+# Delete a remote-tracking branch
+git push origin --delete feature/login
+
+# You cannot delete the branch you're currently on
+# Switch to another branch first:
+git switch main
+git branch -d feature/login</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Force delete (-D) loses commits</strong>
+              <p>If you force-delete an unmerged branch, the commits on that branch become unreachable and will eventually be garbage-collected by Git. You can recover them within ~30 days using <code>git reflog</code>, but don't rely on it. Be certain you don't need those commits before using <code>-D</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="rename-branch">Renaming a Branch</h2>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Rename a branch (while on a different branch)
+git branch -m old-name new-name
+
+# Rename the CURRENT branch
+git branch -m new-name
+
+# If the branch was already pushed to a remote,
+# you need to delete the old remote branch and push the new one:
+git push origin --delete old-name
+git push origin new-name
+git push -u origin new-name  # set tracking</code></pre>
+          </div>
+
+          <h3>Quick Reference</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Task</th><th>Modern (preferred)</th><th>Classic</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>List branches</td><td><code>git branch</code></td><td><code>git branch</code></td></tr>
+                <tr><td>Create branch</td><td><code>git branch &lt;name&gt;</code></td><td><code>git branch &lt;name&gt;</code></td></tr>
+                <tr><td>Switch branch</td><td><code>git switch &lt;name&gt;</code></td><td><code>git checkout &lt;name&gt;</code></td></tr>
+                <tr><td>Create + switch</td><td><code>git switch -c &lt;name&gt;</code></td><td><code>git checkout -b &lt;name&gt;</code></td></tr>
+                <tr><td>Delete (safe)</td><td><code>git branch -d &lt;name&gt;</code></td><td><code>git branch -d &lt;name&gt;</code></td></tr>
+                <tr><td>Delete (force)</td><td><code>git branch -D &lt;name&gt;</code></td><td><code>git branch -D &lt;name&gt;</code></td></tr>
+                <tr><td>Rename</td><td><code>git branch -m old new</code></td><td><code>git branch -m old new</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="deep-branchswitch">Branches Are Just Movable Pointers</h2>
+          <p>The mental unlock: a branch is not a copy of your files — it's a lightweight, movable <strong>pointer to a commit</strong>. Creating one is instant and cheap because nothing is duplicated. <code>HEAD</code> is a pointer to <em>which branch you're on</em>.</p>
+          <pre><code class="language-bash">git branch feature        # create pointer, stay put
+git switch feature        # move HEAD onto it
+git switch -c feature      # create AND switch in one step
+git switch -               # jump back to previous branch</code></pre>
+          <p>As you commit on <code>feature</code>, that pointer advances while <code>main</code> stays where it was. Both point into the same shared commit history — branching just tracks divergent tips.</p>
+          <table>
+            <thead><tr><th>Command</th><th>Note</th></tr></thead>
+            <tbody>
+              <tr><td><code>git switch</code></td><td>modern, branch-only (clearer)</td></tr>
+              <tr><td><code>git checkout</code></td><td>older, does branches AND files (overloaded)</td></tr>
+              <tr><td><code>git branch -d name</code></td><td>delete a merged branch</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Watch for:</strong> switching branches with uncommitted changes can be blocked if they'd conflict — commit or <code>git stash</code> first. Modern Git splits the old overloaded <code>checkout</code> into <code>switch</code> (branches) and <code>restore</code> (files); prefer those for clarity.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create a branch with <code>git branch name</code>.</li>
+              <li>Switch with <code>git switch</code> (or <code>checkout</code>).</li>
+              <li>Create and switch in one step with <code>git switch -c</code>.</li>
+              <li>Rename a branch.</li>
+              <li>Delete a merged branch.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Create a <code>feature</code> branch, switch to it, make a commit, then switch back to <code>main</code> and confirm the commit is not there. Explain the difference between <code>git switch</code>, <code>git checkout</code>, and <code>git switch -c</code>.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>git branch</code> — list branches; <code>-a</code> includes remote-tracking branches; <code>-v</code> shows last commit.</li>
+              <li><code>git branch &lt;name&gt;</code> — creates a branch without switching to it.</li>
+              <li><code>git switch &lt;name&gt;</code> — switch to a branch (modern); <code>git checkout &lt;name&gt;</code> is the classic equivalent.</li>
+              <li><code>git switch -c &lt;name&gt;</code> — create AND switch (modern); <code>git checkout -b</code> is the classic equivalent.</li>
+              <li><code>git branch -d &lt;name&gt;</code> — safe delete (merged branches only); <code>-D</code> force deletes.</li>
+              <li><code>git branch -m old new</code> — rename a branch.</li>
+              <li>Prefer <code>git switch</code> over <code>git checkout</code> for branch operations — it does one thing clearly.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you create a new branch?</li>
+            <li>What is the difference between <code>git switch</code> and <code>git checkout</code>?</li>
+            <li>How do you create and switch in one command?</li>
+            <li>How do you delete a branch?</li>
+            <li>What happens to commits on a deleted, unmerged branch?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/git/branching/branches-overview.html" class="topic-tag git-topic-tag">🔀 Branches Overview</a>
+            <a href="/git/branching/merging.html" class="topic-tag git-topic-tag">🔀 Merging Branches</a>
+            <a href="/git/branching/merge-conflicts.html" class="topic-tag git-topic-tag">🔀 Merge Conflicts</a>
+            <a href="/git/remotes/push-pull-fetch.html" class="topic-tag git-topic-tag">🔀 Push, Pull &amp; Fetch</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What's the difference between git switch and git checkout for branches? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>git switch</code> was introduced in Git 2.23 specifically to handle branch switching, making the command more predictable. <code>git checkout</code> predates it and handles many different tasks (switching branches, restoring files, checking out specific commits). Both work for branch operations, but <code>git switch</code> is clearer in intent and less error-prone. The Git team recommends using <code>git switch</code> for branch operations going forward.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I switch branches with uncommitted changes? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Sometimes. If your uncommitted changes don't conflict with the files on the target branch, Git will carry them with you to the new branch. If there's a conflict (the target branch has a different version of a file you've modified), Git will refuse and ask you to commit or stash first. Use <code>git stash</code> to save your work temporarily, switch branches, work, then <code>git stash pop</code> to restore your changes.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is there a limit on how many branches I can have? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No practical limit. Each branch is just a tiny file, so you can have thousands. However, having hundreds of active branches is a workflow smell — it suggests feature branches are living too long. A healthy practice is to keep branches short-lived (hours to days for features, minutes for hotfixes) and delete them after merging.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">I accidentally deleted a branch. Can I recover it? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, if you act quickly. Git keeps a log of recent HEAD movements in the reflog. Run <code>git reflog</code> to find the commit hash the branch was pointing to, then recreate it: <code>git branch recovered-branch &lt;hash&gt;</code>. The reflog entries expire after 30–90 days by default, so don't wait too long.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/branching/branches-overview.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Branches Overview</span>
+          </a>
+          <a href="/git/branching/merging.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Merging Branches</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

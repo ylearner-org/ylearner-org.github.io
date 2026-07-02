@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Return Values – Functions That Return Data | ylearner</title>
+  <meta name="description" content="Master JavaScript return values: the return statement, implicit undefined, returning multiple values, early return, guard clauses, factory functions, and pure functions.">
+  <meta name="keywords" content="javascript return statement, return values javascript, early return pattern, factory functions javascript, pure functions, return multiple values javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/functions/return-values.html">
+  <meta property="og:title" content="JavaScript Return Values – Functions That Return Data | ylearner">
+  <meta property="og:description" content="Master JavaScript return values: the return statement, implicit undefined, returning multiple values, early return, guard clauses, factory functions, and pure functions.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/functions/return-values.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Return Values – Functions That Return Data | ylearner">
+  <meta name="twitter:description" content="Master JavaScript return values: the return statement, implicit undefined, returning multiple values, early return, guard clauses, factory functions, and pure functions.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/functions/function-basics.html">Functions</a><span class="separator">›</span>
+          <span class="current">Return Values</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Functions</div>
+          <h1>JavaScript Return Values – Returning Data from Functions</h1>
+          <p class="lesson-intro">The return statement is how a function communicates its result back to the caller. Learn how to return single and multiple values, use early returns as guard clauses, return functions from functions, and understand the concept of pure functions.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 16 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="return-statement">The return Statement</h2>
+          <p>The <code>return</code> statement ends function execution and specifies the value the function produces. Execution resumes in the calling code at the point where the function was called.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function add(a, b) {
+  return a + b; // Function ends here; value is sent back
+  console.log("This never runs"); // Dead code after return
+}
+
+const result = add(5, 3);
+console.log(result); // 8
+
+// The returned value can be used anywhere
+console.log(add(10, 20) * 2); // 60
+const greeting = "Sum is: " + add(1, 2);
+console.log(greeting); // Sum is: 3</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>8
+60
+Sum is: 3</div>
+
+          <h2 id="implicit-undefined">Implicit undefined Return</h2>
+          <p>A function with no <code>return</code> statement — or a bare <code>return;</code> — implicitly returns <code>undefined</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// No return statement
+function logMessage(msg) {
+  console.log(msg);
+  // Implicitly returns undefined
+}
+
+const x = logMessage("Hello"); // Hello
+console.log(x); // undefined
+
+// Bare return (used to exit early from a void function)
+function printIfPositive(n) {
+  if (n <= 0) return; // Exit immediately
+  console.log("Positive: " + n);
+}
+
+printIfPositive(-1); // Prints nothing
+printIfPositive(5);  // Positive: 5</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Hello
+undefined
+Positive: 5</div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Automatic Semicolon Insertion Trap</strong>
+              <p>Never put a newline immediately after <code>return</code>. JavaScript inserts a semicolon after <code>return</code> at the end of the line, making the function return <code>undefined</code>. Always keep the returned value on the same line, or use parentheses.</p>
+              <pre><code class="language-javascript">// Bug: returns undefined!
+return
+  { value: 42 };
+
+// Correct:
+return { value: 42 };
+// Or:
+return (
+  { value: 42 }
+);</code></pre>
+            </div>
+          </div>
+
+          <h2 id="returning-multiple-values">Returning Multiple Values</h2>
+          <p>JavaScript can only return one value per <code>return</code>. Bundle multiple values in an array or object, then destructure at the call site.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Return as array
+function minMax(numbers) {
+  const sorted = [...numbers].sort((a, b) => a - b);
+  return [sorted[0], sorted[sorted.length - 1]];
+}
+
+const [min, max] = minMax([3, 1, 8, 2, 9, 4]);
+console.log(`Min: ${min}, Max: ${max}`); // Min: 1, Max: 9
+
+// Return as object — named, easier to read
+function getStats(numbers) {
+  const sum = numbers.reduce((a, b) => a + b, 0);
+  return {
+    count: numbers.length,
+    sum,
+    average: sum / numbers.length,
+    min: Math.min(...numbers),
+    max: Math.max(...numbers)
+  };
+}
+
+const stats = getStats([5, 10, 15, 20]);
+console.log(stats);
+const { average, count } = getStats([2, 4, 6]);
+console.log(`Average of ${count} items: ${average}`);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Min: 1, Max: 9
+{ count: 4, sum: 50, average: 12.5, min: 5, max: 20 }
+Average of 3 items: 4</div>
+
+          <h2 id="early-return-pattern">Early Return Pattern</h2>
+          <p>Return as soon as you know the answer, without executing unnecessary code.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Without early return — deeply nested
+function getDiscount(user, cart) {
+  let discount = 0;
+  if (user) {
+    if (cart.total > 0) {
+      if (user.isPremium) {
+        if (cart.total >= 100) {
+          discount = 0.20;
+        } else {
+          discount = 0.10;
+        }
+      }
+    }
+  }
+  return discount;
+}
+
+// With early return — flat and clear
+function getDiscountClean(user, cart) {
+  if (!user)           return 0;
+  if (cart.total <= 0) return 0;
+  if (!user.isPremium) return 0;
+  return cart.total >= 100 ? 0.20 : 0.10;
+}
+
+const user = { isPremium: true };
+console.log(getDiscountClean(user, { total: 150 })); // 0.2
+console.log(getDiscountClean(null, { total: 150 })); // 0</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>0.2
+0</div>
+
+          <h2 id="functions-as-return-values">Functions as Return Values</h2>
+          <p>Because functions are first-class values, a function can return another function. This is the foundation of closures, factory functions, and currying.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Factory function — returns a configured function
+function createMultiplier(factor) {
+  return function(number) {
+    return number * factor;
+  };
+}
+
+const double = createMultiplier(2);
+const triple = createMultiplier(3);
+const tenX   = createMultiplier(10);
+
+console.log(double(5));  // 10
+console.log(triple(5));  // 15
+console.log(tenX(5));    // 50
+
+// Practical: greeting factory
+function createGreeter(greeting) {
+  return (name) => `${greeting}, ${name}!`;
+}
+
+const sayHello = createGreeter("Hello");
+const sayHowdy = createGreeter("Howdy");
+
+console.log(sayHello("Alice")); // Hello, Alice!
+console.log(sayHowdy("Bob"));   // Howdy, Bob!</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>10
+15
+50
+Hello, Alice!
+Howdy, Bob!</div>
+
+          <h2 id="chaining-returns">Chaining with Return Values</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Method chaining (builder pattern)
+class QueryBuilder {
+  constructor() { this.query = {}; }
+
+  where(field, value) {
+    this.query[field] = value;
+    return this; // Return 'this' enables chaining
+  }
+
+  limit(n) {
+    this.query._limit = n;
+    return this;
+  }
+
+  build() {
+    return this.query;
+  }
+}
+
+const q = new QueryBuilder()
+  .where("status", "active")
+  .where("role", "admin")
+  .limit(10)
+  .build();
+
+console.log(q);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>{ status: 'active', role: 'admin', _limit: 10 }</div>
+
+          <h2 id="pure-functions">Pure Functions</h2>
+          <p>A <strong>pure function</strong>: (1) given the same inputs, always returns the same output; (2) has no side effects (doesn't modify external state, I/O, etc.).</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Pure function — same input always → same output, no side effects
+function calculateTax(price, taxRate) {
+  return price * (1 + taxRate);
+}
+
+console.log(calculateTax(100, 0.1)); // 110 (always)
+console.log(calculateTax(100, 0.1)); // 110 (same input → same output)
+
+// Impure function — depends on external state
+let taxRate = 0.1;
+function calculateTaxImpure(price) {
+  return price * (1 + taxRate); // Depends on external taxRate
+}
+
+taxRate = 0.2;
+console.log(calculateTaxImpure(100)); // 120 (result changed!)</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>110
+110
+120</div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Prefer Pure Functions</strong>
+              <p>Pure functions are easier to test, debug, and reason about. You can always trust a pure function's output given its inputs. Aim for pure functions as the default; use impure functions only when side effects are necessary (DOM updates, API calls, logging).</p>
+            </div>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="deep-jsreturn">Return Values: undefined, Objects, and the ASI Trap</h2>
+          <p><code>return</code> sends a value back and immediately exits the function. A function with no <code>return</code> (or a bare <code>return;</code>) yields <code>undefined</code>. JavaScript adds one nasty gotcha here: automatic semicolon insertion.</p>
+          <pre><code class="language-javascript">function area(w, h) { return w * h; }   // returns a value
+function log(msg) { console.log(msg); } // returns undefined (no return)
+
+// return multiple values via an object or array
+function minMax(a) { return { min: Math.min(...a), max: Math.max(...a) }; }
+const { min, max } = minMax([3, 1, 8]);  // destructure the result</code></pre>
+          <h3>The newline-after-return trap</h3>
+          <pre><code class="language-javascript">function bad() {
+  return          // ← JS inserts a semicolon HERE → returns undefined!
+    { ok: true };
+}
+function good() {
+  return { ok: true };   // keep the value on the same line as return
+}</code></pre>
+          <p><strong>Automatic Semicolon Insertion (ASI):</strong> JavaScript auto-inserts semicolons at line breaks — and if you put <code>return</code> on its own line with the value below, it "helpfully" ends the statement right after <code>return</code>, so the function returns <code>undefined</code> and the object below is dead code. <em>Always keep the returned value on the same line as <code>return</code></em> (or open a bracket on that line). <strong>Multiple values:</strong> JS returns one value, so bundle several into an object (named fields) or array, then destructure at the call site. <strong>Consistency:</strong> a function that returns a value on some paths but falls through to <code>undefined</code> on others is a common bug — make sure every path returns, or none do.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Write a pure function <code>processOrder(order)</code> that takes an order object with <code>items</code> (array of <code>{ name, price, qty }</code>) and <code>discountCode</code>. It should return an object with:</p>
+            <ul>
+              <li><code>subtotal</code> — sum of price × qty for all items</li>
+              <li><code>discount</code> — 10% if discountCode is "SAVE10", else 0</li>
+              <li><code>total</code> — subtotal minus discount</li>
+              <li><code>itemCount</code> — total quantity of all items</li>
+            </ul>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a <code>curry(fn)</code> function that transforms any function into a curried version. A curried function returns partial functions until all arguments are collected, then executes. Example: <code>curry((a, b, c) => a + b + c)(1)(2)(3)</code> should return <code>6</code>. Also support calling with multiple args at once: <code>curry(fn)(1, 2)(3)</code>.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>return value;</code> ends a function and sends the value to the caller.</li>
+              <li>No return or bare <code>return;</code> → function returns <code>undefined</code>.</li>
+              <li>Return multiple values by wrapping in an array or object, then destructuring.</li>
+              <li>Early return replaces deeply nested if/else with flat, readable logic.</li>
+              <li>Functions can return other functions — enabling factory functions and currying.</li>
+              <li>Pure functions (same input → same output, no side effects) are easy to test and trust.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does a function return if it has no return statement?</li>
+            <li>How do you return multiple values from a JavaScript function?</li>
+            <li>What is the automatic semicolon insertion trap with return?</li>
+            <li>What is a pure function? Why are pure functions preferred?</li>
+            <li>Explain the factory function pattern with a code example.</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/javascript/functions/parameters.html" class="topic-tag">Function Parameters</a>
+            <a href="/javascript/functions/arrow-functions.html" class="topic-tag">Arrow Functions</a>
+            <a href="/javascript/functions/closures.html" class="topic-tag">Closures</a>
+            <a href="/javascript/functions/higher-order-functions.html" class="topic-tag">Higher-Order Functions</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can a function have multiple return statements?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Only one return executes per call — once one is hit, the function ends. Multiple returns are the basis of the early return / guard clause pattern.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can you return a function that returns a function?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, and this is used heavily in functional programming (currying, partial application). Each returned function closes over the variables from its outer scope, forming a closure chain.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between return and console.log?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>return</code> produces a value that the caller can use. <code>console.log</code> is a side effect that prints to the console but returns <code>undefined</code>. A function that only logs cannot be composed with other functions.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/functions/parameters.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Function Parameters</span></a>
+          <a href="/javascript/functions/arrow-functions.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Arrow Functions</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

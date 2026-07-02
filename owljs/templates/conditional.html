@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS Conditional Rendering – t-if, t-elif, t-else Explained | ylearner</title>
+  <meta name="description" content="Master OWL JS conditional rendering with t-if, t-elif, and t-else. Learn when elements are removed from the DOM vs hidden, nested conditionals, performance tips for expensive children, and real-world patterns.">
+  <meta name="keywords" content="OWL JS t-if, OWL conditional rendering, OWL t-elif t-else, OWL JS show hide, OWL JS t-if example, Odoo Web Library conditional, OWL template t-if tutorial, OWL JS dynamic rendering">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/owljs/templates/conditional.html">
+  <meta property="og:title" content="OWL JS Conditional Rendering – t-if, t-elif, t-else | ylearner">
+  <meta property="og:description" content="t-if, t-elif, t-else in OWL JS: DOM removal vs CSS hiding, nested conditionals, performance tips, and real-world patterns.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/owljs/templates/conditional.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS t-if Conditional Rendering Guide | ylearner">
+  <meta name="twitter:description" content="t-if, t-elif, t-else — complete OWL JS conditional rendering tutorial with DOM removal vs visibility and performance notes.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS Conditional Rendering (t-if)",
+    "description": "Complete guide to OWL JS conditional rendering with t-if, t-elif, and t-else: DOM removal semantics, nested conditionals, CSS alternatives, and performance patterns.",
+    "educationalLevel": "Beginner",
+    "keywords": "OWL JS t-if, conditional rendering, t-elif, t-else, QWeb conditionals, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/templates/conditional.html">Dynamic Templates</a><span class="separator">›</span>
+          <span class="current">Conditional Rendering</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Dynamic Templates</div>
+          <h1>OWL JS Conditional Rendering – t-if, t-elif, t-else</h1>
+          <p class="lesson-intro">Conditional rendering lets you show different parts of your UI based on state, props, or computed values. In OWL JS, this is done entirely with the <code>t-if</code>, <code>t-elif</code>, and <code>t-else</code> directives in the QWeb template. Unlike setting <code>display: none</code>, these directives <strong>completely remove elements from the DOM</strong> when their condition is false — which has important implications for performance, component lifecycle, and accessibility. This lesson covers every conditional rendering pattern you will need.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 16 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 1 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="t-if-basics">t-if Basics</h2>
+          <p>Place <code>t-if</code> on any element. When the expression is falsy, the element and all its children are removed from the DOM. When truthy, they are rendered normally.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – basic t-if</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Show alert only when there is an error --&gt;
+&lt;div class="alert alert-error" t-if="state.errorMessage"&gt;
+  &lt;t t-esc="state.errorMessage"/&gt;
+&lt;/div&gt;
+
+&lt;!-- Show admin panel only for admins --&gt;
+&lt;div class="admin-panel" t-if="props.user.isAdmin"&gt;
+  &lt;AdminControls/&gt;
+&lt;/div&gt;
+
+&lt;!-- Any JS expression works --&gt;
+&lt;p t-if="state.items.length === 0"&gt;No items yet.&lt;/p&gt;
+&lt;p t-if="props.score &gt;= 60"&gt;Passed!&lt;/p&gt;
+&lt;p t-if="!state.isLoading &amp;&amp; state.data"&gt;Ready.&lt;/p&gt;</code></pre>
+          </div>
+
+          <h2 id="t-if-else">t-if / t-else</h2>
+          <p>The <code>t-else</code> element is rendered only when the immediately preceding <code>t-if</code> (or <code>t-elif</code>) was false. It must be the immediate next sibling in the template.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – t-if / t-else</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Show login button or user name --&gt;
+&lt;div t-if="props.user"&gt;
+  Welcome, &lt;strong t-esc="props.user.name"/&gt;!
+&lt;/div&gt;
+&lt;button t-else="" t-on-click="login"&gt;Log In&lt;/button&gt;
+
+&lt;!-- Loading / error / content pattern --&gt;
+&lt;div t-if="state.isLoading" class="spinner"&gt;Loading…&lt;/div&gt;
+&lt;div t-elif="state.error" class="error" t-esc="state.error"/&gt;
+&lt;div t-else=""&gt;
+  &lt;!-- main content here --&gt;
+&lt;/div&gt;</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>t-else="" requires the empty string attribute value</strong>
+              <p>Write <code>t-else=""</code> with the empty string — not just <code>t-else</code> (no value). QWeb requires an attribute value even for valueless directives like <code>t-else</code>. Forgetting the <code>=""</code> causes a template compilation error.</p>
+            </div>
+          </div>
+
+          <h2 id="t-elif">t-if / t-elif / t-else Chains</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – multi-branch conditional</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Status badge with 4 states --&gt;
+&lt;span t-if="props.status === 'active'"    class="badge badge-green"&gt;Active&lt;/span&gt;
+&lt;span t-elif="props.status === 'pending'" class="badge badge-yellow"&gt;Pending&lt;/span&gt;
+&lt;span t-elif="props.status === 'blocked'" class="badge badge-red"&gt;Blocked&lt;/span&gt;
+&lt;span t-else=""                           class="badge badge-gray"&gt;Unknown&lt;/span&gt;
+
+&lt;!-- Grade calculator --&gt;
+&lt;p t-if="props.score &gt;= 90"&gt;Grade: A&lt;/p&gt;
+&lt;p t-elif="props.score &gt;= 80"&gt;Grade: B&lt;/p&gt;
+&lt;p t-elif="props.score &gt;= 70"&gt;Grade: C&lt;/p&gt;
+&lt;p t-elif="props.score &gt;= 60"&gt;Grade: D&lt;/p&gt;
+&lt;p t-else=""&gt;Grade: F&lt;/p&gt;</code></pre>
+          </div>
+
+          <h2 id="t-tag">Using &lt;t&gt; for Grouping Without a Wrapper</h2>
+          <p>The structural <code>&lt;t&gt;</code> tag lets you conditionally show multiple sibling elements without wrapping them in an extra <code>&lt;div&gt;</code>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – t-if on &lt;t&gt; structural tag</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Show two elements together without adding a DOM wrapper --&gt;
+&lt;t t-if="props.user.isAdmin"&gt;
+  &lt;button class="btn-danger"&gt;Delete All&lt;/button&gt;
+  &lt;button class="btn-warning"&gt;Export Data&lt;/button&gt;
+&lt;/t&gt;
+
+&lt;!-- Conditional text inline without disrupting layout --&gt;
+&lt;span&gt;
+  Hello, &lt;t t-esc="props.name"/&gt;
+  &lt;t t-if="props.isNew"&gt; (new user)&lt;/t&gt;!
+&lt;/span&gt;</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="dom-removal-vs-css">DOM Removal vs CSS Hiding</h2>
+          <p>This is the most important distinction about <code>t-if</code>. It is fundamentally different from <code>display: none</code>:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Aspect</th><th>t-if (false)</th><th>CSS display:none</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Element in DOM?</td><td>❌ Completely removed</td><td>✅ Present but invisible</td></tr>
+                <tr><td>Child components mounted?</td><td>❌ Not mounted — lifecycle hooks don't run</td><td>✅ Mounted, running</td></tr>
+                <tr><td>Readable by screen readers?</td><td>❌ No</td><td>❌ No (both invisible)</td></tr>
+                <tr><td>Findable by querySelector?</td><td>❌ No</td><td>✅ Yes</td></tr>
+                <tr><td>Toggle cost</td><td>Higher — creates/destroys DOM + lifecycle</td><td>Lower — just CSS property change</td></tr>
+                <tr><td>Best for</td><td>Rarely shown content, expensive children</td><td>Frequent show/hide, preserve state</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – CSS hide vs t-if: choosing the right one</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- ✅ t-if: content is rarely shown or expensive to keep alive --&gt;
+&lt;VideoPlayer t-if="state.videoVisible" src="props.videoUrl"/&gt;
+&lt;!-- VideoPlayer only mounts when visible — no resource usage when hidden --&gt;
+
+&lt;!-- ✅ CSS hide: content toggles frequently or must preserve scroll/state --&gt;
+&lt;div t-att-class="{ 'panel': true, 'panel--hidden': !state.panelOpen }"&gt;
+  &lt;textarea t-model="state.draftText"/&gt;
+  &lt;!-- Draft text preserved even when panel closes --&gt;
+&lt;/div&gt;</code></pre>
+          </div>
+
+          <h2 id="nested-conditionals">Nested Conditionals</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – nested t-if</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;div t-if="props.user"&gt;
+
+  &lt;!-- Outer: user exists. Inner: check role --&gt;
+  &lt;div t-if="props.user.role === 'admin'"&gt;
+    &lt;h2&gt;Admin Dashboard&lt;/h2&gt;
+    &lt;t t-if="props.user.hasApiAccess"&gt;
+      &lt;button&gt;API Console&lt;/button&gt;
+    &lt;/t&gt;
+  &lt;/div&gt;
+
+  &lt;div t-elif="props.user.role === 'editor'"&gt;
+    &lt;h2&gt;Editor Panel&lt;/h2&gt;
+  &lt;/div&gt;
+
+  &lt;div t-else=""&gt;
+    &lt;h2&gt;Viewer Mode&lt;/h2&gt;
+  &lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div t-else=""&gt;
+  &lt;p&gt;Please log in to continue.&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+          </div>
+
+          <h2 id="key-for-remount">Using t-key to Force Component Remount</h2>
+          <p>Changing a <code>t-key</code> value on a component forces OWL to unmount the old instance and mount a fresh one — useful when you need to completely reset a component's state:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – t-key to force remount</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Changing selectedId changes the key → fresh component instance --&gt;
+&lt;ProductEditor
+  t-key="state.selectedId"
+  productId="state.selectedId"
+/&gt;
+&lt;!-- When user selects a different product, the editor component remounts
+     from scratch — onWillStart re-runs, all local state resets --&gt;</code></pre>
+          </div>
+
+          <h2 id="guard-patterns">Safe Guard Patterns</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – guarding against null/undefined</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Guard before accessing nested property --&gt;
+&lt;p t-if="state.user &amp;&amp; state.user.address"&gt;
+  &lt;t t-esc="state.user.address.city"/&gt;
+&lt;/p&gt;
+
+&lt;!-- Optional chaining in expression --&gt;
+&lt;p t-if="state.user?.address?.city" t-esc="state.user.address.city"/&gt;
+
+&lt;!-- Show count badge only when count &gt; 0 --&gt;
+&lt;span t-if="state.unreadCount &gt; 0" class="badge" t-esc="state.unreadCount"/&gt;</code></pre>
+          </div>
+
+          <h2 id="deep-conditional">t-if / t-else: Conditional Rendering Done Right</h2>
+          <p><code>t-if</code> renders an element only when its expression is truthy — and crucially, when false the element is <strong>removed from the DOM entirely</strong>, not just hidden. Chain with <code>t-elif</code> and <code>t-else</code> for branches.</p>
+          <pre><code class="language-javascript">static template = xml`
+  &lt;div&gt;
+    &lt;p t-if="state.status === 'loading'"&gt;Loading…&lt;/p&gt;
+    &lt;p t-elif="state.error"&gt;Failed: &lt;t t-esc="state.error"/&gt;&lt;/p&gt;
+    &lt;ul t-else=""&gt;
+      &lt;li t-foreach="state.items" t-as="i" t-key="i.id"&gt;&lt;t t-esc="i.name"/&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;`;</code></pre>
+          <h3>Remove vs hide</h3>
+          <table>
+            <thead><tr><th></th><th><code>t-if</code> false</th><th>CSS <code>display:none</code></th></tr></thead>
+            <tbody>
+              <tr><td>In the DOM?</td><td>no — removed</td><td>yes — hidden</td></tr>
+              <tr><td>Component state</td><td>destroyed (setup re-runs on return)</td><td>preserved</td></tr>
+              <tr><td>Best when</td><td>rarely shown / expensive</td><td>toggled often</td></tr>
+            </tbody>
+          </table>
+          <p><strong>The consequence:</strong> a component inside a false <code>t-if</code> is <em>unmounted</em> — its state is thrown away and rebuilt (setup runs again) when the condition flips back. For something toggled constantly where you want to keep state, prefer hiding with CSS. Note <code>t-else</code>/<code>t-elif</code> must immediately follow the <code>t-if</code> element — no other elements between them.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a <code>Wizard</code> component (multi-step form) using only conditional rendering:</p>
+            <ol>
+              <li>State: <code>step</code> (1, 2, or 3), form data for each step.</li>
+              <li>Use <code>t-if / t-elif / t-else</code> to show only the current step's form fields.</li>
+              <li>Show a progress bar with 3 segments — use <code>t-att-class</code> with <code>{ 'active': step >= n }</code> for each segment.</li>
+              <li>Show a "Back" button only when <code>step > 1</code> (use <code>t-if</code>). Show "Next" when <code>step &lt; 3</code> and "Submit" when <code>step === 3</code> (use <code>t-if / t-else</code>).</li>
+              <li>On "Submit", show a success message (<code>t-if="state.submitted"</code>) and hide the form (<code>t-if="!state.submitted"</code>).</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a component that conditionally renders different content with <code>t-if</code>/<code>t-elif</code>/<code>t-else</code> based on state (e.g. loading/empty/loaded). Explain how OWL evaluates conditions and that <code>t-if</code> adds/removes DOM (unlike hiding with CSS).</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>t-if</code> removes the element from the DOM when false — the element does not exist, is not measured, and any child component is unmounted.</li>
+              <li><code>t-elif</code> and <code>t-else=""</code> must be immediate next siblings of a <code>t-if</code> or <code>t-elif</code>.</li>
+              <li>Write <code>t-else=""</code> with the empty string — <code>t-else</code> without a value causes a compile error.</li>
+              <li>Use <code>&lt;t t-if="..."&gt;</code> to conditionally render multiple sibling elements without adding a DOM wrapper.</li>
+              <li><code>t-if</code> removes from DOM; CSS <code>display:none</code> hides but keeps in DOM. Choose based on toggle frequency and whether you need to preserve child state.</li>
+              <li>Changing a component's <code>t-key</code> forces a fresh remount — useful for resetting state when a key prop (like an ID) changes.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you conditionally render in OWL?</li>
+            <li>What directives handle conditions?</li>
+            <li>Does <code>t-if</code> hide or remove the element?</li>
+            <li>How is <code>t-if</code> different from <code>display:none</code>?</li>
+            <li>Can you use expressions in <code>t-if</code>?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/owljs/templates/list-rendering.html" class="topic-tag owl-topic-tag">🦉 List Rendering (t-foreach)</a>
+            <a href="/owljs/core/templates.html" class="topic-tag owl-topic-tag">🦉 Template Syntax (QWeb)</a>
+            <a href="/owljs/core/state.html" class="topic-tag owl-topic-tag">🦉 State &amp; useState</a>
+            <a href="/owljs/templates/dynamic-attrs.html" class="topic-tag owl-topic-tag">🦉 Dynamic Attributes (t-att)</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does t-if work the same as JavaScript's if statement? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In terms of truthiness evaluation, yes — <code>t-if</code> uses JavaScript's standard truthy/falsy rules. <code>0</code>, <code>""</code>, <code>null</code>, <code>undefined</code>, <code>false</code>, and <code>NaN</code> are all falsy. Everything else is truthy. Be careful with <code>0</code> — <code>t-if="state.count"</code> is false when count is 0, which may not be what you want. Use explicit comparison: <code>t-if="state.count !== null"</code> or <code>t-if="state.items.length > 0"</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I put t-if on a component tag? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — <code>t-if</code> on a component tag controls whether OWL instantiates the component at all. <code>&lt;MyComponent t-if="state.show"/&gt;</code> will mount and run <code>MyComponent</code>'s full lifecycle (including <code>onWillStart</code>) only when <code>state.show</code> is truthy. When it becomes falsy, the component is fully unmounted — <code>onWillUnmount</code> fires and the instance is destroyed.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between t-if and t-att-class with a boolean? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>t-if</code> controls whether the element exists in the DOM at all. <code>t-att-class="{ hidden: !show }"</code> keeps the element in the DOM but adds/removes a CSS class. The practical difference: with <code>t-if</code>, a child component inside is mounted/unmounted (lifecycle runs). With the CSS approach, the child stays mounted even when visually hidden — useful when you want the component to keep its state but not be visible.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use t-elif without a preceding t-if? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — <code>t-elif</code> must follow a <code>t-if</code> or another <code>t-elif</code> as an immediate sibling. Using it without a preceding <code>t-if</code> causes a template compilation error. Similarly, <code>t-else</code> must follow a <code>t-if</code> or <code>t-elif</code>. The chain must be contiguous siblings with no other elements between them.</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/lifecycle/quiz.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+          <a href="/owljs/templates/list-rendering.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">List Rendering (t-foreach)</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

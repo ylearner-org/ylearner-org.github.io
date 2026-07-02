@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python API Project – Build a Quotes REST API with FastAPI | ylearner</title>
+  <meta name="description" content="Build a complete REST API in Python with FastAPI: CRUD endpoints, SQLite, Pydantic validation, and auto-generated Swagger docs.">
+  <meta name="keywords" content="python api project, python fastapi project, python rest api tutorial, python crud api, python sqlite fastapi">
+  <link rel="canonical" href="https://ylearner.org/python/projects/api-project.html">
+  <meta property="og:title" content="Python API Project – Build a Quotes REST API with FastAPI | ylearner">
+  <meta property="og:description" content="Build a complete REST API in Python with FastAPI: CRUD endpoints, SQLite, Pydantic validation, and auto-generated Swagger docs.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/projects/api-project.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python API Project – Build a Quotes REST API with FastAPI | ylearner">
+  <meta name="twitter:description" content="Build a complete REST API in Python with FastAPI: CRUD endpoints, SQLite, Pydantic validation, and auto-generated Swagger docs.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Quotes REST API Project","description":"FastAPI quotes REST API with SQLite, CRUD, Pydantic validation, and auto-generated docs.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/projects/calculator.html">Projects</a><span class="separator">›</span><span class="current">API Project</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📡 Projects</div>
+          <h1>Python API Project – Quotes REST API</h1>
+          <p class="lesson-intro">Build a production-ready Quotes REST API using FastAPI and SQLite. Full CRUD, filtering, random endpoint, and Swagger docs in under 100 lines.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Projects</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="setup">Setup</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Bash</span><button class="copy-btn">Copy</button></div><pre><code class="language-bash">pip install fastapi uvicorn sqlalchemy
+uvicorn main:app --reload</code></pre></div>
+          <h2 id="code">Complete Implementation</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from fastapi import FastAPI, HTTPException, Query
+from pydantic import BaseModel
+from sqlalchemy import create_engine, Column, Integer, String, text
+from sqlalchemy.orm import DeclarativeBase, Session
+import random
+
+engine = create_engine("sqlite:///quotes.db")
+
+class Base(DeclarativeBase): pass
+
+class QuoteModel(Base):
+    __tablename__ = "quotes"
+    id = Column(Integer, primary_key=True, index=True)
+    text = Column(String, nullable=False)
+    author = Column(String, nullable=False)
+    category = Column(String, default="general")
+
+Base.metadata.create_all(engine)
+
+class QuoteCreate(BaseModel):
+    text: str
+    author: str
+    category: str = "general"
+
+class QuoteResponse(QuoteCreate):
+    id: int
+    class Config: from_attributes = True
+
+app = FastAPI(title="Quotes API")
+
+@app.get("/quotes", response_model=list[QuoteResponse])
+def list_quotes(category: str | None = Query(None), skip: int = 0, limit: int = 20):
+    with Session(engine) as db:
+        q = db.query(QuoteModel)
+        if category: q = q.filter(QuoteModel.category == category)
+        return q.offset(skip).limit(limit).all()
+
+@app.get("/quotes/random", response_model=QuoteResponse)
+def random_quote(category: str | None = None):
+    with Session(engine) as db:
+        q = db.query(QuoteModel)
+        if category: q = q.filter(QuoteModel.category == category)
+        quotes = q.all()
+        if not quotes: raise HTTPException(404, "No quotes")
+        return random.choice(quotes)
+
+@app.get("/quotes/{quote_id}", response_model=QuoteResponse)
+def get_quote(quote_id: int):
+    with Session(engine) as db:
+        q = db.get(QuoteModel, quote_id)
+        if not q: raise HTTPException(404, "Not found")
+        return q
+
+@app.post("/quotes", response_model=QuoteResponse, status_code=201)
+def create_quote(quote: QuoteCreate):
+    with Session(engine) as db:
+        q = QuoteModel(**quote.dict())
+        db.add(q); db.commit(); db.refresh(q)
+        return q
+
+@app.delete("/quotes/{quote_id}", status_code=204)
+def delete_quote(quote_id: int):
+    with Session(engine) as db:
+        q = db.get(QuoteModel, quote_id)
+        if not q: raise HTTPException(404, "Not found")
+        db.delete(q); db.commit()</code></pre></div>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Bash</span><button class="copy-btn">Copy</button></div><pre><code class="language-bash"># API docs: http://localhost:8000/docs</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> FastAPI auto-generates Swagger at /docs and ReDoc at /redoc — use them to test all endpoints without any client code.</div>
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Extend the API project:</p>
+            <ol>
+              <li>Add a new endpoint that updates an existing resource (PUT/PATCH).</li>
+              <li>Return a 404 with a clear message when a requested id does not exist.</li>
+              <li>Add input validation so invalid payloads are rejected with a 422/400.</li>
+              <li>Add a simple filter query parameter to the list endpoint.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Take the API to production-readiness: persist data in a database instead of memory, add token-based authentication on write routes, paginate the list endpoint, and write automated tests with <code>TestClient</code> covering success and error paths. Bonus: containerize the app with a Dockerfile and document the endpoints.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>This project builds a working REST API with create, read, update, and delete endpoints.</li>
+              <li>CRUD maps to HTTP methods with appropriate status codes (200/201/404/400).</li>
+              <li>Request bodies are validated with schemas (e.g. Pydantic) before processing.</li>
+              <li>Authentication protects write operations.</li>
+              <li>Automated tests verify both happy paths and error cases.</li>
+              <li>Swapping in-memory storage for a database makes the API persistent and production-ready.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Building a REST API</h2>
+          <ul class="interview-list">
+            <li>How do you structure a REST API project for maintainability?</li>
+            <li>How do you map CRUD operations to HTTP methods and status codes?</li>
+            <li>How do you validate request data in an API?</li>
+            <li>How do you add authentication to selected routes?</li>
+            <li>How do you test an API?</li>
+            <li>How do you handle errors and return consistent error responses?</li>
+            <li>How would you move from in-memory storage to a real database?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/frameworks/fastapi.html" class="topic-tag">⚡ FastAPI</a>
+            <a href="/python/real-world/api-development.html" class="topic-tag">🌐 API Development</a>
+            <a href="/python/real-world/database.html" class="topic-tag">🗄️ Databases</a>
+            <a href="/python/real-world/testing.html" class="topic-tag">🧪 Testing</a>
+            <a href="/python/intermediate/json.html" class="topic-tag">📄 JSON</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Should I use FastAPI or Flask for this project? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>FastAPI is a great fit for a modern API: automatic validation, type hints, and built-in docs. Flask works well too and is very flexible. Either lets you complete this project; FastAPI just removes more boilerplate.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I move from in-memory data to a database? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Replace the Python list/dict store with a database layer — SQLite via <code>sqlite3</code> or SQLAlchemy to start. Define models, and update each endpoint to query and persist through the database instead of the in-memory structure.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I test API endpoints? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use the framework’s test client (FastAPI’s <code>TestClient</code> or Flask’s <code>test_client</code>) to send requests in your tests and assert on status codes and response bodies — no running server needed.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How should errors be returned? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Return appropriate status codes with a consistent JSON error body (e.g. <code>{"detail": "Not found"}</code>). Frameworks provide helpers like FastAPI’s <code>HTTPException</code> to do this cleanly.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/projects/web-scraper.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Web Scraper</span>
+          </a>
+          <a href="/python/projects/full-stack.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Full Stack Project</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

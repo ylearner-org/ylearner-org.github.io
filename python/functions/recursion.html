@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Recursion Explained – Factorial, Fibonacci & More | ylearner | ylearner</title>
+  <meta name="description" content="Learn Python recursion: how functions call themselves, base cases, recursive vs iterative solutions, the call stack, and when to use recursion with examples.">
+  <meta name="keywords" content="python recursion, python recursive function, python factorial recursion, python fibonacci, python base case recursion">
+  <link rel="canonical" href="https://ylearner.org/python/functions/recursion.html">
+  <meta property="og:title" content="Python Recursion Explained – Factorial, Fibonacci & More | ylearner">
+  <meta property="og:description" content="Learn Python recursion: how functions call themselves, base cases, recursive vs iterative solutions, the call stack, and when to use recursion with examples.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/functions/recursion.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Recursion Explained – Factorial, Fibonacci & More | ylearner">
+  <meta name="twitter:description" content="Learn Python recursion: how functions call themselves, base cases, recursive vs iterative solutions, the call stack, and when to use recursion with examples.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Python Recursion – Functions that Call Themselves","description":"Learn Python recursion: how functions call themselves, base cases, recursive vs iterative solutions, the call stack, and when to use recursion with examples.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/functions/function-basics.html">Functions</a><span class="separator">›</span>
+          <span class="current">Recursion</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Functions</div>
+          <h1>Python Recursion – Functions that Call Themselves</h1>
+          <p class="lesson-intro">Recursion is a technique where a function calls itself to solve a problem. It works by breaking a large problem into smaller, identical sub-problems. Every recursive solution has two parts: a <strong>base case</strong> (where it stops) and a <strong>recursive case</strong> (where it calls itself).</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="concept">How Recursion Works</h2>
+          <p>When a function calls itself, a new frame is added to the call stack. When the base case is reached, the frames unwind and return values back up the chain.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def countdown(n):
+    if n <= 0:           # Base case - MUST exist to prevent infinite loop
+        print("Done!")
+        return
+    print(n)
+    countdown(n - 1)    # Recursive case - calls itself with smaller n
+
+countdown(5)</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+5
+4
+3
+2
+1
+Done!
+          </div>
+
+          <h2 id="factorial">Classic Example – Factorial</h2>
+          <p>n! (n factorial) = n × (n-1) × (n-2) × ... × 1. This is the quintessential recursion example.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def factorial(n):
+    if n == 0 or n == 1:     # Base case
+        return 1
+    return n * factorial(n - 1)  # Recursive case
+
+print(factorial(5))   # 120  (5×4×3×2×1)
+print(factorial(10))  # 3628800</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+120
+3628800
+          </div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="fibonacci">Fibonacci Sequence</h2>
+          <p>Fibonacci: each number is the sum of the two preceding ones. 0, 1, 1, 2, 3, 5, 8, 13...</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def fibonacci(n):
+    if n <= 1:              # Base case
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)  # Recursive
+
+for i in range(8):
+    print(fibonacci(i), end=" ")</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+0 1 1 2 3 5 8 13 
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>Tip</strong><p>Naive Fibonacci recursion is exponentially slow (O(2^n)). Use memoization (@functools.lru_cache) for performance.</p></div>
+          </div>
+
+          <h2 id="vs-iterative">Recursion vs Iteration</h2>
+          <p>Recursion is elegant but not always the best choice. Python has a default recursion limit of 1000 calls (sys.setrecursionlimit()).</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Recursive factorial
+def factorial_recursive(n):
+    return 1 if n <= 1 else n * factorial_recursive(n - 1)
+
+# Iterative factorial (usually preferred in Python)
+def factorial_iterative(n):
+    result = 1
+    for i in range(2, n + 1):
+        result *= i
+    return result
+
+print(factorial_recursive(10))  # 3628800
+print(factorial_iterative(10))  # 3628800 - same result</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+3628800
+3628800
+          </div>
+
+          <h2 id="deep-recursion">Base Case, the Call Stack, and Why Recursion Blows Up</h2>
+          <p>Every recursive function needs two parts: a <strong>base case</strong> that stops the recursion, and a <strong>recursive case</strong> that moves toward it. Forget the base case and Python raises <code>RecursionError: maximum recursion depth exceeded</code> — because each call adds a frame to the call stack, and Python caps that at about 1000 frames by default.</p>
+          <pre><code class="language-python">import sys
+print(sys.getrecursionlimit())   # 1000
+
+def countdown(n):
+    if n == 0:          # base case — without this it never stops
+        return
+    print(n)
+    countdown(n - 1)    # recursive case moves toward base</code></pre>
+          <h3>Naive recursion can be exponentially slow</h3>
+          <p>Plain recursive Fibonacci recomputes the same values over and over — <code>fib(35)</code> makes ~30 million calls. Cache results with <code>lru_cache</code> and it drops to linear:</p>
+          <pre><code class="language-python">from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fib(n):
+    return n if n < 2 else fib(n-1) + fib(n-2)</code></pre>
+          <p><strong>Rule of thumb:</strong> reach for recursion when the data is itself nested (trees, JSON, folders). For flat counting loops, an iterative <code>for</code> is faster and can't overflow the stack.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Write recursive functions:</p>
+            <ol>
+              <li>Implement <code>factorial(n)</code> recursively with a proper base case.</li>
+              <li>Implement <code>fibonacci(n)</code> recursively and print the first 10 numbers.</li>
+              <li>Write a recursive function that sums a list of numbers.</li>
+              <li>Write a recursive countdown that prints from n to 0.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a recursive function that walks a nested list (a list that may contain other lists) and returns the flat sum of all numbers inside it, at any depth. Then compare the recursive Fibonacci with an iterative version and time both for <code>n = 30</code> to see why naive recursion is slow. Bonus: speed up the recursive version with <code>functools.lru_cache</code>.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Recursion is when a function calls itself to solve a smaller version of a problem.</li>
+              <li>Every recursive function needs a base case (to stop) and a recursive case (to progress toward it).</li>
+              <li>Without a reachable base case, recursion runs forever and raises <code>RecursionError</code>.</li>
+              <li>Recursion can be elegant for tree-like and divide-and-conquer problems, but iteration is often faster and uses less memory.</li>
+              <li>Python’s default recursion depth is about 1000; change it with <code>sys.setrecursionlimit()</code> cautiously.</li>
+              <li>Memoization (e.g. <code>functools.lru_cache</code>) avoids recomputing overlapping subproblems.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Recursion</h2>
+          <ul class="interview-list">
+            <li>What is recursion?</li>
+            <li>What are the two essential parts of every recursive function?</li>
+            <li>What is a base case and why is it required?</li>
+            <li>What is the difference between recursion and iteration?</li>
+            <li>What is a stack overflow / <code>RecursionError</code> and what causes it?</li>
+            <li>What is Python’s default recursion limit and how do you change it?</li>
+            <li>How can memoization improve recursive performance?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/functions/function-basics.html" class="topic-tag">⚙️ Function Basics</a>
+            <a href="/python/functions/return-values.html" class="topic-tag">↩️ Return Values</a>
+            <a href="/python/control-flow/for-loop.html" class="topic-tag">🔁 For Loops</a>
+            <a href="/python/advanced/generators.html" class="topic-tag">🔁 Generators</a>
+            <a href="/python/data-structures/lists.html" class="topic-tag">📚 Lists</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">When should I use recursion instead of a loop? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Recursion shines for naturally recursive structures — trees, nested data, divide-and-conquer algorithms like quicksort. For simple repetition, a loop is usually clearer and more efficient because it avoids call-stack overhead.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What causes a <code>RecursionError</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It happens when recursion goes too deep — typically because the base case is missing or never reached, so the call stack exceeds Python’s limit (about 1000 frames by default).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why is recursive Fibonacci so slow? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The naive version recomputes the same subproblems exponentially many times. Memoizing results with <code>functools.lru_cache</code>, or switching to an iterative approach, reduces it to linear time.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Does Python optimize tail recursion? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Unlike some languages, CPython does not perform tail-call optimization, so deep tail-recursive functions still grow the stack. Prefer iteration when recursion depth could be large.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/functions/scope.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Scope</span>
+          </a>
+          <a href="/python/functions/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

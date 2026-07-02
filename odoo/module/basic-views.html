@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Basic Views — Odoo XML Views, QWeb, Data Files &amp; XPath | ylearner</title>
+  <meta name="description" content="Master Odoo's XML-based views — form, list, kanban, search — plus XPath inheritance, QWeb templates, data files, and external IDs. Practical examples for every view type.">
+  <meta name="keywords" content="Odoo views, Odoo form view, Odoo list view, Odoo kanban view, Odoo search view, XPath inheritance, QWeb templates, Odoo XML views, Odoo data files, external IDs">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/module/basic-views.html">
+  <meta property="og:title" content="Basic Views — Odoo XML Views, QWeb, Data Files &amp; XPath">
+  <meta property="og:description" content="Master Odoo's XML-based views — form, list, kanban, search — plus XPath inheritance, QWeb templates, data files, and external IDs. Practical examples for every view type.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/module/basic-views.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Basic Views — Odoo XML Views, QWeb, Data Files &amp; XPath | ylearner">
+  <meta name="twitter:description" content="Master Odoo's XML-based views — form, list, kanban, search — plus XPath inheritance, QWeb templates, data files, and external IDs. Practical examples for every view type.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Basic Views — Odoo XML",
+    "description": "Master Odoo's XML-based views — form, list, kanban, search — plus XPath inheritance, QWeb templates, data files, and external IDs. Practical examples for every view type.",
+    "educationalLevel": "Beginner",
+    "keywords": "Odoo views, form view, list view, kanban, search view, XPath, QWeb, data files, external IDs",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/module/module-structure.html">Module Development</a><span class="separator">›</span>
+          <span class="current">Basic Views</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Module Development</div>
+          <h1>Odoo Basic Views — XML Views, XPath, QWeb, and Data Files</h1>
+          <p class="lesson-intro">Odoo's user interface is defined entirely in XML. Every form, list, kanban board, and search bar your users interact with is a view record stored in the database and rendered by the OWL JS framework. This lesson covers how Odoo loads XML files, how to define the four essential view types, how to use XPath to inherit and extend existing views, how QWeb templates work for reports and portal pages, and how to manage data records and external IDs in your module.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 50 min</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <!-- Section 1: How Odoo Loads XML Files -->
+          <h2 id="how-odoo-loads-xml">How Odoo Loads XML Files</h2>
+          <p>When you install or upgrade a module, Odoo processes every XML file listed in <code>__manifest__.py</code> in order. Understanding this loading process helps you debug missing record errors and ensure correct load order.</p>
+
+          <p>The loading sequence:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-plaintext">Module install/upgrade triggered
+  ↓
+Odoo reads __manifest__.py → gets ordered list of data files
+  ↓
+For each file (in order):
+  1. lxml parses the XML → XMLSyntaxError if invalid
+  2. Odoo walks each &lt;record&gt; element
+  3. Resolves ref="..." to integer IDs
+  4. Evaluates eval="..." Python expressions
+  5. Creates or updates the ir.model.data row (XML ID registry)
+  6. Creates or updates the target model row
+  ↓
+Module loaded</code></pre>
+          </div>
+
+          <p>Python code showing what happens internally (simplified):</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import lxml.etree as etree
+
+with open('views/book_views.xml', 'rb') as f:
+    tree = etree.parse(f)          # Step 1 — parse XML
+    root = tree.getroot()          # &lt;odoo&gt; element
+
+for record_el in root.iter('record'):
+    model_name = record_el.get('model')    # e.g. 'ir.ui.view'
+    xml_id = record_el.get('id')           # e.g. 'view_book_form'
+    # Odoo creates/updates the row, registers the XML ID</code></pre>
+          </div>
+
+          <p>Common load-time errors:</p>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Error</th><th>Cause</th></tr></thead>
+              <tbody>
+                <tr><td><code>XMLSyntaxError: Opening and ending tag mismatch</code></td><td>Missing or wrong closing tag</td></tr>
+                <tr><td><code>XMLSyntaxError: EntityRef: expecting ';'</code></td><td>Unescaped <code>&amp;</code> — use <code>&amp;amp;</code></td></tr>
+                <tr><td><code>XMLSyntaxError: attributes construct error</code></td><td>Unquoted attribute value</td></tr>
+                <tr><td><code>ValueError: External ID not found in the system</code></td><td><code>ref="module.id"</code> points to a record not yet loaded</td></tr>
+                <tr><td><code>KeyError: 'field_name'</code></td><td>Field declared in view doesn't exist on the model</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p><strong>Load order is critical.</strong> Odoo processes manifest data files top-to-bottom. A file that <code>ref=</code>-references a record from a later file will fail. Safe order:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">'data': [
+    'security/ir.model.access.csv',   # 1. security first (models must exist)
+    'views/book_views.xml',           # 2. views
+    'views/actions.xml',              # 3. actions (may reference views)
+    'views/menus.xml',                # 4. menus (reference actions)
+    'data/book_config.xml',           # 5. configuration data last
+],</code></pre>
+          </div>
+
+          <!-- Section 2: Data and Demo Files -->
+          <h2 id="data-demo-files">Data and Demo Files</h2>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">{
+    'name': 'Library Management',
+    'data': [
+        'security/ir.model.access.csv',
+        'views/book_views.xml',
+        'views/menus.xml',
+        'data/mail_template.xml',
+        'report/book_report.xml',
+    ],
+    'demo': [
+        'demo/demo_books.xml',
+        'demo/demo_members.xml',
+    ],
+}</code></pre>
+          </div>
+
+          <p><strong><code>data/</code></strong> — loaded on every module install AND every upgrade. Use for: views, menus, actions, security, email templates, sequences, default configuration.</p>
+          <p><strong><code>demo/</code></strong> — loaded ONLY when the database was created with demo data enabled. Use for: sample records for exploration and testing. Never rely on demo data for module functionality.</p>
+
+          <p><strong><code>noupdate="1"</code></strong> — wrap records that users are expected to modify:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;
+    &lt;!-- Updated on every upgrade (default) --&gt;
+    &lt;record id="view_book_form" model="ir.ui.view"&gt;
+        ...
+    &lt;/record&gt;
+
+    &lt;!-- Created once, never overwritten on upgrade --&gt;
+    &lt;data noupdate="1"&gt;
+        &lt;record id="sequence_library_book" model="ir.sequence"&gt;
+            &lt;field name="name"&gt;Library Book Sequence&lt;/field&gt;
+            &lt;field name="code"&gt;library.book&lt;/field&gt;
+            &lt;field name="prefix"&gt;LIB/%(year)s/&lt;/field&gt;
+            &lt;field name="padding"&gt;4&lt;/field&gt;
+        &lt;/record&gt;
+        &lt;record id="mail_template_overdue" model="mail.template"&gt;
+            &lt;field name="name"&gt;Book Overdue Notice&lt;/field&gt;
+            ...
+        &lt;/record&gt;
+    &lt;/data&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <p>Use <code>noupdate="1"</code> for: email templates (users customise wording), sequences (users set numbering), default configuration values. Do NOT use it for: access rights, record rules, view definitions (those must update).</p>
+
+          <!-- Section 3: External IDs (XML IDs) -->
+          <h2 id="xml-ids">External IDs (XML IDs)</h2>
+          <p>Every <code>&lt;record&gt;</code> element has an <code>id</code> attribute — its <strong>external identifier</strong>. Odoo stores these in <code>ir.model.data</code> and resolves them to database integer IDs at load time. This lets you reference records without hardcoding IDs that differ between installations.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- Define an external ID --&gt;
+&lt;record id="action_library_book" model="ir.actions.act_window"&gt;
+    &lt;field name="name"&gt;Books&lt;/field&gt;
+    &lt;field name="res_model"&gt;library.book&lt;/field&gt;
+    &lt;field name="view_mode"&gt;list,form&lt;/field&gt;
+&lt;/record&gt;
+
+&lt;!-- Reference within same module (no prefix needed) --&gt;
+&lt;menuitem id="menu_library_books"
+          name="Books"
+          action="action_library_book"/&gt;
+
+&lt;!-- Reference from another module (prefix required) --&gt;
+&lt;menuitem id="menu_ext_books"
+          action="library_management.action_library_book"/&gt;</code></pre>
+          </div>
+
+          <p>Python access:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># Get the record object
+action = self.env.ref('library_management.action_library_book')
+
+# Get just the integer ID
+action_id = self.env.ref('library_management.action_library_book').id
+
+# Safe lookup (returns None if not found instead of raising)
+action = self.env.ref('library_management.action_library_book', raise_if_not_found=False)</code></pre>
+          </div>
+
+          <p><strong><code>ref</code> vs <code>eval</code> attributes:</strong></p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- ref: resolves XML ID to integer ID, assigns to Many2one field --&gt;
+&lt;field name="parent_id" ref="base.group_user"/&gt;
+
+&lt;!-- eval: evaluates a Python expression at load time --&gt;
+&lt;field name="active" eval="True"/&gt;
+&lt;field name="groups_id" eval="[(4, ref('base.group_user'))]"/&gt;
+&lt;field name="date" eval="(datetime.date.today()).strftime('%Y-%m-%d')"/&gt;</code></pre>
+          </div>
+
+          <p><strong><code>&lt;delete&gt;</code> tag</strong> — remove a record during module upgrade:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;delete id="old_menu_item" model="ir.ui.menu"/&gt;
+&lt;delete model="ir.ui.menu" search="[('name', '=', 'Legacy Menu')]"/&gt;</code></pre>
+          </div>
+
+          <p>Naming conventions:</p>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Record type</th><th>Convention</th><th>Example</th></tr></thead>
+              <tbody>
+                <tr><td>Form view</td><td><code>view_{model}_form</code></td><td><code>view_library_book_form</code></td></tr>
+                <tr><td>List view</td><td><code>view_{model}_list</code></td><td><code>view_library_book_list</code></td></tr>
+                <tr><td>Kanban view</td><td><code>view_{model}_kanban</code></td><td><code>view_library_book_kanban</code></td></tr>
+                <tr><td>Search view</td><td><code>view_{model}_search</code></td><td><code>view_library_book_search</code></td></tr>
+                <tr><td>Window action</td><td><code>action_{model}</code></td><td><code>action_library_book</code></td></tr>
+                <tr><td>Root menu</td><td><code>menu_{module}_root</code></td><td><code>menu_library_root</code></td></tr>
+                <tr><td>Sub-menu</td><td><code>menu_{model}</code></td><td><code>menu_library_books</code></td></tr>
+                <tr><td>Email template</td><td><code>mail_template_{name}</code></td><td><code>mail_template_book_overdue</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Section 4: Odoo View Types Overview -->
+          <h2 id="view-types-overview">Odoo View Types Overview</h2>
+          <p>All Odoo views are <code>&lt;record&gt;</code> elements with <code>model="ir.ui.view"</code>. The <code>arch</code> field holds the view XML. The <code>model</code> field names which Odoo model the view belongs to.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>View type</th><th><code>&lt;arch&gt;</code> tag</th><th>Purpose</th></tr></thead>
+              <tbody>
+                <tr><td>Form</td><td><code>&lt;form&gt;</code></td><td>View and edit one record</td></tr>
+                <tr><td>List</td><td><code>&lt;list&gt;</code> (was <code>&lt;tree&gt;</code>)</td><td>Browse many records in a table</td></tr>
+                <tr><td>Kanban</td><td><code>&lt;kanban&gt;</code></td><td>Card-based board, ideal for pipelines</td></tr>
+                <tr><td>Search</td><td><code>&lt;search&gt;</code></td><td>Filters, group-by options, search panel</td></tr>
+                <tr><td>Pivot</td><td><code>&lt;pivot&gt;</code></td><td>Spreadsheet-style aggregation</td></tr>
+                <tr><td>Graph</td><td><code>&lt;graph&gt;</code></td><td>Bar, line, or pie chart</td></tr>
+                <tr><td>Calendar</td><td><code>&lt;calendar&gt;</code></td><td>Records plotted on a date/time calendar</td></tr>
+                <tr><td>Activity</td><td><code>&lt;activity&gt;</code></td><td>Activity schedule per record</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>A window action controls which views are available and in what order:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="action_library_book" model="ir.actions.act_window"&gt;
+    &lt;field name="name"&gt;Books&lt;/field&gt;
+    &lt;field name="res_model"&gt;library.book&lt;/field&gt;
+    &lt;field name="view_mode"&gt;list,kanban,form&lt;/field&gt;
+    &lt;!-- Optional: set a default domain or context --&gt;
+    &lt;field name="domain"&gt;[]&lt;/field&gt;
+    &lt;field name="context"&gt;{'search_default_active': 1}&lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <!-- AD BLOCK 1 -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <!-- Section 5: Form View -->
+          <h2 id="form-view">Form View</h2>
+          <p>The form view is the most complex view — it's the full-screen editor for a single record. Annotated structure:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="view_library_book_form" model="ir.ui.view"&gt;
+    &lt;field name="name"&gt;library.book.form&lt;/field&gt;
+    &lt;field name="model"&gt;library.book&lt;/field&gt;
+    &lt;field name="arch" type="xml"&gt;
+        &lt;form string="Book"&gt;
+
+            &lt;!-- HEADER: action buttons + state progression bar --&gt;
+            &lt;header&gt;
+                &lt;button name="action_confirm" string="Confirm"
+                        type="object" class="oe_highlight"
+                        invisible="state != 'draft'"/&gt;
+                &lt;button name="action_return" string="Return"
+                        type="object"
+                        invisible="state != 'borrowed'"/&gt;
+                &lt;button name="action_cancel" string="Cancel"
+                        type="object"
+                        invisible="state in ['cancelled', 'returned']"/&gt;
+                &lt;field name="state" widget="statusbar"
+                       statusbar_visible="draft,confirmed,borrowed,returned"/&gt;
+            &lt;/header&gt;
+
+            &lt;!-- SHEET: main white content card --&gt;
+            &lt;sheet&gt;
+                &lt;!-- Title row --&gt;
+                &lt;div class="oe_title"&gt;
+                    &lt;h1&gt;
+                        &lt;field name="name" placeholder="Book title…"/&gt;
+                    &lt;/h1&gt;
+                &lt;/div&gt;
+
+                &lt;!-- Two-column group --&gt;
+                &lt;group&gt;
+                    &lt;group string="Book Details" name="book_details"&gt;
+                        &lt;field name="author_id"/&gt;
+                        &lt;field name="isbn"/&gt;
+                        &lt;field name="publisher_id"/&gt;
+                        &lt;field name="publish_date"/&gt;
+                    &lt;/group&gt;
+                    &lt;group string="Library Info" name="library_info"&gt;
+                        &lt;field name="category_id"/&gt;
+                        &lt;field name="available_copies"/&gt;
+                        &lt;field name="price" widget="monetary"
+                               options="{'currency_field': 'currency_id'}"/&gt;
+                        &lt;field name="currency_id" invisible="1"/&gt;
+                    &lt;/group&gt;
+                &lt;/group&gt;
+
+                &lt;!-- One2many embedded list (book copies/lines) --&gt;
+                &lt;field name="copy_ids" string="Copies"&gt;
+                    &lt;list editable="bottom"&gt;
+                        &lt;field name="barcode"/&gt;
+                        &lt;field name="location_id"/&gt;
+                        &lt;field name="state"/&gt;
+                    &lt;/list&gt;
+                &lt;/field&gt;
+
+                &lt;!-- Tabbed secondary content --&gt;
+                &lt;notebook&gt;
+                    &lt;page string="Description" name="description"&gt;
+                        &lt;field name="description" widget="html"/&gt;
+                    &lt;/page&gt;
+                    &lt;page string="Tags" name="tags"&gt;
+                        &lt;field name="tag_ids" widget="many2many_tags"/&gt;
+                    &lt;/page&gt;
+                &lt;/notebook&gt;
+            &lt;/sheet&gt;
+
+            &lt;!-- CHATTER: messages, activities, followers --&gt;
+            &lt;!-- Requires mail.thread + mail.activity.mixin on the model --&gt;
+            &lt;chatter/&gt;
+        &lt;/form&gt;
+    &lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <p><strong>Conditional attributes</strong> — control visibility, editability, and required-ness based on field values:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- invisible: hide based on record state (client-side) --&gt;
+&lt;field name="return_date" invisible="state != 'borrowed'"/&gt;
+
+&lt;!-- readonly: make non-editable in certain states --&gt;
+&lt;field name="author_id" readonly="state != 'draft'"/&gt;
+
+&lt;!-- required: enforce a value in certain states --&gt;
+&lt;field name="return_reason" required="state == 'cancelled'"/&gt;
+
+&lt;!-- Combining: invisible on a button --&gt;
+&lt;button name="action_borrow" string="Borrow"
+        type="object"
+        invisible="state != 'confirmed' or available_copies == 0"/&gt;</code></pre>
+          </div>
+
+          <p>Common widgets:</p>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Widget</th><th>Field types</th><th>Effect</th></tr></thead>
+              <tbody>
+                <tr><td><code>statusbar</code></td><td>Selection/Many2one</td><td>Progress bar showing stages</td></tr>
+                <tr><td><code>priority</code></td><td>Selection (0-3)</td><td>Star rating</td></tr>
+                <tr><td><code>state_selection</code></td><td>Selection</td><td>Kanban state traffic light (grey/green/red)</td></tr>
+                <tr><td><code>many2many_tags</code></td><td>Many2many</td><td>Pill-style coloured tags</td></tr>
+                <tr><td><code>many2one_avatar</code></td><td>Many2one (res.users)</td><td>Avatar image next to name</td></tr>
+                <tr><td><code>html</code></td><td>Html/Text</td><td>Rich text WYSIWYG editor</td></tr>
+                <tr><td><code>monetary</code></td><td>Float</td><td>Formatted currency with currency symbol</td></tr>
+                <tr><td><code>handle</code></td><td>Integer</td><td>Drag handle for manual reordering in lists</td></tr>
+                <tr><td><code>binary</code></td><td>Binary</td><td>File upload/download button</td></tr>
+                <tr><td><code>color_picker</code></td><td>Integer</td><td>Color selector (0–11 Odoo palette)</td></tr>
+                <tr><td><code>badge</code></td><td>Selection/Char</td><td>Coloured badge instead of plain text</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Section 6: List View -->
+          <h2 id="list-view">List View</h2>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="view_library_book_list" model="ir.ui.view"&gt;
+    &lt;field name="name"&gt;library.book.list&lt;/field&gt;
+    &lt;field name="model"&gt;library.book&lt;/field&gt;
+    &lt;field name="arch" type="xml"&gt;
+        &lt;list string="Books"
+              decoration-danger="available_copies == 0"
+              decoration-warning="available_copies &amp;lt; 3"
+              decoration-muted="active == False"
+              multi_edit="1"
+              default_order="name asc"&gt;
+
+            &lt;field name="name"/&gt;
+            &lt;field name="author_id"/&gt;
+            &lt;field name="category_id" optional="show"/&gt;
+            &lt;field name="available_copies"
+                   decoration-danger="available_copies == 0"
+                   decoration-warning="available_copies &amp;lt; 3"
+                   sum="Total Copies"/&gt;
+            &lt;field name="price" sum="Total Value" optional="hide"/&gt;
+            &lt;field name="state" widget="badge"
+                   decoration-success="state == 'available'"
+                   decoration-warning="state == 'borrowed'"
+                   decoration-danger="state == 'lost'"/&gt;
+            &lt;field name="publish_date" optional="hide"/&gt;
+
+            &lt;!-- Inline action button --&gt;
+            &lt;button name="action_quick_borrow" string="Borrow"
+                    type="object" icon="fa-book"
+                    invisible="state != 'available'"/&gt;
+        &lt;/list&gt;
+    &lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <p><strong>Row decoration</strong> — color the entire row:</p>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Attribute</th><th>Row colour</th></tr></thead>
+              <tbody>
+                <tr><td><code>decoration-danger</code></td><td>Red</td></tr>
+                <tr><td><code>decoration-warning</code></td><td>Yellow/amber</td></tr>
+                <tr><td><code>decoration-success</code></td><td>Green</td></tr>
+                <tr><td><code>decoration-info</code></td><td>Blue</td></tr>
+                <tr><td><code>decoration-muted</code></td><td>Grey/faded</td></tr>
+                <tr><td><code>decoration-bf</code></td><td>Bold</td></tr>
+                <tr><td><code>decoration-it</code></td><td>Italic</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>The expression uses Python syntax. Field names reference the current row's values.</p>
+
+          <p><strong>Key list attributes:</strong></p>
+          <ul>
+            <li><code>multi_edit="1"</code> — select multiple rows, edit one field, apply the change to all selected rows</li>
+            <li><code>editable="bottom"</code> or <code>editable="top"</code> — enable inline editing without opening a form view; new rows added at bottom or top</li>
+            <li><code>optional="show"</code> — column is visible by default but user can hide it; <code>optional="hide"</code> — hidden by default</li>
+            <li><code>sum="Label"</code> / <code>avg="Label"</code> on numeric <code>&lt;field&gt;</code> — shows aggregate in footer</li>
+          </ul>
+
+          <!-- Section 7: Kanban View -->
+          <h2 id="kanban-view">Kanban View</h2>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="view_library_book_kanban" model="ir.ui.view"&gt;
+    &lt;field name="name"&gt;library.book.kanban&lt;/field&gt;
+    &lt;field name="model"&gt;library.book&lt;/field&gt;
+    &lt;field name="arch" type="xml"&gt;
+        &lt;kanban default_group_by="category_id"
+                class="o_kanban_small_column"&gt;
+
+            &lt;!-- Declare all fields used in the template --&gt;
+            &lt;field name="name"/&gt;
+            &lt;field name="author_id"/&gt;
+            &lt;field name="category_id"/&gt;
+            &lt;field name="available_copies"/&gt;
+            &lt;field name="state"/&gt;
+            &lt;field name="priority"/&gt;
+            &lt;field name="kanban_state"/&gt;
+            &lt;field name="color"/&gt;
+
+            &lt;!-- Column-top progress bar (shows state distribution) --&gt;
+            &lt;progressbar field="state"
+                         colors='{"available": "success", "borrowed": "warning", "lost": "danger"}'/&gt;
+
+            &lt;!-- Card template (Odoo 17+: t-name="card") --&gt;
+            &lt;templates&gt;
+                &lt;t t-name="card"&gt;
+                    &lt;div t-attf-class="oe_kanban_color_#{record.color.raw_value}"&gt;
+                        &lt;div class="oe_kanban_details"&gt;
+                            &lt;strong class="o_kanban_record_title"&gt;
+                                &lt;field name="name"/&gt;
+                            &lt;/strong&gt;
+                            &lt;div class="o_kanban_record_body"&gt;
+                                &lt;span class="text-muted"&gt;
+                                    &lt;field name="author_id"/&gt;
+                                &lt;/span&gt;
+                            &lt;/div&gt;
+                            &lt;div class="o_kanban_record_bottom"&gt;
+                                &lt;div class="oe_kanban_bottom_left"&gt;
+                                    &lt;field name="priority" widget="priority"/&gt;
+                                    &lt;span t-if="record.available_copies.raw_value &gt; 0"
+                                          class="badge text-bg-success"&gt;
+                                        &lt;t t-esc="record.available_copies.value"/&gt; available
+                                    &lt;/span&gt;
+                                &lt;/div&gt;
+                                &lt;div class="oe_kanban_bottom_right"&gt;
+                                    &lt;field name="kanban_state"
+                                           widget="state_selection"/&gt;
+                                &lt;/div&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/t&gt;
+            &lt;/templates&gt;
+        &lt;/kanban&gt;
+    &lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <p>Key concepts:</p>
+          <ul>
+            <li><code>default_group_by="field_name"</code> — groups cards into columns by a Many2one or Selection field</li>
+            <li><code>&lt;progressbar field="..."&gt;</code> — coloured bar at the top of each column based on a field's distribution</li>
+            <li><code>t-name="card"</code> — the card template (Odoo 17+). Older: <code>t-name="kanban-box"</code></li>
+            <li><code>record.field_name.raw_value</code> — the raw database value (integer, string, boolean)</li>
+            <li><code>record.field_name.value</code> — the formatted display string</li>
+            <li><code>t-attf-class="literal #{expr}"</code> — string template for dynamic CSS class names</li>
+          </ul>
+
+          <!-- Section 8: Search View -->
+          <h2 id="search-view">Search View</h2>
+          <p>The search view does not display data — it defines what appears in the search bar (filter buttons, group-by options, facets).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="view_library_book_search" model="ir.ui.view"&gt;
+    &lt;field name="name"&gt;library.book.search&lt;/field&gt;
+    &lt;field name="model"&gt;library.book&lt;/field&gt;
+    &lt;field name="arch" type="xml"&gt;
+        &lt;search string="Search Books"&gt;
+
+            &lt;!-- Fields searched when user types in the search bar --&gt;
+            &lt;field name="name" string="Title"/&gt;
+            &lt;field name="author_id" string="Author"/&gt;
+            &lt;field name="isbn"/&gt;
+            &lt;field name="tag_ids" string="Tag"
+                   filter_domain="[('tag_ids.name', 'ilike', self)]"/&gt;
+
+            &lt;separator/&gt;
+
+            &lt;!-- One-click filter buttons --&gt;
+            &lt;filter string="Available" name="available"
+                    domain="[('state', '=', 'available')]"/&gt;
+            &lt;filter string="Borrowed" name="borrowed"
+                    domain="[('state', '=', 'borrowed')]"/&gt;
+            &lt;filter string="My Borrowings" name="my_books"
+                    domain="[('borrower_id', '=', uid)]"/&gt;
+
+            &lt;!-- Date filter (Odoo generates This Week / This Month etc.) --&gt;
+            &lt;filter string="Published Date" name="published"
+                    date="publish_date"/&gt;
+
+            &lt;separator/&gt;
+
+            &lt;!-- Group-by options --&gt;
+            &lt;group expand="0" string="Group By"&gt;
+                &lt;filter string="Category" name="group_category"
+                        context="{'group_by': 'category_id'}"/&gt;
+                &lt;filter string="Author" name="group_author"
+                        context="{'group_by': 'author_id'}"/&gt;
+                &lt;filter string="State" name="group_state"
+                        context="{'group_by': 'state'}"/&gt;
+                &lt;filter string="Publish Month" name="group_month"
+                        context="{'group_by': 'publish_date:month'}"/&gt;
+            &lt;/group&gt;
+
+            &lt;!-- Search panel: sidebar with category filters --&gt;
+            &lt;searchpanel&gt;
+                &lt;field name="category_id" select="one"
+                       icon="fa-book" string="Category"/&gt;
+                &lt;field name="state" select="multi"
+                       icon="fa-circle" string="Status"/&gt;
+            &lt;/searchpanel&gt;
+
+        &lt;/search&gt;
+    &lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <p>Key search view elements:</p>
+          <ul>
+            <li><code>&lt;field name="..."&gt;</code> — adds the field to full-text search. When user types in the bar and selects this field, Odoo searches using an <code>ilike</code> domain by default.</li>
+            <li><code>filter_domain</code> with <code>self</code> — <code>self</code> is replaced with the typed value. Use for cross-field searches.</li>
+            <li><code>&lt;filter domain="..."&gt;</code> — one-click button that applies a domain permanently</li>
+            <li><code>&lt;filter date="field_name"&gt;</code> — Odoo auto-generates "This Week", "This Month", "This Quarter", "This Year" sub-filters</li>
+            <li><code>&lt;group context="{'group_by': 'field'}"&gt;</code> — adds a group-by option; date fields support granularity: <code>:day</code>, <code>:week</code>, <code>:month</code>, <code>:quarter</code>, <code>:year</code></li>
+            <li><code>&lt;searchpanel&gt;</code> — left sidebar with <code>select="one"</code> (radio) or <code>select="multi"</code> (checkboxes)</li>
+          </ul>
+
+          <p><strong>Activating filters by default</strong> — add to the action's context:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;field name="context"&gt;{'search_default_available': 1, 'search_default_group_category': 1}&lt;/field&gt;</code></pre>
+          </div>
+
+          <!-- AD BLOCK 2 -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <!-- Section 9: XPath View Inheritance -->
+          <h2 id="xpath-inheritance">XPath View Inheritance</h2>
+          <p>XPath lets you modify an existing view from another module without editing the original. This is how Odoo's modular architecture works — a sales module can add a field to a base contact form without touching the contacts module.</p>
+
+          <p>XPath expression anatomy:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-plaintext">    //    field    [@name='partner_id']
+    ↑     ↑        ↑
+    |     |        predicate — filter by attribute value
+    |     element name to match
+    // = search anywhere in the document
+    /  = search only immediate children of root</code></pre>
+          </div>
+
+          <p>Position values:</p>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Position</th><th>What happens</th></tr></thead>
+              <tbody>
+                <tr><td><code>after</code></td><td>New XML inserted immediately after the matched element</td></tr>
+                <tr><td><code>before</code></td><td>New XML inserted immediately before the matched element</td></tr>
+                <tr><td><code>inside</code></td><td>New XML appended as last child of the matched element</td></tr>
+                <tr><td><code>replace</code></td><td>Matched element removed and replaced with new XML</td></tr>
+                <tr><td><code>attributes</code></td><td>Attributes of the matched element modified (use <code>&lt;attribute&gt;</code> children)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p><strong>Full example</strong> — extending the sale order form from a custom module:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="view_sale_order_form_inherit_library" model="ir.ui.view"&gt;
+    &lt;field name="name"&gt;sale.order.form.library&lt;/field&gt;
+    &lt;field name="model"&gt;sale.order&lt;/field&gt;
+    &lt;field name="inherit_id" ref="sale.view_order_form"/&gt;
+    &lt;field name="arch" type="xml"&gt;
+
+        &lt;!-- Add a field after partner_id --&gt;
+        &lt;xpath expr="//field[@name='partner_id']" position="after"&gt;
+            &lt;field name="library_card_id" string="Library Card"/&gt;
+        &lt;/xpath&gt;
+
+        &lt;!-- Add a new page to the notebook --&gt;
+        &lt;xpath expr="//notebook" position="inside"&gt;
+            &lt;page string="Library Info" name="library_info"&gt;
+                &lt;group&gt;
+                    &lt;field name="borrowed_book_ids" widget="many2many_tags"/&gt;
+                    &lt;field name="library_notes"/&gt;
+                &lt;/group&gt;
+            &lt;/page&gt;
+        &lt;/xpath&gt;
+
+        &lt;!-- Make a field invisible --&gt;
+        &lt;xpath expr="//field[@name='client_order_ref']" position="attributes"&gt;
+            &lt;attribute name="invisible"&gt;1&lt;/attribute&gt;
+        &lt;/xpath&gt;
+
+        &lt;!-- Replace a field with a different one --&gt;
+        &lt;xpath expr="//field[@name='payment_term_id']" position="replace"&gt;
+            &lt;field name="custom_payment_id" string="Custom Payment"/&gt;
+        &lt;/xpath&gt;
+
+        &lt;!-- Add a button to the header --&gt;
+        &lt;xpath expr="//header/button[last()]" position="after"&gt;
+            &lt;button name="action_library_sync" string="Sync Library"
+                    type="object" icon="fa-refresh"/&gt;
+        &lt;/xpath&gt;
+
+    &lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <p><strong>Shorthand syntax</strong> — for fields and buttons, you can use the element tag directly instead of a full XPath expression:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- Shorthand: fine for simple cases --&gt;
+&lt;field name="partner_id" position="after"&gt;
+    &lt;field name="library_card_id"/&gt;
+&lt;/field&gt;
+
+&lt;!-- Use full XPath when: --&gt;
+&lt;!-- 1. The target is not a field (e.g. &lt;group&gt;, &lt;notebook&gt;, &lt;page&gt;, &lt;div&gt;) --&gt;
+&lt;!-- 2. The field name appears multiple times in the view --&gt;
+&lt;!-- 3. You need positional selectors like [last()] or [1] --&gt;</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always name your groups and pages</strong>
+              <p>Always give your <code>&lt;group&gt;</code>, <code>&lt;page&gt;</code>, and <code>&lt;notebook&gt;</code> elements a <code>name</code> attribute. This makes them targetable with a stable XPath: <code>//group[@name='billing']</code> instead of <code>//sheet/group[2]</code> (which breaks if any module adds a group earlier).</p>
+            </div>
+          </div>
+
+          <!-- Section 10: XML Validation -->
+          <h2 id="xml-validation">XML Validation</h2>
+          <p><strong>Well-formed vs valid:</strong></p>
+          <ul>
+            <li><strong>Well-formed</strong> — follows XML syntax rules (tags close, attributes quoted, one root, correct nesting). Required — the module won't load if XML is malformed.</li>
+            <li><strong>Valid</strong> — well-formed AND conforms to a schema defining which elements are allowed and where. Odoo validates view XML against RNG schema files in <code>odoo/addons/base/views/</code>.</li>
+          </ul>
+
+          <p><strong>Run Odoo with XML validation in development:</strong></p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Enables strict view validation (slower but catches schema violations)
+python odoo-bin -c odoo.conf --dev=xml
+
+# Upgrade a module with validation
+python odoo-bin -c odoo.conf -u my_module --dev=xml</code></pre>
+          </div>
+
+          <p><strong>Check XML syntax locally before loading</strong> (catch errors fast without restarting Odoo):</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Install xmllint
+sudo apt install libxml2-utils    # Ubuntu/Debian
+
+# Validate a file (no output = valid; error shows file:line)
+xmllint --noout views/book_views.xml
+
+# Example error output:
+# views/book_views.xml:23: parser error : Opening and ending tag mismatch</code></pre>
+          </div>
+
+          <p>Common XML errors and fixes:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- ERROR: unescaped &amp; in domain --&gt;
+&lt;filter domain="[('amount', '&gt;', 100) and ('state', '=', 'open')]"/&gt;
+&lt;!-- FIX: use &amp;amp; --&gt;
+&lt;filter domain="[('amount', '&amp;gt;', 100)]"/&gt;
+
+&lt;!-- ERROR: self-closing tag not closed --&gt;
+&lt;field name="name"&gt;
+&lt;!-- FIX: self-close or add closing tag --&gt;
+&lt;field name="name"/&gt;
+
+&lt;!-- ERROR: missing closing tag --&gt;
+&lt;group&gt;
+    &lt;field name="name"/&gt;
+&lt;field name="email"/&gt;   &lt;!-- This is outside the group! --&gt;
+&lt;!-- FIX --&gt;
+&lt;group&gt;
+    &lt;field name="name"/&gt;
+&lt;/group&gt;
+&lt;field name="email"/&gt;</code></pre>
+          </div>
+
+          <!-- Section 11: QWeb — Odoo's XML Template Engine -->
+          <h2 id="qweb">QWeb — Odoo's XML Template Engine</h2>
+          <p>QWeb is Odoo's template engine built on top of XML. It adds <code>t-*</code> directive attributes to standard HTML elements to produce dynamic output. QWeb is used for PDF reports, portal pages, website pages, and email templates — NOT for the main OWL-based UI views (form, list, kanban).</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Directive</th><th>Purpose</th></tr></thead>
+              <tbody>
+                <tr><td><code>t-esc="expr"</code></td><td>Output HTML-escaped value — safe for user data</td></tr>
+                <tr><td><code>t-raw="expr"</code></td><td>Output raw HTML — only for trusted content</td></tr>
+                <tr><td><code>t-if="condition"</code></td><td>Render element only if condition is true</td></tr>
+                <tr><td><code>t-elif="condition"</code></td><td>Else-if branch</td></tr>
+                <tr><td><code>t-else</code></td><td>Else branch</td></tr>
+                <tr><td><code>t-foreach="list" t-as="item"</code></td><td>Loop; also gives <code>item_index</code>, <code>item_size</code>, <code>item_first</code>, <code>item_last</code></td></tr>
+                <tr><td><code>t-call="template.xmlid"</code></td><td>Include another template (like a function call)</td></tr>
+                <tr><td><code>t-set="var" t-value="expr"</code></td><td>Assign a variable</td></tr>
+                <tr><td><code>t-att-href="expr"</code></td><td>Dynamic attribute value</td></tr>
+                <tr><td><code>t-attf-class="literal #{expr}"</code></td><td>String-template for mixed literal/dynamic attributes</td></tr>
+                <tr><td><code>t-field="record.fieldname"</code></td><td>Render a field with Odoo formatting (currency, date, etc.)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>The <code>&lt;t&gt;</code> element is an invisible wrapper — it applies directives without adding any element to the output:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- t-foreach without adding a wrapper div --&gt;
+&lt;t t-foreach="order.line_ids" t-as="line"&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;t t-esc="line.product_id.name"/&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;t t-esc="line.quantity"/&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;t t-field="line.price_subtotal"/&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/t&gt;</code></pre>
+          </div>
+
+          <p>Minimal PDF report template:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;template id="report_book_document"&gt;
+    &lt;t t-call="web.html_container"&gt;
+        &lt;t t-foreach="docs" t-as="doc"&gt;
+            &lt;div class="page"&gt;
+                &lt;div class="row"&gt;
+                    &lt;div class="col-6"&gt;
+                        &lt;h2&gt;&lt;t t-esc="doc.name"/&gt;&lt;/h2&gt;
+                        &lt;p&gt;Author: &lt;t t-field="doc.author_id"/&gt;&lt;/p&gt;
+                    &lt;/div&gt;
+                    &lt;div class="col-6 text-end"&gt;
+                        &lt;p t-if="doc.isbn"&gt;ISBN: &lt;t t-esc="doc.isbn"/&gt;&lt;/p&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+                &lt;table class="table table-sm"&gt;
+                    &lt;thead&gt;
+                        &lt;tr&gt;
+                            &lt;th&gt;Copy #&lt;/th&gt;
+                            &lt;th&gt;Location&lt;/th&gt;
+                            &lt;th&gt;Status&lt;/th&gt;
+                        &lt;/tr&gt;
+                    &lt;/thead&gt;
+                    &lt;tbody&gt;
+                        &lt;t t-foreach="doc.copy_ids" t-as="copy"&gt;
+                            &lt;tr&gt;
+                                &lt;td&gt;&lt;t t-esc="copy.barcode"/&gt;&lt;/td&gt;
+                                &lt;td&gt;&lt;t t-esc="copy.location_id.name"/&gt;&lt;/td&gt;
+                                &lt;td&gt;&lt;t t-esc="copy.state"/&gt;&lt;/td&gt;
+                            &lt;/tr&gt;
+                        &lt;/t&gt;
+                    &lt;/tbody&gt;
+                &lt;/table&gt;
+            &lt;/div&gt;
+        &lt;/t&gt;
+    &lt;/t&gt;
+&lt;/template&gt;</code></pre>
+          </div>
+
+          <p>Registering the report action:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="action_report_book" model="ir.actions.report"&gt;
+    &lt;field name="name"&gt;Book Card&lt;/field&gt;
+    &lt;field name="model"&gt;library.book&lt;/field&gt;
+    &lt;field name="report_type"&gt;qweb-pdf&lt;/field&gt;
+    &lt;field name="report_name"&gt;library_management.report_book_document&lt;/field&gt;
+    &lt;field name="binding_model_id" ref="model_library_book"/&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>QWeb vs OWL templates</strong>
+              <p>QWeb is separate from OWL's template syntax. OWL also uses <code>t-*</code> directives but operates on JavaScript objects in the browser. QWeb runs on the Python server side and produces an HTML string (for portal/website/email) or a PDF (for reports). Don't confuse the two.</p>
+            </div>
+          </div>
+
+          <!-- Section 12: Summary -->
+          <h2 id="deep-views">View Types: How the Same Data Gets Displayed</h2>
+          <p>A view is an XML definition of <em>how</em> records appear. The same model can have many views — a list to scan, a form to edit, a kanban board to drag. The action's <code>view_mode</code> decides which are available.</p>
+          <table>
+            <thead><tr><th>View</th><th>Shows records as</th></tr></thead>
+            <tbody>
+              <tr><td><code>list</code> (tree)</td><td>a table of rows</td></tr>
+              <tr><td><code>form</code></td><td>one record, editable</td></tr>
+              <tr><td><code>kanban</code></td><td>draggable cards/columns</td></tr>
+              <tr><td><code>search</code></td><td>filters &amp; group-by options</td></tr>
+              <tr><td><code>calendar / graph / pivot</code></td><td>time / analytics</td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-xml">&lt;record id="view_course_form" model="ir.ui.view"&gt;
+    &lt;field name="model"&gt;school.course&lt;/field&gt;
+    &lt;field name="arch" type="xml"&gt;
+        &lt;form&gt;
+            &lt;sheet&gt;
+                &lt;field name="name"/&gt;
+                &lt;field name="teacher_id"/&gt;
+            &lt;/sheet&gt;
+        &lt;/form&gt;
+    &lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          <h3>Extend, don't replace</h3>
+          <p>To tweak a <em>standard</em> Odoo view, don't copy it — inherit and patch with <code>xpath</code>:</p>
+          <pre><code class="language-xml">&lt;field name="inherit_id" ref="sale.view_order_form"/&gt;
+&lt;field name="arch" type="xml"&gt;
+    &lt;xpath expr="//field[@name='partner_id']" position="after"&gt;
+        &lt;field name="my_custom_field"/&gt;
+    &lt;/xpath&gt;
+&lt;/field&gt;</code></pre>
+          <p>This adds your field without touching Odoo's source, so upgrades don't wipe your change — the standard, upgrade-safe way to customize views.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create a form view in XML.</li>
+              <li>Create a tree/list view.</li>
+              <li>Add fields to the form.</li>
+              <li>Add a search view.</li>
+              <li>Link the views to an action.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build form, list, and search views for a model in XML, wiring them to a window action and a menu so records can be created and browsed. Explain how <code>&lt;record model="ir.ui.view"&gt;</code> defines views and how actions connect views to menus.</p>
+          </div>
+
+          <div class="summary-box" id="summary">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li>Odoo loads XML files top-to-bottom in <code>__manifest__.py</code> order. A <code>ref=</code> pointing to a record in a later file causes "External ID not found" — always load security before views, views before actions, actions before menus.</li>
+              <li><code>data/</code> files load on every install+upgrade. <code>demo/</code> files load only when demo data is enabled. Use <code>noupdate="1"</code> for records users are expected to modify.</li>
+              <li><strong>External IDs</strong> let you reference records reliably with <code>ref="module.id"</code> in XML and <code>self.env.ref()</code> in Python, without hardcoding database integer IDs.</li>
+              <li>Odoo has 8+ view types: form (single record), list (table), kanban (cards), search (filters/group-by), plus pivot, graph, calendar, activity.</li>
+              <li><strong>Form view</strong>: <code>&lt;header&gt;</code> for buttons+statusbar, <code>&lt;sheet&gt;</code> for content, <code>&lt;group&gt;</code> for columns, <code>&lt;notebook&gt;</code> for tabs, <code>&lt;chatter/&gt;</code> for messaging. Use <code>invisible</code>/<code>readonly</code>/<code>required</code> with Python expressions.</li>
+              <li><strong>List view</strong>: <code>decoration-*</code> colors rows, <code>sum</code>/<code>avg</code> for footer aggregates, <code>optional</code> for user-toggleable columns, <code>multi_edit</code> for bulk changes.</li>
+              <li><strong>Kanban view</strong>: group by Many2one column, <code>&lt;progressbar&gt;</code> for column status bars, card template in <code>t-name="card"</code>.</li>
+              <li><strong>Search view</strong>: <code>&lt;field&gt;</code> for full-text search, <code>&lt;filter&gt;</code> for quick filters, <code>&lt;group&gt;</code> for group-by options, <code>&lt;searchpanel&gt;</code> for sidebar categories.</li>
+              <li><strong>XPath inheritance</strong>: <code>&lt;inherit_id ref="module.view_id"&gt;</code> + <code>&lt;xpath expr="..." position="..."&gt;</code> modifies any existing view without touching the original module.</li>
+              <li><strong>QWeb</strong>: <code>t-*</code> directives on XML elements produce dynamic HTML/PDF output — used for reports, portal pages, website, and email templates (not for form/list/kanban UI).</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you define a view in Odoo?</li>
+            <li>What view types exist (form, list, kanban…)?</li>
+            <li>How is a view linked to a model?</li>
+            <li>What is a window action?</li>
+            <li>How does a search view work?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/odoo/xml-basics.html" class="topic-tag odoo-topic-tag">🐍 XML Basics</a>
+            <a href="/odoo/module/module-structure.html" class="topic-tag odoo-topic-tag">🐍 Module Structure</a>
+            <a href="/odoo/module/models-fields.html" class="topic-tag odoo-topic-tag">🐍 Models &amp; Fields</a>
+            <a href="/odoo/module/menus-actions.html" class="topic-tag odoo-topic-tag">🐍 Menus &amp; Actions</a>
+            <a href="/odoo/module/security-access.html" class="topic-tag odoo-topic-tag">🐍 Security &amp; Access Rights</a>
+            <a href="/odoo/backend/computed-fields.html" class="topic-tag odoo-topic-tag">🐍 Backend Development</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>&lt;tree&gt;</code> and <code>&lt;list&gt;</code> in Odoo views? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>They are the same view type. Odoo renamed <code>&lt;tree&gt;</code> to <code>&lt;list&gt;</code> in Odoo 17 for semantic clarity. Both tags still work in Odoo 17+. Any module you find using <code>&lt;tree&gt;</code> is targeting Odoo 16 or earlier, but the tag still parses correctly.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When should I use <code>noupdate="1"</code> on data records? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use it for records users will customise after installation — email templates (they'll change the wording), sequences (they'll change the numbering prefix), and default company settings. Avoid it for views, access rights, and server actions — those must be updatable so security fixes and feature changes apply correctly on module upgrade.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does my XPath fail even though the expression looks correct? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Three common reasons: (1) the element doesn't have the attribute you're filtering on — the field might be named differently in the target view; (2) the element appears inside a sub-template that's rendered separately; (3) another module's inherited view changed the structure between the original view and your xpath. Use developer mode's "Edit View" feature (Settings &gt; Technical &gt; Views) to inspect the compiled arch before writing your XPath.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is <code>docs</code> in a QWeb report template? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>docs</code> is a standard variable automatically passed to every QWeb report template. It is a recordset of the records being printed — for example, if you print 3 sale orders, <code>docs</code> is a recordset of those 3 orders. The <code>t-foreach="docs" t-as="doc"</code> loop iterates over each one to produce one page per record.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I add a <code>&lt;searchpanel&gt;</code> to a list view? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — the search view defines the searchpanel and it works with both list and kanban views. It does not work with form, pivot, or graph views. The <code>select="one"</code> option gives radio buttons (filter by one value at a time); <code>select="multi"</code> gives checkboxes (filter by multiple values simultaneously).</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/module/models-fields.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Models &amp; Fields</span>
+          </a>
+          <a href="/odoo/module/menus-actions.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Menus &amp; Actions</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

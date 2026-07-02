@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>git bisect &amp; git blame – Finding Who Changed What | ylearner</title>
+  <meta name="description" content="Learn how to use git blame to see who changed each line of code, and git bisect to binary-search through history to find which commit introduced a bug.">
+  <meta name="keywords" content="git blame, git bisect, find bug commit, git bisect run, git blame line range, binary search git history">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/git/advanced/git-bisect.html">
+  <meta property="og:title" content="git bisect &amp; git blame – Finding Who Changed What | ylearner">
+  <meta property="og:description" content="Learn git blame to trace line ownership and git bisect to binary-search commit history and pinpoint exactly which commit introduced a bug.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/git/advanced/git-bisect.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="git bisect &amp; git blame – Finding Who Changed What | ylearner">
+  <meta name="twitter:description" content="Learn git blame to trace line ownership and git bisect to binary-search commit history and pinpoint exactly which commit introduced a bug.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"git bisect & git blame – Finding Who Changed What","description":"Learn git blame to trace line ownership and git bisect to binary-search commit history to find which commit introduced a bug.","educationalLevel":"Intermediate","keywords":"git blame, git bisect, find bug in git history","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <span>Advanced Git</span><span class="separator">›</span>
+          <span class="current">git bisect &amp; git blame</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Advanced Git</div>
+          <h1>git bisect &amp; git blame – Finding Who Changed What</h1>
+          <p class="lesson-intro">When a bug appears and you don't know where it came from, Git gives you two powerful investigation tools. <strong>git blame</strong> shows you which commit (and which developer) last changed each line of a file. <strong>git bisect</strong> uses binary search to find the exact commit that introduced a bug — even across hundreds of commits. Together, these commands turn debugging from guesswork into a systematic process.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="git-blame">git blame – Line-by-Line Authorship</h2>
+          <p><code>git blame</code> annotates every line of a file with the commit hash, author name, and date of the last change to that line. It's your first stop when you find a confusing line of code and need context about why it was written.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Blame an entire file
+git blame src/auth.js
+
+# Blame a specific line range (lines 10–20)
+git blame -L 10,20 src/auth.js
+
+# Blame a range using a function name (Git 2.13+)
+git blame -L :validateUser src/auth.js
+
+# Follow renames — useful when a file was renamed or moved
+git blame --follow -L 15,25 src/auth.js
+
+# Show author email instead of name
+git blame -e src/auth.js
+
+# Ignore whitespace-only changes
+git blame -w src/auth.js</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Sample git blame output</div>
+            a1b2c3d4 (Jane Dev  2026-05-12 09:14:22 +0000 10) function validateUser(user) {<br>
+            9f8e7d6c (Bob Smith 2026-04-01 14:22:11 +0000 11)   if (!user.email) {<br>
+            a1b2c3d4 (Jane Dev  2026-05-12 09:14:22 +0000 12)     throw new Error('Email required');<br>
+            ^3c2b1a0 (Alice Lee 2026-01-08 11:55:03 +0000 13)   }<br>
+            9f8e7d6c (Bob Smith 2026-04-01 14:22:11 +0000 14)   return user.email.toLowerCase();<br>
+            a1b2c3d4 (Jane Dev  2026-05-12 09:14:22 +0000 15) }
+          </div>
+
+          <p>The <code>^</code> prefix on line 13 means that line was in the very first commit of the file. After finding a suspicious commit hash, dig deeper:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Inspect the full commit to understand the change in context
+git show 9f8e7d6c</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="git-bisect">git bisect – Binary Search Through History</h2>
+          <p>When you know a bug didn't exist in version <code>v1.0.0</code> but exists now (after 200 commits), manually checking each commit would take forever. <strong>git bisect</strong> uses binary search — it cuts the search space in half with each test, finding the bad commit in just <code>log₂(n)</code> steps. For 200 commits, that's only 8 checks.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>The scenario</strong>
+              <p>"The user dashboard was working fine three weeks ago. Now it crashes on load. There have been about 150 commits since then. Which commit broke it?" — git bisect will find it in ~8 steps.</p>
+            </div>
+          </div>
+
+          <h2 id="bisect-workflow">Step-by-Step Bisect Workflow</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Step 1: Start bisect mode
+git bisect start
+
+# Step 2: Mark current state as BAD (the bug exists here)
+git bisect bad
+
+# Step 3: Mark a known GOOD commit (when the bug didn't exist)
+# Use a tag, branch, or commit hash
+git bisect good v1.0.0
+# Bisecting: 75 revisions left to test after this (roughly 6 steps)
+# [abc123] Add user profile endpoint
+
+# Step 4: Git checks out the midpoint commit
+# Test your code — does the bug exist here?
+# Run your app, run tests, check manually...
+
+# Step 5a: If the bug EXISTS at this commit:
+git bisect bad
+
+# Step 5b: If the bug does NOT exist at this commit:
+git bisect good
+
+# Git will keep halving the range and checking out the midpoint
+# Repeat until Git prints:
+# abc123 is the first bad commit
+# commit abc123
+# Author: Bob Smith &lt;bob@example.com&gt;
+# Date: Fri May 30 11:22:00 2026 +0000
+#     Refactor dashboard data fetching
+
+# Step 6: When done, reset back to your original HEAD
+git bisect reset</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Can't test a particular commit?</strong>
+              <p>If Git checks out a commit that can't be tested (e.g., it won't compile due to an unrelated issue), mark it as <code>git bisect skip</code>. Git will find another commit to test nearby.</p>
+            </div>
+          </div>
+
+          <h2 id="bisect-run">Automating Bisect with a Test Script</h2>
+          <p>If you have an automated test or script that returns exit code 0 for good and non-zero for bad, you can let Git run bisect entirely automatically:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">git bisect start
+git bisect bad HEAD
+git bisect good v1.0.0
+
+# Fully automated: run this command after each checkout
+# Exit 0 = good, non-zero = bad
+git bisect run npm test
+
+# Or a custom test script
+git bisect run ./test-bug.sh
+
+# Or a one-liner shell test
+git bisect run sh -c "node -e \"require('./src/dashboard.js')\" 2>/dev/null"
+
+# Git will run through all commits automatically and report the first bad one
+git bisect reset</code></pre>
+          </div>
+
+          <h2 id="blame-in-editors">git blame in Your Editor</h2>
+          <p>Most modern editors provide git blame functionality inline:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Editor / Tool</th><th>How to access blame</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>VS Code</strong></td><td>GitLens extension → hover over any line or open "File History"</td></tr>
+                <tr><td><strong>JetBrains IDEs</strong></td><td>Right-click line → Git → Annotate with Git Blame</td></tr>
+                <tr><td><strong>GitHub web</strong></td><td>Open a file → click "Blame" button (top right)</td></tr>
+                <tr><td><strong>Neovim</strong></td><td><code>:Git blame</code> via vim-fugitive plugin</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="deep-bisect">git bisect: Binary-Search Your History for the Bug</h2>
+          <p>A bug appeared "sometime in the last 200 commits." Instead of checking each one, <code>git bisect</code> does a <strong>binary search</strong>: you mark a known-good and known-bad commit, and it repeatedly checks out the midpoint for you to test — finding the culprit in about <code>log₂(n)</code> steps (200 commits → ~8 tests).</p>
+          <pre><code class="language-bash">git bisect start
+git bisect bad                 # current commit is broken
+git bisect good v1.0           # this old release worked
+# → Git checks out a commit halfway between. Test it, then:
+git bisect good                # (or `git bisect bad`) based on your test
+# repeat ~8 times; Git names the first bad commit
+git bisect reset               # return to where you started</code></pre>
+          <h3>Automate it</h3>
+          <pre><code class="language-bash"># let a test script decide good/bad at each step — fully hands-off
+git bisect run npm test</code></pre>
+          <p>With <code>bisect run</code>, you hand Git a command that <em>exits 0 for good, non-zero for bad</em>. Git drives the entire search automatically and hands back the offending commit — brilliant for pinpointing regressions in a large history.</p>
+          <p><strong>Why it's powerful:</strong> binary search means even a huge history is a handful of tests, not hundreds. Once bisect names the commit, <code>git show &lt;commit&gt;</code> reveals the exact change that introduced the bug. Requirement: you need a reliable way to tell "good" from "bad" at each step (a test, or a manual repro).</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Start a bisect session with <code>git bisect start</code>.</li>
+              <li>Mark a bad commit.</li>
+              <li>Mark a good commit.</li>
+              <li>Test and mark each midpoint.</li>
+              <li>Reset after finding the culprit.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Use <code>git bisect</code> to find the commit that introduced a bug: mark known good and bad commits, let Git binary-search through history testing each midpoint, and identify the culprit. Explain why bisect is far faster than checking commits one by one.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>git blame &lt;file&gt;</strong> — annotates every line with its commit hash, author, and date.</li>
+              <li>Use <strong>-L &lt;start&gt;,&lt;end&gt;</strong> to blame a specific line range.</li>
+              <li>Use <strong>--follow</strong> to trace blame through file renames.</li>
+              <li><strong>git bisect start</strong> → <strong>git bisect bad</strong> → <strong>git bisect good &lt;ref&gt;</strong> — starts binary search.</li>
+              <li>At each checkpoint: test the code, then run <code>git bisect good</code> or <code>git bisect bad</code>.</li>
+              <li>Git identifies the first bad commit after ~log₂(n) steps.</li>
+              <li><strong>git bisect run &lt;script&gt;</strong> — fully automates the search using an exit-code-based test.</li>
+              <li><strong>git bisect skip</strong> — skip a commit that can't be tested.</li>
+              <li>Always end with <strong>git bisect reset</strong> to return to your original branch.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is <code>git bisect</code> used for?</li>
+            <li>How does bisect work (binary search)?</li>
+            <li>What do you mark as good and bad?</li>
+            <li>Can bisect be automated?</li>
+            <li>Why is bisect efficient on a large history?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/git/advanced/cherry-pick.html" class="topic-tag git-topic-tag">⚙️ Cherry-Pick</a>
+            <a href="/git/advanced/git-hooks.html" class="topic-tag git-topic-tag">⚙️ Git Hooks</a>
+            <a href="/git/basics/viewing-diffs.html" class="topic-tag git-topic-tag">⚙️ Viewing Diffs</a>
+            <a href="/git/basics/status-log.html" class="topic-tag git-topic-tag">⚙️ git log</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">git blame shows a merge commit — how do I find the real change? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>When blame shows a merge commit, the actual code change was made in one of the merged branches. Run <code>git show &lt;merge-commit-hash&gt;</code> to see which branches were merged. Then blame the individual branch commits before the merge to trace the actual author. The <code>-C</code> flag (<code>git blame -C</code>) can also detect code copied from other files, which is sometimes what a "merge commit" hides.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I bisect when the bug is intermittent (not 100% reproducible)? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Intermittent bugs are harder to bisect. Options: (1) Use <code>git bisect skip</code> for commits where you can't determine good/bad with confidence. (2) Write a more reliable test that triggers the bug more consistently. (3) Run your test multiple times at each commit. If using <code>git bisect run</code>, your script can run the test N times and only exit 0 if it passes all N runs. The bisect result may be less precise but will still narrow the search significantly.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What does it mean when git bisect says "only skips left to test"? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>This happens when all remaining commits to test have been marked as <code>skip</code>. Git reports the boundary of the skipped range — the first bad commit is somewhere between the last known good and first known bad commit, but Git can't identify it precisely due to the skips. You'll need to inspect the commits in that range manually (using <code>git log --oneline &lt;good&gt;..&lt;bad&gt;</code>) and test them individually.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is "blame" the right word? Does it actually blame developers? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The name is a bit unfortunate — in practice, most development cultures use "git blame" as a neutral investigation tool, not to assign fault. The information it reveals is simply: "who has the most context about this line?" When you're confused by a piece of code, git blame helps you find the right person to ask (or the PR/commit to read for context). Some tools rename it to "git annotate" for a more neutral feel. The <code>git annotate</code> command in Git itself provides similar output.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/advanced/cherry-pick.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Cherry-Pick</span>
+          </a>
+          <a href="/git/advanced/git-hooks.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Git Hooks</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

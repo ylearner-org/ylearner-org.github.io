@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Web Scraper Project – Build a News Aggregator | ylearner</title>
+  <meta name="description" content="Build a Python news aggregator that scrapes headlines, deduplicates, saves to JSON/CSV, and can email digests.">
+  <meta name="keywords" content="python web scraper project, python news scraper, python beautifulsoup project, python data collection">
+  <link rel="canonical" href="https://ylearner.org/python/projects/web-scraper.html">
+  <meta property="og:title" content="Python Web Scraper Project – Build a News Aggregator | ylearner">
+  <meta property="og:description" content="Build a Python news aggregator that scrapes headlines, deduplicates, saves to JSON/CSV, and can email digests.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/projects/web-scraper.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Web Scraper Project – Build a News Aggregator | ylearner">
+  <meta name="twitter:description" content="Build a Python news aggregator that scrapes headlines, deduplicates, saves to JSON/CSV, and can email digests.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Web Scraper Project","description":"Python news aggregator project: multi-source scraping, deduplication, and data export.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/projects/calculator.html">Projects</a><span class="separator">›</span><span class="current">Web Scraper</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🕷️ Projects</div>
+          <h1>Python Web Scraper – News Aggregator</h1>
+          <p class="lesson-intro">Scrape news headlines from multiple sources, deduplicate, save to JSON/CSV, and optionally email a digest. Combines web scraping, data processing, and automation.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Projects</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="code">Complete Implementation</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import requests, csv, json, hashlib
+from datetime import datetime
+from pathlib import Path
+from bs4 import BeautifulSoup
+from dataclasses import dataclass, asdict
+
+@dataclass
+class Article:
+    title: str
+    url: str
+    source: str
+    scraped_at: str = ""
+    def __post_init__(self):
+        if not self.scraped_at:
+            self.scraped_at = datetime.now().isoformat()
+    @property
+    def id(self):
+        return hashlib.md5(self.url.encode()).hexdigest()[:8]
+
+SOURCES = {
+    "Hacker News": {
+        "url": "https://news.ycombinator.com",
+        "selector": ".storylink",
+        "attr": "href",
+    },
+}
+
+def scrape(name, config):
+    try:
+        r = requests.get(config["url"], headers={"User-Agent": "NewsBot/1.0"}, timeout=15)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "lxml")
+        return [
+            Article(title=a.get_text(strip=True), url=a.get(config["attr"], ""), source=name)
+            for a in soup.select(config["selector"])[:20]
+            if a.get_text(strip=True)
+        ]
+    except Exception as e:
+        print(f"Failed {name}: {e}"); return []
+
+def deduplicate(articles):
+    seen, unique = set(), []
+    for a in articles:
+        if a.id not in seen:
+            seen.add(a.id); unique.append(a)
+    return unique
+
+all_articles = []
+for name, config in SOURCES.items():
+    arts = scrape(name, config)
+    all_articles.extend(arts)
+    print(f"{name}: {len(arts)} articles")
+
+unique = deduplicate(all_articles)
+out = Path("news_data"); out.mkdir(exist_ok=True)
+date = datetime.now().strftime("%Y%m%d")
+
+Path(out / f"news_{date}.json").write_text(json.dumps([asdict(a) for a in unique], indent=2))
+with open(out / f"news_{date}.csv", "w", newline="") as f:
+    w = csv.DictWriter(f, fieldnames=["title","url","source","scraped_at"])
+    w.writeheader(); w.writerows([asdict(a) for a in unique])
+
+print(f"\nSaved {len(unique)} articles to {out}/")
+for i, a in enumerate(unique[:5], 1):
+    print(f"  {i}. [{a.source}] {a.title}")</code></pre></div>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Bash</span><button class="copy-btn">Copy</button></div><pre><code class="language-bash">pip install requests beautifulsoup4 lxml
+python scraper.py</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> Schedule with cron to run daily and build a historical news archive.</div>
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Extend the web scraper:</p>
+            <ol>
+              <li>Scrape an additional field from each item on the page.</li>
+              <li>Follow the “next page” link to scrape multiple pages.</li>
+              <li>Save the results to both CSV and JSON.</li>
+              <li>Add a polite delay and a custom User-Agent header.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a complete scraping pipeline: crawl a paginated listing site, extract structured records with CSS selectors, deduplicate them, and store them in a CSV or database. Add resilient handling for missing fields and failed requests (retry with backoff), and respect <code>robots.txt</code> and rate limits. Bonus: schedule the scraper to run daily and only append new items.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>This project builds a scraper that fetches pages and extracts structured data.</li>
+              <li><code>requests</code> retrieves HTML and BeautifulSoup parses it via CSS selectors.</li>
+              <li>Pagination is handled by following “next” links or page parameters.</li>
+              <li>Results are saved to CSV/JSON or a database, with duplicates removed.</li>
+              <li>Polite scraping — delays, User-Agent, robots.txt — keeps it ethical.</li>
+              <li>Retries and defensive parsing make it resilient to failures and layout changes.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Building a Web Scraper</h2>
+          <ul class="interview-list">
+            <li>What libraries would you use to build a scraper and why?</li>
+            <li>How do you locate and extract specific elements from a page?</li>
+            <li>How do you scrape data spread across multiple pages?</li>
+            <li>How do you handle pages that render content with JavaScript?</li>
+            <li>What ethical and legal practices should a scraper follow?</li>
+            <li>How do you make a scraper resilient to failures and page changes?</li>
+            <li>How would you store and deduplicate scraped data?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/real-world/web-scraping.html" class="topic-tag">🕸️ Web Scraping</a>
+            <a href="/python/real-world/rest-api.html" class="topic-tag">🔗 REST APIs</a>
+            <a href="/python/intermediate/csv.html" class="topic-tag">📊 CSV Files</a>
+            <a href="/python/real-world/automation.html" class="topic-tag">🤖 Automation</a>
+            <a href="/python/intermediate/exception-handling.html" class="topic-tag">⚠️ Exception Handling</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Is it OK to scrape any website? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not always. Check the site’s <code>robots.txt</code> and terms of service, avoid collecting personal or copyrighted data you have no right to, throttle your requests, and use an official API when one is available.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I scrape a site that loads data with JavaScript? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A plain request only sees the initial HTML. For JS-rendered content, use a browser-automation tool like Selenium or Playwright that runs the page’s scripts, or look for an underlying API the page calls.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I scrape multiple pages? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Identify the pagination mechanism — a “next” link or a page-number query parameter — and loop, fetching and parsing each page until there are no more, accumulating the records as you go.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I avoid getting blocked? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Add delays between requests, set a realistic User-Agent, respect rate limits and robots.txt, and avoid aggressive crawling. Considerate scraping is both ethical and less likely to get your IP banned.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/projects/file-organizer.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">File Organizer</span>
+          </a>
+          <a href="/python/projects/api-project.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">API Project</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

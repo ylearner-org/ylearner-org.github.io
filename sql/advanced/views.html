@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Views – Saving Queries as Virtual Tables | ylearner</title>
+  <meta name="description" content="Learn how SQL views work, how to create and query them with CREATE VIEW, when views are updatable, how to use CREATE OR REPLACE VIEW, and when to use materialized views.">
+  <meta name="keywords" content="SQL views, CREATE VIEW, virtual table, updatable views, materialized views, DROP VIEW, SQL view tutorial, view use cases">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/advanced/views.html">
+  <meta property="og:title" content="SQL Views – Saving Queries as Virtual Tables | ylearner">
+  <meta property="og:description" content="Master SQL views — CREATE VIEW, querying views, updatable views, materialized views, and practical use cases like security and simplifying complex joins.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/advanced/views.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL Views – Saving Queries as Virtual Tables | ylearner">
+  <meta name="twitter:description" content="Master SQL views — CREATE VIEW, querying views, updatable views, materialized views, and practical use cases like security and simplifying complex joins.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Views","description":"How to create and use SQL views as virtual tables, including updatable and materialized views.","educationalLevel":"Intermediate","keywords":"SQL views, CREATE VIEW, virtual table, materialized views","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <span>Advanced SQL</span><span class="separator">›</span>
+          <span class="current">Views</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Advanced SQL</div>
+          <h1>SQL Views – Saving Queries as Virtual Tables</h1>
+          <p class="lesson-intro">A view is a named, saved query that you can treat exactly like a table in subsequent queries. Views don't store data themselves — they re-run the underlying query each time you access them. They're invaluable for simplifying complex joins, providing security layers, and presenting a consistent interface over evolving schemas.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-view">What Is a View?</h2>
+          <p>A <strong>view</strong> is a virtual table defined by a SELECT query. When you query a view, the database executes the underlying SELECT and returns the results as if they were rows in a table. The data is <em>not</em> stored separately — the view is just a saved query definition.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>View vs Table</strong>
+              <p>A regular table stores data on disk. A view stores only the query definition — every time you SELECT from a view, the database re-runs the query and returns fresh data. This means a view always reflects the current state of the underlying tables.</p>
+            </div>
+          </div>
+
+          <h2 id="create-view">Creating a View</h2>
+          <p>Use <code>CREATE VIEW</code> followed by the view name and the SELECT query that defines it.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Create a view that filters to active employees only
+CREATE VIEW active_employees AS
+  SELECT id, name, department, salary, hire_date
+  FROM employees
+  WHERE status = 'active';
+
+-- Create a view that encapsulates a complex join
+CREATE VIEW order_summary AS
+  SELECT
+    o.id        AS order_id,
+    c.name      AS customer_name,
+    c.email     AS customer_email,
+    o.total     AS order_total,
+    o.created_at
+  FROM orders o
+  JOIN customers c ON c.id = o.customer_id;
+
+-- Update an existing view without dropping it first
+CREATE OR REPLACE VIEW active_employees AS
+  SELECT id, name, department, salary, hire_date, email
+  FROM employees
+  WHERE status = 'active';
+</code></pre>
+          </div>
+
+          <h2 id="querying-views">Querying Views</h2>
+          <p>Once created, query a view exactly like a table — use WHERE, ORDER BY, JOIN, GROUP BY, etc.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Simple select from view
+SELECT * FROM active_employees;
+
+-- Add filters on top of the view
+SELECT * FROM active_employees
+WHERE department = 'Engineering'
+ORDER BY salary DESC;
+
+-- Aggregate on a view
+SELECT department, COUNT(*) AS headcount, AVG(salary) AS avg_salary
+FROM active_employees
+GROUP BY department;
+
+-- Join a view with another table
+SELECT ae.name, ae.department, m.name AS manager
+FROM active_employees ae
+JOIN employees m ON m.id = ae.manager_id;</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Views are transparent to the query optimizer</strong>
+              <p>Most modern databases "inline" view definitions into the outer query during query planning. This means the optimizer can apply your WHERE clause filters before running the full view query — you don't always pay for computing the entire view result set.</p>
+            </div>
+          </div>
+
+          <h2 id="updatable-views">Updatable Views</h2>
+          <p>In some cases you can INSERT, UPDATE, and DELETE through a view. The rules vary by database, but the general requirement is that the view must be <em>simple</em>: it queries a single table, has no aggregation, no DISTINCT, no GROUP BY, and no subqueries.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- This simple view is updatable
+CREATE VIEW engineering_staff AS
+  SELECT id, name, salary
+  FROM employees
+  WHERE department = 'Engineering';
+
+-- Update through the view — modifies the underlying employees table
+UPDATE engineering_staff
+SET salary = salary * 1.10
+WHERE name = 'Alice';
+
+-- Insert through the view
+INSERT INTO engineering_staff (name, salary)
+VALUES ('Bob', 95000);
+-- Note: 'department' column gets its DEFAULT value in the base table
+
+-- WITH CHECK OPTION prevents inserting rows that don't match the view's WHERE
+CREATE OR REPLACE VIEW engineering_staff AS
+  SELECT id, name, salary, department
+  FROM employees
+  WHERE department = 'Engineering'
+  WITH CHECK OPTION;
+
+-- This INSERT would FAIL because 'Marketing' doesn't match the view filter
+INSERT INTO engineering_staff (name, salary, department)
+VALUES ('Carol', 80000, 'Marketing'); -- ERROR</code></pre>
+          </div>
+
+          <h2 id="drop-view">Dropping and Replacing Views</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Drop a view
+DROP VIEW active_employees;
+
+-- Drop only if it exists (no error if it doesn't)
+DROP VIEW IF EXISTS active_employees;
+
+-- Update (replace) an existing view — no need to drop first
+CREATE OR REPLACE VIEW active_employees AS
+  SELECT id, name, department, salary, email, hire_date
+  FROM employees
+  WHERE status = 'active';
+
+-- List all views in the current database (PostgreSQL)
+SELECT table_name FROM information_schema.views
+WHERE table_schema = 'public';
+
+-- List all views (MySQL)
+SHOW FULL TABLES WHERE Table_type = 'VIEW';</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="use-cases">Practical Use Cases</h2>
+
+          <h3>1. Simplify complex joins</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Without a view: repeated complex join in every report query
+SELECT p.name, c.name AS category, s.quantity, s.sold_at
+FROM sales s
+JOIN products p ON p.id = s.product_id
+JOIN categories c ON c.id = p.category_id
+WHERE s.sold_at >= '2024-01-01';
+
+-- With a view: define it once, query it simply
+CREATE VIEW sales_with_details AS
+  SELECT s.id, p.name AS product, c.name AS category,
+         s.quantity, s.sold_at
+  FROM sales s
+  JOIN products p ON p.id = s.product_id
+  JOIN categories c ON c.id = p.category_id;
+
+SELECT * FROM sales_with_details WHERE sold_at >= '2024-01-01';</code></pre>
+          </div>
+
+          <h3>2. Security — restrict column access</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Expose only safe columns to reporting users
+CREATE VIEW employees_public AS
+  SELECT id, name, department, job_title
+  FROM employees;
+  -- salary, ssn, home_address are intentionally excluded
+
+-- Grant SELECT on the view only — reporting users never see sensitive columns
+GRANT SELECT ON employees_public TO reporting_role;</code></pre>
+          </div>
+
+          <h3>3. Materialized views (PostgreSQL)</h3>
+          <p>A <strong>materialized view</strong> actually stores the query results on disk, unlike a regular view. Reads are fast because no re-computation happens, but the data can be slightly stale until you refresh it.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Create a materialized view (PostgreSQL)
+CREATE MATERIALIZED VIEW monthly_revenue AS
+  SELECT
+    DATE_TRUNC('month', created_at) AS month,
+    SUM(total)                       AS revenue,
+    COUNT(*)                         AS order_count
+  FROM orders
+  GROUP BY 1
+  ORDER BY 1;
+
+-- Query it like any table — data is pre-computed, very fast
+SELECT * FROM monthly_revenue WHERE month >= '2024-01-01';
+
+-- Refresh (re-run the query and update stored data)
+REFRESH MATERIALIZED VIEW monthly_revenue;
+
+-- Refresh without locking reads (PostgreSQL 9.4+)
+REFRESH MATERIALIZED VIEW CONCURRENTLY monthly_revenue;</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>When to use materialized views</strong>
+              <p>Use materialized views for expensive aggregate queries that are run frequently but whose results don't need to be real-time — for example, dashboards, nightly reports, or analytics summaries. Schedule a <code>REFRESH</code> via a cron job or a database scheduler to keep data acceptably fresh.</p>
+            </div>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-sqlviews">Views: Save a Query as a Virtual Table</h2>
+          <p>A view is a stored <code>SELECT</code> that behaves like a table — you query it by name, but it holds <em>no data</em> of its own; it runs its underlying query each time. Use it to hide complexity and reuse logic.</p>
+          <pre><code class="language-sql">CREATE VIEW active_customers AS
+SELECT c.id, c.name, COUNT(o.id) AS orders
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+WHERE c.active = true
+GROUP BY c.id, c.name;
+
+-- now query it like a table
+SELECT * FROM active_customers WHERE orders > 5;</code></pre>
+          <table>
+            <thead><tr><th></th><th>View</th><th>Materialized view</th></tr></thead>
+            <tbody>
+              <tr><td>Stores data?</td><td>no — re-runs query</td><td>yes — cached result</td></tr>
+              <tr><td>Always fresh?</td><td>yes</td><td>no — needs <code>REFRESH</code></td></tr>
+              <tr><td>Speed</td><td>as slow as the query</td><td>fast reads, stale data</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Three real uses:</strong> <em>simplify</em> — wrap a gnarly 5-table join so app code just does <code>SELECT * FROM view</code>; <em>reuse</em> — one definition of "active customer" instead of copy-pasting the logic; <em>security</em> — grant access to a view exposing only certain columns/rows, keeping the base table private. <strong>Trade-off:</strong> a plain view adds no speed (it re-executes every time); for an expensive query hit often, a <em>materialized</em> view caches the result but you must <code>REFRESH</code> it to update — trading freshness for speed.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create a view from a SELECT.</li>
+              <li>Query the view like a table.</li>
+              <li>Create a view that joins two tables.</li>
+              <li>Update the underlying data and re-query the view.</li>
+              <li>Drop the view.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Create a view <code>customer_order_summary</code> that joins customers and orders with totals, then query it. Explain how a view is a saved query (not stored data) and the difference between a regular view and a materialized view.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A view is a named saved query that behaves like a table but stores no data.</li>
+              <li>Create with <code>CREATE VIEW name AS SELECT ...</code>; replace in-place with <code>CREATE OR REPLACE VIEW</code>.</li>
+              <li>Query views exactly like tables — WHERE, JOIN, GROUP BY, ORDER BY all work.</li>
+              <li>Simple single-table views are updatable; complex views (joins, aggregates) are read-only.</li>
+              <li>Use <code>WITH CHECK OPTION</code> to prevent DML that would produce rows invisible to the view.</li>
+              <li>Use views to simplify joins, enforce security (hide columns), and create a stable interface over changing schema.</li>
+              <li>Materialized views (PostgreSQL) store results on disk for fast reads; run <code>REFRESH MATERIALIZED VIEW</code> to update.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a database view?</li>
+            <li>How does a view differ from a table?</li>
+            <li>Can you update data through a view?</li>
+            <li>What is a materialized view?</li>
+            <li>Why use views (security, abstraction)?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/advanced/indexes.html" class="topic-tag sql-topic-tag">🗄️ Indexes</a>
+            <a href="/sql/advanced/stored-procedures.html" class="topic-tag sql-topic-tag">🗄️ Stored Procedures</a>
+            <a href="/sql/advanced/normalization.html" class="topic-tag sql-topic-tag">🗄️ Normalization</a>
+            <a href="/sql/subqueries/cte.html" class="topic-tag sql-topic-tag">🗄️ CTEs</a>
+            <a href="/sql/interview/questions.html" class="topic-tag sql-topic-tag">🗄️ Interview Questions</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does a view slow down my queries? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not inherently. Most database engines "inline" a view definition — they merge the view's SQL with your outer query and optimize the combined plan. However, a very complex view with many joins may be harder to optimize than an equivalent raw query. If performance is critical, benchmark both approaches or consider a materialized view.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I create a view based on another view? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — views can reference other views. However, deeply nested view chains can make query plans complex and hard to debug. A better practice is often to use a CTE (Common Table Expression) inside a single query, or to flatten the view definitions when performance becomes an issue.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between a view and a CTE? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A CTE (<code>WITH ... AS (...)</code>) is temporary — it exists only for the duration of the single query it is defined in. A view is persistent — it is saved in the database and can be reused across many queries and sessions. Use a CTE for a one-off query breakdown; use a view when many queries need the same sub-result.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I add an index to a view? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not on a regular view (which stores no data). You can add indexes to a materialized view in PostgreSQL because the data is physically stored. In SQL Server, "indexed views" are also supported — these are equivalent to materialized views. In MySQL and SQLite, regular views cannot have indexes.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/advanced/indexes.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Indexes</span>
+          </a>
+          <a href="/sql/advanced/stored-procedures.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Stored Procedures</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

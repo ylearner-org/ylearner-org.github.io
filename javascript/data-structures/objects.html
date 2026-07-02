@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Objects – Properties, Methods &amp; Prototypes | ylearner</title>
+  <meta name="description" content="Learn JavaScript objects thoroughly: creating objects, dot vs bracket notation, adding/deleting properties, Object methods, shorthand syntax, destructuring, and nested objects.">
+  <meta name="keywords" content="javascript objects, javascript object methods, Object.keys values entries, javascript this keyword, object destructuring, shorthand properties javascript, computed property names, Object.assign javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/data-structures/objects.html">
+  <meta property="og:title" content="JavaScript Objects – Properties, Methods &amp; Prototypes | ylearner">
+  <meta property="og:description" content="Learn JavaScript objects thoroughly: creating objects, dot vs bracket notation, adding/deleting properties, Object methods, shorthand syntax, destructuring, and nested objects.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/data-structures/objects.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Objects – Properties, Methods &amp; Prototypes | ylearner">
+  <meta name="twitter:description" content="Learn JavaScript objects thoroughly: creating objects, dot vs bracket notation, adding/deleting properties, Object methods, shorthand syntax, destructuring, and nested objects.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/data-structures/arrays.html">Data Structures</a><span class="separator">›</span>
+          <span class="current">Objects</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📦 Data Structures</div>
+          <h1>JavaScript Objects – Keys, Values, and Methods</h1>
+          <p class="lesson-intro">Objects are the foundation of JavaScript. Nearly everything in the language — arrays, functions, even DOM nodes — is an object. Understanding how to create, read, update, and iterate objects is essential for writing real-world JavaScript.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 26 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="object-literals">Object Literals</h2>
+          <p>The object literal <code>{}</code> is the most common way to create an object. A property is a key-value pair; the key is always a string (or Symbol), but the value can be anything.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Basic object literal
+const user = {
+  name: 'Alice',
+  age: 28,
+  isAdmin: false,
+  address: {
+    city: 'London',
+    country: 'UK'
+  },
+  hobbies: ['reading', 'coding']
+};
+
+// Keys can be multi-word strings (use quotes)
+const config = {
+  'max-retries': 3,
+  'api-url': 'https://api.example.com'
+};
+
+// Empty object
+const empty = {};
+
+console.log(typeof user);    // 'object'
+console.log(user.name);      // 'Alice'
+console.log(user.address.city); // 'London'</code></pre>
+          </div>
+
+          <h2 id="dot-vs-bracket">Dot Notation vs Bracket Notation</h2>
+          <p>Both notations read and write properties. Use dot notation when the key is a valid identifier; use bracket notation for dynamic keys or keys with special characters.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const person = { name: 'Bob', age: 30 };
+
+// Dot notation
+console.log(person.name);  // 'Bob'
+person.email = 'bob@example.com'; // add property
+
+// Bracket notation
+console.log(person['age']); // 30
+person['phone'] = '555-1234';
+
+// Dynamic key (only bracket notation works here)
+const key = 'name';
+console.log(person[key]);   // 'Bob' — equivalent to person.name
+
+// Multi-word keys require bracket notation
+const cfg = { 'max-retries': 5 };
+console.log(cfg['max-retries']); // 5
+// console.log(cfg.max-retries); // SyntaxError
+
+// Deleting a property
+delete person.phone;
+console.log(person.phone); // undefined</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>Bob
+30
+Bob
+5
+undefined</pre>
+          </div>
+
+          <h2 id="methods-this">Object Methods and the this Keyword</h2>
+          <p>When a function is stored as a property of an object, it is called a <strong>method</strong>. Inside a method, <code>this</code> refers to the object the method was called on.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const calculator = {
+  value: 0,
+
+  // Method shorthand (ES6)
+  add(n) {
+    this.value += n;
+    return this; // enables chaining
+  },
+  subtract(n) {
+    this.value -= n;
+    return this;
+  },
+  result() {
+    return this.value;
+  }
+};
+
+const answer = calculator.add(10).add(5).subtract(3).result();
+console.log(answer); // 12
+
+// Beware: arrow functions do NOT bind their own 'this'
+const counter = {
+  count: 0,
+  increment: () => {
+    // this is the outer scope (window/undefined in strict mode)
+    this.count++; // won't work as expected
+  },
+  decrement() {
+    this.count--; // regular method — 'this' is counter
+  }
+};</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Avoid Arrow Functions for Object Methods</strong>
+              <p>Arrow functions inherit <code>this</code> from their surrounding lexical scope, not from the object. Always use regular function syntax (<code>method() {}</code> or <code>method: function() {}</code>) when you need <code>this</code> to refer to the object.</p>
+            </div>
+          </div>
+
+          <h2 id="object-static-methods">Object.keys, Object.values, Object.entries</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const product = { id: 1, name: 'Laptop', price: 999 };
+
+// Object.keys – array of property names
+console.log(Object.keys(product));    // ['id', 'name', 'price']
+
+// Object.values – array of property values
+console.log(Object.values(product));  // [1, 'Laptop', 999]
+
+// Object.entries – array of [key, value] pairs
+console.log(Object.entries(product));
+// [['id', 1], ['name', 'Laptop'], ['price', 999]]
+
+// Iterating with for...of + destructuring
+for (const [key, value] of Object.entries(product)) {
+  console.log(`${key}: ${value}`);
+}
+
+// Convert entries back to an object
+const doubled = Object.fromEntries(
+  Object.entries(product).map(([k, v]) =>
+    typeof v === 'number' ? [k, v * 2] : [k, v]
+  )
+);
+console.log(doubled); // { id: 2, name: 'Laptop', price: 1998 }</code></pre>
+          </div>
+
+          <h2 id="assign-spread">Object.assign and Spread</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const defaults = { theme: 'light', lang: 'en', debug: false };
+const userPrefs = { theme: 'dark', notifications: true };
+
+// Object.assign – copies properties into target (mutates target)
+const merged1 = Object.assign({}, defaults, userPrefs);
+// { theme: 'dark', lang: 'en', debug: false, notifications: true }
+
+// Spread operator – cleaner, preferred in modern code
+const merged2 = { ...defaults, ...userPrefs };
+// { theme: 'dark', lang: 'en', debug: false, notifications: true }
+
+// Shallow copy with spread
+const original = { a: 1, nested: { b: 2 } };
+const copy = { ...original };
+copy.a = 99;
+copy.nested.b = 99; // mutates ORIGINAL.nested too — it's a shallow copy!
+console.log(original.nested.b); // 99 ← shared reference
+
+// Shorthand properties (ES6)
+const name = 'Carol';
+const age = 25;
+const person = { name, age }; // same as { name: name, age: age }
+console.log(person); // { name: 'Carol', age: 25 }
+
+// Computed property names
+const fieldName = 'email';
+const dynamic = { [fieldName]: 'carol@example.com' };
+console.log(dynamic); // { email: 'carol@example.com' }</code></pre>
+          </div>
+
+          <h2 id="property-checks">Checking Property Existence</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const obj = { name: 'Alice', role: undefined };
+
+// in operator – checks own + inherited properties
+console.log('name' in obj);     // true
+console.log('role' in obj);     // true (even though value is undefined)
+console.log('toString' in obj); // true (inherited from Object.prototype)
+
+// hasOwnProperty – own properties only
+console.log(obj.hasOwnProperty('name'));     // true
+console.log(obj.hasOwnProperty('toString')); // false
+
+// Object.hasOwn (ES2022 – preferred over hasOwnProperty)
+console.log(Object.hasOwn(obj, 'name'));  // true
+console.log(Object.hasOwn(obj, 'email')); // false
+
+// Optional chaining for safe nested access
+const config = { db: { host: 'localhost' } };
+console.log(config?.db?.port);    // undefined (no error)
+console.log(config?.cache?.host); // undefined (no error)</code></pre>
+          </div>
+
+          <h2 id="freeze-seal">Object.freeze and Object.seal</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Operation</th><th>Object.freeze()</th><th>Object.seal()</th><th>Normal Object</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Add properties</td><td>No</td><td>No</td><td>Yes</td></tr>
+                <tr><td>Delete properties</td><td>No</td><td>No</td><td>Yes</td></tr>
+                <tr><td>Change values</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+                <tr><td>Check with</td><td><code>Object.isFrozen()</code></td><td><code>Object.isSealed()</code></td><td>—</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Freeze is Shallow</strong>
+              <p><code>Object.freeze()</code> only prevents changes to the top-level properties. Nested objects remain mutable. For a deep freeze you need a recursive utility function.</p>
+            </div>
+          </div>
+
+          <h2 id="deep-objref">Objects Are References — and the Shallow-Copy Trap</h2>
+          <p>Assigning an object doesn't copy it; it copies the <em>reference</em>. Both names point at the same object, so a change through one is visible through the other:</p>
+          <pre><code class="language-javascript">const a = { count: 1 };
+const b = a;
+b.count = 99;
+console.log(a.count);   // 99  ← same object</code></pre>
+          <p>Spread (<code>...</code>) and <code>Object.assign</code> make a copy — but only <strong>one level deep</strong>. Nested objects are still shared:</p>
+          <pre><code class="language-javascript">const user = { name: "Sara", address: { city: "Cairo" } };
+const copy = { ...user };
+copy.name = "Ali";           // ✅ independent
+copy.address.city = "Giza";  // ⚠️ also changes user.address.city!</code></pre>
+          <div class="callout callout-info">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Deep copy when you need full independence</strong>
+              <p>Modern browsers/Node give you <code>structuredClone(user)</code> for a true deep copy. Also handy: optional chaining and nullish coalescing avoid crashes on missing nested data — <code>user?.address?.city ?? "Unknown"</code>.</p>
+            </div>
+          </div>
+
+<div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Create a <code>bankAccount</code> object with properties <code>owner</code> (string), <code>balance</code> (number), and methods <code>deposit(amount)</code>, <code>withdraw(amount)</code> (prevent negative balance), and <code>statement()</code> (returns a formatted string). Test all three methods.</p>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a function <code>deepFreeze(obj)</code> that recursively freezes an object and all of its nested objects so that no property at any depth can be modified. Ensure it handles arrays and circular references safely.</p>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Object literals <code>{}</code> are the standard way to create objects in JavaScript.</li>
+              <li>Use dot notation for known keys; bracket notation for dynamic or special-character keys.</li>
+              <li>Methods defined with regular function syntax can use <code>this</code> to reference the object.</li>
+              <li><code>Object.keys/values/entries</code> convert an object to iterable arrays.</li>
+              <li>Spread <code>{...obj}</code> creates a shallow copy; nested objects are still shared references.</li>
+              <li>Use shorthand properties and computed property names for cleaner ES6+ code.</li>
+              <li><code>in</code> checks own and inherited properties; <code>Object.hasOwn</code> checks own only.</li>
+              <li><code>Object.freeze</code> prevents all modifications; <code>Object.seal</code> prevents add/delete only.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between dot notation and bracket notation?</li>
+            <li>Why does <code>this</code> behave differently in arrow functions vs regular methods?</li>
+            <li>What is the difference between <code>Object.freeze()</code> and <code>Object.seal()</code>?</li>
+            <li>How do you check if a property exists on an object vs its prototype?</li>
+            <li>What is the output of <code>Object.keys({ a: 1, b: undefined })</code>?</li>
+            <li>How does spread-based object copying differ from <code>Object.assign</code>?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/javascript/data-structures/arrays.html" class="topic-tag">Arrays</a>
+            <a href="/javascript/data-structures/maps-sets.html" class="topic-tag">Maps &amp; Sets</a>
+            <a href="/javascript/data-structures/destructuring.html" class="topic-tag">Destructuring</a>
+            <a href="/javascript/oop/classes.html" class="topic-tag">Classes</a>
+            <a href="/javascript/intermediate/json.html" class="topic-tag">JSON</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Is <code>null</code> an object? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>typeof null === 'object'</code> is a historic JavaScript bug. <code>null</code> is not an object; it represents the intentional absence of any value. Always check for <code>null</code> explicitly: <code>if (value !== null &amp;&amp; typeof value === 'object')</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>Object.assign</code> and spread? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Both perform shallow merges. <code>Object.assign</code> mutates the target object; spread always creates a new object. Spread is generally preferred in modern code for its clarity.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can object keys be numbers? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Keys are always coerced to strings (or Symbols). <code>obj[1]</code> and <code>obj['1']</code> access the same property. Use a <code>Map</code> if you need non-string keys.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I deeply clone an object? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>structuredClone(obj)</code> (available in Node 17+ and modern browsers). Alternatively, <code>JSON.parse(JSON.stringify(obj))</code> works for plain data but drops functions, <code>undefined</code>, and Dates.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What does <code>Object.fromEntries</code> do? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It converts an iterable of <code>[key, value]</code> pairs into a plain object. It is the inverse of <code>Object.entries()</code> and is useful for transforming objects via array methods.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/data-structures/arrays.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Arrays</span></a>
+          <a href="/javascript/data-structures/maps-sets.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Maps &amp; Sets</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

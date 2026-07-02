@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pandas Tutorial – DataFrame, Series & Data Analysis | ylearner | ylearner</title>
+  <meta name="description" content="Learn Pandas: Series and DataFrame, reading CSV/JSON, selecting data, filtering, groupby, aggregation, merging, handling missing values, and data transformation.">
+  <meta name="keywords" content="pandas tutorial, pandas python, pandas dataframe, pandas series, pandas read csv, pandas groupby, python data analysis">
+  <link rel="canonical" href="https://ylearner.org/python/data-science/pandas.html">
+  <meta property="og:title" content="Pandas Tutorial – DataFrame, Series & Data Analysis | ylearner">
+  <meta property="og:description" content="Learn Pandas: Series and DataFrame, reading CSV/JSON, selecting data, filtering, groupby, aggregation, merging, handling missing values, and data transformation.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/data-science/pandas.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Pandas Tutorial – DataFrame, Series & Data Analysis | ylearner">
+  <meta name="twitter:description" content="Learn Pandas: Series and DataFrame, reading CSV/JSON, selecting data, filtering, groupby, aggregation, merging, handling missing values, and data transformation.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Pandas Tutorial – Data Analysis with Python","description":"Learn Pandas: Series and DataFrame, reading CSV/JSON, selecting data, filtering, groupby, aggregation, merging, handling missing values, and data transformation.","educationalLevel":"Advanced","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/data-science/numpy.html">Data Science</a><span class="separator">›</span><span class="current">Pandas</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📊 Data Science</div>
+          <h1>Pandas Tutorial – Data Analysis with Python</h1>
+          <p class="lesson-intro">Pandas is Python's premier data analysis library. It provides two main data structures: <code>Series</code> (1D) and <code>DataFrame</code> (2D table). Pandas can read and write CSV, Excel, JSON, SQL — and provides SQL-like operations (filter, groupby, join) for any data source.</p>
+          <div class="lesson-meta"><span>⏱️ 35 min read</span><span>🎯 Advanced</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="series">Pandas Series</h2>
+          <p>A Series is a 1D labelled array — like a Python list with an index.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import pandas as pd
+
+# Create from list
+scores = pd.Series([85, 92, 78, 95, 88], 
+                   name="scores",
+                   index=["Alice","Bob","Charlie","Diana","Eve"])
+
+print(scores)
+print(scores["Alice"])   # 85
+print(scores.mean())     # 87.6
+print(scores[scores > 90])</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Alice      85
+Bob        92
+Charlie    78
+Diana      95
+Eve        88
+Name: scores, dtype: int64
+85
+87.6
+Bob      92
+Diana    95</div>
+
+          <h2 id="dataframe">Creating DataFrames</h2>
+          <p>A DataFrame is a 2D table with labelled rows and columns.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import pandas as pd
+
+# From dict of lists
+df = pd.DataFrame({
+    "name":  ["Alice", "Bob", "Charlie", "Diana"],
+    "age":   [25, 30, 35, 28],
+    "score": [88, 92, 78, 95],
+    "city":  ["London", "Paris", "NYC", "London"]
+})
+
+print(df)
+print(df.shape)    # (4, 4)
+print(df.dtypes)</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>      name  age  score    city
+0    Alice   25     88  London
+1      Bob   30     92   Paris
+2  Charlie   35     78     NYC
+3    Diana   28     95  London
+(4, 4)
+name     object
+age       int64
+score     int64
+city     object</div>
+
+          <h2 id="select">Selecting Data</h2>
+          <p>Use <code>[]</code>, <code>.loc[]</code>, and <code>.iloc[]</code> to access rows and columns.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># Select column
+print(df["name"])           # Series
+print(df[["name","score"]]) # DataFrame
+
+# Select rows by label (.loc)
+print(df.loc[0])            # First row
+print(df.loc[0:2, ["name","score"]])  # Rows 0-2, 2 cols
+
+# Select rows by position (.iloc)
+print(df.iloc[0:3, 0:2])   # First 3 rows, first 2 cols</code></pre></div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="filter">Filtering Rows</h2>
+          <p>Use boolean conditions to filter rows.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># Filter
+high_scorers = df[df["score"] >= 90]
+print(high_scorers)
+
+# Multiple conditions
+london_high = df[(df["city"] == "London") & (df["score"] > 80)]
+print(london_high[["name","score"]])</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>    name  age  score   city
+1    Bob   30     92  Paris
+3  Diana   28     95  London
+
+    name  score
+0  Alice     88
+3  Diana     95</div>
+
+          <h2 id="groupby">GroupBy – Aggregation</h2>
+          <p>Group data and compute aggregates — like SQL GROUP BY.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># Average score by city
+print(df.groupby("city")["score"].mean())
+
+# Multiple aggregations
+print(df.groupby("city").agg({"score": ["mean","max"], "age": "mean"}))</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>city
+London    91.5
+NYC       78.0
+Paris     92.0
+Name: score, dtype: float64</div>
+
+          <h2 id="deep-pandas">Pandas: DataFrames, loc vs iloc, and the Copy Warning</h2>
+          <p>Pandas builds on NumPy to give you labeled tables (<code>DataFrame</code>) and columns (<code>Series</code>). Like NumPy, you work in <em>vectorized</em> operations over whole columns — never a row-by-row Python loop.</p>
+          <pre><code class="language-python">import pandas as pd
+df = pd.DataFrame({"name": ["Ann", "Bob"], "age": [30, 25]})
+
+df["age"] * 2               # vectorized on the whole column
+df[df["age"] > 26]          # boolean filter → rows where age > 26
+df.groupby("dept")["salary"].mean()   # split-apply-combine</code></pre>
+          <h3>loc vs iloc — label vs position</h3>
+          <table>
+            <thead><tr><th></th><th><code>.loc</code></th><th><code>.iloc</code></th></tr></thead>
+            <tbody>
+              <tr><td>Selects by</td><td>label / condition</td><td>integer position</td></tr>
+              <tr><td>Example</td><td><code>df.loc[df.age > 26, "name"]</code></td><td><code>df.iloc[0:2, 1]</code></td></tr>
+            </tbody>
+          </table>
+          <p><strong>The SettingWithCopyWarning:</strong> chained indexing like <code>df[df.age > 26]["age"] = 0</code> may edit a temporary copy, not the real frame — so your change silently vanishes. Always assign through a single <code>.loc</code>: <code>df.loc[df.age > 26, "age"] = 0</code>. Also watch for <code>NaN</code> (pandas' missing value) — handle it with <code>fillna</code>/<code>dropna</code> before math, since it propagates through calculations.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Manipulate tabular data:</p>
+            <ol>
+              <li>Create a <code>DataFrame</code> from a dictionary of lists.</li>
+              <li>Select a single column and a subset of columns.</li>
+              <li>Filter rows where a numeric column exceeds a threshold.</li>
+              <li>Group by a category column and compute the mean of another column.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Load a CSV of sales data into a DataFrame, clean it (handle missing values with <code>fillna</code> or <code>dropna</code>), add a computed column (e.g. revenue = price × quantity), then use <code>groupby</code> to report total revenue per region sorted descending. Finally, export the summary to a new CSV. Bonus: pivot the data with <code>pivot_table</code> to compare regions across months.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>pandas is the standard Python library for tabular data analysis.</li>
+              <li>A Series is a 1D labeled array; a DataFrame is a 2D labeled table.</li>
+              <li>Select data with column names, <code>loc</code> (labels), and <code>iloc</code> (positions).</li>
+              <li>Filter rows with boolean conditions: <code>df[df["age"] &gt; 18]</code>.</li>
+              <li><code>groupby</code> splits data into groups and aggregates them (sum, mean, count).</li>
+              <li>Handle missing values with <code>dropna</code>/<code>fillna</code>; read/write CSV with <code>read_csv</code>/<code>to_csv</code>.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on pandas</h2>
+          <ul class="interview-list">
+            <li>What is pandas and what are its two core data structures?</li>
+            <li>What is the difference between a Series and a DataFrame?</li>
+            <li>What is the difference between <code>loc</code> and <code>iloc</code>?</li>
+            <li>How do you filter rows based on a condition?</li>
+            <li>What does <code>groupby</code> do?</li>
+            <li>How do you handle missing data in pandas?</li>
+            <li>How do you read and write CSV files with pandas?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/data-science/numpy.html" class="topic-tag">🔢 NumPy</a>
+            <a href="/python/data-science/matplotlib.html" class="topic-tag">📈 Matplotlib</a>
+            <a href="/python/data-science/seaborn.html" class="topic-tag">🌊 Seaborn</a>
+            <a href="/python/intermediate/csv.html" class="topic-tag">📊 CSV Files</a>
+            <a href="/python/data-science/machine-learning.html" class="topic-tag">🤖 Machine Learning</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between a Series and a DataFrame? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A Series is a single labeled column of data (1D). A DataFrame is a table of multiple columns (2D), where each column is a Series sharing a common index. Most analysis works on DataFrames.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>loc</code> and <code>iloc</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>loc</code> selects by labels (row/column names), while <code>iloc</code> selects by integer position. For example <code>df.loc[0, "name"]</code> versus <code>df.iloc[0, 1]</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I handle missing values? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Detect them with <code>isna()</code>, drop them with <code>dropna()</code>, or fill them with <code>fillna(value)</code>. Which to use depends on whether missing rows can be discarded or should be imputed.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is pandas suitable for very large datasets? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>pandas works in memory, so it handles datasets up to a few gigabytes comfortably. For larger-than-memory data, consider chunked reading, Dask, Polars, or a database.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/data-science/numpy.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">NumPy</span></a>
+          <a href="/python/data-science/matplotlib.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Matplotlib</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

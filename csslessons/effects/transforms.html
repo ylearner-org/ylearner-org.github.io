@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Transforms – translate, scale, rotate, skew Explained | ylearner</title>
+  <meta name="description" content="Master CSS transforms: translate, scale, rotate, skew, matrix, 3D transforms, transform-origin, perspective, and using transforms for performant animations.">
+  <meta name="keywords" content="CSS transform, CSS translate, CSS scale, CSS rotate, CSS skew, CSS 3D transform, transform-origin, CSS perspective, CSS animation performance">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/csslessons/effects/transforms.html">
+  <meta property="og:title" content="CSS Transforms – translate, scale, rotate, skew | ylearner">
+  <meta property="og:description" content="Complete CSS transforms guide — translate, scale, rotate, skew, 3D transforms, transform-origin, and performance tips.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/csslessons/effects/transforms.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CSS Transforms Complete Guide | ylearner">
+  <meta name="twitter:description" content="translate, scale, rotate, skew, 3D — every CSS transform function with examples.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "CSS Transforms",
+    "description": "Complete guide to CSS transforms — translate, scale, rotate, skew, matrix, 3D transforms, transform-origin, perspective, and performance best practices.",
+    "educationalLevel": "Beginner",
+    "keywords": "CSS transform, translate, scale, rotate, skew, 3D CSS, transform-origin",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+  <style>
+    .t-grid { display:flex; flex-wrap:wrap; gap:16px; margin:1rem 0 1.5rem; }
+    .t-box { width:90px; height:90px; background:#1572B6; color:white; display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:700; border-radius:6px; text-align:center; }
+    .t-wrap { display:flex; flex-direction:column; align-items:center; gap:6px; font-size:.75rem; color:var(--text-muted); }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/csslessons/what-is-css.html">CSS</a><span class="separator">›</span>
+          <a href="/csslessons/effects/transitions.html">CSS Effects</a><span class="separator">›</span>
+          <span class="current">CSS Transforms</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">✨ CSS Effects</div>
+          <h1>CSS Transforms – Translate, Scale, Rotate &amp; Skew</h1>
+          <p class="lesson-intro">CSS transforms let you move, resize, rotate, and distort elements visually — without affecting the document flow. The element's original space in the layout is preserved; only its visual rendering changes. Transforms are also the foundation of performant CSS animations, because changes to <code>transform</code> are handled entirely by the GPU compositor, bypassing the expensive layout and paint phases. In this lesson you will learn every transform function, how to combine them, and how to use them for smooth high-performance effects.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 3 of 4</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="translate">translate() – Moving Elements</h2>
+          <p>Moves an element from its current position. Unlike <code>top</code>/<code>left</code>/<code>margin</code>, translate doesn't trigger layout reflow.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – translate</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* translate(x, y) */
+transform: translate(20px, 40px);    /* 20px right, 40px down */
+transform: translate(-50%, -50%);    /* center trick (see below) */
+transform: translate(0, -8px);       /* lift 8px up */
+
+/* Single axis shorthand */
+transform: translateX(100px);        /* horizontal only */
+transform: translateY(-20px);        /* vertical only */
+transform: translateZ(50px);         /* depth (3D only) */
+
+/* Modern individual properties (no need to wrap in transform) */
+translate: 20px 40px;   /* CSS individual transform property */
+translate: -50% -50%;
+
+/* The classic centering trick */
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* top/left move the top-left corner to center of parent
+     translate(-50%, -50%) then offsets back by half its own size */
+}</code></pre>
+          </div>
+
+          <div class="t-grid">
+            <div class="t-wrap">
+              <div class="t-box">normal</div>
+              <span>no transform</span>
+            </div>
+            <div class="t-wrap">
+              <div class="t-box" style="transform:translateX(16px);">+16px X</div>
+              <span>translateX(16px)</span>
+            </div>
+            <div class="t-wrap">
+              <div class="t-box" style="transform:translateY(-12px);">-12px Y</div>
+              <span>translateY(-12px)</span>
+            </div>
+          </div>
+
+          <h2 id="scale">scale() – Resizing Elements</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – scale</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* scale(x, y) — 1 = original size */
+transform: scale(1.2);        /* 120% — both axes */
+transform: scale(1.5, 0.8);   /* wider, shorter */
+transform: scale(0.5);        /* 50% — shrink */
+transform: scale(-1);         /* flip both axes (mirror) */
+
+/* Single axis */
+transform: scaleX(2);         /* double width */
+transform: scaleY(0.5);       /* half height */
+
+/* Modern individual property */
+scale: 1.1;
+scale: 1.5 0.8;
+
+/* Button hover: slight scale up */
+.btn:hover { transform: scale(1.05); }
+
+/* Flip horizontally (mirror image) */
+.rtl-icon { transform: scaleX(-1); }</code></pre>
+          </div>
+
+          <div class="t-grid">
+            <div class="t-wrap">
+              <div class="t-box" style="transform:scale(0.7);">0.7</div>
+              <span>scale(0.7)</span>
+            </div>
+            <div class="t-wrap">
+              <div class="t-box">1.0</div>
+              <span>normal</span>
+            </div>
+            <div class="t-wrap">
+              <div class="t-box" style="transform:scale(1.25);">1.25</div>
+              <span>scale(1.25)</span>
+            </div>
+          </div>
+
+          <h2 id="rotate">rotate() – Rotating Elements</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – rotate</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* rotate(angle) — positive = clockwise */
+transform: rotate(45deg);     /* 45 degrees clockwise */
+transform: rotate(-90deg);    /* 90 degrees counter-clockwise */
+transform: rotate(0.5turn);   /* half turn = 180deg */
+transform: rotate(3.14159rad); /* radians */
+
+/* 3D rotation */
+transform: rotateX(30deg);    /* tilt forward/backward */
+transform: rotateY(45deg);    /* spin around vertical axis */
+transform: rotateZ(30deg);    /* same as rotate(30deg) */
+transform: rotate3d(1, 1, 0, 45deg); /* arbitrary axis */
+
+/* Modern individual property */
+rotate: 45deg;
+
+/* Spinning loader */
+@keyframes spin { to { rotate: 360deg; } }
+/* or */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Chevron arrow toggle */
+.chevron { transition: rotate 0.3s ease; }
+.open .chevron { rotate: 180deg; }</code></pre>
+          </div>
+
+          <div class="t-grid">
+            <div class="t-wrap">
+              <div class="t-box" style="transform:rotate(15deg);">15deg</div>
+              <span>rotate(15deg)</span>
+            </div>
+            <div class="t-wrap">
+              <div class="t-box" style="transform:rotate(45deg);">45deg</div>
+              <span>rotate(45deg)</span>
+            </div>
+            <div class="t-wrap">
+              <div class="t-box" style="transform:rotate(-30deg);">-30deg</div>
+              <span>rotate(-30deg)</span>
+            </div>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="skew">skew() – Distorting Elements</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – skew</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">transform: skew(20deg);           /* skew on X axis */
+transform: skew(10deg, 5deg);     /* skew both axes */
+transform: skewX(15deg);          /* horizontal shear */
+transform: skewY(10deg);          /* vertical shear */
+
+/* Angled section divider */
+.section-divider {
+  transform: skewY(-3deg);
+}
+.section-divider > * {
+  transform: skewY(3deg); /* counter-skew content so text stays upright */
+}</code></pre>
+          </div>
+
+          <div class="t-grid">
+            <div class="t-wrap">
+              <div class="t-box" style="transform:skewX(15deg);">skewX</div>
+              <span>skewX(15deg)</span>
+            </div>
+            <div class="t-wrap">
+              <div class="t-box" style="transform:skewY(10deg);">skewY</div>
+              <span>skewY(10deg)</span>
+            </div>
+          </div>
+
+          <h2 id="combining">Combining Transforms</h2>
+          <p>List multiple functions space-separated. Order matters — transforms are applied right to left.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Combining transforms</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Order matters: each transform is relative to the previous */
+transform: translateY(-8px) scale(1.05);     /* lift then scale */
+transform: rotate(45deg) scale(0.7);          /* rotate then shrink */
+transform: translateX(-50%) translateY(-50%); /* center centering */
+
+/* Wrong order can produce unexpected results */
+transform: scale(2) translateX(10px);   /* translate 10px in scaled space = 20px visually */
+transform: translateX(10px) scale(2);   /* translate 10px in original space, then scale */
+
+/* Individual properties (order independent, applied separately) */
+translate: 0 -8px;
+scale: 1.05;
+rotate: 0deg;
+/* These are always applied in order: translate → rotate → scale */</code></pre>
+          </div>
+
+          <h2 id="transform-origin">transform-origin – Pivot Point</h2>
+          <p>Controls the point around which transforms are applied. Default is <code>50% 50%</code> (center).</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – transform-origin</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">transform-origin: center;          /* default — 50% 50% */
+transform-origin: top left;        /* 0% 0% — rotate from corner */
+transform-origin: bottom center;   /* 50% 100% */
+transform-origin: 20px 40px;       /* exact pixel from top-left */
+transform-origin: right;           /* 100% 50% */
+
+/* Practical example: tooltip scale from its tip */
+.tooltip {
+  transform-origin: bottom center;   /* grows from the bottom-center */
+  transform: scale(0);
+  transition: transform 0.2s ease;
+}
+.tooltip.visible { transform: scale(1); }
+
+/* Page-turn effect: rotate from left edge */
+.page {
+  transform-origin: left center;
+  transform: rotateY(-90deg);
+}</code></pre>
+          </div>
+
+          <h2 id="3d-transforms">3D Transforms and perspective</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – 3D transforms</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* perspective defines depth — lower = more dramatic 3D effect */
+/* Applied to the PARENT container */
+.scene {
+  perspective: 800px;
+  perspective-origin: 50% 50%;  /* viewpoint position */
+}
+
+/* 3D transforms on the child */
+.card {
+  transform: rotateY(30deg);
+  transform-style: preserve-3d;  /* children also in 3D space */
+}
+
+/* Card flip effect */
+.card-inner {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+.card-inner.flipped { transform: rotateY(180deg); }
+
+.card-front, .card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;  /* hide the reverse side */
+}
+.card-back { transform: rotateY(180deg); }</code></pre>
+          </div>
+
+          <h2 id="deep-transforms">transform: Move, Rotate, and Scale Without Reflow</h2>
+          <p><code>transform</code> visually changes an element — but crucially, it does <strong>not</strong> affect layout. The element still occupies its original box; only its rendering shifts. That's why transforms are the go-to for animation: no reflow, GPU-accelerated, smooth.</p>
+          <pre><code class="language-css">.box {
+  transform: translate(20px, 0) rotate(15deg) scale(1.2);
+  /* functions apply right-to-left; order changes the result */
+  transform-origin: center;   /* the pivot point */
+}</code></pre>
+          <table>
+            <thead><tr><th>Function</th><th>Effect</th></tr></thead>
+            <tbody>
+              <tr><td><code>translate(x, y)</code></td><td>move — no reflow (unlike top/left)</td></tr>
+              <tr><td><code>rotate(deg)</code></td><td>spin around the origin</td></tr>
+              <tr><td><code>scale(n)</code></td><td>resize (0.5 = half, 2 = double)</td></tr>
+              <tr><td><code>skew(deg)</code></td><td>slant</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Two things to know:</strong> transform functions compose <em>right to left</em>, so <code>translate() rotate()</code> differs from <code>rotate() translate()</code>. And because the element keeps its original layout box, a translated element can visually overlap neighbors without pushing them — great for hover effects, occasionally surprising. Pair with <code>transition</code> for smooth motion; prefer transforms over animating <code>top/left/width</code>.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Scale an element with <code>transform: scale()</code>.</li>
+              <li>Rotate it with <code>rotate()</code>.</li>
+              <li>Move it with <code>translate()</code>.</li>
+              <li>Skew it with <code>skew()</code>.</li>
+              <li>Combine multiple transforms in one declaration.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a card that on hover lifts up (<code>translateY</code>), slightly enlarges (<code>scale</code>), and rotates a child icon — all via <code>transform</code>. Set <code>transform-origin</code> to control the pivot. Explain why <code>transform</code> avoids layout reflow and how multiple functions combine.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>translate(x, y)</strong> — move without reflow. <code>translate(-50%, -50%)</code> for centering.</li>
+              <li><strong>scale(n)</strong> — resize visually. <code>scale(-1)</code> to flip/mirror.</li>
+              <li><strong>rotate(deg)</strong> — clockwise for positive values. Use <code>turn</code> unit for readability.</li>
+              <li><strong>skew(deg)</strong> — shear/distort. Use for angled section dividers.</li>
+              <li>Combine with space-separated list. Order is right-to-left application.</li>
+              <li><strong>transform-origin</strong> — pivot point. Default: center. Change for corner rotations or tooltip growth.</li>
+              <li><strong>Individual properties</strong> (<code>translate:</code>, <code>scale:</code>, <code>rotate:</code>) apply in fixed order: translate → rotate → scale.</li>
+              <li><strong>perspective</strong> on parent — enables 3D depth effect on children.</li>
+              <li><strong>backface-visibility: hidden</strong> — hides the back of a flipped element.</li>
+              <li>Transform + opacity = GPU compositor only — always 60fps, no layout reflow.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does the <code>transform</code> property do?</li>
+            <li>Name four transform functions.</li>
+            <li>What is <code>transform-origin</code>?</li>
+            <li>Why is <code>transform</code> more performant than changing <code>top</code>/<code>left</code>?</li>
+            <li>In what order are multiple transform functions applied?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/csslessons/effects/transitions.html" class="topic-tag css-topic-tag">🎨 CSS Transitions</a>
+            <a href="/csslessons/effects/animations.html" class="topic-tag css-topic-tag">🎨 CSS Animations</a>
+            <a href="/csslessons/effects/filters.html" class="topic-tag css-topic-tag">🎨 CSS Filters</a>
+            <a href="/csslessons/layout/position.html" class="topic-tag css-topic-tag">🎨 CSS Position</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why use transform: translate instead of top/left? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Changing <code>top</code> or <code>left</code> triggers layout reflow — the browser recalculates all element positions. This is expensive and can cause jank (stuttering). Changing <code>transform: translate</code> only triggers the compositor layer — the GPU handles it directly without any layout or paint work. On most devices, this means the difference between 15fps and 60fps for animations. Always use <code>transform: translateX/translateY</code> instead of <code>left/top</code> for anything animated.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Does transform affect layout flow? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — transforms are purely visual. The element keeps its original space in the document flow as if the transform didn't exist. Adjacent elements don't move when you translate or scale something. This is both a feature (won't break layout) and a potential confusion (a translated element may visually overlap other elements without those elements reflowing). Use transforms for visual effects and animations, not for repositioning elements in the layout — use flexbox/grid/position for actual layout changes.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between transform individual properties and the transform shorthand? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Individual properties (<code>translate</code>, <code>rotate</code>, <code>scale</code>) are applied in a fixed order: translate first, then rotate, then scale — regardless of the order you write them. The <code>transform</code> shorthand applies functions in the order you write them (right to left). Individual properties also don't interfere with each other — animating <code>rotate</code> via keyframes while also using <code>transform: scale()</code> on hover works cleanly with individual properties but would conflict with the shorthand.</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/csslessons/effects/animations.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">CSS Animations</span>
+          </a>
+          <a href="/csslessons/effects/filters.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">CSS Filters</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Web Storage – localStorage, sessionStorage &amp; IndexedDB | ylearner</title>
+  <meta name="description" content="Learn JavaScript Web Storage: localStorage vs sessionStorage, setItem/getItem/removeItem, storing objects with JSON, the storage event for cross-tab sync, IndexedDB intro, cookies comparison table, and security best practices.">
+  <meta name="keywords" content="javascript localStorage, sessionStorage javascript, IndexedDB javascript, web storage api, JSON.stringify localStorage, storage event javascript, cookies vs localStorage, browser storage javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/dom/web-storage.html">
+  <meta property="og:title" content="JavaScript Web Storage – localStorage, sessionStorage &amp; IndexedDB | ylearner">
+  <meta property="og:description" content="Learn localStorage, sessionStorage, and IndexedDB: storing, reading, and syncing data in the browser with security best practices.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/dom/web-storage.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Web Storage – localStorage, sessionStorage &amp; IndexedDB | ylearner">
+  <meta name="twitter:description" content="Learn localStorage, sessionStorage, and IndexedDB: storing, reading, and syncing data in the browser with security best practices.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/dom/dom-manipulation.html">DOM &amp; Browser</a><span class="separator">›</span>
+          <span class="current">Web Storage</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 DOM &amp; Browser</div>
+          <h1>JavaScript Web Storage – Storing Data in the Browser</h1>
+          <p class="lesson-intro">The <strong>Web Storage API</strong> lets JavaScript persist data directly in the browser — no server required. <code>localStorage</code> survives browser restarts; <code>sessionStorage</code> lives only as long as the tab is open. Together they provide a simple key-value store for user preferences, cached data, and application state.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="localstorage">localStorage – Persistent Storage</h2>
+          <p><code>localStorage</code> stores data with no expiration time. Data persists across browser sessions, tabs (same origin), and restarts. The limit is approximately 5 MB per origin (varies by browser).</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// setItem — store a value (strings only!)
+localStorage.setItem('username', 'alice');
+localStorage.setItem('theme', 'dark');
+
+// getItem — retrieve (returns null if key doesn't exist)
+const username = localStorage.getItem('username');
+console.log(username); // "alice"
+
+const missing = localStorage.getItem('nonexistent');
+console.log(missing); // null
+
+// removeItem — delete a single key
+localStorage.removeItem('theme');
+
+// clear — delete ALL keys in this origin (use with caution!)
+// localStorage.clear();
+
+// length — number of stored items
+console.log(localStorage.length); // 1
+
+// key(index) — get key name by index (order not guaranteed)
+console.log(localStorage.key(0)); // "username"
+
+// Direct property access (works but not recommended — conflicts with built-in props)
+localStorage.color = 'blue';  // ❌ avoid
+localStorage.setItem('color', 'blue'); // ✅ preferred</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>username → "alice"
+missing  → null
+length   → 1
+key(0)   → "username"</pre>
+          </div>
+
+          <h2 id="sessionstorage">sessionStorage – Tab-Scoped Storage</h2>
+          <p><code>sessionStorage</code> has the same API as <code>localStorage</code> but data is cleared when the <em>tab</em> (or window) is closed. Opening the same URL in a new tab creates a completely separate storage scope.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Identical API to localStorage
+sessionStorage.setItem('currentStep', '2');
+sessionStorage.setItem('formDraft', JSON.stringify({ name: 'Bob', email: 'bob@mail.com' }));
+
+const step = sessionStorage.getItem('currentStep');
+console.log(step); // "2"
+
+// Use cases:
+// - Wizard/multi-step form progress (lose if user closes tab — by design)
+// - Temporary shopping cart (before checkout)
+// - One-time messages / alerts per session
+// - Protecting against CSRF tokens (very short-lived)
+
+sessionStorage.removeItem('currentStep');
+// Cleared automatically when tab closes — no manual cleanup needed</code></pre>
+          </div>
+
+          <h2 id="storing-objects">Storing Objects with JSON</h2>
+          <p>Web Storage only stores strings. Use <code>JSON.stringify()</code> to store objects and <code>JSON.parse()</code> to restore them:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Store an object
+const user = { name: 'Alice', role: 'admin', preferences: { theme: 'dark', lang: 'en' } };
+localStorage.setItem('user', JSON.stringify(user));
+
+// Retrieve and parse
+const stored = localStorage.getItem('user');
+const parsedUser = stored ? JSON.parse(stored) : null;
+console.log(parsedUser.preferences.theme); // "dark"
+
+// Store an array
+const history = ['home', 'about', 'products'];
+localStorage.setItem('navHistory', JSON.stringify(history));
+const navHistory = JSON.parse(localStorage.getItem('navHistory') || '[]');
+navHistory.push('contact');
+localStorage.setItem('navHistory', JSON.stringify(navHistory));
+
+// Helper wrapper to avoid repetition
+const store = {
+  set(key, val) { localStorage.setItem(key, JSON.stringify(val)); },
+  get(key, fallback = null) {
+    const item = localStorage.getItem(key);
+    return item !== null ? JSON.parse(item) : fallback;
+  },
+  remove(key) { localStorage.removeItem(key); }
+};
+
+store.set('settings', { fontSize: 16, color: '#333' });
+const settings = store.get('settings', { fontSize: 14, color: '#000' });</code></pre>
+          </div>
+
+          <h2 id="storage-event">The storage Event – Cross-Tab Sync</h2>
+          <p>When <code>localStorage</code> is changed in one tab, a <code>storage</code> event fires in <em>all other tabs</em> of the same origin — enabling real-time cross-tab communication:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Listen for changes made in OTHER tabs
+window.addEventListener('storage', (event) =&gt; {
+  console.log('Key changed:', event.key);
+  console.log('Old value:', event.oldValue);
+  console.log('New value:', event.newValue);
+  console.log('Storage area:', event.storageArea); // localStorage or sessionStorage
+  console.log('Origin URL:', event.url);
+
+  // Example: sync theme across tabs
+  if (event.key === 'theme') {
+    document.body.dataset.theme = event.newValue;
+  }
+
+  // Cross-tab logout
+  if (event.key === 'auth_token' &amp;&amp; event.newValue === null) {
+    redirectToLogin();
+  }
+});
+
+// Note: the storage event does NOT fire in the tab that made the change
+// It ONLY fires in other tabs/windows</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Practical: Persist User Theme Preference</strong>
+              <p>Store the theme choice in <code>localStorage</code> and read it on page load before rendering to avoid flash of wrong theme (FOUC). Apply the theme class to <code>&lt;html&gt;</code> or <code>&lt;body&gt;</code> at the very top of <code>&lt;head&gt;</code> — before any CSS is applied.</p>
+            </div>
+          </div>
+
+          <h2 id="indexeddb">IndexedDB – Large Structured Data</h2>
+          <p>IndexedDB is a browser-native NoSQL database for large volumes of structured data. It supports transactions, indexes, cursors, and blob storage — but has a complex API. Libraries like <a href="https://dexie.org" target="_blank" rel="noopener">Dexie.js</a> make it practical:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Raw IndexedDB API (simplified example)
+const request = indexedDB.open('myDatabase', 1);
+
+request.onupgradeneeded = (event) =&gt; {
+  const db = event.target.result;
+  // Create an object store (like a table)
+  const store = db.createObjectStore('users', { keyPath: 'id' });
+  store.createIndex('email', 'email', { unique: true });
+};
+
+request.onsuccess = (event) =&gt; {
+  const db = event.target.result;
+
+  // Write a record
+  const tx = db.transaction('users', 'readwrite');
+  tx.objectStore('users').put({ id: 1, name: 'Alice', email: 'alice@example.com' });
+  tx.oncomplete = () =&gt; console.log('User saved');
+};
+
+// Using Dexie.js (much cleaner):
+// const db = new Dexie('myDatabase');
+// db.version(1).stores({ users: '++id, name, email' });
+// await db.users.add({ name: 'Alice', email: 'alice@example.com' });
+// const alice = await db.users.where('email').equals('alice@example.com').first();</code></pre>
+          </div>
+
+          <h2 id="comparison-table">Storage Options Comparison</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Feature</th><th>Cookies</th><th>localStorage</th><th>sessionStorage</th><th>IndexedDB</th></tr></thead>
+              <tbody>
+                <tr><td>Capacity</td><td>~4 KB</td><td>~5 MB</td><td>~5 MB</td><td>Hundreds of MB+</td></tr>
+                <tr><td>Lifetime</td><td>Set by expiry / session</td><td>Permanent</td><td>Until tab closes</td><td>Permanent</td></tr>
+                <tr><td>Sent with requests</td><td>Yes (automatic)</td><td>No</td><td>No</td><td>No</td></tr>
+                <tr><td>Accessible from JS</td><td>Yes (unless HttpOnly)</td><td>Yes</td><td>Yes</td><td>Yes (async)</td></tr>
+                <tr><td>Cross-tab sharing</td><td>Yes</td><td>Yes (same origin)</td><td>No</td><td>Yes (same origin)</td></tr>
+                <tr><td>Data format</td><td>String</td><td>String</td><td>String</td><td>Any structured data</td></tr>
+                <tr><td>Use case</td><td>Auth, tracking</td><td>Preferences, cache</td><td>Form draft, wizard</td><td>Offline apps, large data</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout callout-danger">
+            <span class="callout-icon">🚫</span>
+            <div class="callout-content">
+              <strong>Never store sensitive data in Web Storage</strong>
+              <p>localStorage and sessionStorage are accessible by any JavaScript on the page, including injected third-party scripts. Never store passwords, authentication tokens (JWTs), credit card numbers, or any personally identifiable information. For auth tokens, prefer <code>HttpOnly</code> cookies which are invisible to JavaScript.</p>
+            </div>
+          </div>
+
+          <h2 id="practical-example">Practical: Persisting Theme and Preferences</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Theme persistence
+const themeBtn = document.getElementById('themeToggle');
+
+// Apply saved theme on load
+const savedTheme = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+
+themeBtn.addEventListener('click', () =&gt; {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+});
+
+// Persist font size preference
+const fontSizeControl = document.getElementById('fontSize');
+const savedSize = localStorage.getItem('fontSize') || '16';
+document.body.style.fontSize = savedSize + 'px';
+fontSizeControl.value = savedSize;
+
+fontSizeControl.addEventListener('input', () =&gt; {
+  const size = fontSizeControl.value;
+  document.body.style.fontSize = size + 'px';
+  localStorage.setItem('fontSize', size);
+});</code></pre>
+          </div>
+
+          <h2 id="deep-webstorage">localStorage vs sessionStorage: Persisting Data in the Browser</h2>
+          <p>Web Storage saves key/value data in the browser. The two flavors differ only in <em>lifetime</em>: <code>localStorage</code> persists until explicitly cleared (survives restarts); <code>sessionStorage</code> lasts only for that tab's session.</p>
+          <pre><code class="language-javascript">localStorage.setItem("theme", "dark");
+localStorage.getItem("theme");    // "dark"
+localStorage.removeItem("theme");
+
+// Values are STRINGS ONLY — objects must be serialized
+localStorage.setItem("user", JSON.stringify({ name: "Ann" }));
+const user = JSON.parse(localStorage.getItem("user"));</code></pre>
+          <table>
+            <thead><tr><th></th><th>localStorage</th><th>sessionStorage</th></tr></thead>
+            <tbody>
+              <tr><td>Lifetime</td><td>until cleared</td><td>until tab closes</td></tr>
+              <tr><td>Shared across tabs</td><td>yes (same origin)</td><td>no</td></tr>
+              <tr><td>Size</td><td colspan="2">~5-10 MB per origin</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Three things to know:</strong> everything is stored as a <em>string</em>, so wrap objects in <code>JSON.stringify</code>/<code>parse</code> (forgetting this stores <code>"[object Object]"</code>). The API is <em>synchronous</em> — writing megabytes blocks the main thread, so keep it small. And it's <strong>not secure</strong>: any JavaScript on the page (including XSS) can read it, so never store tokens, passwords, or sensitive data there. Listen for the <code>storage</code> event to sync state across tabs.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a persistent notes app:</p>
+            <ol>
+              <li>A <code>&lt;textarea&gt;</code> for note input and a "Save" button.</li>
+              <li>On save, add the note to an array stored in localStorage under the key <code>'notes'</code>.</li>
+              <li>On page load, read the array from localStorage and render all notes as cards.</li>
+              <li>Each card has a "Delete" button that removes the note from the array and updates localStorage.</li>
+              <li>Show the count of saved notes.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a multi-tab counter using the <code>storage</code> event. Page A has increment/decrement buttons. Page B displays the current count. Any change on page A should instantly update page B via the <code>storage</code> event (without polling). Both pages should also persist the count across page refreshes. Test by opening both pages in separate tabs.</p>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>localStorage</code>: persistent, ~5 MB, same origin, string-only values.</li>
+              <li><code>sessionStorage</code>: same API, cleared when tab closes, not shared between tabs.</li>
+              <li>Use <code>JSON.stringify/parse</code> to store and retrieve objects and arrays.</li>
+              <li>The <code>storage</code> event fires in <em>other</em> tabs when localStorage changes — useful for cross-tab sync.</li>
+              <li>IndexedDB handles large structured data; use Dexie.js to simplify its API.</li>
+              <li>Never store passwords or auth tokens in Web Storage — use <code>HttpOnly</code> cookies instead.</li>
+              <li>Always provide a fallback value when reading from storage in case the key doesn't exist.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between localStorage and sessionStorage?</li>
+            <li>Why can't you store objects directly in localStorage?</li>
+            <li>How would you implement cross-tab communication using Web Storage?</li>
+            <li>Why should you avoid storing JWT tokens in localStorage?</li>
+            <li>When would you choose IndexedDB over localStorage?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/javascript/dom/ajax.html" class="topic-tag">AJAX</a>
+            <a href="/javascript/dom/fetch-api.html" class="topic-tag">Fetch API</a>
+            <a href="/javascript/dom/events.html" class="topic-tag">JS Events</a>
+            <a href="/javascript/frameworks/react.html" class="topic-tag">React</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What happens when localStorage is full (quota exceeded)? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The browser throws a <code>DOMException</code> with the name <code>QuotaExceededError</code>. Wrap write operations in a try/catch to handle this gracefully: catch the error, inform the user, or remove old data to make room with <code>localStorage.removeItem()</code> before retrying.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can different websites access my localStorage data? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Web Storage is scoped to the <em>origin</em> (scheme + domain + port). <code>https://example.com</code> cannot read <code>https://other.com</code>'s storage, and <code>http://example.com</code> cannot read <code>https://example.com</code>'s storage. However, all scripts running on the same origin can access the same storage — including ads and analytics scripts loaded on your page.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Does Private/Incognito mode affect Web Storage? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. In private/incognito mode, <code>localStorage</code> is isolated to the private session and is cleared when the window closes — behaving like <code>sessionStorage</code>. On some browsers (older Safari), <code>localStorage.setItem()</code> may throw in private mode due to quota being set to zero. Always wrap writes in try/catch.</p></div>
+            </div>
+          </section>
+
+<div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/dom/ajax.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">AJAX</span></a>
+          <a href="/javascript/dom/quiz.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">📝 Section Quiz</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

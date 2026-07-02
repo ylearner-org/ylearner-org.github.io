@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Spread and Rest Operator – ... Explained | ylearner</title>
+  <meta name="description" content="Master the JavaScript spread and rest operators: copy and merge arrays/objects, pass arguments, rest parameters, shallow vs deep copy, and practical immutable update patterns.">
+  <meta name="keywords" content="javascript spread operator, javascript rest operator, spread array javascript, spread object javascript, rest parameters javascript, shallow copy javascript, immutable updates javascript, merge arrays javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/data-structures/spread-rest.html">
+  <meta property="og:title" content="JavaScript Spread and Rest Operator – ... Explained | ylearner">
+  <meta property="og:description" content="Master the JavaScript spread and rest operators: copy and merge arrays/objects, pass arguments, rest parameters, shallow vs deep copy, and practical immutable update patterns.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/data-structures/spread-rest.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Spread and Rest Operator – ... Explained | ylearner">
+  <meta name="twitter:description" content="Master the JavaScript spread and rest operators: copy and merge arrays/objects, pass arguments, rest parameters, shallow vs deep copy, and practical immutable update patterns.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/data-structures/arrays.html">Data Structures</a><span class="separator">›</span>
+          <span class="current">Spread &amp; Rest</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📦 Data Structures</div>
+          <h1>JavaScript Spread and Rest – The ... Operator</h1>
+          <p class="lesson-intro">The three dots <code>...</code> are one of the most useful additions in ES6. In two different contexts, they do opposite things: <strong>spread</strong> expands an iterable into individual elements, while <strong>rest</strong> collects multiple elements into a single value. Both are essential for writing clean, functional, and immutable JavaScript.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="spread-arrays">Spread in Arrays</h2>
+          <p>The spread operator expands an iterable (array, string, Set, Map) into individual elements wherever a list is expected.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const a = [1, 2, 3];
+const b = [4, 5, 6];
+
+// Merge arrays
+const merged = [...a, ...b];
+console.log(merged); // [1, 2, 3, 4, 5, 6]
+
+// Copy (shallow)
+const copy = [...a];
+copy.push(99);
+console.log(a);    // [1, 2, 3] — unchanged
+console.log(copy); // [1, 2, 3, 99]
+
+// Prepend / append
+const withExtra = [0, ...a, 4];
+console.log(withExtra); // [0, 1, 2, 3, 4]
+
+// Pass array as function arguments
+function sum(x, y, z) { return x + y + z; }
+const nums = [10, 20, 30];
+console.log(sum(...nums)); // 60
+// Equivalent to: sum(nums[0], nums[1], nums[2])
+
+// Spread a string into characters
+const chars = [..."hello"];
+console.log(chars); // ['h', 'e', 'l', 'l', 'o']
+
+// Spread a Set into array (deduplication)
+const unique = [...new Set([1, 2, 2, 3, 3])];
+console.log(unique); // [1, 2, 3]</code></pre>
+          </div>
+
+          <h2 id="spread-objects">Spread in Objects</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const defaults = { theme: 'light', lang: 'en', fontSize: 14 };
+const userPrefs = { theme: 'dark', fontSize: 16 };
+
+// Shallow copy
+const copy = { ...defaults };
+console.log(copy); // { theme: 'light', lang: 'en', fontSize: 14 }
+
+// Merge – later properties win (override)
+const config = { ...defaults, ...userPrefs };
+console.log(config);
+// { theme: 'dark', lang: 'en', fontSize: 16 }
+
+// Add / override a single property
+const updated = { ...defaults, lang: 'fr' };
+console.log(updated);
+// { theme: 'light', lang: 'fr', fontSize: 14 }
+
+// Remove a property (spread + destructuring)
+const { theme, ...withoutTheme } = defaults;
+console.log(withoutTheme); // { lang: 'en', fontSize: 14 }
+
+// Order matters — last spread wins
+const a = { x: 1, y: 2 };
+const b = { y: 10, z: 3 };
+console.log({ ...a, ...b }); // { x: 1, y: 10, z: 3 }
+console.log({ ...b, ...a }); // { y: 2, z: 3, x: 1 }</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>{ theme: 'light', lang: 'en', fontSize: 14 }
+{ theme: 'dark', lang: 'en', fontSize: 16 }
+{ theme: 'light', lang: 'fr', fontSize: 14 }
+{ lang: 'en', fontSize: 14 }
+{ x: 1, y: 10, z: 3 }
+{ y: 2, z: 3, x: 1 }</pre>
+          </div>
+
+          <h2 id="rest-parameters">Rest Parameters in Functions</h2>
+          <p>Rest parameters use the same <code>...</code> syntax but in function definitions. They collect remaining arguments into a real array.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Rest parameter collects extra arguments
+function sum(first, ...rest) {
+  return rest.reduce((acc, n) => acc + n, first);
+}
+console.log(sum(1, 2, 3, 4, 5)); // 15
+console.log(sum(10));             // 10
+
+// Variadic log with prefix
+function log(level, ...messages) {
+  console.log(`[${level.toUpperCase()}]`, ...messages);
+}
+log('info', 'Server started', 'on port', 3000);
+// [INFO] Server started on port 3000
+
+// Rest vs arguments object (pre-ES6)
+function oldWay() {
+  // arguments is array-like, NOT a real array
+  const arr = Array.from(arguments); // needed conversion
+  return arr.reduce((a, b) => a + b, 0);
+}
+function newWay(...args) {
+  // args is already a real Array — has map, filter, reduce, etc.
+  return args.reduce((a, b) => a + b, 0);
+}
+
+// Rest must be the last parameter
+function first(a, b, ...rest) { // OK
+  console.log(a, b, rest);
+}
+// function wrong(...rest, last) {} // SyntaxError!</code></pre>
+          </div>
+
+          <h2 id="rest-destructuring">Rest in Destructuring</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Array destructuring with rest
+const [first, second, ...remaining] = [1, 2, 3, 4, 5];
+console.log(first, second); // 1 2
+console.log(remaining);     // [3, 4, 5]
+
+// Object destructuring with rest
+const { id, name, ...extras } = { id: 1, name: 'Alice', role: 'admin', age: 28 };
+console.log(id, name); // 1 Alice
+console.log(extras);   // { role: 'admin', age: 28 }
+
+// Practical: extract known fields, pass the rest along
+function createUser({ name, email, ...profile }) {
+  return { id: Date.now(), name, email, profile };
+}
+const user = createUser({ name: 'Bob', email: 'b@x.com', age: 25, bio: 'Dev' });
+console.log(user.profile); // { age: 25, bio: 'Dev' }</code></pre>
+          </div>
+
+          <h2 id="shallow-deep">Shallow vs Deep Copy Gotcha</h2>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Spread is Always Shallow</strong>
+              <p>Both <code>[...arr]</code> and <code>{...obj}</code> copy only one level deep. Nested objects and arrays are still shared by reference. Mutating a nested property in the copy will mutate the original too.</p>
+            </div>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const original = { a: 1, nested: { b: 2 } };
+const shallowCopy = { ...original };
+
+shallowCopy.a = 99;            // OK — primitive, independent
+shallowCopy.nested.b = 99;     // mutates ORIGINAL.nested.b too!
+
+console.log(original.a);        // 1 ← unchanged
+console.log(original.nested.b); // 99 ← CHANGED (shared reference!)
+
+// Solutions for deep copy:
+// 1. structuredClone (modern, handles most types)
+const deepCopy = structuredClone(original);
+deepCopy.nested.b = 42;
+console.log(original.nested.b); // 99 — truly independent
+
+// 2. JSON round-trip (simple data only — no functions/dates/undefined)
+const jsonCopy = JSON.parse(JSON.stringify(original));
+
+// 3. Manual deep copy for nested arrays
+const matrix = [[1, 2], [3, 4]];
+const matrixCopy = matrix.map(row => [...row]);
+matrixCopy[0][0] = 99;
+console.log(matrix[0][0]); // 1 — unchanged</code></pre>
+          </div>
+
+          <h2 id="practical-patterns">Practical Patterns</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// 1. Immutable state updates (React pattern)
+const state = { user: { name: 'Alice' }, count: 0 };
+
+// Add to array immutably
+const newState1 = {
+  ...state,
+  items: [...(state.items ?? []), { id: 3, label: 'New' }]
+};
+
+// Update nested property immutably
+const newState2 = {
+  ...state,
+  user: { ...state.user, name: 'Alice Smith' }
+};
+
+// 2. Merge config objects with defaults
+const defaultOptions = { timeout: 5000, retries: 3, cache: true };
+function request(url, options = {}) {
+  const opts = { ...defaultOptions, ...options };
+  console.log(`Fetching ${url} with`, opts);
+}
+request('/api/data', { timeout: 10000, cache: false });
+// { timeout: 10000, retries: 3, cache: false }
+
+// 3. Clone and add properties
+const baseUser = { role: 'user', createdAt: Date.now() };
+const adminUser = { ...baseUser, name: 'Carol', role: 'admin' };
+
+// 4. Spread with Math functions
+const values = [3, 1, 4, 1, 5, 9, 2, 6];
+console.log(Math.max(...values)); // 9
+console.log(Math.min(...values)); // 1
+
+// 5. Convert NodeList to Array
+const divs = document.querySelectorAll('div');
+const divsArray = [...divs]; // now has .map, .filter, etc.</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Syntax</th><th>Context</th><th>Behaviour</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>[...arr]</code></td><td>Expression</td><td>Spread: expands iterable into elements</td></tr>
+                <tr><td><code>{...obj}</code></td><td>Expression</td><td>Spread: copies own enumerable properties</td></tr>
+                <tr><td><code>fn(...arr)</code></td><td>Call site</td><td>Spread: passes array elements as arguments</td></tr>
+                <tr><td><code>function f(...args)</code></td><td>Parameter list</td><td>Rest: collects extra args into array</td></tr>
+                <tr><td><code>const [a, ...b] = arr</code></td><td>Destructuring</td><td>Rest: collects remaining elements</td></tr>
+                <tr><td><code>const { x, ...y } = obj</code></td><td>Destructuring</td><td>Rest: collects remaining properties</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Spread vs Object.assign</strong>
+              <p><code>Object.assign(target, src)</code> and <code>{ ...target, ...src }</code> both perform shallow merges. Key differences: <code>Object.assign</code> mutates <code>target</code> and triggers setters; spread always creates a new object and copies enumerable own properties directly without invoking setters.</p>
+            </div>
+          </div>
+
+          <h2 id="deep-spreadrest">Spread vs Rest: Same <code>...</code>, Opposite Jobs</h2>
+          <p>The <code>...</code> operator does two mirror-image things depending on <em>where</em> it sits. <strong>Spread</strong> unpacks a collection into pieces; <strong>rest</strong> gathers loose pieces into one array. Position is the whole distinction.</p>
+          <pre><code class="language-javascript">// SPREAD — expand (right-hand side / call args / literals)
+const merged = [...arr1, ...arr2];         // combine arrays
+const copy   = { ...original };            // shallow-copy an object
+Math.max(...[3, 1, 4]);                    // pass array as separate args
+
+// REST — collect (function params / destructuring)
+function sum(...nums) { return nums.reduce((a, b) => a + b); }
+const [first, ...others] = [1, 2, 3, 4];   // others = [2, 3, 4]</code></pre>
+          <h3>The shallow-copy trap</h3>
+          <p>Spread copies only <em>one level deep</em>. Nested objects/arrays are still shared references:</p>
+          <pre><code class="language-javascript">const a = { user: { name: "Ann" } };
+const b = { ...a };
+b.user.name = "Bob";     // also changes a.user.name! — same nested object</code></pre>
+          <p>For a true independent copy of nested data, use <code>structuredClone(a)</code>. Also handy: spread with override — <code>{ ...defaults, ...overrides }</code> — where later keys win, the standard way to merge config objects.</p>
+
+<div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Write a function <code>mergeDeep(target, ...sources)</code> that deeply merges multiple source objects into the target without mutating the sources. Test it with objects that have nested properties at two levels. (Hint: check if values are plain objects before merging recursively.)</p>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Implement a Redux-style reducer using only spread and rest. The reducer should handle three action types: <code>ADD_ITEM</code> (adds to an items array), <code>UPDATE_ITEM</code> (updates matching item by id), and <code>REMOVE_ITEM</code> (removes matching item). Every operation must produce a new state without mutating the previous one.</p>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Spread</strong> expands an iterable or object into individual elements/properties.</li>
+              <li>Use spread to copy arrays (<code>[...arr]</code>), merge arrays (<code>[...a, ...b]</code>), and pass arguments (<code>fn(...arr)</code>).</li>
+              <li>Use spread to copy objects (<code>{...obj}</code>) and merge with overrides (<code>{...defaults, ...overrides}</code>).</li>
+              <li><strong>Rest</strong> collects multiple items into a single array or object.</li>
+              <li>Rest parameters (<code>...args</code>) replace the legacy <code>arguments</code> object with a real array.</li>
+              <li>Both spread and object spread are <em>shallow</em> — use <code>structuredClone()</code> for deep copies.</li>
+              <li>Order matters for object spread: later properties override earlier ones.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between spread and rest in JavaScript?</li>
+            <li>How does spread differ from <code>Object.assign</code> for object copying?</li>
+            <li>Why is spread considered a shallow copy? Give an example of the problem.</li>
+            <li>How would you merge two arrays without mutating either?</li>
+            <li>What is wrong with using <code>arguments</code> instead of rest parameters?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/javascript/data-structures/destructuring.html" class="topic-tag">Destructuring</a>
+            <a href="/javascript/data-structures/array-methods.html" class="topic-tag">Array Methods</a>
+            <a href="/javascript/data-structures/objects.html" class="topic-tag">Objects</a>
+            <a href="/javascript/intermediate/es6-features.html" class="topic-tag">ES6+ Features</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I spread a non-iterable object into an array? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Spreading into an array context requires an iterable (arrays, strings, Sets, Maps, generators). Plain objects are not iterable, so <code>[...obj]</code> throws a TypeError. Object spread <code>{...obj}</code> works because it copies own enumerable properties, not via iteration.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Does <code>{...obj}</code> copy prototype methods? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Object spread only copies own, enumerable, string-keyed properties. Prototype methods and non-enumerable properties are not included.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can rest parameters replace the <code>arguments</code> object entirely? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Almost. The main difference is that <code>arguments</code> also captures parameters before the rest element, and it is not available in arrow functions. Rest parameters are preferred in modern code because they are real arrays with full array methods.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I pass all arguments from one function to another? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use rest + spread together: <code>function wrapper(...args) { return inner(...args); }</code>. This perfectly forwards all arguments regardless of their number or type.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>structuredClone</code> and JSON round-trip for deep cloning? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>structuredClone</code> handles Dates, RegExp, Map, Set, circular references, ArrayBuffers, and more. JSON round-trip silently drops <code>undefined</code>, functions, and Symbols, and converts Dates to strings. Prefer <code>structuredClone</code> for modern environments.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/data-structures/destructuring.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Destructuring</span></a>
+          <a href="/javascript/data-structures/array-methods.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Array Methods</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

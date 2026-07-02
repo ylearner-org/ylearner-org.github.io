@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL FULL OUTER JOIN – All Rows from Both Tables | ylearner</title>
+  <meta name="description" content="Learn SQL FULL OUTER JOIN: all rows from both tables with NULLs for unmatched sides. MySQL workaround using UNION, and data reconciliation use cases.">
+  <meta name="keywords" content="SQL FULL OUTER JOIN, FULL JOIN SQL, MySQL FULL OUTER JOIN workaround, data reconciliation SQL, SQL join tutorial">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/joins/full-outer-join.html">
+  <meta property="og:title" content="SQL FULL OUTER JOIN – All Rows from Both Tables | ylearner">
+  <meta property="og:description" content="Learn SQL FULL OUTER JOIN, how NULLs appear on both sides, how to emulate it in MySQL, and real use cases for data reconciliation.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/joins/full-outer-join.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL FULL OUTER JOIN – All Rows from Both Tables | ylearner">
+  <meta name="twitter:description" content="Learn SQL FULL OUTER JOIN, how NULLs appear on both sides, how to emulate it in MySQL, and real use cases for data reconciliation.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL FULL OUTER JOIN","description":"Learn SQL FULL OUTER JOIN: all rows from both tables, NULLs on both sides for unmatched rows, MySQL emulation with UNION, and data reconciliation patterns.","educationalLevel":"Intermediate","keywords":"SQL FULL OUTER JOIN, FULL JOIN, MySQL UNION workaround, data reconciliation","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/joins/joins-overview.html">Joins</a><span class="separator">›</span>
+          <span class="current">FULL OUTER JOIN</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔗 Joins</div>
+          <h1>SQL FULL OUTER JOIN – All Rows from Both Tables</h1>
+          <p class="lesson-intro">FULL OUTER JOIN returns <em>all rows</em> from both tables. Where a row from one table has no match in the other, the unmatched columns are filled with NULL. It is the combination of LEFT JOIN and RIGHT JOIN in one operation — and it is particularly useful for data reconciliation and auditing tasks.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="full-outer-syntax">FULL OUTER JOIN Syntax</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT columns
+FROM table_a
+FULL OUTER JOIN table_b ON table_a.col = table_b.col;
+
+-- OUTER keyword is optional (same result)
+SELECT columns
+FROM table_a
+FULL JOIN table_b ON table_a.col = table_b.col;</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- All employees AND all departments — matched where possible
+SELECT e.name, d.dept_name
+FROM employees e
+FULL OUTER JOIN departments d ON e.dept_id = d.id;
+
+-- Result (PostgreSQL / SQL Server):
+-- name  | dept_name
+-- Alice | Marketing
+-- Bob   | Engineering
+-- Carol | Engineering
+-- Dave  | HR
+-- Eve   | NULL          ← Employee with no department
+-- NULL  | Finance       ← Department with no employees
+
+-- All 5 employees + Finance department = 6 rows total</code></pre>
+          </div>
+
+          <h2 id="nulls-both-sides">NULLs on Both Sides</h2>
+          <p>In a FULL OUTER JOIN result, NULLs can appear in columns from either the left table or the right table. Use IS NULL checks on each side to categorize the rows.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT
+  e.id       AS emp_id,
+  e.name     AS emp_name,
+  d.id       AS dept_id,
+  d.dept_name,
+  CASE
+    WHEN e.id IS NULL  THEN 'Department with no employees'
+    WHEN d.id IS NULL  THEN 'Employee with no department'
+    ELSE 'Matched'
+  END AS match_status
+FROM employees e
+FULL OUTER JOIN departments d ON e.dept_id = d.id;
+
+-- Result breakdown:
+-- match_status                    count
+-- Matched                           4   (Alice, Bob, Carol, Dave)
+-- Employee with no department       1   (Eve)
+-- Department with no employees      1   (Finance)</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="mysql-workaround">MySQL Workaround</h2>
+          <p>MySQL does not support FULL OUTER JOIN. The standard workaround is to UNION a LEFT JOIN with a RIGHT JOIN (or LEFT JOIN with tables swapped), using IS NULL to avoid duplicating matched rows.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- MySQL FULL OUTER JOIN emulation using UNION
+-- Step 1: LEFT JOIN gets all employees + matched departments
+SELECT e.name, d.dept_name
+FROM employees e
+LEFT JOIN departments d ON e.dept_id = d.id
+
+UNION
+
+-- Step 2: RIGHT JOIN (or swapped LEFT JOIN) gets all departments
+-- Use IS NULL to exclude already-matched rows (avoid duplicates)
+SELECT e.name, d.dept_name
+FROM employees e
+RIGHT JOIN departments d ON e.dept_id = d.id
+WHERE e.id IS NULL;
+
+-- Alternative: swap tables in the second LEFT JOIN
+SELECT e.name, d.dept_name
+FROM employees e
+LEFT JOIN departments d ON e.dept_id = d.id
+
+UNION
+
+SELECT e.name, d.dept_name
+FROM departments d
+LEFT JOIN employees e ON e.dept_id = d.id
+WHERE e.id IS NULL;</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>UNION vs UNION ALL</strong>
+              <p>The workaround uses <code>UNION</code> (not <code>UNION ALL</code>) so that exactly-matched rows from both halves are not duplicated. However, since the second half explicitly filters with <code>WHERE e.id IS NULL</code>, using <code>UNION ALL</code> is also correct and faster (skips the deduplication step).</p>
+            </div>
+          </div>
+
+          <h2 id="use-cases">Use Cases for FULL OUTER JOIN</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Data reconciliation: compare two monthly reports
+-- Find orders that appear in one month but not the other
+SELECT
+  COALESCE(jan.order_id, feb.order_id) AS order_id,
+  jan.amount                           AS jan_amount,
+  feb.amount                           AS feb_amount,
+  CASE
+    WHEN jan.order_id IS NULL THEN 'New in Feb'
+    WHEN feb.order_id IS NULL THEN 'Only in Jan'
+    ELSE 'Both months'
+  END AS status
+FROM january_orders jan
+FULL OUTER JOIN february_orders feb ON jan.order_id = feb.order_id;
+
+-- Merge two user tables from different systems
+SELECT
+  COALESCE(a.email, b.email) AS email,
+  a.name AS system_a_name,
+  b.name AS system_b_name
+FROM system_a_users a
+FULL OUTER JOIN system_b_users b ON a.email = b.email;
+
+-- Find discrepancies: rows only in one table
+SELECT *
+FROM system_a_users a
+FULL OUTER JOIN system_b_users b ON a.email = b.email
+WHERE a.email IS NULL OR b.email IS NULL;</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-fullouter">FULL OUTER JOIN: Keep Everything From Both Sides</h2>
+          <p>A <code>FULL OUTER JOIN</code> returns <em>all</em> rows from both tables — matched rows joined together, plus unmatched rows from <em>each</em> side padded with <code>NULL</code>. It's the union of LEFT and RIGHT joins.</p>
+          <table>
+            <thead><tr><th>Join</th><th>Keeps unmatched from</th></tr></thead>
+            <tbody>
+              <tr><td>INNER</td><td>neither (only matches)</td></tr>
+              <tr><td>LEFT</td><td>left table</td></tr>
+              <tr><td>RIGHT</td><td>right table</td></tr>
+              <tr><td>FULL OUTER</td><td><strong>both</strong></td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-sql">-- reconcile two systems: rows only in A, only in B, and in both
+SELECT COALESCE(a.id, b.id) AS id, a.amount AS sys_a, b.amount AS sys_b
+FROM system_a a
+FULL OUTER JOIN system_b b ON a.id = b.id
+WHERE a.id IS NULL OR b.id IS NULL;   -- show only the mismatches</code></pre>
+          <p><strong>Prime use case:</strong> reconciliation — comparing two datasets to find what's in one but not the other (missing invoices, sync gaps). The <code>WHERE a.id IS NULL OR b.id IS NULL</code> filter surfaces exactly the discrepancies.</p>
+          <p><strong>Portability gotcha:</strong> <strong>MySQL doesn't support FULL OUTER JOIN.</strong> Emulate it by <code>UNION</code>-ing a LEFT JOIN with a RIGHT JOIN: <code>SELECT ... LEFT JOIN ... UNION SELECT ... RIGHT JOIN ...</code>. PostgreSQL, SQL Server, and Oracle support it directly. Because it keeps unmatched rows from both sides, always use <code>COALESCE</code> on the key column to get a non-NULL identifier.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Write a FULL OUTER JOIN.</li>
+              <li>Identify rows unmatched on both sides.</li>
+              <li>Emulate FULL OUTER in MySQL with UNION.</li>
+              <li>Combine it with COALESCE.</li>
+              <li>Compare the result to an INNER JOIN.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Given <code>online_customers</code> and <code>store_customers</code>, use a FULL OUTER JOIN to list everyone in either set, marking which source each came from. Explain how FULL OUTER differs from INNER and LEFT, and how to emulate it where unsupported.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>FULL OUTER JOIN</strong> — Returns all rows from both tables. NULLs on either side for unmatched rows.</li>
+              <li><strong>Combines LEFT + RIGHT</strong> — Eve (no dept) and Finance (no employees) both appear.</li>
+              <li><strong>MySQL limitation</strong> — Not supported. Emulate with LEFT JOIN UNION RIGHT JOIN (+ IS NULL filter).</li>
+              <li><strong>PostgreSQL / SQL Server / Oracle</strong> — FULL OUTER JOIN is natively supported.</li>
+              <li><strong>Use CASE + IS NULL</strong> — Categorize rows as matched, left-only, or right-only.</li>
+              <li><strong>Best use case</strong> — Data reconciliation, finding mismatches between two datasets.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does FULL OUTER JOIN return?</li>
+            <li>How does FULL OUTER differ from LEFT and INNER?</li>
+            <li>How do you emulate FULL OUTER JOIN in MySQL?</li>
+            <li>What appears for rows unmatched on one side?</li>
+            <li>When is FULL OUTER JOIN useful?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/joins/left-right-join.html" class="topic-tag sql-topic-tag">🗄️ LEFT & RIGHT JOIN</a>
+            <a href="/sql/joins/self-join.html" class="topic-tag sql-topic-tag">🗄️ Self Join</a>
+            <a href="/sql/joins/inner-join.html" class="topic-tag sql-topic-tag">🗄️ INNER JOIN</a>
+            <a href="/sql/functions/null-functions.html" class="topic-tag sql-topic-tag">🗄️ NULL Handling</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Which databases support FULL OUTER JOIN natively?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>PostgreSQL, SQL Server, Oracle, DB2, SQLite (version 3.39+), and most enterprise databases support FULL OUTER JOIN natively. MySQL and MariaDB do not — use the LEFT JOIN UNION RIGHT JOIN workaround shown in this lesson.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I avoid duplicates in the MySQL FULL OUTER JOIN workaround?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Matched rows appear in both the LEFT JOIN half and the RIGHT JOIN half. To avoid duplicates in the second half, add <code>WHERE right_table.id IS NULL</code> (or whichever side's key is not the driving table). This ensures only the unmatched rows from the right table are included in the UNION. Alternatively, use <code>UNION</code> (not UNION ALL) to deduplicate automatically, though this is slower.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is FULL OUTER JOIN commonly used in practice?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>FULL OUTER JOIN is less common than INNER JOIN or LEFT JOIN in day-to-day application queries. It is most useful in data engineering tasks: reconciling records between two datasets, ETL (extract-transform-load) processes, auditing data migrations, and comparing staging vs production tables. If you find yourself using FULL OUTER JOIN in a regular application query, reconsider whether your data model needs adjustment.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can FULL OUTER JOIN be used with GROUP BY?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. After a FULL OUTER JOIN, you can GROUP BY and aggregate as normal. Use COALESCE on the key columns before grouping if you want to merge NULLs from both sides: <code>GROUP BY COALESCE(a.id, b.id)</code>. Be careful about which columns you aggregate — NULL columns from unmatched rows are ignored by SUM/AVG/MIN/MAX.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/joins/left-right-join.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">LEFT & RIGHT JOIN</span>
+          </a>
+          <a href="/sql/joins/self-join.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Self Join</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

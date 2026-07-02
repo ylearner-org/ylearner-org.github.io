@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Triggers – Automating Actions on Data Changes | ylearner</title>
+  <meta name="description" content="Learn how SQL triggers work, how to create BEFORE and AFTER triggers on INSERT, UPDATE, and DELETE, use NEW and OLD row references, and when to use or avoid triggers.">
+  <meta name="keywords" content="SQL triggers, CREATE TRIGGER, BEFORE trigger, AFTER trigger, NEW OLD rows, trigger use cases, audit logging trigger, SQL automation">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/advanced/triggers.html">
+  <meta property="og:title" content="SQL Triggers – Automating Actions on Data Changes | ylearner">
+  <meta property="og:description" content="Master SQL triggers — CREATE TRIGGER syntax, BEFORE vs AFTER, NEW and OLD row references, audit logging, timestamp automation, and cautions for production use.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/advanced/triggers.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL Triggers – Automating Actions on Data Changes | ylearner">
+  <meta name="twitter:description" content="Master SQL triggers — CREATE TRIGGER syntax, BEFORE vs AFTER, NEW and OLD row references, audit logging, timestamp automation, and cautions for production use.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Triggers","description":"How to create and use SQL triggers to automate actions on INSERT, UPDATE, and DELETE events.","educationalLevel":"Advanced","keywords":"SQL triggers, CREATE TRIGGER, BEFORE AFTER, audit logging, NEW OLD","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <span>Advanced SQL</span><span class="separator">›</span>
+          <span class="current">Triggers</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Advanced SQL</div>
+          <h1>SQL Triggers – Automating Actions on Data Changes</h1>
+          <p class="lesson-intro">A trigger is a special type of stored procedure that fires automatically when a specified data event occurs on a table — INSERT, UPDATE, or DELETE. Triggers run without being called explicitly. They're powerful for audit logging, timestamp automation, and enforcing complex business rules, but they introduce hidden logic that must be used with care.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-are-triggers">What Are Triggers?</h2>
+          <p>A <strong>trigger</strong> is a database object associated with a table that automatically executes a block of SQL when a specific DML event (INSERT, UPDATE, or DELETE) occurs. Unlike stored procedures, triggers are never called directly — they fire implicitly as a reaction to data changes.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Trigger events</strong>
+              <p>Every trigger is tied to exactly one table and one event: INSERT, UPDATE, or DELETE. It fires either BEFORE the change is written (BEFORE trigger) or AFTER it has been written (AFTER trigger). You choose based on whether you need to inspect or modify the data before it is saved, or react to it after it is committed.</p>
+            </div>
+          </div>
+
+          <h2 id="create-trigger">Creating a Trigger</h2>
+          <p>The general syntax is: <code>CREATE TRIGGER name BEFORE|AFTER INSERT|UPDATE|DELETE ON table FOR EACH ROW BEGIN ... END</code></p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – MySQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">DELIMITER $$
+
+-- AFTER INSERT trigger: log new employee to audit table
+CREATE TRIGGER trg_employee_insert
+AFTER INSERT ON employees
+FOR EACH ROW
+BEGIN
+  INSERT INTO audit_log (table_name, operation, record_id, changed_at, changed_by)
+  VALUES ('employees', 'INSERT', NEW.id, NOW(), CURRENT_USER());
+END$$
+
+-- BEFORE UPDATE trigger: prevent salary from being decreased
+CREATE TRIGGER trg_no_salary_decrease
+BEFORE UPDATE ON employees
+FOR EACH ROW
+BEGIN
+  IF NEW.salary < OLD.salary THEN
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'Salary cannot be decreased via UPDATE';
+  END IF;
+END$$
+
+-- AFTER DELETE trigger: archive deleted record
+CREATE TRIGGER trg_employee_delete
+AFTER DELETE ON employees
+FOR EACH ROW
+BEGIN
+  INSERT INTO employees_archive
+    (id, name, department, salary, deleted_at)
+  VALUES
+    (OLD.id, OLD.name, OLD.department, OLD.salary, NOW());
+END$$
+
+DELIMITER ;</code></pre>
+          </div>
+
+          <h2 id="before-after">BEFORE vs AFTER Triggers</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Timing</th><th>Fires When</th><th>Can Modify NEW Row?</th><th>Typical Use Cases</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>BEFORE</strong></td><td>Before the row is written to disk</td><td>Yes — set NEW.col = value</td><td>Validation, data normalization, computed columns, rejecting invalid values</td></tr>
+                <tr><td><strong>AFTER</strong></td><td>After the row is successfully written</td><td>No — row already saved</td><td>Audit logging, cascading updates to other tables, sending notifications</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – MySQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">DELIMITER $$
+
+-- BEFORE INSERT: normalize email to lowercase and auto-set created_at
+CREATE TRIGGER trg_normalize_user
+BEFORE INSERT ON users
+FOR EACH ROW
+BEGIN
+  SET NEW.email      = LOWER(TRIM(NEW.email));
+  SET NEW.created_at = COALESCE(NEW.created_at, NOW());
+END$$
+
+DELIMITER ;</code></pre>
+          </div>
+
+          <h2 id="new-old-rows">NEW and OLD Row References</h2>
+          <p>Inside a trigger body, two special pseudo-rows give you access to the data being changed:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Reference</th><th>Available In</th><th>Meaning</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>NEW</strong></td><td>INSERT, UPDATE</td><td>The row as it will be after the operation. In BEFORE triggers you can modify NEW columns.</td></tr>
+                <tr><td><strong>OLD</strong></td><td>UPDATE, DELETE</td><td>The row as it was before the operation. Read-only — you cannot modify OLD.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – MySQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">DELIMITER $$
+
+-- Full audit trail: record what changed, old value, and new value
+CREATE TRIGGER trg_salary_audit
+AFTER UPDATE ON employees
+FOR EACH ROW
+BEGIN
+  IF OLD.salary != NEW.salary THEN
+    INSERT INTO salary_changes
+      (employee_id, old_salary, new_salary, changed_at, changed_by)
+    VALUES
+      (NEW.id, OLD.salary, NEW.salary, NOW(), CURRENT_USER());
+  END IF;
+END$$
+
+DELIMITER ;</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="use-cases">Practical Use Cases</h2>
+
+          <h3>1. Automatic updated_at timestamp</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – MySQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">DELIMITER $$
+
+CREATE TRIGGER trg_updated_at
+BEFORE UPDATE ON products
+FOR EACH ROW
+BEGIN
+  SET NEW.updated_at = NOW();
+END$$
+
+DELIMITER ;
+
+-- Note: In MySQL you can also achieve this with:
+-- updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+-- But a trigger gives you more control (e.g. conditional updates).</code></pre>
+          </div>
+
+          <h3>2. Cascade stock deduction on order</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – MySQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">DELIMITER $$
+
+CREATE TRIGGER trg_deduct_stock
+AFTER INSERT ON order_items
+FOR EACH ROW
+BEGIN
+  UPDATE products
+  SET stock = stock - NEW.quantity
+  WHERE id = NEW.product_id;
+
+  -- Warn (but allow) if stock goes negative
+  IF (SELECT stock FROM products WHERE id = NEW.product_id) < 0 THEN
+    INSERT INTO stock_alerts (product_id, alert_time)
+    VALUES (NEW.product_id, NOW());
+  END IF;
+END$$
+
+DELIMITER ;</code></pre>
+          </div>
+
+          <h3>3. PostgreSQL trigger (PL/pgSQL)</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – PostgreSQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Step 1: Create the trigger function
+CREATE OR REPLACE FUNCTION update_modified_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Step 2: Attach the function to the table as a trigger
+CREATE TRIGGER trg_set_updated_at
+BEFORE UPDATE ON employees
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+-- Drop a trigger (PostgreSQL)
+DROP TRIGGER trg_set_updated_at ON employees;</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>PostgreSQL uses trigger functions</strong>
+              <p>In PostgreSQL, the logic goes in a separate trigger function that returns <code>TRIGGER</code>. The <code>CREATE TRIGGER</code> statement then attaches that function to a table event. This allows you to reuse the same trigger function on multiple tables — a cleaner design than MySQL's inline approach.</p>
+            </div>
+          </div>
+
+          <h2 id="cautions">Cautions: When Not to Use Triggers</h2>
+          <ul>
+            <li><strong>Hidden logic</strong> — triggers fire silently. A developer querying the table won't see the trigger logic unless they specifically look for it, making the system harder to understand and debug.</li>
+            <li><strong>Performance impact</strong> — every INSERT/UPDATE/DELETE on the table executes the trigger. A poorly written trigger can add significant overhead to write-heavy tables.</li>
+            <li><strong>Hard to debug</strong> — trigger errors surface as cryptic database errors, and stepping through trigger logic in a debugger is not as straightforward as application code.</li>
+            <li><strong>Cascading chains</strong> — a trigger that modifies another table can fire a second trigger, which fires a third, and so on. These chains are extremely hard to reason about and can cause unexpected behavior or infinite loops.</li>
+            <li><strong>Testing difficulty</strong> — triggers make unit testing harder because test code must be aware of all the side effects that fire on simple INSERT/UPDATE operations.</li>
+          </ul>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Use triggers sparingly</strong>
+              <p>Triggers are best suited for infrastructure concerns (audit trails, updated_at stamps) that should happen for every write, regardless of application. Avoid encoding business logic in triggers — put that in your application's service layer or in explicit stored procedures called deliberately.</p>
+            </div>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-triggers">Triggers: Code That Runs Automatically on Data Changes</h2>
+          <p>A trigger is a function the database runs <em>automatically</em> when a row is inserted, updated, or deleted. Great for audit trails, keeping derived values in sync, or enforcing complex rules — without the app having to remember.</p>
+          <pre><code class="language-sql">-- auto-stamp updated_at on every UPDATE
+CREATE FUNCTION set_updated_at() RETURNS trigger AS $$
+BEGIN
+  NEW.updated_at = now();     -- NEW = the row being written
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_updated
+BEFORE UPDATE ON orders
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();</code></pre>
+          <table>
+            <thead><tr><th>Timing</th><th>Use for</th></tr></thead>
+            <tbody>
+              <tr><td><code>BEFORE</code></td><td>modify/validate the row before it's saved (use <code>NEW</code>)</td></tr>
+              <tr><td><code>AFTER</code></td><td>react once saved — write to an audit/log table</td></tr>
+            </tbody>
+          </table>
+          <p>Inside a trigger, <code>NEW</code> is the incoming row and <code>OLD</code> is the previous version (on UPDATE/DELETE) — compare them to log exactly what changed.</p>
+          <p><strong>The caution:</strong> triggers are <em>hidden</em> logic. A developer running an <code>UPDATE</code> may have no idea five triggers fired, cascaded, or slowed it down — surprising bugs and hard-to-trace performance issues. Use them for cross-cutting concerns that <em>must</em> always happen (auditing, timestamps) regardless of which app touches the data; keep normal business logic in the application where it's visible and testable.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create an AFTER INSERT trigger.</li>
+              <li>Create a BEFORE UPDATE trigger.</li>
+              <li>Log changes to an audit table.</li>
+              <li>Use the OLD and NEW row references.</li>
+              <li>Drop the trigger.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write an AFTER UPDATE trigger that logs the old and new salary into an <code>audit_log</code> table whenever an employee’s salary changes. Explain BEFORE vs AFTER triggers, the OLD/NEW references, and why triggers can make debugging harder.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A trigger fires automatically on INSERT, UPDATE, or DELETE — you never call it directly.</li>
+              <li>BEFORE triggers run before the write and can modify <code>NEW</code> column values; AFTER triggers run after and are read-only.</li>
+              <li><code>NEW</code> refers to the incoming row (INSERT/UPDATE); <code>OLD</code> refers to the existing row (UPDATE/DELETE).</li>
+              <li>Great use cases: audit logging, automatic timestamps, cascading stock updates.</li>
+              <li>In PostgreSQL, triggers use a two-step approach: create a trigger function, then attach it with <code>CREATE TRIGGER ... EXECUTE FUNCTION</code>.</li>
+              <li>Avoid complex business logic in triggers — they are hidden, hard to debug, and can cascade unexpectedly.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a database trigger?</li>
+            <li>What is the difference between BEFORE and AFTER triggers?</li>
+            <li>What do OLD and NEW refer to?</li>
+            <li>Give a use case for a trigger.</li>
+            <li>What are the risks of overusing triggers?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/advanced/stored-procedures.html" class="topic-tag sql-topic-tag">🗄️ Stored Procedures</a>
+            <a href="/sql/advanced/normalization.html" class="topic-tag sql-topic-tag">🗄️ Normalization</a>
+            <a href="/sql/advanced/views.html" class="topic-tag sql-topic-tag">🗄️ Views</a>
+            <a href="/sql/advanced/indexes.html" class="topic-tag sql-topic-tag">🗄️ Indexes</a>
+            <a href="/sql/interview/questions.html" class="topic-tag sql-topic-tag">🗄️ Interview Questions</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can a trigger call a stored procedure? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — a trigger body can call a stored procedure using <code>CALL procedure_name(...)</code> in MySQL. In PostgreSQL, a trigger function can call other functions. However, calling long-running procedures from triggers is risky because triggers run inside the transaction of the triggering statement, which means locks are held longer than expected.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I have multiple triggers on the same table and event? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In PostgreSQL, yes — multiple triggers can fire for the same event on the same table, and they execute in alphabetical order by trigger name. In MySQL, each table can have at most one trigger for each combination of event (INSERT/UPDATE/DELETE) and timing (BEFORE/AFTER) — so a maximum of 6 triggers per table. In MySQL 5.7+ you can use the <code>FOLLOWS</code> and <code>PRECEDES</code> clauses to order triggers on the same event (MySQL supports multiple triggers per event from 5.7).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Do triggers fire for bulk operations like DELETE with no WHERE? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In MySQL and PostgreSQL, <code>FOR EACH ROW</code> triggers fire once per affected row — so a DELETE that removes 10,000 rows fires the trigger 10,000 times. This can be extremely slow for bulk operations. If you run large bulk deletes/updates frequently, consider disabling triggers temporarily (if the database supports it) or using batch stored procedures instead of row-level triggers.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I list all triggers in a database? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In MySQL: <code>SHOW TRIGGERS FROM my_database;</code> or query <code>information_schema.TRIGGERS</code>. In PostgreSQL: <code>SELECT trigger_name, event_manipulation, event_object_table FROM information_schema.triggers WHERE trigger_schema = 'public';</code>. Both return the trigger name, the event it fires on, the associated table, and timing information.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/advanced/stored-procedures.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Stored Procedures</span>
+          </a>
+          <a href="/sql/advanced/normalization.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Normalization</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

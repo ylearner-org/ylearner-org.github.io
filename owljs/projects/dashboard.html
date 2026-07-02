@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS Dashboard Component – KPI Cards, Charts &amp; Live Data | ylearner</title>
+  <meta name="description" content="Build a dashboard component with OWL JS featuring KPI cards, data tables, Chart.js integration, auto-refresh, and Odoo backend data via ORM. Covers onWillStart, onPatched, AbortController, and service layer patterns.">
+  <meta name="keywords" content="OWL JS dashboard, OWL JS KPI cards, OWL JS chart integration, Odoo dashboard OWL, OWL JS data fetching, OWL onWillStart example, Odoo client action dashboard, OWL JS project advanced">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/owljs/projects/dashboard.html">
+  <meta property="og:title" content="OWL JS Dashboard Component – KPI Cards &amp; Live Data | ylearner">
+  <meta property="og:description" content="Build a complete OWL JS dashboard: KPI cards, Chart.js, auto-refresh, AbortController, and Odoo ORM data layer.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/owljs/projects/dashboard.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS Dashboard Component Project 2026 | ylearner">
+  <meta name="twitter:description" content="Advanced OWL JS project: build a live dashboard with KPI cards, charts, auto-refresh, and Odoo backend integration.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS Dashboard Component – KPI Cards, Charts and Live Data",
+    "description": "Build a dashboard component with OWL JS covering KPI cards, Chart.js integration, auto-refresh with AbortController, and Odoo ORM data layer.",
+    "educationalLevel": "Advanced",
+    "keywords": "OWL JS dashboard, KPI cards, Chart.js, auto-refresh, onWillStart, Odoo client action",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/projects/todo-app.html">Projects</a><span class="separator">›</span>
+          <span class="current">Dashboard Component</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Project</div>
+          <h1>OWL JS Dashboard Component – KPI Cards, Charts &amp; Live Data</h1>
+          <p class="lesson-intro">Dashboards are the most demanding OWL projects: they fetch data asynchronously before rendering, need to cancel in-flight requests when the user navigates away, refresh on a timer, integrate third-party libraries (Chart.js) that need a DOM element to mount into, and handle error states gracefully. This project builds a complete sales dashboard as an Odoo client action — the same architecture used in real Odoo modules like Sales, CRM, and Inventory.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 60 min</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="what-youll-build">What You'll Build</h2>
+          <ul>
+            <li>Four KPI cards: Total Revenue, Orders, New Customers, Avg Order Value</li>
+            <li>Bar chart of monthly revenue (Chart.js)</li>
+            <li>Recent orders data table with status badges</li>
+            <li>Date range filter (This Month / Last 3 Months / This Year)</li>
+            <li>Auto-refresh every 60 seconds</li>
+            <li>Loading skeleton and error state</li>
+            <li>Registered as an Odoo client action</li>
+          </ul>
+
+          <h2 id="component-structure">Component Structure</h2>
+          <pre><code class="language-text">my_module/
+└── static/src/
+    ├── dashboard/
+    │   ├── Dashboard.js          ← root component, data layer
+    │   ├── Dashboard.xml
+    │   ├── KpiCard.js            ← stateless card component
+    │   ├── KpiCard.xml
+    │   ├── RevenueChart.js       ← Chart.js wrapper
+    │   ├── RevenueChart.xml
+    │   └── OrdersTable.js        ← recent orders table
+    │       OrdersTable.xml
+    └── index.js</code></pre>
+
+          <h2 id="kpi-card">KpiCard Component</h2>
+          <p>Purely presentational — no state, receives all data as props.</p>
+
+          <pre><code class="language-javascript">// KpiCard.js
+/** @odoo-module **/
+import { Component } from "@odoo/owl";
+
+export class KpiCard extends Component {
+  static template = "my_module.KpiCard";
+
+  static props = {
+    label:  String,
+    value:  [String, Number],
+    change: { type: Number, optional: true },   // % change vs previous period
+    icon:   { type: String, optional: true },
+    color:  { type: String, optional: true },
+  };
+
+  static defaultProps = { change: null, icon: "📊", color: "#2271b1" };
+
+  get changeLabel() {
+    if (this.props.change === null) return "";
+    const sign = this.props.change &gt;= 0 ? "+" : "";
+    return `${sign}${this.props.change.toFixed(1)}%`;
+  }
+
+  get isPositive() { return this.props.change &gt;= 0; }
+}</code></pre>
+
+          <pre><code class="language-xml">&lt;!-- KpiCard.xml --&gt;
+&lt;templates&gt;
+  &lt;t t-name="my_module.KpiCard"&gt;
+    &lt;div class="kpi-card" t-att-style="'border-top: 3px solid ' + props.color"&gt;
+      &lt;div class="kpi-icon"&gt;&lt;t t-esc="props.icon" /&gt;&lt;/div&gt;
+      &lt;div class="kpi-body"&gt;
+        &lt;div class="kpi-label" t-esc="props.label" /&gt;
+        &lt;div class="kpi-value" t-esc="props.value" /&gt;
+        &lt;div
+          t-if="props.change !== null"
+          t-att-class="'kpi-change ' + (isPositive ? 'positive' : 'negative')"
+          t-esc="changeLabel"
+        /&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/t&gt;
+&lt;/templates&gt;</code></pre>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="revenue-chart">RevenueChart Component (Chart.js)</h2>
+          <p>Chart.js needs a <code>&lt;canvas&gt;</code> element. Use <code>useRef</code> + <code>onMounted</code> to initialise the chart instance, and <code>onPatched</code> to update it when data changes.</p>
+
+          <pre><code class="language-javascript">// RevenueChart.js
+/** @odoo-module **/
+import { Component, useRef, onMounted, onPatched, onWillUnmount } from "@odoo/owl";
+// Chart.js loaded as an asset in __manifest__.py
+// import Chart from "chart.js/auto";  — or via globalThis.Chart
+
+export class RevenueChart extends Component {
+  static template = "my_module.RevenueChart";
+
+  static props = {
+    labels: Array,   // ["Jan", "Feb", ...]
+    data:   Array,   // [12000, 18500, ...]
+    title:  { type: String, optional: true },
+  };
+
+  setup() {
+    this.canvasRef = useRef("canvas");
+    this._chart = null;
+
+    onMounted(() => {
+      this._chart = new Chart(this.canvasRef.el, {
+        type: "bar",
+        data: {
+          labels: this.props.labels,
+          datasets: [{
+            label: this.props.title ?? "Revenue",
+            data: this.props.data,
+            backgroundColor: "#2271b1cc",
+            borderColor: "#2271b1",
+            borderWidth: 1,
+            borderRadius: 4,
+          }],
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { callback: v => "$" + (v / 1000).toFixed(0) + "k" },
+            },
+          },
+        },
+      });
+    });
+
+    onPatched(() => {
+      if (!this._chart) return;
+      this._chart.data.labels = this.props.labels;
+      this._chart.data.datasets[0].data = this.props.data;
+      this._chart.update("none");   // "none" = no animation on update
+    });
+
+    onWillUnmount(() => {
+      this._chart?.destroy();
+      this._chart = null;
+    });
+  }
+}</code></pre>
+
+          <pre><code class="language-xml">&lt;!-- RevenueChart.xml --&gt;
+&lt;templates&gt;
+  &lt;t t-name="my_module.RevenueChart"&gt;
+    &lt;div class="chart-container"&gt;
+      &lt;h3 class="chart-title" t-esc="props.title or 'Monthly Revenue'" /&gt;
+      &lt;canvas t-ref="canvas" /&gt;
+    &lt;/div&gt;
+  &lt;/t&gt;
+&lt;/templates&gt;</code></pre>
+
+          <div class="callout callout-warning">
+            <strong>canvas t-ref timing:</strong> The canvas DOM element only exists after <code>onMounted</code> fires. Never call <code>new Chart()</code> in <code>setup()</code> or <code>onWillStart()</code> — the canvas isn't in the DOM yet. Always use <code>onMounted</code> for third-party DOM libraries.
+          </div>
+
+          <h2 id="dashboard-root">Dashboard Root Component</h2>
+          <pre><code class="language-javascript">// Dashboard.js
+/** @odoo-module **/
+import { Component, useState, onWillStart, onMounted, onWillUnmount } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
+import { KpiCard } from "./KpiCard";
+import { RevenueChart } from "./RevenueChart";
+import { OrdersTable } from "./OrdersTable";
+
+export class Dashboard extends Component {
+  static template = "my_module.Dashboard";
+  static components = { KpiCard, RevenueChart, OrdersTable };
+
+  setup() {
+    this.orm = useService("orm");
+    this.notification = useService("notification");
+
+    this.state = useState({
+      loading: true,
+      error: null,
+      period: "month",      // "month" | "quarter" | "year"
+      kpi: {
+        revenue:    { value: 0, change: null },
+        orders:     { value: 0, change: null },
+        customers:  { value: 0, change: null },
+        avgOrder:   { value: 0, change: null },
+      },
+      chart: { labels: [], data: [] },
+      recentOrders: [],
+    });
+
+    this._refreshTimer = null;
+    this._abortCtrl = null;
+
+    onWillStart(() => this.loadData());
+
+    onMounted(() => {
+      this._refreshTimer = setInterval(() => this.loadData(), 60_000);
+    });
+
+    onWillUnmount(() => {
+      clearInterval(this._refreshTimer);
+      this._abortCtrl?.abort();
+    });
+  }
+
+  async loadData() {
+    this._abortCtrl?.abort();
+    this._abortCtrl = new AbortController();
+    const signal = this._abortCtrl.signal;
+
+    this.state.loading = true;
+    this.state.error = null;
+
+    try {
+      const [kpiData, chartData, orders] = await Promise.all([
+        this.fetchKpi(this.state.period, signal),
+        this.fetchChartData(this.state.period, signal),
+        this.fetchRecentOrders(signal),
+      ]);
+
+      if (signal.aborted) return;
+
+      this.state.kpi        = kpiData;
+      this.state.chart      = chartData;
+      this.state.recentOrders = orders;
+    } catch (err) {
+      if (signal.aborted) return;
+      this.state.error = err.message;
+    } finally {
+      if (!signal.aborted) this.state.loading = false;
+    }
+  }
+
+  async fetchKpi(period) {
+    // Replace with real ORM calls — using readGroup for aggregated data
+    const domain = this.periodDomain(period);
+
+    const result = await this.orm.readGroup(
+      "sale.order",
+      [["state", "=", "sale"], ...domain],
+      ["amount_total:sum", "partner_id:count_distinct"],
+      [],
+    );
+
+    const revenue   = result[0]?.amount_total_sum ?? 0;
+    const customers = result[0]?.partner_id_count_distinct ?? 0;
+    const orders    = await this.orm.searchCount("sale.order", [["state","=","sale"], ...domain]);
+
+    return {
+      revenue:   { value: this.formatCurrency(revenue), change: 12.4 },
+      orders:    { value: orders, change: -2.1 },
+      customers: { value: customers, change: 8.7 },
+      avgOrder:  { value: this.formatCurrency(orders ? revenue / orders : 0), change: 15.2 },
+    };
+  }
+
+  async fetchChartData(period) {
+    // readGroup by month for bar chart
+    const domain = this.periodDomain(period);
+
+    const groups = await this.orm.readGroup(
+      "sale.order",
+      [["state", "=", "sale"], ...domain],
+      ["amount_total:sum", "date_order:month"],
+      ["date_order:month"],
+      { orderby: "date_order ASC" }
+    );
+
+    return {
+      labels: groups.map(g => g.date_order_month),
+      data:   groups.map(g => g.amount_total_sum ?? 0),
+    };
+  }
+
+  async fetchRecentOrders() {
+    return await this.orm.searchRead(
+      "sale.order",
+      [["state", "in", ["sale", "done", "cancel"]]],
+      ["name", "partner_id", "amount_total", "state", "date_order"],
+      { order: "date_order DESC", limit: 10 }
+    );
+  }
+
+  periodDomain(period) {
+    const now = new Date();
+    if (period === "month") {
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      return [["date_order", "&gt;=", start.toISOString().slice(0, 10)]];
+    }
+    if (period === "quarter") {
+      const start = new Date(now);
+      start.setMonth(start.getMonth() - 3);
+      return [["date_order", "&gt;=", start.toISOString().slice(0, 10)]];
+    }
+    // year
+    const start = new Date(now.getFullYear(), 0, 1);
+    return [["date_order", "&gt;=", start.toISOString().slice(0, 10)]];
+  }
+
+  setPeriod(period) {
+    this.state.period = period;
+    this.loadData();
+  }
+
+  formatCurrency(v) {
+    return "$" + Number(v).toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+}</code></pre>
+
+          <h2 id="dashboard-template">Dashboard Template</h2>
+          <pre><code class="language-xml">&lt;!-- Dashboard.xml --&gt;
+&lt;templates&gt;
+  &lt;t t-name="my_module.Dashboard"&gt;
+    &lt;div class="o-dashboard"&gt;
+
+      &lt;div class="dashboard-header"&gt;
+        &lt;h1&gt;Sales Dashboard&lt;/h1&gt;
+        &lt;div class="period-selector"&gt;
+          &lt;button
+            t-foreach="[['month','This Month'],['quarter','Last 3 Months'],['year','This Year']]"
+            t-as="p"
+            t-key="p[0]"
+            t-att-class="{ active: state.period === p[0] }"
+            t-on-click="() =&gt; setPeriod(p[0])"
+            t-esc="p[1]"
+          /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;!-- Error banner --&gt;
+      &lt;div t-if="state.error" class="dashboard-error"&gt;
+        Failed to load data: &lt;t t-esc="state.error" /&gt;
+        &lt;button t-on-click="loadData"&gt;Retry&lt;/button&gt;
+      &lt;/div&gt;
+
+      &lt;!-- Loading skeleton --&gt;
+      &lt;t t-if="state.loading"&gt;
+        &lt;div class="kpi-grid"&gt;
+          &lt;div t-foreach="[1,2,3,4]" t-as="i" t-key="i" class="kpi-skeleton" /&gt;
+        &lt;/div&gt;
+        &lt;div class="chart-skeleton" /&gt;
+      &lt;/t&gt;
+
+      &lt;t t-else=""&gt;
+        &lt;!-- KPI Grid --&gt;
+        &lt;div class="kpi-grid"&gt;
+          &lt;KpiCard
+            label="Total Revenue"
+            value="state.kpi.revenue.value"
+            change="state.kpi.revenue.change"
+            icon="'💰'"
+            color="'#00a32a'"
+          /&gt;
+          &lt;KpiCard
+            label="Orders"
+            value="state.kpi.orders.value"
+            change="state.kpi.orders.change"
+            icon="'📦'"
+            color="'#2271b1'"
+          /&gt;
+          &lt;KpiCard
+            label="New Customers"
+            value="state.kpi.customers.value"
+            change="state.kpi.customers.change"
+            icon="'👥'"
+            color="'#8b5cf6'"
+          /&gt;
+          &lt;KpiCard
+            label="Avg Order Value"
+            value="state.kpi.avgOrder.value"
+            change="state.kpi.avgOrder.change"
+            icon="'📈'"
+            color="'#f59e0b'"
+          /&gt;
+        &lt;/div&gt;
+
+        &lt;!-- Revenue Chart --&gt;
+        &lt;RevenueChart
+          labels="state.chart.labels"
+          data="state.chart.data"
+          title="'Monthly Revenue'"
+        /&gt;
+
+        &lt;!-- Recent Orders Table --&gt;
+        &lt;OrdersTable orders="state.recentOrders" /&gt;
+      &lt;/t&gt;
+    &lt;/div&gt;
+  &lt;/t&gt;
+&lt;/templates&gt;</code></pre>
+
+          <h2 id="orders-table">OrdersTable Component</h2>
+          <pre><code class="language-javascript">// OrdersTable.js
+/** @odoo-module **/
+import { Component } from "@odoo/owl";
+
+export class OrdersTable extends Component {
+  static template = "my_module.OrdersTable";
+  static props = { orders: Array };
+
+  statusLabel(state) {
+    return { sale: "Confirmed", done: "Done", cancel: "Cancelled" }[state] ?? state;
+  }
+  statusColor(state) {
+    return { sale: "#00a32a", done: "#2271b1", cancel: "#d63638" }[state] ?? "#666";
+  }
+  formatDate(iso) {
+    return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  }
+  formatAmount(n) {
+    return "$" + Number(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+}</code></pre>
+
+          <pre><code class="language-xml">&lt;!-- OrdersTable.xml --&gt;
+&lt;templates&gt;
+  &lt;t t-name="my_module.OrdersTable"&gt;
+    &lt;div class="orders-table-wrapper"&gt;
+      &lt;h3&gt;Recent Orders&lt;/h3&gt;
+      &lt;table class="orders-table"&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th&gt;Order&lt;/th&gt;
+            &lt;th&gt;Customer&lt;/th&gt;
+            &lt;th&gt;Date&lt;/th&gt;
+            &lt;th&gt;Amount&lt;/th&gt;
+            &lt;th&gt;Status&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          &lt;tr t-foreach="props.orders" t-as="order" t-key="order.id"&gt;
+            &lt;td t-esc="order.name" /&gt;
+            &lt;td t-esc="order.partner_id[1]" /&gt;
+            &lt;td t-esc="formatDate(order.date_order)" /&gt;
+            &lt;td t-esc="formatAmount(order.amount_total)" /&gt;
+            &lt;td&gt;
+              &lt;span
+                class="status-badge"
+                t-att-style="'background:' + statusColor(order.state)"
+                t-esc="statusLabel(order.state)"
+              /&gt;
+            &lt;/td&gt;
+          &lt;/tr&gt;
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+      &lt;div t-if="!props.orders.length" class="empty-orders"&gt;No orders found.&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/t&gt;
+&lt;/templates&gt;</code></pre>
+
+          <h2 id="client-action">Register as Client Action</h2>
+          <pre><code class="language-javascript">// index.js
+/** @odoo-module **/
+import { registry } from "@web/core/registry";
+import { Dashboard } from "./dashboard/Dashboard";
+
+registry.category("actions").add("my_module.sales_dashboard", Dashboard);</code></pre>
+
+          <pre><code class="language-xml">&lt;!-- data/actions.xml --&gt;
+&lt;record id="action_sales_dashboard" model="ir.actions.client"&gt;
+  &lt;field name="name"&gt;Sales Dashboard&lt;/field&gt;
+  &lt;field name="tag"&gt;my_module.sales_dashboard&lt;/field&gt;
+&lt;/record&gt;
+
+&lt;!-- Add to menu --&gt;
+&lt;record id="menu_sales_dashboard" model="ir.ui.menu"&gt;
+  &lt;field name="name"&gt;Dashboard&lt;/field&gt;
+  &lt;field name="parent_id" ref="sale.sale_menu_root" /&gt;
+  &lt;field name="action" ref="action_sales_dashboard" /&gt;
+  &lt;field name="sequence"&gt;1&lt;/field&gt;
+&lt;/record&gt;</code></pre>
+
+          <h2 id="manifest">Manifest</h2>
+          <pre><code class="language-python"># __manifest__.py
+{
+    "name": "Sales Dashboard",
+    "version": "17.0.1.0.0",
+    "depends": ["sale", "web"],
+    "data": ["data/actions.xml"],
+    "assets": {
+        "web.assets_backend": [
+            # Chart.js CDN or local copy
+            "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js",
+            "my_module/static/src/dashboard/KpiCard.js",
+            "my_module/static/src/dashboard/KpiCard.xml",
+            "my_module/static/src/dashboard/RevenueChart.js",
+            "my_module/static/src/dashboard/RevenueChart.xml",
+            "my_module/static/src/dashboard/OrdersTable.js",
+            "my_module/static/src/dashboard/OrdersTable.xml",
+            "my_module/static/src/dashboard/Dashboard.js",
+            "my_module/static/src/dashboard/Dashboard.xml",
+            "my_module/static/src/index.js",
+        ],
+    },
+}</code></pre>
+
+          <h2 id="css">CSS</h2>
+          <pre><code class="language-css">.o-dashboard { padding: 24px; }
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.period-selector button {
+  padding: 6px 14px;
+  border: 1px solid #ccd0d4;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+}
+.period-selector button:first-child { border-radius: 4px 0 0 4px; }
+.period-selector button:last-child  { border-radius: 0 4px 4px 0; }
+.period-selector button.active      { background: #2271b1; color: white; border-color: #2271b1; }
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.kpi-icon   { font-size: 28px; }
+.kpi-label  { font-size: 12px; color: #666; margin-bottom: 4px; }
+.kpi-value  { font-size: 24px; font-weight: 700; color: #1d2327; }
+.kpi-change { font-size: 12px; font-weight: 600; margin-top: 4px; }
+.kpi-change.positive { color: #00a32a; }
+.kpi-change.negative { color: #d63638; }
+
+.kpi-skeleton {
+  height: 100px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+.chart-skeleton {
+  height: 280px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+.chart-container {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  margin-bottom: 24px;
+}
+.chart-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+
+.orders-table-wrapper {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.orders-table th {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 2px solid #f0f0f0;
+  color: #666;
+  font-weight: 600;
+}
+.orders-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f8f8f8;
+  color: #1d2327;
+}
+.status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+}
+.dashboard-error {
+  padding: 12px 16px;
+  background: #fce8e8;
+  border: 1px solid #d63638;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  color: #a20e0e;
+  font-size: 13px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}</code></pre>
+
+          <div class="exercise-box">
+          <h3>🏋️ Practical Exercise</h3>
+          <ol>
+            <li>Add a product breakdown doughnut chart (top 5 products by revenue) using Chart.js and a second <code>readGroup</code> call grouped by <code>product_id</code>.</li>
+            <li>Add a "Compare to previous period" toggle that fetches data for both periods and shows a side-by-side grouped bar chart.</li>
+            <li>Make the refresh interval configurable: add a dropdown (30s / 60s / 5min / Off) stored in a custom user preference via <code>orm.write("res.users", ...)</code>.</li>
+            <li>Add WebSocket-based live updates using Odoo's <code>bus.bus</code> service: push KPI invalidation events from Python when a new order is confirmed, and re-fetch in the OWL component when the event arrives.</li>
+          </ol>
+        </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a small dashboard: a parent that loads data in <code>onWillStart</code> and passes it to reusable card sub-components via props, rendered with <code>t-foreach</code>, with a loading state. Explain component composition, async data loading, and props flow.</p>
+          </div>
+
+        <div class="summary-box">
+          <h3>📋 Summary</h3>
+          <ul>
+            <li><strong>onWillStart + onMounted + onWillUnmount</strong>: complete async data lifecycle with cleanup</li>
+            <li><strong>AbortController</strong>: cancel previous requests when period changes or component unmounts</li>
+            <li><strong>Chart.js integration</strong>: useRef + onMounted to mount, onPatched to update data, onWillUnmount to destroy</li>
+            <li><strong>readGroup aggregation</strong>: Odoo ORM readGroup for server-side SUM/COUNT grouping</li>
+            <li><strong>Auto-refresh</strong>: setInterval in onMounted, clearInterval in onWillUnmount</li>
+            <li><strong>Loading skeleton</strong>: CSS shimmer animation while data loads</li>
+            <li><strong>Client action</strong>: registry.category("actions").add() + ir.actions.client record</li>
+          </ul>
+        </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you structure a dashboard in OWL?</li>
+            <li>Where do you load async data?</li>
+            <li>How do you pass data to child cards?</li>
+            <li>How do you show a loading state?</li>
+            <li>How do sub-components keep the UI modular?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+        <div class="related-topics">
+          <a href="/owljs/lifecycle/will-start.html" class="topic-tag owl-topic-tag">🦉 onWillStart</a>
+          <a href="/owljs/lifecycle/setup-mounted.html" class="topic-tag owl-topic-tag">🦉 onMounted</a>
+          <a href="/owljs/lifecycle/patch-hooks.html" class="topic-tag owl-topic-tag">🦉 onPatched</a>
+          <a href="/owljs/advanced/concurrency.html" class="topic-tag owl-topic-tag">🦉 AbortController</a>
+          <a href="/owljs/templates/refs.html" class="topic-tag owl-topic-tag">🦉 useRef</a>
+          <a href="/owljs/odoo/rpc-calls.html" class="topic-tag owl-topic-tag">🦉 readGroup</a>
+          <a href="/owljs/odoo/owl-in-odoo.html" class="topic-tag owl-topic-tag">🦉 Client Action</a>
+        </div>
+
+          <section class="faq-section">
+          <h2 id="faq">FAQ</h2>
+          <div class="faq-item">
+            <div class="faq-question">Why use readGroup instead of searchRead for KPI data? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p><code>readGroup</code> runs aggregation (SUM, COUNT, AVG) on the database server side and returns one row per group. For KPI cards you need total revenue across all orders — fetching every order with <code>searchRead</code> and summing in JavaScript would be slow for large datasets and would hit pagination limits. Always push aggregation to the server.</p></div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">Can I use onWillStart to load data instead of onMounted? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>Yes — and for the initial load you should use <code>onWillStart</code> because it blocks rendering until the promise resolves, preventing a flash of empty state. However, you cannot access DOM refs in <code>onWillStart</code>, so Chart.js initialisation must stay in <code>onMounted</code>. The recommended pattern: load data in <code>onWillStart</code>, initialise DOM libraries in <code>onMounted</code>.</p></div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">How do I show a spinner during reload (not just initial load)? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>Set a separate <code>state.reloading</code> flag distinct from <code>state.loading</code>. <code>loading</code> is true only on first render (show skeleton). <code>reloading</code> is true on any subsequent fetch (show a small spinner overlay instead of replacing the entire UI). Reset <code>loading</code> after first successful fetch and never set it to true again.</p></div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">Does the AbortController actually cancel the ORM request? <span class="faq-toggle">+</span></div>
+            <div class="faq-answer"><p>In OWL's ORM service layer, <code>AbortController</code> signals can be passed to the underlying <code>fetch</code> if the rpc layer supports it. In current Odoo web, the ORM service does not expose an abort signal parameter on most methods. The pattern here guards on <code>signal.aborted</code> after each await — meaning the request completes but the result is discarded and state is not updated. True network cancellation requires passing the signal through a custom <code>rpc</code> call using the lower-level <code>fetch</code> API.</p></div>
+          </div>
+        </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/projects/form-validation.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Form with Validation</span>
+          </a>
+          <a href="/owljs/projects/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

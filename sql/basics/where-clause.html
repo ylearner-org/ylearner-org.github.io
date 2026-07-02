@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL WHERE Clause – Filtering Rows | ylearner</title>
+  <meta name="description" content="Master the SQL WHERE clause: filter rows with equality, comparison operators, AND/OR conditions, NULL checks, and practical examples. Beginner-friendly with an employees table.">
+  <meta name="keywords" content="SQL WHERE clause, SQL filter rows, WHERE condition, SQL AND OR, SQL IS NULL, SQL comparison operators, SQL basics, WHERE syntax">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/basics/where-clause.html">
+  <meta property="og:title" content="SQL WHERE Clause – Filtering Rows | ylearner">
+  <meta property="og:description" content="Learn the SQL WHERE clause — how to filter rows with equality, comparison operators, AND/OR logic, and NULL checks. Clear examples with an employees table.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/basics/where-clause.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL WHERE Clause – Filtering Rows | ylearner">
+  <meta name="twitter:description" content="Learn the SQL WHERE clause — how to filter rows with equality, comparison operators, AND/OR logic, and NULL checks. Clear examples with an employees table.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL WHERE Clause – Filtering Rows","description":"Master the SQL WHERE clause — filter rows with equality, comparison operators, AND/OR conditions, and NULL checks.","educationalLevel":"Beginner","keywords":"SQL WHERE clause, SQL filter, AND OR, IS NULL","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/basics/select-statement.html">SQL Basics</a><span class="separator">›</span>
+          <span class="current">WHERE Clause</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 SQL Basics</div>
+          <h1>SQL WHERE Clause – Filtering Rows</h1>
+          <p class="lesson-intro">The <code>SELECT</code> statement returns every row from a table by default. In the real world, you almost never want all rows — you want <em>specific</em> rows that meet certain conditions. That is exactly what the <strong>WHERE clause</strong> is for. It filters rows before they are returned, keeping only the rows that satisfy your condition. This lesson covers equality checks, comparison operators, multiple conditions with AND/OR, and the all-important NULL check.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="where-syntax">WHERE Syntax</h2>
+          <p>The <code>WHERE</code> clause is placed <em>after</em> the <code>FROM</code> clause. The database evaluates the condition for every row and returns only the rows where the condition is <strong>TRUE</strong>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT column1, column2
+FROM table_name
+WHERE condition;</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>WHERE runs BEFORE SELECT</strong>
+              <p>The SQL execution order is not the same as the written order. The database processes <code>FROM</code> first (identify the table), then <code>WHERE</code> (filter rows), and <em>then</em> <code>SELECT</code> (choose which columns to return). This is why you cannot use a column alias defined in <code>SELECT</code> inside a <code>WHERE</code> condition — the alias does not exist yet when WHERE runs.</p>
+            </div>
+          </div>
+
+          <p>All examples use the following <strong>employees</strong> table:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>id</th><th>first_name</th><th>department</th><th>salary</th><th>manager_id</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>Alice</td><td>Engineering</td><td>85000</td><td>NULL</td></tr>
+                <tr><td>2</td><td>Bob</td><td>Marketing</td><td>62000</td><td>1</td></tr>
+                <tr><td>3</td><td>Carol</td><td>Engineering</td><td>91000</td><td>1</td></tr>
+                <tr><td>4</td><td>David</td><td>Marketing</td><td>58000</td><td>2</td></tr>
+                <tr><td>5</td><td>Eve</td><td>Engineering</td><td>77000</td><td>3</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="equality">Equality – = and &lt;&gt;</h2>
+          <p>The most basic WHERE condition checks whether a column equals a specific value. Use <code>=</code> for equality and <code>&lt;&gt;</code> (or <code>!=</code>) for not-equal.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Rows where department equals 'Engineering'
+SELECT first_name, department, salary
+FROM employees
+WHERE department = 'Engineering';
+-- Returns: Alice, Carol, Eve
+
+-- Rows where department is NOT Engineering
+SELECT first_name, department
+FROM employees
+WHERE department <> 'Engineering';
+-- Returns: Bob, David
+
+-- <> and != are equivalent; <> is standard SQL
+WHERE department != 'Marketing'   -- same as <></code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>String comparisons are case-sensitive in PostgreSQL</strong>
+              <p>In PostgreSQL, <code>WHERE department = 'engineering'</code> and <code>WHERE department = 'Engineering'</code> return different results. MySQL's default collation is case-insensitive for string comparisons. Always match the case of your data, or use <code>LOWER(department) = 'engineering'</code> for case-insensitive matching in any database.</p>
+            </div>
+          </div>
+
+          <h2 id="comparison">Comparison Operators</h2>
+          <p>For numeric and date columns, use the standard comparison operators to filter ranges:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Greater than
+SELECT first_name, salary FROM employees WHERE salary > 80000;
+-- Returns: Alice (85000), Carol (91000)
+
+-- Less than or equal
+SELECT first_name, salary FROM employees WHERE salary <= 62000;
+-- Returns: Bob (62000), David (58000)
+
+-- Greater than or equal
+SELECT first_name, salary FROM employees WHERE salary >= 77000;
+-- Returns: Alice, Carol, Eve
+
+-- Using dates (same operators apply)
+SELECT * FROM orders WHERE order_date >= '2026-01-01';
+SELECT * FROM orders WHERE order_date < '2026-06-01';</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Operator</th><th>Meaning</th><th>Example</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>=</code></td><td>Equal to</td><td><code>salary = 85000</code></td></tr>
+                <tr><td><code>&lt;&gt;</code> / <code>!=</code></td><td>Not equal to</td><td><code>department &lt;&gt; 'HR'</code></td></tr>
+                <tr><td><code>&gt;</code></td><td>Greater than</td><td><code>salary &gt; 70000</code></td></tr>
+                <tr><td><code>&lt;</code></td><td>Less than</td><td><code>salary &lt; 60000</code></td></tr>
+                <tr><td><code>&gt;=</code></td><td>Greater than or equal</td><td><code>salary &gt;= 80000</code></td></tr>
+                <tr><td><code>&lt;=</code></td><td>Less than or equal</td><td><code>salary &lt;= 65000</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="multiple-conditions">Multiple Conditions – AND and OR</h2>
+          <p>You can combine multiple conditions using <code>AND</code> and <code>OR</code>. <strong>AND</strong> requires both conditions to be true; <strong>OR</strong> requires at least one to be true.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- AND: both conditions must be true
+SELECT first_name, department, salary
+FROM employees
+WHERE department = 'Engineering' AND salary > 80000;
+-- Returns: Alice (85000), Carol (91000)
+
+-- OR: at least one condition must be true
+SELECT first_name, department, salary
+FROM employees
+WHERE department = 'Engineering' OR salary < 60000;
+-- Returns: Alice, Carol, Eve (Engineering) AND David (salary < 60000)
+
+-- Combining AND and OR — use parentheses for clarity!
+SELECT first_name, salary
+FROM employees
+WHERE (department = 'Engineering' AND salary > 80000)
+   OR (department = 'Marketing'   AND salary > 60000);
+-- Engineering with salary > 80000 OR Marketing with salary > 60000</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>AND binds tighter than OR — always use parentheses</strong>
+              <p><code>WHERE a OR b AND c</code> is evaluated as <code>WHERE a OR (b AND c)</code> because AND has higher operator precedence than OR. This often produces unexpected results. Always use explicit parentheses when combining AND and OR to make your intent clear: <code>WHERE (a OR b) AND c</code> vs <code>WHERE a OR (b AND c)</code> are very different queries.</p>
+            </div>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="null-check">NULL Checks – IS NULL and IS NOT NULL</h2>
+          <p>NULL in SQL is a special marker meaning "no value" or "unknown". It is fundamentally different from zero, false, or an empty string. NULL requires special syntax for comparison — you <strong>cannot</strong> use <code>= NULL</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- WRONG: this never returns any rows, even for NULL values!
+SELECT * FROM employees WHERE manager_id = NULL;
+
+-- CORRECT: use IS NULL
+SELECT first_name FROM employees WHERE manager_id IS NULL;
+-- Returns: Alice (the top-level manager, no manager above her)
+
+-- Find all employees who DO have a manager
+SELECT first_name FROM employees WHERE manager_id IS NOT NULL;
+-- Returns: Bob, Carol, David, Eve</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Why does <code>= NULL</code> never work?</strong>
+              <p>NULL represents an unknown value. Comparing an unknown to anything — including another unknown — produces NULL (neither TRUE nor FALSE). The expression <code>NULL = NULL</code> evaluates to NULL, not TRUE. Because NULL is not TRUE, the row is excluded. The only correct way to test for NULL is <code>IS NULL</code> and <code>IS NOT NULL</code>, which are specifically designed to handle the three-valued logic of SQL.</p>
+            </div>
+          </div>
+
+          <h2 id="practical-example">Practical Example</h2>
+          <p>Putting it all together — a realistic query that combines multiple WHERE conditions:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Find all Engineering employees earning over $60,000
+-- who have a manager assigned
+SELECT first_name, department, salary, manager_id
+FROM employees
+WHERE department = 'Engineering'
+  AND salary > 60000
+  AND manager_id IS NOT NULL;
+-- Returns: Carol (91000, manager_id=1), Eve (77000, manager_id=3)
+
+-- Alternative: find all high earners regardless of department,
+-- or anyone in Marketing
+SELECT first_name, department, salary
+FROM employees
+WHERE salary > 80000
+   OR department = 'Marketing';
+-- Returns: Alice, Carol (salary > 80000) + Bob, David (Marketing)</code></pre>
+          </div>
+
+          <h2 id="deep-where">WHERE: Filtering Rows Before Anything Else Happens</h2>
+          <p><code>WHERE</code> keeps only rows matching a condition — and it runs <em>early</em>, before grouping and before the columns in <code>SELECT</code> are computed. That ordering explains two classic errors.</p>
+          <pre><code class="language-sql">SELECT name, price * 1.1 AS with_tax
+FROM products
+WHERE price > 100 AND category = 'books';</code></pre>
+          <h3>Two things WHERE can't do</h3>
+          <ul>
+            <li><strong>Can't use a SELECT alias:</strong> <code>WHERE with_tax > 50</code> fails — <code>WHERE</code> runs before the alias exists. Repeat the expression or use a subquery.</li>
+            <li><strong>Can't use aggregates:</strong> <code>WHERE COUNT(*) > 5</code> is illegal — that's <code>HAVING</code>'s job, which runs after grouping.</li>
+          </ul>
+          <table>
+            <thead><tr><th>Operator</th><th>Matches</th></tr></thead>
+            <tbody>
+              <tr><td><code>BETWEEN 1 AND 10</code></td><td>inclusive range</td></tr>
+              <tr><td><code>IN ('a','b')</code></td><td>any of a list</td></tr>
+              <tr><td><code>LIKE 'A%'</code></td><td>pattern (% = any chars)</td></tr>
+              <tr><td><code>IS NULL</code></td><td>missing value</td></tr>
+            </tbody>
+          </table>
+          <p><strong>NULL trap:</strong> <code>WHERE col = NULL</code> never matches anything — comparison with NULL yields "unknown," not true. Always use <code>IS NULL</code> / <code>IS NOT NULL</code>. And mind precedence: <code>AND</code> binds tighter than <code>OR</code>, so parenthesize mixed conditions.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Filter rows with a single <code>WHERE</code> condition.</li>
+              <li>Combine two conditions with <code>AND</code>.</li>
+              <li>Use <code>OR</code> for alternatives.</li>
+              <li>Filter on a text value.</li>
+              <li>Filter on a numeric range.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>On an <code>orders</code> table, write a query returning orders with <code>amount &gt; 100</code> placed in 2024, combining conditions with <code>AND</code>. Explain how <code>WHERE</code> filters rows before grouping and the difference between <code>WHERE</code> and <code>HAVING</code>.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>The <strong>WHERE clause</strong> filters rows before they are returned. Only rows where the condition is TRUE are included.</li>
+              <li>WHERE runs <strong>before SELECT</strong> in the logical execution order — column aliases defined in SELECT cannot be used in WHERE.</li>
+              <li><strong>Equality</strong>: use <code>=</code> and <code>&lt;&gt;</code> (or <code>!=</code>) for equals / not equals.</li>
+              <li><strong>Comparison operators</strong>: <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code> work on numbers, dates, and strings.</li>
+              <li>Combine conditions with <strong>AND</strong> (both must be true) and <strong>OR</strong> (at least one must be true). Use parentheses because AND binds tighter than OR.</li>
+              <li>To test for NULL, always use <strong>IS NULL</strong> / <strong>IS NOT NULL</strong> — never <code>= NULL</code>.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does the <code>WHERE</code> clause do?</li>
+            <li>Does <code>WHERE</code> filter before or after grouping?</li>
+            <li>What is the difference between <code>WHERE</code> and <code>HAVING</code>?</li>
+            <li>How do you combine multiple conditions?</li>
+            <li>How do you filter for NULL values?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/basics/select-statement.html" class="topic-tag sql-topic-tag">🗄️ SELECT Statement</a>
+            <a href="/sql/basics/order-by.html" class="topic-tag sql-topic-tag">🗄️ ORDER BY</a>
+            <a href="/sql/basics/limit-offset.html" class="topic-tag sql-topic-tag">🗄️ LIMIT &amp; OFFSET</a>
+            <a href="/sql/filtering/comparison-operators.html" class="topic-tag sql-topic-tag">🗄️ Comparison Operators</a>
+            <a href="/sql/filtering/logical-operators.html" class="topic-tag sql-topic-tag">🗄️ Logical Operators</a>
+            <a href="/sql/filtering/like-pattern.html" class="topic-tag sql-topic-tag">🗄️ LIKE Pattern</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I use WHERE with UPDATE and DELETE? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — WHERE works identically with UPDATE and DELETE. <code>UPDATE employees SET salary = 90000 WHERE id = 3;</code> updates only the row with id=3. <code>DELETE FROM employees WHERE department = 'Marketing';</code> deletes all Marketing rows. Omitting WHERE from UPDATE or DELETE applies the operation to every row in the table — always double-check your WHERE condition before running a destructive operation.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between WHERE and HAVING? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>WHERE filters individual rows <em>before</em> any grouping or aggregation. HAVING filters groups <em>after</em> GROUP BY has been applied. For example, <code>WHERE salary &gt; 70000</code> excludes individual rows with salary under 70000 before counting. <code>HAVING COUNT(*) &gt; 5</code> excludes groups (departments) that have 5 or fewer rows after grouping. You cannot use aggregate functions (SUM, COUNT, AVG) in WHERE — only in HAVING.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use WHERE with a subquery? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — subqueries in WHERE are very powerful. For example: <code>SELECT name FROM employees WHERE salary &gt; (SELECT AVG(salary) FROM employees);</code> returns everyone earning above the average salary. The subquery runs first and its result is used in the outer WHERE condition. Subqueries in WHERE are covered in detail in the Subqueries section of this course.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I filter by multiple values for the same column? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use the IN operator: <code>WHERE department IN ('Engineering', 'Marketing', 'HR')</code> is equivalent to <code>WHERE department = 'Engineering' OR department = 'Marketing' OR department = 'HR'</code> but much cleaner to read. The IN operator is covered in detail in the BETWEEN &amp; IN lesson.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/basics/select-statement.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">SELECT Statement</span>
+          </a>
+          <a href="/sql/basics/order-by.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">ORDER BY</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

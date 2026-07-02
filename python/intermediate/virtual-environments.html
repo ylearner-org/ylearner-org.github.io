@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Virtual Environments – venv, pip, Requirements | ylearner | ylearner</title>
+  <meta name="description" content="Learn Python virtual environments: creating with venv, activating/deactivating, installing packages, freezing requirements, and why every project needs its own environment.">
+  <meta name="keywords" content="python virtual environment, python venv, python virtualenv, python pip requirements, python environment isolation">
+  <link rel="canonical" href="https://ylearner.org/python/intermediate/virtual-environments.html">
+  <meta property="og:title" content="Python Virtual Environments – venv, pip, Requirements | ylearner">
+  <meta property="og:description" content="Learn Python virtual environments: creating with venv, activating/deactivating, installing packages, freezing requirements, and why every project needs its own environment.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/intermediate/virtual-environments.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Virtual Environments – venv, pip, Requirements | ylearner">
+  <meta name="twitter:description" content="Learn Python virtual environments: creating with venv, activating/deactivating, installing packages, freezing requirements, and why every project needs its own environment.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Virtual Environments – Isolate Project Dependencies","description":"Learn Python virtual environments: creating with venv, activating/deactivating, installing packages, freezing requirements, and why every project needs its own environment.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/intermediate/modules.html">Intermediate</a><span class="separator">›</span><span class="current">Virtual Environments</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Intermediate</div>
+          <h1>Python Virtual Environments – Isolate Project Dependencies</h1>
+          <p class="lesson-intro">A virtual environment is an isolated Python environment with its own interpreter and package library. Without one, all your projects share the same global Python installation — meaning a version conflict in one project can break others. Virtual environments solve this completely.</p>
+          <div class="lesson-meta"><span>⏱️ 16 min read</span><span>🎯 Intermediate</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="why">Why Virtual Environments Matter</h2>
+          <p>Without virtual environments: Project A needs requests 2.0, Project B needs requests 3.0 — they cannot coexist in global pip. Virtual environments give each project its own isolated space.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># Without venv (global):
+# pip install django==3.2  → breaks Project B which needs django==4.2
+
+# With venv:
+# project_a/venv/ → django 3.2 installed here
+# project_b/venv/ → django 4.2 installed here
+# Zero conflict!</code></pre></div>
+
+          <h2 id="create">Creating a Virtual Environment</h2>
+          <p>Use Python's built-in <code>venv</code> module. Create one per project.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># Create virtual environment (from project root)
+python -m venv venv         # Windows
+python3 -m venv venv        # macOS/Linux
+
+# This creates:
+# venv/
+#   bin/python (or Scripts\python.exe on Windows)
+#   bin/pip
+#   lib/           ← installed packages go here</code></pre></div>
+
+          <h2 id="activate">Activating and Deactivating</h2>
+          <p>Always activate before working on a project.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># Activate:
+# Windows (Command Prompt):
+venv\Scripts\activate
+
+# Windows (PowerShell):
+venv\Scripts\Activate.ps1
+
+# macOS / Linux:
+source venv/bin/activate
+
+# Prompt changes to show (venv) prefix
+# (venv) $ pip install requests   ← installs ONLY in this env
+
+# Deactivate when done:
+deactivate</code></pre></div>
+          <div class="callout callout-tip"><span class="callout-icon">💡</span><div class="callout-content"><strong>Tip</strong><p>Your prompt shows (venv) when a virtual environment is active. If you don't see it, you're installing into the global Python.</p></div></div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="packages">Installing and Managing Packages</h2>
+          <p>Install packages with pip after activating your venv.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># Activate first, then:
+pip install requests flask
+pip install pandas==2.0.0    # specific version
+
+# See what's installed:
+pip list
+pip show requests            # details about one package
+
+# Save your dependencies:
+pip freeze > requirements.txt
+
+# Reproduce on another machine:
+pip install -r requirements.txt</code></pre></div>
+
+          <h2 id="gitignore">Never Commit the venv Folder</h2>
+          <p>Add <code>venv/</code> to .gitignore. Teammates recreate it from requirements.txt.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># .gitignore
+venv/
+__pycache__/
+*.pyc
+.env
+*.egg-info/
+dist/
+build/
+
+# Teammate setup:
+git clone your-repo
+cd your-repo
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt</code></pre></div>
+
+          <h2 id="deep-venv">Virtual Environments: One Isolated Python per Project</h2>
+          <p>A virtual environment is a private copy of Python and its packages for a single project. Without one, every <code>pip install</code> goes into your <em>global</em> Python — so Project A needing Django 3 and Project B needing Django 5 collide, and you can't have both.</p>
+          <pre><code class="language-bash">python -m venv .venv            # create an env in ./.venv
+source .venv/bin/activate       # activate (Linux/macOS)
+# .venv\Scripts\activate       # Windows
+pip install requests            # installs INTO this env only
+deactivate                      # leave it</code></pre>
+          <p>Once activated, <code>python</code> and <code>pip</code> point at the isolated env — installs and versions stay local to the project and never touch the system Python.</p>
+          <table>
+            <thead><tr><th>File/command</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>pip freeze &gt; requirements.txt</code></td><td>record exact versions</td></tr>
+              <tr><td><code>pip install -r requirements.txt</code></td><td>reproduce the env elsewhere</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Best practices:</strong> one env per project, and <em>never commit</em> the <code>.venv/</code> folder — add it to <code>.gitignore</code> and share <code>requirements.txt</code> instead so teammates rebuild it. This is what makes "works on my machine" reproducible: the dependency list travels with the code, the heavy installed files don't. Modern tools (<code>poetry</code>, <code>uv</code>, <code>pipenv</code>) automate the same idea.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Master virtual environments:</p>
+            <ol>
+              <li>Create a virtual environment with <code>python -m venv .venv</code>.</li>
+              <li>Activate it and confirm <code>which python</code> (or <code>where python</code>) points inside the project.</li>
+              <li>Install a package, then run <code>pip list</code> to see it isolated from the global install.</li>
+              <li>Add <code>.venv/</code> to a <code>.gitignore</code> file.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Set up two separate projects, each with its own virtual environment, and install <em>different versions</em> of the same package in each to prove isolation. Freeze each environment to its own <code>requirements.txt</code>, then delete and recreate one environment purely from its requirements file. Write a short note explaining why the <code>.venv</code> folder should never be committed to version control.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A virtual environment is an isolated Python installation with its own packages.</li>
+              <li>Create one with <code>python -m venv .venv</code> and activate it before installing dependencies.</li>
+              <li>Isolation prevents version conflicts between projects and keeps the global interpreter clean.</li>
+              <li>Never commit the <code>.venv</code> folder — commit <code>requirements.txt</code> instead.</li>
+              <li>Reproduce an environment with <code>pip install -r requirements.txt</code>.</li>
+              <li><code>venv</code> ships with Python; <code>conda</code> and <code>virtualenv</code> are alternatives with extra features.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Virtual Environments</h2>
+          <ul class="interview-list">
+            <li>What is a virtual environment and why is it important?</li>
+            <li>How do you create and activate a virtual environment?</li>
+            <li>What problem does isolation solve?</li>
+            <li>Why should the virtual environment folder not be committed to git?</li>
+            <li>What is the difference between <code>venv</code> and tools like <code>virtualenv</code> or <code>conda</code>?</li>
+            <li>How do you reproduce an environment on another machine?</li>
+            <li>What does “activating” an environment actually change?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/intermediate/packages.html" class="topic-tag">📦 Packages</a>
+            <a href="/python/intermediate/modules.html" class="topic-tag">📄 Modules</a>
+            <a href="/python/beginner/python-setup.html" class="topic-tag">🛠️ Python Setup</a>
+            <a href="/python/beginner/installing-python.html" class="topic-tag">⬇️ Installing Python</a>
+            <a href="/python/real-world/api-development.html" class="topic-tag">🌐 API Development</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why should every project have its own virtual environment? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Different projects often need different, sometimes conflicting, package versions. A per-project environment isolates dependencies so upgrading one project cannot break another, and keeps your global Python clean.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why shouldn’t I commit the <code>.venv</code> folder to git? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It is large, platform-specific, and fully reproducible from <code>requirements.txt</code>. Committing it bloats the repo and can break on other operating systems. Commit the requirements file instead and add <code>.venv/</code> to <code>.gitignore</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What does activating an environment do? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It adjusts your shell’s PATH so <code>python</code> and <code>pip</code> resolve to the environment’s copies, scoping installs and imports to that project until you run <code>deactivate</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>venv</code> and <code>conda</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>venv</code> is built into Python and manages Python packages via pip. <code>conda</code> is a separate package and environment manager that also handles non-Python dependencies, popular in data science.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/intermediate/csv.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">CSV Files</span></a>
+          <a href="/python/intermediate/quiz.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">📝 Section Quiz</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Module Structure – Anatomy of an Odoo Module | ylearner</title>
+  <meta name="description" content="Learn the anatomy of an Odoo module — every file and directory explained, from __manifest__.py and models/ to security/, static/, and controllers/. Build your first working addon from scratch.">
+  <meta name="keywords" content="Odoo module structure, Odoo addon structure, __manifest__.py, Odoo models directory, Odoo views directory, Odoo security, Odoo static files, Odoo module tutorial">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/module/module-structure.html">
+  <meta property="og:title" content="Odoo Module Structure – Anatomy of an Odoo Module">
+  <meta property="og:description" content="Learn the anatomy of an Odoo module — every file and directory explained, from __manifest__.py and models/ to security/, static/, and controllers/. Build your first working addon from scratch.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/module/module-structure.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Module Structure – Anatomy of an Odoo Module | ylearner">
+  <meta name="twitter:description" content="Learn the anatomy of an Odoo module — every file and directory explained, from __manifest__.py and models/ to security/, static/, and controllers/. Build your first working addon from scratch.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Module Structure – Anatomy of an Odoo Module",
+    "description": "Learn the anatomy of an Odoo module — every file and directory explained, from __manifest__.py and models/ to security/, static/, and controllers/.",
+    "educationalLevel": "Beginner",
+    "keywords": "Odoo module structure, addon, __manifest__.py, models, views, security, static",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/module/module-structure.html">Module Development</a><span class="separator">›</span>
+          <span class="current">Module Structure</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Module Development</div>
+          <h1>Odoo Module Structure – Anatomy of an Odoo Addon</h1>
+          <p class="lesson-intro">Every feature in Odoo is packaged as a module (also called an addon). A module is simply a directory with a specific file structure that Odoo's module loader recognises. This page walks through every file and directory in an Odoo module, what each one does, and how to create a minimal working module from scratch.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <!-- Section 1: Directory Layout -->
+          <h2 id="directory-layout">Module Directory Layout</h2>
+          <p>A well-structured Odoo module follows a predictable layout. Here is the full directory tree of a real-world module, <code>library_management</code>, with comments explaining each entry:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-plaintext">library_management/          ← module root (must match technical name)
+├── __init__.py              ← makes it a Python package
+├── __manifest__.py          ← module metadata and file lists
+├── models/
+│   ├── __init__.py
+│   └── library_book.py      ← model definitions
+├── views/
+│   ├── book_views.xml       ← form, list, kanban, search views
+│   └── menus.xml            ← menu items and window actions
+├── security/
+│   ├── ir.model.access.csv  ← CRUD access rights per group
+│   └── record_rules.xml     ← row-level access filters
+├── data/
+│   └── book_sequence.xml    ← default data (sequences, config)
+├── demo/
+│   └── demo_books.xml       ← sample data for development
+├── report/
+│   └── book_report.xml      ← QWeb PDF report templates
+├── wizard/
+│   ├── __init__.py
+│   └── borrow_wizard.py     ← transient models for multi-step flows
+├── static/
+│   ├── description/
+│   │   └── icon.png         ← module icon shown in Apps list
+│   └── src/
+│       ├── js/              ← custom OWL components / JS
+│       ├── xml/             ← OWL component templates
+│       └── scss/            ← custom styles
+└── controllers/
+    ├── __init__.py
+    └── portal.py            ← HTTP routes for portal/website</code></pre>
+          </div>
+
+          <!-- Section 2: Required Files -->
+          <h2 id="required-files">Required Files (Minimum Module)</h2>
+          <p>The absolute minimum to get Odoo to recognise a module is two files:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-plaintext">my_module/
+├── __init__.py      ← can be empty but must exist
+└── __manifest__.py  ← must exist with name and version keys</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># __init__.py — empty or imports subpackages
+from . import models</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># __manifest__.py — minimum valid manifest
+{
+    'name': 'My Module',
+    'version': '19.0.1.0.0',
+}</code></pre>
+          </div>
+
+          <p>Odoo scans all directories in the addons path. A directory is treated as a module if and only if it contains <code>__manifest__.py</code>.</p>
+
+          <!-- AD BLOCK -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <!-- Section 3: models/ Directory -->
+          <h2 id="models-directory">models/ Directory</h2>
+          <p>Each Python file in <code>models/</code> defines one or more model classes. The <code>models/__init__.py</code> must import every file so Odoo loads them:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># models/__init__.py
+from . import library_book
+from . import library_member
+from . import res_partner  # extending a base model</code></pre>
+          </div>
+
+          <p>Naming convention: the file name should match the model's <code>_name</code> with dots replaced by underscores — <code>library.book</code> → <code>library_book.py</code>.</p>
+
+          <p>The module's root <code>__init__.py</code> imports the models package (and any other Python packages present):</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># __init__.py (module root)
+from . import models
+from . import controllers  # if you have controllers
+from . import wizard       # if you have wizards</code></pre>
+          </div>
+
+          <!-- Section 4: views/ Directory -->
+          <h2 id="views-directory">views/ Directory</h2>
+          <p>The <code>views/</code> directory holds all XML view definitions, window actions, and menu items. Conventions to follow:</p>
+          <ul>
+            <li>One file per model — <code>book_views.xml</code>, <code>member_views.xml</code></li>
+            <li>Keep menus in a separate <code>menus.xml</code> or <code>actions.xml</code> so they load after the views they reference</li>
+            <li>All files must be listed in <code>__manifest__.py</code> under the <code>'data'</code> key, in the correct load order</li>
+          </ul>
+
+          <!-- Section 5: security/ Directory -->
+          <h2 id="security-directory">security/ Directory</h2>
+          <p>Two files live here in almost every module:</p>
+          <ul>
+            <li><code>ir.model.access.csv</code> — controls which user groups can Create, Read, Write, and Delete each model</li>
+            <li><code>record_rules.xml</code> — row-level filters (for example, users may only see their own records)</li>
+          </ul>
+          <p><strong>Important:</strong> the security CSV must be listed <em>first</em> in the manifest <code>data</code> list — before views. Models must be registered before access rules can reference them.</p>
+          <p>CSV format:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Text</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-plaintext">id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink</code></pre>
+          </div>
+
+          <!-- Section 6: static/ Directory -->
+          <h2 id="static-directory">static/ Directory</h2>
+          <p>Everything under <code>static/</code> is served directly by the web server — no Python processing occurs. Key subdirectories:</p>
+          <ul>
+            <li><code>static/description/icon.png</code> — 128×128 px module icon shown in the Apps menu</li>
+            <li><code>static/src/js/</code> — OWL JavaScript components</li>
+            <li><code>static/src/xml/</code> — OWL component XML templates</li>
+            <li><code>static/src/scss/</code> — custom SCSS stylesheets</li>
+          </ul>
+          <p>Asset files must be registered in <code>__manifest__.py</code> under the <code>'assets'</code> key (Odoo 14+):</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">'assets': {
+    'web.assets_backend': [
+        'my_module/static/src/scss/my_module.scss',
+        'my_module/static/src/js/my_component.js',
+        'my_module/static/src/xml/my_component.xml',
+    ],
+},</code></pre>
+          </div>
+
+          <!-- Section 7: Naming Conventions -->
+          <h2 id="naming-conventions">Naming Conventions</h2>
+          <p>Following community naming conventions keeps your module consistent with the Odoo ecosystem and easier to navigate:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Item</th><th>Convention</th><th>Example</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Module directory</td><td><code>snake_case</code></td><td><code>library_management</code></td></tr>
+                <tr><td>Python model file</td><td>matches <code>_name</code> with dots→underscores</td><td><code>library_book.py</code></td></tr>
+                <tr><td>View XML file</td><td><code>{model}_views.xml</code></td><td><code>book_views.xml</code></td></tr>
+                <tr><td>XML record <code>id</code></td><td><code>view_{model}_{type}</code></td><td><code>view_library_book_form</code></td></tr>
+                <tr><td>Python class name</td><td><code>CamelCase</code></td><td><code>LibraryBook</code></td></tr>
+                <tr><td>Model <code>_name</code></td><td><code>dot.notation</code></td><td><code>library.book</code></td></tr>
+                <tr><td>Module technical name</td><td><code>snake_case</code>, start with company/project prefix</td><td><code>algorid_library</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always prefix your module name</strong>
+              <p>Prefix your module name with your company or project identifier (e.g. <code>algorid_library</code>, not just <code>library</code>). Odoo has thousands of community modules — generic names like <code>pos_custom</code> or <code>sale_extension</code> are very likely to conflict with an existing module in a production environment.</p>
+            </div>
+          </div>
+
+          <!-- Section 8: Summary -->
+          <h2 id="deep-modstructure">Anatomy of an Odoo Module Folder</h2>
+          <p>Odoo modules follow a strict, predictable folder convention. Learn it once and any module — yours or Odoo's own — becomes navigable. Two files are mandatory; the rest are conventional folders Odoo knows to look in.</p>
+          <pre><code class="language-text">my_module/
+├── __init__.py          # imports the Python subpackages (models, etc.)
+├── __manifest__.py      # module metadata — REQUIRED, or it won't load
+├── models/              # Python business logic (*.py)
+│   └── __init__.py
+├── views/               # XML: form/list/menu definitions
+├── security/            # ir.model.access.csv + record rules
+├── data/                # seed/config data loaded on install
+├── static/              # JS, CSS, images (web assets)
+└── controllers/         # HTTP routes / website endpoints</code></pre>
+          <table>
+            <thead><tr><th>File/folder</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td><code>__manifest__.py</code></td><td>name, version, <code>depends</code>, <code>data</code> — the module's ID card</td></tr>
+              <tr><td><code>__init__.py</code></td><td>Python glue — imports each subpackage</td></tr>
+              <tr><td><code>models/</code></td><td>models &amp; fields (the data layer)</td></tr>
+              <tr><td><code>security/</code></td><td>who can read/write each model</td></tr>
+            </tbody>
+          </table>
+          <p><strong>The two <code>__init__.py</code> chains matter:</strong> the module's <code>__init__.py</code> must <code>from . import models</code>, and <code>models/__init__.py</code> must import each model file — miss a link and your model silently never loads. Everything in <code>views/</code>, <code>security/</code>, <code>data/</code> only loads if it's listed in the manifest's <code>data</code> list, <em>in order</em>.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create a module folder.</li>
+              <li>Add <code>__init__.py</code> and <code>__manifest__.py</code>.</li>
+              <li>Add <code>models/</code> and <code>views/</code> subfolders.</li>
+              <li>Add a <code>security/</code> folder.</li>
+              <li>Install the module.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Scaffold a minimal Odoo module with <code>__manifest__.py</code>, <code>__init__.py</code>, a <code>models/</code> package, a <code>views/</code> directory, and a <code>security/</code> file. Explain the purpose of each part and how Odoo discovers and loads the module.</p>
+          </div>
+
+          <div class="summary-box" id="summary">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li>A module is a directory with <code>__init__.py</code> + <code>__manifest__.py</code> — Odoo recognises it if and only if <code>__manifest__.py</code> is present.</li>
+              <li>Standard subdirectories: <code>models/</code>, <code>views/</code>, <code>security/</code>, <code>data/</code>, <code>demo/</code>, <code>report/</code>, <code>wizard/</code>, <code>static/</code>, <code>controllers/</code>.</li>
+              <li>Every subdirectory containing Python files needs its own <code>__init__.py</code>.</li>
+              <li>Root <code>__init__.py</code> imports: <code>from . import models</code> (plus <code>controllers</code>, <code>wizard</code> if present).</li>
+              <li><code>models/__init__.py</code> must import every model file so Odoo loads them all.</li>
+              <li><code>static/</code> is served directly by the web server; JS/SCSS assets must be registered in the <code>'assets'</code> section of <code>__manifest__.py</code>.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What files make up a minimal Odoo module?</li>
+            <li>What does <code>__manifest__.py</code> do?</li>
+            <li>What does <code>__init__.py</code> do?</li>
+            <li>How does Odoo discover modules?</li>
+            <li>What are the standard module subdirectories?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/odoo/what-is-odoo.html" class="topic-tag odoo-topic-tag">🐍 What is Odoo</a>
+            <a href="/odoo/odoo-architecture.html" class="topic-tag odoo-topic-tag">🐍 Odoo Architecture</a>
+            <a href="/odoo/module/manifest-file.html" class="topic-tag odoo-topic-tag">🐍 Manifest File</a>
+            <a href="/odoo/module/models-fields.html" class="topic-tag odoo-topic-tag">🐍 Models &amp; Fields</a>
+            <a href="/odoo/module/basic-views.html" class="topic-tag odoo-topic-tag">🐍 Basic Views</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I have multiple models in one Python file? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, but it is bad practice for large models. Small utility models that are tightly related to a main model are sometimes grouped in a single file, but in general one file per model is easier to navigate and review.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Does every directory need an <code>__init__.py</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Every directory containing Python files that Odoo should import needs an <code>__init__.py</code>. The <code>views/</code>, <code>security/</code>, <code>data/</code>, <code>demo/</code>, <code>report/</code>, and <code>static/</code> directories don't contain Python — they don't need <code>__init__.py</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>data/</code> and <code>views/</code> directories? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Convention only — both contain XML files loaded from <code>__manifest__.py</code>. Typically: <code>views/</code> holds UI views, actions, and menus. <code>data/</code> holds non-UI records like sequences, email templates, and default configuration. Odoo doesn't enforce this split.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I add a module to Odoo's addons path? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Add the parent directory of your module to the <code>addons_path</code> in <code>odoo.conf</code>. For example, if your module is at <code>~/custom_addons/library_management/</code>, add <code>~/custom_addons</code> to <code>addons_path</code>. Then restart Odoo and click "Update Apps List" in Settings.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/module/basic-views.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Basic Views</span>
+          </a>
+          <a href="/odoo/module/manifest-file.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Manifest File</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Expense Tracker – CRUD, Charts & localStorage | ylearner</title>
+  <meta name="description" content="Build a JavaScript expense tracker with CRUD operations, category filtering, income vs expense balance, localStorage persistence, and a DOM bar chart — no libraries required.">
+  <meta name="keywords" content="JavaScript expense tracker, budget app JavaScript, CRUD JavaScript project, localStorage project, JavaScript chart DOM">
+  <link rel="canonical" href="https://ylearner.org/javascript/projects/expense-tracker.html">
+  <meta property="og:title" content="JavaScript Expense Tracker – CRUD, Charts & localStorage | ylearner">
+  <meta property="og:description" content="Build a JavaScript expense tracker with CRUD operations, category filtering, income vs expense balance, localStorage persistence, and a DOM bar chart — no libraries required.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/projects/expense-tracker.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Expense Tracker – CRUD, Charts & localStorage | ylearner">
+  <meta name="twitter:description" content="Build a JavaScript expense tracker with CRUD operations, category filtering, income vs expense balance, localStorage persistence, and a DOM bar chart — no libraries required.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/projects/calculator.html">Projects</a><span class="separator">›</span>
+          <span class="current">Expense Tracker</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🛠️ Projects</div>
+          <h1>JavaScript Expense Tracker – Build a Budget App</h1>
+          <p class="lesson-intro">Build a complete personal budget tracker: add income and expense entries with categories, calculate real-time balance, filter by category, persist all data to localStorage, and visualize spending with a bar chart built entirely from DOM elements — no chart library required.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 32 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="project-overview">Project Overview</h2>
+          <p>The expense tracker is a full CRUD application covering the complete Create-Read-Update-Delete lifecycle. It also introduces data aggregation with <code>Array.reduce()</code> and a custom data visualization built from pure DOM elements.</p>
+
+          <table>
+            <thead><tr><th>Feature</th><th>Technique Used</th></tr></thead>
+            <tbody>
+              <tr><td>Add expense/income</td><td>Form submit → push to array → persist → re-render</td></tr>
+              <tr><td>Delete entry</td><td>Filter by ID → persist → re-render</td></tr>
+              <tr><td>Balance calculation</td><td><code>reduce()</code> — income minus expenses</td></tr>
+              <tr><td>Category filter</td><td>Filter array before rendering</td></tr>
+              <tr><td>localStorage persist</td><td>JSON.stringify/parse on every change</td></tr>
+              <tr><td>Bar chart</td><td>DOM div heights set proportionally</td></tr>
+              <tr><td>Category totals</td><td><code>reduce()</code> grouped by category</td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="html-structure">HTML Structure</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/* expense.html
+
+&lt;div class="expense-app"&gt;
+  &lt;!-- Summary Cards --&gt;
+  &lt;div class="summary-cards"&gt;
+    &lt;div class="card card-income"&gt;  &lt;h3&gt;Income&lt;/h3&gt;   &lt;span id="total-income"&gt;$0.00&lt;/span&gt;&lt;/div&gt;
+    &lt;div class="card card-balance"&gt; &lt;h3&gt;Balance&lt;/h3&gt;  &lt;span id="balance"&gt;$0.00&lt;/span&gt;&lt;/div&gt;
+    &lt;div class="card card-expense"&gt; &lt;h3&gt;Expenses&lt;/h3&gt; &lt;span id="total-expense"&gt;$0.00&lt;/span&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Add Entry Form --&gt;
+  &lt;form id="entry-form" class="entry-form"&gt;
+    &lt;input id="entry-name"    type="text"   placeholder="Description" required&gt;
+    &lt;input id="entry-amount" type="number" placeholder="Amount" step="0.01" min="0.01" required&gt;
+    &lt;select id="entry-type"&gt;
+      &lt;option value="expense"&gt;Expense&lt;/option&gt;
+      &lt;option value="income"&gt;Income&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;select id="entry-category"&gt;
+      &lt;option value="Food"&gt;Food&lt;/option&gt;
+      &lt;option value="Transport"&gt;Transport&lt;/option&gt;
+      &lt;option value="Housing"&gt;Housing&lt;/option&gt;
+      &lt;option value="Entertainment"&gt;Entertainment&lt;/option&gt;
+      &lt;option value="Health"&gt;Health&lt;/option&gt;
+      &lt;option value="Other"&gt;Other&lt;/option&gt;
+      &lt;option value="Salary"&gt;Salary&lt;/option&gt;
+      &lt;option value="Freelance"&gt;Freelance&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;button type="submit"&gt;Add Entry&lt;/button&gt;
+  &lt;/form&gt;
+
+  &lt;!-- Filter + List --&gt;
+  &lt;div class="filter-row"&gt;
+    &lt;select id="category-filter"&gt;&lt;option value="all"&gt;All Categories&lt;/option&gt;&lt;/select&gt;
+    &lt;select id="type-filter"&gt;
+      &lt;option value="all"&gt;All Types&lt;/option&gt;
+      &lt;option value="income"&gt;Income&lt;/option&gt;
+      &lt;option value="expense"&gt;Expense&lt;/option&gt;
+    &lt;/select&gt;
+  &lt;/div&gt;
+  &lt;ul id="entry-list"&gt;&lt;/ul&gt;
+
+  &lt;!-- Bar Chart --&gt;
+  &lt;div class="chart-section"&gt;
+    &lt;h3&gt;Spending by Category&lt;/h3&gt;
+    &lt;div id="bar-chart" class="bar-chart"&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+*/</code></pre>
+          </div>
+
+          <h2 id="state-and-crud">State and CRUD Operations</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// expense-script.js — State & CRUD
+
+const STORAGE_KEY = "ylearner-expenses";
+const CATEGORIES  = ["Food","Transport","Housing","Entertainment","Health","Other","Salary","Freelance"];
+
+let entries = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+let filterCategory = "all";
+let filterType     = "all";
+
+// Persistence
+function persist() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+}
+
+// Create
+function addEntry({ name, amount, type, category }) {
+  entries.unshift({          // prepend so newest is first
+    id:        crypto.randomUUID(),
+    name,
+    amount:    parseFloat(amount),
+    type,      // "income" | "expense"
+    category,
+    date:      new Date().toLocaleDateString("en-GB", { day:"2-digit", month:"short", year:"numeric" })
+  });
+  persist();
+}
+
+// Delete
+function deleteEntry(id) {
+  entries = entries.filter(e => e.id !== id);
+  persist();
+}
+
+// Computed values using reduce
+function computeSummary() {
+  return entries.reduce((acc, e) => {
+    if (e.type === "income")  acc.income  += e.amount;
+    else                      acc.expense += e.amount;
+    return acc;
+  }, { income: 0, expense: 0 });
+}
+
+function computeCategoryTotals() {
+  return entries
+    .filter(e => e.type === "expense")
+    .reduce((acc, e) => {
+      acc[e.category] = (acc[e.category] || 0) + e.amount;
+      return acc;
+    }, {});
+}
+
+const fmt = n => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);</code></pre>
+          </div>
+
+          <h2 id="render">Render Function</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function render() {
+  renderSummary();
+  renderList();
+  renderChart();
+  updateCategoryFilter();
+}
+
+function renderSummary() {
+  const { income, expense } = computeSummary();
+  const balance = income - expense;
+
+  document.getElementById("total-income").textContent  = fmt(income);
+  document.getElementById("total-expense").textContent = fmt(expense);
+  const balEl = document.getElementById("balance");
+  balEl.textContent = fmt(balance);
+  balEl.className = balance >= 0 ? "positive" : "negative";
+}
+
+function renderList() {
+  const list = document.getElementById("entry-list");
+  const visible = entries.filter(e => {
+    const matchCat  = filterCategory === "all" || e.category === filterCategory;
+    const matchType = filterType     === "all" || e.type     === filterType;
+    return matchCat && matchType;
+  });
+
+  list.innerHTML = visible.length === 0
+    ? '&lt;li class="empty"&gt;No entries match your filters.&lt;/li&gt;'
+    : visible.map(e => `
+      &lt;li class="entry-item ${e.type}" data-id="${e.id}"&gt;
+        &lt;div class="entry-icon"&gt;${categoryEmoji(e.category)}&lt;/div&gt;
+        &lt;div class="entry-info"&gt;
+          &lt;strong&gt;${e.name}&lt;/strong&gt;
+          &lt;small&gt;${e.category} · ${e.date}&lt;/small&gt;
+        &lt;/div&gt;
+        &lt;span class="entry-amount ${e.type}"&gt;
+          ${e.type === "income" ? "+" : "−"}${fmt(e.amount)}
+        &lt;/span&gt;
+        &lt;button class="delete-btn" title="Delete"&gt;✕&lt;/button&gt;
+      &lt;/li&gt;
+    `).join("");
+}
+
+function renderChart() {
+  const chart  = document.getElementById("bar-chart");
+  const totals = computeCategoryTotals();
+  const cats   = Object.keys(totals);
+  if (cats.length === 0) { chart.innerHTML = '&lt;p class="no-data"&gt;No expense data yet.&lt;/p&gt;'; return; }
+
+  const max = Math.max(...Object.values(totals));
+  chart.innerHTML = cats.map(cat => {
+    const height = Math.round((totals[cat] / max) * 150); // max bar height 150px
+    return `
+      &lt;div class="bar-col"&gt;
+        &lt;div class="bar-value"&gt;${fmt(totals[cat])}&lt;/div&gt;
+        &lt;div class="bar" style="height:${height}px;" title="${cat}: ${fmt(totals[cat])}"&gt;&lt;/div&gt;
+        &lt;div class="bar-label"&gt;${categoryEmoji(cat)} ${cat}&lt;/div&gt;
+      &lt;/div&gt;
+    `;
+  }).join("");
+}
+
+function updateCategoryFilter() {
+  const sel  = document.getElementById("category-filter");
+  const used = [...new Set(entries.map(e => e.category))];
+  sel.innerHTML = `&lt;option value="all"&gt;All Categories&lt;/option&gt;` +
+    used.map(c => `&lt;option value="${c}" ${c === filterCategory ? "selected" : ""}&gt;${c}&lt;/option&gt;`).join("");
+}
+
+function categoryEmoji(cat) {
+  const map = { Food:"🍔", Transport:"🚗", Housing:"🏠", Entertainment:"🎬",
+                Health:"💊", Other:"📦", Salary:"💼", Freelance:"💻" };
+  return map[cat] || "📋";
+}</code></pre>
+          </div>
+
+          <h2 id="event-handlers">Event Handlers</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Add entry
+document.getElementById("entry-form").addEventListener("submit", e => {
+  e.preventDefault();
+  addEntry({
+    name:     document.getElementById("entry-name").value.trim(),
+    amount:   document.getElementById("entry-amount").value,
+    type:     document.getElementById("entry-type").value,
+    category: document.getElementById("entry-category").value
+  });
+  e.target.reset();
+  render();
+});
+
+// Delete (event delegation)
+document.getElementById("entry-list").addEventListener("click", e => {
+  if (e.target.matches(".delete-btn")) {
+    const id = e.target.closest("[data-id]").dataset.id;
+    deleteEntry(id);
+    render();
+  }
+});
+
+// Category filter
+document.getElementById("category-filter").addEventListener("change", e => {
+  filterCategory = e.target.value;
+  render();
+});
+
+// Type filter
+document.getElementById("type-filter").addEventListener("change", e => {
+  filterType = e.target.value;
+  render();
+});
+
+// Seed with sample data if empty
+if (entries.length === 0) {
+  [
+    { name: "Monthly Salary",   amount: 3000, type: "income",  category: "Salary" },
+    { name: "Rent",             amount: 900,  type: "expense", category: "Housing" },
+    { name: "Groceries",        amount: 120,  type: "expense", category: "Food" },
+    { name: "Netflix",          amount: 15,   type: "expense", category: "Entertainment" },
+    { name: "Gym",              amount: 40,   type: "expense", category: "Health" },
+    { name: "Bus pass",         amount: 55,   type: "expense", category: "Transport" },
+  ].forEach(addEntry);
+}
+
+render();</code></pre>
+          </div>
+
+          <div class="output-block"><strong>Initial State:</strong> Balance shows $1,870.00. Income card: $3,000. Expenses card: $1,130. Bar chart shows Housing as the tallest bar, then Food, Transport, Health, Entertainment.</div>
+
+          <div class="callout callout-tip">
+            <strong>Array.reduce() Power:</strong> Both <code>computeSummary()</code> and <code>computeCategoryTotals()</code> are single-pass <code>reduce()</code> calls. This is the most important array method for data aggregation. Master it: sum, group-by, flatten, and transform — all with <code>reduce()</code>.
+          </div>
+
+          <div class="callout callout-info">
+            <strong>Concepts Practiced:</strong> Full CRUD with localStorage, <code>Array.reduce()</code> for aggregation, event delegation, Intl.NumberFormat for currency formatting, data visualization without libraries, and crypto.randomUUID() for unique IDs.
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="bar-chart-css">Bar Chart CSS</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/* Key chart styles
+
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 20px 0;
+  min-height: 200px;
+  border-bottom: 2px solid #e2e8f0;
+}
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.bar {
+  width: 100%;
+  background: linear-gradient(to top, #3b82f6, #8b5cf6);
+  border-radius: 6px 6px 0 0;
+  transition: height 0.5s ease;
+  min-height: 4px;
+}
+.bar-value { font-size: 11px; color: #64748b; }
+.bar-label { font-size: 11px; text-align: center; }
+*/</code></pre>
+          </div>
+
+          <h2 id="enhancements">Enhancements</h2>
+
+          <div class="exercise-box">
+            <h3>Extend the Expense Tracker</h3>
+            <ul>
+              <li><strong>Monthly view</strong> — add a month selector and filter entries to the chosen month</li>
+              <li><strong>Export to CSV</strong> — implement <code>exportToCSV()</code> using Blob and a dynamically created download link</li>
+              <li><strong>Budget limits</strong> — set a monthly budget per category and highlight over-budget categories in red</li>
+              <li><strong>Edit entry</strong> — click an entry to edit its values inline (similar to the Todo App's contenteditable pattern)</li>
+              <li><strong>Pie chart</strong> — convert the bar chart to a CSS conic-gradient pie chart</li>
+            </ul>
+          </div>
+
+          <div class="challenge-box">
+            <h3>CSV Export Challenge</h3>
+            <p>Implement a one-click CSV download of all entries:</p>
+            <pre style="background:#1e1e2e;color:#cdd6f4;padding:12px;border-radius:8px;font-size:13px;overflow:auto;"><code>function exportToCSV() {
+  const headers = ["Date","Name","Category","Type","Amount"];
+  const rows = entries.map(e =>
+    [e.date, e.name, e.category, e.type, e.amount.toFixed(2)]
+  );
+  const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href = url; a.download = "expenses.csv";
+  a.click();
+  URL.revokeObjectURL(url); // clean up
+}</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <h3>Summary</h3>
+            <ul>
+              <li>Full CRUD: add, delete, read with filters — all persisted to localStorage</li>
+              <li><code>Array.reduce()</code>: powers both the balance summary and the grouped category chart data</li>
+              <li>Event delegation: one handler on <code>#entry-list</code> for all delete buttons</li>
+              <li>Intl.NumberFormat: proper currency display without manual string formatting</li>
+              <li>DOM bar chart: proportional heights via inline CSS — no chart library needed</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li><code>Array.reduce()</code> mastery is a top-tier JavaScript skill — it's asked in virtually every senior JS interview</li>
+            <li>Building a chart without a library shows DOM manipulation confidence</li>
+            <li>Using <code>Intl.NumberFormat</code> instead of manual string formatting demonstrates modern API awareness</li>
+            <li>CRUD + localStorage is the core pattern behind every local-first web application</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <h3>Related Topics</h3>
+            <ul>
+              <li><a href="/javascript/projects/quiz-app.html">Quiz App Project</a></li>
+              <li><a href="/javascript/projects/memory-game.html">Memory Game Project</a></li>
+              <li><a href="/javascript/intermediate/local-storage.html">localStorage and sessionStorage</a></li>
+            </ul>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why use crypto.randomUUID() instead of Date.now() for IDs? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>crypto.randomUUID()</code> generates a cryptographically random UUID — guaranteed unique even if multiple entries are added in the same millisecond. Supported in all modern browsers. Fall back to <code>Date.now() + Math.random()</code> for older environments.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How does the bar chart work without a library? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Each bar is a <code>div</code> with a height set as a percentage of the tallest category total. CSS transitions animate the height change. The approach works because SVG and Canvas are not required for simple bar charts — CSS is sufficient.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How does Intl.NumberFormat work? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(1234.5)</code> produces <code>"$1,234.50"</code>. It handles locale-specific formatting (commas vs periods, currency symbols, decimal places) automatically. Pass a different locale for other currencies.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why prepend new entries instead of appending? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>entries.unshift()</code> adds to the front, so the newest entry is always first in the rendered list — a natural chronological expectation for a transaction log. Alternatively, sort by date descending.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How would I add a monthly budget backend? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use IndexedDB for structured querying (filter by month, group by category). Or sync to a backend API (Node.js + PostgreSQL/MongoDB) so data is accessible across devices. The CRUD functions here map directly to REST API calls.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/projects/quiz-app.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Quiz App</span></a>
+          <a href="/javascript/projects/memory-game.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Memory Game</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

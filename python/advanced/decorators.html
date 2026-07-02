@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Decorators – How to Use and Create Decorators | ylearner</title>
+  <meta name="description" content="Learn Python decorators from scratch. Understand the @ syntax, function decorators, decorators with arguments, class decorators, functools.wraps, and real-world examples.">
+  <meta name="keywords" content="python decorators, python @ syntax, python function decorators, python class decorators, functools wraps, python property decorator, python staticmethod, python classmethod">
+  <link rel="canonical" href="https://ylearner.org/python/advanced/decorators.html">
+  <meta property="og:title" content="Python Decorators – How to Use and Create Decorators | ylearner">
+  <meta property="og:description" content="Learn Python decorators from scratch. Understand the @ syntax, function decorators, decorators with arguments, class decorators, functools.wraps, and real-world examples.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/advanced/decorators.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Decorators – How to Use and Create Decorators | ylearner">
+  <meta name="twitter:description" content="Learn Python decorators from scratch. Understand the @ syntax, function decorators, decorators with arguments, class decorators, functools.wraps, and real-world examples.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo">
+      <img src="/assets/logo.png" alt="ylearner" class="header-logo-img">
+    </a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar">
+      <nav id="sidebarNav"></nav>
+    </aside>
+
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/advanced/">Advanced Python</a><span class="separator">›</span>
+          <span class="current">Decorators</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Advanced</div>
+          <h1>Python Decorators – How to Use and Create Them</h1>
+          <p class="lesson-intro">Decorators are one of Python's most elegant features. They let you <em>wrap</em> a function with additional behaviour — adding logging, timing, access control, or caching — without touching the function's original code. Once you understand decorators, a vast amount of Python frameworks (Flask, Django, FastAPI, pytest) suddenly become readable and writable. This lesson builds from first principles to production-ready patterns.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 30 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="intro">What Are Decorators?</h2>
+          <p>A decorator is a <strong>function that takes another function as input and returns a new function</strong> with added (or modified) behaviour. The <code>@</code> syntax is just a clean shorthand for applying a decorator.</p>
+
+          <p>Before understanding decorators, you need to know three things about Python functions:</p>
+          <ul>
+            <li>Functions are <strong>first-class objects</strong> — they can be passed as arguments, returned from functions, and stored in variables.</li>
+            <li>Functions can be <strong>defined inside other functions</strong> (closures).</li>
+            <li>A function can <strong>return another function</strong>.</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Functions as first-class objects
+def greet(name):
+    return f"Hello, {name}!"
+
+# Assign a function to a variable
+say_hello = greet
+print(say_hello("Alice"))   # Hello, Alice!
+
+# Pass a function as an argument
+def apply(func, value):
+    return func(value)
+
+print(apply(greet, "Bob"))  # Hello, Bob!
+
+# Return a function from a function
+def make_multiplier(n):
+    def multiply(x):
+        return x * n       # 'n' is captured in the closure
+    return multiply
+
+double = make_multiplier(2)
+triple = make_multiplier(3)
+print(double(5))   # 10
+print(triple(5))   # 15</code></pre>
+          </div>
+
+          <h2 id="first-decorator">Building Your First Decorator</h2>
+          <p>A decorator is nothing more than a function that wraps another function. Here is the pattern without and then with the <code>@</code> syntax:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># Step 1: Write a wrapper manually
+def my_decorator(func):
+    def wrapper(*args, **kwargs):
+        print("Before the function runs")
+        result = func(*args, **kwargs)
+        print("After the function runs")
+        return result
+    return wrapper
+
+def say_hi():
+    print("Hi!")
+
+# Apply the decorator manually
+say_hi = my_decorator(say_hi)
+say_hi()
+
+# Step 2: The @ syntax does the same thing — cleaner!
+@my_decorator
+def say_bye():
+    print("Bye!")
+
+say_bye()</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Before the function runs
+Hi!
+After the function runs
+Before the function runs
+Bye!
+After the function runs
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>@decorator is Just Syntactic Sugar</strong>
+              <p><code>@my_decorator</code> placed above a function definition is exactly equivalent to writing <code>func = my_decorator(func)</code> right after the function. The <code>@</code> syntax just makes it visually clear that the decoration happens at definition time.</p>
+            </div>
+          </div>
+
+          <h2 id="functools-wraps">Preserving Metadata with functools.wraps</h2>
+          <p>Without <code>functools.wraps</code>, decorated functions lose their name, docstring, and other metadata. Always use it in real-world decorators:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from functools import wraps
+
+# Without wraps — identity is lost
+def bad_decorator(func):
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper
+
+@bad_decorator
+def compute():
+    """Compute something important."""
+    pass
+
+print(compute.__name__)   # wrapper  ← WRONG
+print(compute.__doc__)    # None     ← WRONG
+
+# With wraps — identity is preserved
+def good_decorator(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper
+
+@good_decorator
+def compute():
+    """Compute something important."""
+    pass
+
+print(compute.__name__)   # compute  ← Correct
+print(compute.__doc__)    # Compute something important.  ← Correct</code></pre>
+          </div>
+
+          <h2 id="practical-examples">Practical Decorator Examples</h2>
+
+          <h3>Timing Decorator</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import time
+from functools import wraps
+
+def timer(func):
+    """Measure and print how long a function takes to run."""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        elapsed = time.perf_counter() - start
+        print(f"{func.__name__} finished in {elapsed:.4f}s")
+        return result
+    return wrapper
+
+@timer
+def slow_sum(n):
+    return sum(range(n))
+
+total = slow_sum(10_000_000)
+print(f"Sum: {total}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+slow_sum finished in 0.2831s
+Sum: 49999995000000
+          </div>
+
+          <h3>Logging Decorator</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import logging
+from functools import wraps
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
+def log_calls(func):
+    """Log every call to the decorated function with args and return value."""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        arg_str = ", ".join(
+            [repr(a) for a in args] +
+            [f"{k}={v!r}" for k, v in kwargs.items()]
+        )
+        logging.info("Calling %s(%s)", func.__name__, arg_str)
+        result = func(*args, **kwargs)
+        logging.info("%s returned %r", func.__name__, result)
+        return result
+    return wrapper
+
+@log_calls
+def add(a, b):
+    return a + b
+
+@log_calls
+def greet(name, greeting="Hello"):
+    return f"{greeting}, {name}!"
+
+add(3, 4)
+greet("Alice", greeting="Hi")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+INFO: Calling add(3, 4)
+INFO: add returned 7
+INFO: Calling greet('Alice', greeting='Hi')
+INFO: greet returned 'Hi, Alice!'
+          </div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="decorators-with-args">Decorators with Arguments</h2>
+          <p>To pass arguments to a decorator you need one more level of nesting: a function that receives the arguments and returns the actual decorator:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from functools import wraps
+
+def repeat(times):
+    """Run the decorated function 'times' number of times."""
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for _ in range(times):
+                result = func(*args, **kwargs)
+            return result
+        return wrapper
+    return decorator
+
+@repeat(3)
+def say_hello(name):
+    print(f"Hello, {name}!")
+
+say_hello("World")
+
+# Another example: retry on exception
+def retry(times=3, exceptions=(Exception,)):
+    """Retry the function up to 'times' times if one of 'exceptions' is raised."""
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            last_error = None
+            for attempt in range(1, times + 1):
+                try:
+                    return func(*args, **kwargs)
+                except exceptions as e:
+                    last_error = e
+                    print(f"Attempt {attempt}/{times} failed: {e}")
+            raise last_error
+        return wrapper
+    return decorator
+
+import random
+
+@retry(times=4, exceptions=(ConnectionError,))
+def unstable_fetch():
+    if random.random() < 0.7:
+        raise ConnectionError("Network unavailable")
+    return "data"</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Hello, World!
+Hello, World!
+Hello, World!
+          </div>
+
+          <h2 id="stacking">Stacking Multiple Decorators</h2>
+          <p>You can apply several decorators to a single function. They are applied <strong>bottom-up</strong> at decoration time, but execute <strong>top-down</strong> at call time:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from functools import wraps
+
+def bold(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        return f"&lt;b&gt;{func(*args, **kwargs)}&lt;/b&gt;"
+    return wrapper
+
+def italic(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        return f"&lt;i&gt;{func(*args, **kwargs)}&lt;/i&gt;"
+    return wrapper
+
+@bold        # applied second (outer)
+@italic      # applied first (inner)
+def greet(name):
+    return f"Hello, {name}"
+
+# Equivalent to: greet = bold(italic(greet))
+print(greet("Alice"))   # &lt;b&gt;&lt;i&gt;Hello, Alice&lt;/i&gt;&lt;/b&gt;</code></pre>
+          </div>
+
+          <h2 id="class-decorators">Class Decorators</h2>
+          <p>A class can be used as a decorator if it implements <code>__init__</code> and <code>__call__</code>. This is useful when your decorator needs to maintain state:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from functools import wraps
+
+class CallCounter:
+    """Decorator that counts how many times a function has been called."""
+    def __init__(self, func):
+        wraps(func)(self)   # copy metadata
+        self.func = func
+        self.count = 0
+
+    def __call__(self, *args, **kwargs):
+        self.count += 1
+        print(f"[{self.func.__name__}] call #{self.count}")
+        return self.func(*args, **kwargs)
+
+@CallCounter
+def process(item):
+    return f"Processed: {item}"
+
+process("apple")
+process("banana")
+process("cherry")
+print(f"Total calls: {process.count}")</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+[process] call #1
+[process] call #2
+[process] call #3
+Total calls: 3
+          </div>
+
+          <h2 id="builtin-decorators">Built-in Decorators: @property, @staticmethod, @classmethod</h2>
+          <p>Python ships with three widely-used built-in decorators for class design:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class Temperature:
+    def __init__(self, celsius):
+        self._celsius = celsius
+
+    # @property: access a method like an attribute (getter)
+    @property
+    def celsius(self):
+        return self._celsius
+
+    # @&lt;property&gt;.setter: validate on assignment
+    @celsius.setter
+    def celsius(self, value):
+        if value < -273.15:
+            raise ValueError("Temperature below absolute zero!")
+        self._celsius = value
+
+    # Computed property — no setter needed
+    @property
+    def fahrenheit(self):
+        return self._celsius * 9/5 + 32
+
+    # @classmethod: receives the class (cls) instead of the instance
+    @classmethod
+    def from_fahrenheit(cls, f):
+        return cls((f - 32) * 5/9)
+
+    # @staticmethod: no access to instance or class, just a utility
+    @staticmethod
+    def absolute_zero():
+        return -273.15
+
+    def __repr__(self):
+        return f"Temperature({self._celsius}°C)"
+
+t = Temperature(100)
+print(t.celsius)       # 100
+print(t.fahrenheit)    # 212.0
+
+t.celsius = 25
+print(t.fahrenheit)    # 77.0
+
+body = Temperature.from_fahrenheit(98.6)
+print(body)            # Temperature(37.0°C)
+
+print(Temperature.absolute_zero())  # -273.15</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+100
+212.0
+77.0
+Temperature(37.0°C)
+-273.15
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Decorator</th><th>First parameter</th><th>Use case</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>@property</code></td><td><code>self</code></td><td>Computed attributes, validation on set</td></tr>
+                <tr><td><code>@classmethod</code></td><td><code>cls</code></td><td>Alternative constructors, factory methods</td></tr>
+                <tr><td><code>@staticmethod</code></td><td>none</td><td>Utility functions that belong to the class namespace</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="caching">Caching with @functools.lru_cache and @functools.cache</h2>
+          <p>Python's standard library ships with ready-made memoization decorators that can dramatically speed up recursive or expensive functions:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from functools import lru_cache, cache
+import time
+
+# Without caching — exponential time
+def fib_slow(n):
+    if n < 2:
+        return n
+    return fib_slow(n - 1) + fib_slow(n - 2)
+
+# With lru_cache — linear time, bounded cache
+@lru_cache(maxsize=128)
+def fib_fast(n):
+    if n < 2:
+        return n
+    return fib_fast(n - 1) + fib_fast(n - 2)
+
+# @cache (Python 3.9+) — unbounded, simpler
+@cache
+def fib_cached(n):
+    if n < 2:
+        return n
+    return fib_cached(n - 1) + fib_cached(n - 2)
+
+start = time.perf_counter()
+print(fib_fast(40))
+print(f"Cached: {time.perf_counter() - start:.6f}s")
+
+# Inspect cache statistics
+print(fib_fast.cache_info())   # CacheInfo(hits=38, misses=41, maxsize=128, currsize=41)</code></pre>
+          </div>
+
+          <h2 id="auth-example">Real-World: Authentication Decorator</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from functools import wraps
+
+# Simulated user session
+_current_user = {"username": "alice", "roles": ["editor"]}
+
+def require_role(*roles):
+    """Decorator factory: restrict access to users with one of the given roles."""
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            user_roles = _current_user.get("roles", [])
+            if not any(r in user_roles for r in roles):
+                raise PermissionError(
+                    f"User '{_current_user['username']}' needs one of: {roles}"
+                )
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+@require_role("admin")
+def delete_database():
+    return "Database deleted!"
+
+@require_role("editor", "admin")
+def publish_article(title):
+    return f"'{title}' published."
+
+try:
+    delete_database()
+except PermissionError as e:
+    print(f"Access denied: {e}")
+
+print(publish_article("Decorators in Python"))  # Alice is an editor</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+Access denied: User 'alice' needs one of: ('admin',)
+'Decorators in Python' published.
+          </div>
+
+          <h2 id="deep-desugar">Decorators, Unwrapped: What <code>@</code> Actually Does</h2>
+          <p>A decorator is just syntactic sugar. These two snippets are <strong>identical</strong>:</p>
+          <pre><code class="language-python">@timer
+def work(): ...
+
+# is exactly the same as:
+def work(): ...
+work = timer(work)</code></pre>
+          <p>So <code>timer</code> is simply a function that takes a function and returns a (usually wrapping) function. Here's a complete, real one that measures runtime:</p>
+          <pre><code class="language-python">import functools, time
+
+def timer(func):
+    @functools.wraps(func)            # keep name/docstring of func
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        print(f"{func.__name__} took {time.perf_counter()-start:.4f}s")
+        return result
+    return wrapper</code></pre>
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Always use <code>functools.wraps</code></strong>
+              <p>Without it, <code>work.__name__</code> becomes <code>"wrapper"</code> and the docstring vanishes, which breaks debugging, logging, and tools that introspect functions. It's one line and saves real headaches.</p>
+            </div>
+          </div>
+          <h3>Decorators that take arguments need three layers</h3>
+          <p>When you write <code>@retry(times=3)</code>, the outer call runs first and must <em>return a decorator</em>:</p>
+          <pre><code class="language-python">def retry(times):                     # 1) takes the arg
+    def decorator(func):              # 2) takes the function
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs): # 3) does the work
+            for attempt in range(times):
+                try:
+                    return func(*args, **kwargs)
+                except Exception:
+                    if attempt == times - 1:
+                        raise
+        return wrapper
+    return decorator</code></pre>
+          <p>Read it inside-out: <code>retry(3)</code> returns <code>decorator</code>, which is then applied to your function — the same <code>func = decorator(func)</code> pattern, one level up.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Write a <code>@validate_types</code> decorator that checks the types of all arguments against the function's type hints. If any argument doesn't match, raise a <code>TypeError</code> with a clear message. Test it on a function like <code>def add(a: int, b: int) -> int</code>.</p>
+            <p><em>Hint:</em> use <code>import inspect; inspect.signature(func).parameters</code> and <code>func.__annotations__</code>.</p>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a <code>@rate_limit(calls, period)</code> decorator that allows at most <code>calls</code> invocations within any <code>period</code>-second window. If the limit is exceeded, raise a <code>RateLimitError</code>. Use a <code>collections.deque</code> to track call timestamps. Test it with <code>@rate_limit(3, 10)</code> — no more than 3 calls per 10 seconds.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Decorators are functions that wrap other functions to add behaviour without changing the original code.</li>
+              <li><code>@decorator</code> is syntactic sugar for <code>func = decorator(func)</code>.</li>
+              <li>Always use <code>@functools.wraps</code> inside a decorator to preserve the wrapped function's metadata.</li>
+              <li>To pass arguments to a decorator, add one more level of nesting (a factory function).</li>
+              <li>Multiple decorators stack bottom-up but execute top-down.</li>
+              <li>Class-based decorators implement <code>__init__</code> and <code>__call__</code>; they are ideal when state is needed.</li>
+              <li>Built-in decorators: <code>@property</code> (computed attributes), <code>@classmethod</code> (factory methods), <code>@staticmethod</code> (utilities).</li>
+              <li><code>@functools.lru_cache</code> and <code>@functools.cache</code> provide ready-made memoization.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a decorator in Python? What problem does it solve?</li>
+            <li>What does the <code>@</code> syntax actually do under the hood?</li>
+            <li>Why is <code>functools.wraps</code> important and what does it do?</li>
+            <li>How do you write a decorator that accepts its own arguments?</li>
+            <li>What is the difference between a function decorator and a class decorator?</li>
+            <li>When are decorators applied — at definition time or at call time?</li>
+            <li>What is the difference between <code>@staticmethod</code> and <code>@classmethod</code>?</li>
+            <li>What does <code>@property</code> do, and why is it preferred over getters/setters?</li>
+            <li>How does <code>@lru_cache</code> work? What does LRU stand for?</li>
+            <li>When would you use a class-based decorator instead of a function-based one?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/oop/magic-methods.html" class="topic-tag">✨ Magic Methods</a>
+            <a href="/python/advanced/generators.html" class="topic-tag">⚙️ Generators</a>
+            <a href="/python/oop/inheritance.html" class="topic-tag">🧬 Inheritance</a>
+            <a href="/python/intermediate/exception-handling.html" class="topic-tag">🛡️ Exception Handling</a>
+            <a href="/python/functions/closures.html" class="topic-tag">🔒 Closures</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Are decorators applied every time a function is called? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Decorators are applied <strong>once at definition time</strong>, when Python encounters the <code>@</code> line. After that, every call goes through the wrapper function, but the decoration itself only runs once. This is why decorators are efficient for one-time setup like caching.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I remove a decorator from a function after it's applied? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not directly — once the function is replaced by the wrapper, the original is only accessible if you saved a reference to it. A common pattern is to expose the original via a <code>wrapper.__wrapped__</code> attribute, which <code>functools.wraps</code> sets automatically.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between a decorator and a mixin? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Decorators add behaviour to individual functions or classes at definition time, without using inheritance. Mixins add behaviour to classes via multiple inheritance. Decorators are more composable for function-level concerns (timing, auth, caching); mixins are better for adding a family of methods to a class hierarchy.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can a decorator modify the arguments passed to the original function? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Because the wrapper receives <code>*args</code> and <code>**kwargs</code> before passing them along, it can inspect, modify, filter, or augment them. This is how input-validation decorators and dependency-injection frameworks work.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/oop/quiz.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+          <a href="/python/advanced/generators.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Generators</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

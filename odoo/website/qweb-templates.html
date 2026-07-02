@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QWeb Templates for Website Pages – Odoo Web Layer | ylearner</title>
+  <meta name="description" content="Write QWeb templates for Odoo website pages. Learn t-call, t-if, t-foreach, t-field vs t-out, inheritance with xpath, and the website.layout wrapper.">
+  <meta name="keywords" content="Odoo QWeb templates, t-call website.layout, t-foreach, t-if, t-field, QWeb xpath inheritance, Odoo 19 website templates">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/website/qweb-templates.html">
+  <meta property="og:title" content="QWeb Templates for Website Pages – Odoo Web Layer">
+  <meta property="og:description" content="Write QWeb templates for Odoo website pages. Learn t-call, t-if, t-foreach, t-field vs t-out, inheritance with xpath, and the website.layout wrapper.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/website/qweb-templates.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="QWeb Templates for Website Pages – Odoo Web Layer | ylearner">
+  <meta name="twitter:description" content="Write QWeb templates for Odoo website pages with t-call, t-foreach, xpath inheritance, and website.layout.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "QWeb Templates for Website Pages – Odoo Web Layer",
+    "description": "Write QWeb templates for Odoo website pages. Learn t-call, t-if, t-foreach, t-field vs t-out, inheritance with xpath, and the website.layout wrapper.",
+    "educationalLevel": "Intermediate",
+    "keywords": "QWeb templates, website.layout, t-call, t-foreach, xpath, t-field, t-out",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/website/website-overview.html">Website Development</a><span class="separator">›</span>
+          <span class="current">QWeb Templates</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">💻 Website Development</div>
+          <h1>QWeb Templates for Website Pages</h1>
+          <p class="lesson-intro">QWeb is Odoo's XML-based templating engine. Website pages use QWeb templates stored as <code>ir.ui.view</code> records. Templates inherit from <code>website.layout</code>, use <code>t-</code> directives for logic, and can be extended at specific points using xpath expressions.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="deep-webqweb">QWeb Templates for the Website</h2>
+          <p>Website pages are QWeb templates — XML with <code>t-</code> directives — rendered server-side into HTML. The same QWeb engine powers reports and the portal, so learning it once pays off across Odoo.</p>
+          <pre><code class="language-xml">&lt;template id="product_page" name="Product Page"&gt;
+  &lt;t t-call="website.layout"&gt;              &lt;!-- reuse site header/footer --&gt;
+    &lt;div class="container"&gt;
+      &lt;h1 t-field="product.name"/&gt;          &lt;!-- t-field = formatted value --&gt;
+      &lt;p t-esc="product.description"/&gt;       &lt;!-- t-esc = escaped text --&gt;
+      &lt;t t-if="product.in_stock"&gt;In stock&lt;/t&gt;
+    &lt;/div&gt;
+  &lt;/t&gt;
+&lt;/template&gt;</code></pre>
+          <table>
+            <thead><tr><th>Directive</th><th>Does</th></tr></thead>
+            <tbody>
+              <tr><td><code>t-call="website.layout"</code></td><td>wrap in the site's theme/shell</td></tr>
+              <tr><td><code>t-field</code></td><td>output a value with its formatting</td></tr>
+              <tr><td><code>t-esc</code></td><td>output escaped text</td></tr>
+              <tr><td><code>t-foreach</code> / <code>t-if</code></td><td>loop / condition</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Server-side rendering:</strong> unlike a client framework, website QWeb runs on the server — the controller queries data, passes it to the template, and Odoo returns finished HTML. This is good for SEO (crawlers see real content) and works without JavaScript. <strong><code>t-call="website.layout"</code> is the key habit:</strong> it wraps your content in the site's header, footer, menus, and theme, so custom pages look native automatically — never build a full page from scratch. <strong><code>t-field</code> vs <code>t-esc</code>:</strong> use <code>t-field</code> for record values that need formatting (prices with currency, dates in locale, rich-text HTML fields) — it also enables in-place editing in the website editor; use <code>t-esc</code> for plain escaped text. <strong>Security:</strong> prefer <code>t-esc</code>/<code>t-field</code> (escaped) over <code>t-out</code> (raw HTML) for any user-supplied data, or you risk XSS on a public page. <strong>Data comes from the controller</strong> via <code>request.render(template, {values})</code>. <strong>Extend, don't copy:</strong> customize existing templates with <code>xpath</code> inheritance so Odoo upgrades don't overwrite your changes.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create a frontend QWeb template.</li>
+              <li>Reuse one with <code>t-call</code>.</li>
+              <li>Output data with <code>t-field</code>/<code>t-esc</code>.</li>
+              <li>Loop with <code>t-foreach</code>.</li>
+              <li>Inherit a template with <code>xpath</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a frontend QWeb template that renders a list of records passed from a controller, using <code>t-foreach</code> and <code>t-esc</code>, and inherit an existing template with <code>xpath</code>. Explain the difference between frontend QWeb (website) and report QWeb (PDF).</p>
+          </div>
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>QWeb template structure and how to register templates in XML</li>
+              <li>Using <code>website.layout</code> as the base wrapper</li>
+              <li>Core <code>t-</code> directives: <code>t-if</code>, <code>t-foreach</code>, <code>t-call</code>, <code>t-set</code></li>
+              <li>Difference between <code>t-field</code>, <code>t-out</code>, and <code>t-esc</code></li>
+              <li>Template inheritance with <code>xpath</code></li>
+            </ul>
+          </div>
+
+          <h2 id="template-registration">Registering a Template</h2>
+          <p>Templates live in your module's <code>views/</code> directory and are loaded via <code>__manifest__.py</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- views/website_books_templates.xml --&gt;
+&lt;odoo&gt;
+  &lt;template id="website_books_listing" name="Books Listing"&gt;
+    &lt;t t-call="website.layout"&gt;
+      &lt;t t-set="title"&gt;Our Library&lt;/t&gt;
+
+      &lt;div class="container"&gt;
+        &lt;h1&gt;Books&lt;/h1&gt;
+        &lt;div class="row"&gt;
+          &lt;t t-foreach="books" t-as="book"&gt;
+            &lt;div class="col-md-4"&gt;
+              &lt;h3&gt;&lt;t t-out="book.name"/&gt;&lt;/h3&gt;
+              &lt;p&gt;&lt;t t-out="book.author"/&gt;&lt;/p&gt;
+            &lt;/div&gt;
+          &lt;/t&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/t&gt;
+  &lt;/template&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+          <p>The template key is <code>my_module.website_books_listing</code>. In your controller: <code>request.render('my_module.website_books_listing', {'books': books})</code>.</p>
+
+          <h2 id="website-layout">website.layout – The Base Wrapper</h2>
+          <p><code>t-call="website.layout"</code> wraps your content with the full website page structure: header, footer, theme CSS/JS, language selector, and edit toolbar (when logged in as publisher). Always use it for website pages.</p>
+          <p>Named slots you can fill via <code>t-set</code>:</p>
+          <table>
+            <thead><tr><th>Slot</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td>title</td><td>Page &lt;title&gt; tag content</td></tr>
+              <tr><td>meta_description</td><td>Meta description override</td></tr>
+              <tr><td>head</td><td>Additional &lt;head&gt; content (CSS, meta tags)</td></tr>
+              <tr><td>website_form_object_model</td><td>Used by website forms for SPAM protection</td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="t-directives">Core t- Directives</h2>
+          <p><strong>t-if / t-elif / t-else</strong> — conditional rendering:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (QWeb)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;t t-if="book.available_copies &gt; 0"&gt;
+  &lt;span class="badge bg-success"&gt;Available&lt;/span&gt;
+&lt;/t&gt;
+&lt;t t-else=""&gt;
+  &lt;span class="badge bg-danger"&gt;Unavailable&lt;/span&gt;
+&lt;/t&gt;</code></pre>
+          </div>
+          <p><strong>t-foreach / t-as</strong> — loops:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (QWeb)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;t t-foreach="books" t-as="book"&gt;
+  &lt;!-- book_index: 0-based index --&gt;
+  &lt;!-- book_first: True on first iteration --&gt;
+  &lt;!-- book_last: True on last iteration --&gt;
+  &lt;div t-attf-class="book-card #{book_first and 'first' or ''}"&gt;
+    &lt;t t-out="book.name"/&gt;
+  &lt;/div&gt;
+&lt;/t&gt;</code></pre>
+          </div>
+          <p><strong>t-set</strong> — define a variable:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (QWeb)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;t t-set="page_title"&gt;Library – &lt;t t-out="book.name"/&gt;&lt;/t&gt;
+&lt;title&gt;&lt;t t-out="page_title"/&gt;&lt;/title&gt;</code></pre>
+          </div>
+
+          <h2 id="t-field-vs-t-out">t-field vs t-out vs t-esc</h2>
+          <table>
+            <thead><tr><th>Directive</th><th>Purpose</th><th>Escaping</th></tr></thead>
+            <tbody>
+              <tr><td>t-field</td><td>Render Odoo field with widget formatting; also enables inline editing by website publisher</td><td>Yes (handled by widget)</td></tr>
+              <tr><td>t-out</td><td>Render any Python expression; HTML is rendered as-is (use for trusted HTML)</td><td>No — HTML rendered raw</td></tr>
+              <tr><td>t-esc</td><td>Render any Python expression, HTML-escaped (plain text)</td><td>Yes — safe for user input</td></tr>
+            </tbody>
+          </table>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (QWeb)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Renders field with Odoo formatting (date, currency, etc.) --&gt;
+&lt;span t-field="book.publish_date"/&gt;
+
+&lt;!-- Renders HTML content from a fields.Html field --&gt;
+&lt;div t-out="book.description"/&gt;
+
+&lt;!-- Safe for user-supplied strings (escapes &lt;&gt;&amp;) --&gt;
+&lt;span t-esc="user_input"/&gt;</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="template-inheritance">Template Inheritance with xpath</h2>
+          <p>Extend an existing template without copying it by using <code>inherit_id</code> and <code>xpath</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;template id="website_books_listing_extend"
+          inherit_id="my_module.website_books_listing"
+          name="Books – Add Category Filter"&gt;
+  &lt;!-- Insert before the h1 --&gt;
+  &lt;xpath expr="//h1" position="before"&gt;
+    &lt;div class="category-filter"&gt;
+      &lt;a href="/books"&gt;All&lt;/a&gt;
+      &lt;t t-foreach="categories" t-as="cat"&gt;
+        &lt;a t-attf-href="/books?category=#{cat.id}"&gt;
+          &lt;t t-out="cat.name"/&gt;
+        &lt;/a&gt;
+      &lt;/t&gt;
+    &lt;/div&gt;
+  &lt;/xpath&gt;
+
+  &lt;!-- Replace a specific element --&gt;
+  &lt;xpath expr="//div[@class='row']" position="replace"&gt;
+    &lt;div class="row g-4"&gt;...&lt;/div&gt;
+  &lt;/xpath&gt;
+&lt;/template&gt;</code></pre>
+          </div>
+          <p><code>position</code> values: <code>before</code>, <code>after</code>, <code>inside</code> (appends children), <code>replace</code>, <code>attributes</code>.</p>
+
+          <h2 id="t-att-and-t-attf">Dynamic Attributes – t-att and t-attf</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (QWeb)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- t-att-{name}: Python expression --&gt;
+&lt;a t-att-href="'/books/' + slug(book)"&gt;&lt;t t-out="book.name"/&gt;&lt;/a&gt;
+
+&lt;!-- t-attf-{name}: f-string style with #{} interpolation --&gt;
+&lt;div t-attf-class="book-card #{book.available and 'available' or 'unavailable'}"&gt;
+  ...
+&lt;/div&gt;</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Always wrap website page templates with <code>t-call="website.layout"</code></li>
+              <li>Use <code>t-field</code> for Odoo model fields — it enables inline editing by website publishers</li>
+              <li>Use <code>t-esc</code> for user-supplied strings; <code>t-out</code> only for trusted HTML</li>
+              <li>Extend templates with <code>inherit_id</code> + <code>xpath</code> instead of copying</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is QWeb on the frontend?</li>
+            <li>What does <code>t-call</code> do?</li>
+            <li>How do you loop in a QWeb template?</li>
+            <li>How do you inherit a website template?</li>
+            <li>How does frontend QWeb differ from report QWeb?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/website/website-controllers.html" class="topic-tag odoo-topic-tag">💻 Website Controllers</a>
+              <a href="/odoo/website/website-forms.html" class="topic-tag odoo-topic-tag">💻 Website Forms</a>
+              <a href="/odoo/website/snippets.html" class="topic-tag odoo-topic-tag">💻 Website Snippets</a>
+              <a href="/odoo/backend/qweb-reports.html" class="topic-tag odoo-topic-tag">🐍 QWeb Reports</a>
+            </div>
+          </section>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">When should I use t-field vs t-out for record data? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>t-field</code> when you want Odoo's built-in formatting (currency symbols, date formatting, many2one display names) and when you want website publishers to edit content inline. Use <code>t-out</code> when you are rendering raw HTML from a <code>fields.Html</code> field or building a custom string in the controller. Never use <code>t-out</code> with user-supplied text — use <code>t-esc</code> instead.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I pass additional context to a t-call sub-template? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>t-set</code> inside the <code>t-call</code> block. Variables set this way are scoped to the called template: <code>&lt;t t-call="my_module.sub_template"&gt;&lt;t t-set="extra_var" t-value="42"/&gt;&lt;/t&gt;</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does xpath not match my element? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>XPath expressions must match exactly. Common issues: class attribute order matters in XPath (<code>[@class='foo bar']</code> won't match <code>class="bar foo"</code>), so prefer matching by <code>id</code> or <code>t-attf-id</code>. Use <code>//div[hasclass('my-class')]</code> for class-based selection (Odoo extends XPath with <code>hasclass()</code>).</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a href="/odoo/website/website-controllers.html" class="lesson-nav-link">
+        <span class="nav-label">← Prev</span>
+        <span class="nav-title">Website Controllers</span>
+        </a>
+        <a href="/odoo/website/website-forms.html" class="lesson-nav-link next">
+        <span class="nav-label">Next →</span>
+        <span class="nav-title">Website Forms</span>
+        </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

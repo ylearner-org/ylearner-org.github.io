@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Constructors – __init__ Method Explained | ylearner | ylearner</title>
+  <meta name="description" content="Learn Python constructors: the __init__ method, self parameter, default arguments, __new__ vs __init__, chaining constructors, and class initialisation patterns.">
+  <meta name="keywords" content="python constructor, python __init__, python self, python class constructor, python object initialisation">
+  <link rel="canonical" href="https://ylearner.org/python/oop/constructors.html">
+  <meta property="og:title" content="Python Constructors – __init__ Method Explained | ylearner">
+  <meta property="og:description" content="Learn Python constructors: the __init__ method, self parameter, default arguments, __new__ vs __init__, chaining constructors, and class initialisation patterns.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/oop/constructors.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Constructors – __init__ Method Explained | ylearner">
+  <meta name="twitter:description" content="Learn Python constructors: the __init__ method, self parameter, default arguments, __new__ vs __init__, chaining constructors, and class initialisation patterns.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Constructors – __init__ and Object Initialisation","description":"Learn Python constructors: the __init__ method, self parameter, default arguments, __new__ vs __init__, chaining constructors, and class initialisation patterns.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/oop/classes.html">OOP</a><span class="separator">›</span><span class="current">Constructors</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🏗️ OOP</div>
+          <h1>Python Constructors – __init__ and Object Initialisation</h1>
+          <p class="lesson-intro">A constructor is special method that runs automatically when an object is created. In Python, the constructor is <code>__init__()</code>. It sets up the initial state of an object by assigning values to instance attributes. Understanding constructors is fundamental to working with classes.</p>
+          <div class="lesson-meta"><span>⏱️ 18 min read</span><span>🎯 Intermediate</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="init">The __init__ Method</h2>
+          <p><code>__init__()</code> is called immediately after an object is created. The first parameter <code>self</code> refers to the newly created instance.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Dog:
+    def __init__(self, name, breed, age):
+        self.name = name    # Instance attribute
+        self.breed = breed
+        self.age = age
+        self.tricks = []    # Default empty list
+
+# Creating objects — __init__ runs automatically
+rex = Dog("Rex", "German Shepherd", 3)
+buddy = Dog("Buddy", "Labrador", 5)
+
+print(rex.name)   # Rex
+print(buddy.age)  # 5</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Rex
+5</div>
+
+          <h2 id="self">Understanding self</h2>
+          <p><code>self</code> is a reference to the instance being created. It is not a keyword — you could name it anything — but <code>self</code> is the universal Python convention.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Circle:
+    def __init__(self, radius):
+        self.radius = radius          # "this circle's radius"
+        self.area = 3.14 * radius**2  # Computed on creation
+
+c1 = Circle(5)
+c2 = Circle(10)
+
+print(c1.radius, c1.area)   # 5 78.5
+print(c2.radius, c2.area)   # 10 314.0</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>5 78.5
+10 314.0</div>
+
+          <h2 id="defaults">Default Constructor Arguments</h2>
+          <p>Use default values for optional attributes.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class User:
+    def __init__(self, username, email, role="user", active=True):
+        self.username = username
+        self.email = email
+        self.role = role
+        self.active = active
+
+admin = User("alice", "alice@example.com", role="admin")
+guest = User("bob", "bob@example.com")
+
+print(admin.role)   # admin
+print(guest.role)   # user (default)</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>admin
+user</div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="validation">Validation in __init__</h2>
+          <p>Validate arguments inside __init__ to prevent invalid objects from being created.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class BankAccount:
+    def __init__(self, owner, balance=0):
+        if not owner:
+            raise ValueError("Owner name required")
+        if balance < 0:
+            raise ValueError("Balance cannot be negative")
+        self.owner = owner
+        self.balance = balance
+
+try:
+    bad = BankAccount("", -100)
+except ValueError as e:
+    print(f"Error: {e}")
+
+good = BankAccount("Alice", 1000)
+print(f"{good.owner}: ${good.balance}")</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Error: Owner name required
+Alice: $1000</div>
+
+          <h2 id="class-vs-instance">Class Attributes vs Instance Attributes</h2>
+          <p>Class attributes are shared across all instances. Instance attributes are unique per object.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Employee:
+    company = "Algorid"   # Class attribute
+    employee_count = 0
+
+    def __init__(self, name, salary):
+        self.name = name          # Instance attribute
+        self.salary = salary
+        Employee.employee_count += 1  # Modify class attr
+
+e1 = Employee("Alice", 75000)
+e2 = Employee("Bob", 80000)
+
+print(e1.company)          # Algorid (class attr)
+print(Employee.employee_count)  # 2</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Algorid
+2</div>
+
+          <h2 id="deep-pyctor">__init__: The Constructor That Sets Up Each Instance</h2>
+          <p><code>__init__</code> runs automatically right after a new object is created, and its job is to set up that instance's starting state. <code>self</code> is the instance being built — every instance attribute hangs off it.</p>
+          <pre><code class="language-python">class Account:
+    bank = "Acme"                      # class attribute — SHARED by all instances
+
+    def __init__(self, owner, balance=0):
+        self.owner = owner             # instance attribute — unique per object
+        self.balance = balance
+
+a = Account("Ann", 100)                # __init__ runs with self=a
+b = Account("Bob")                     # balance defaults to 0</code></pre>
+          <table>
+            <thead><tr><th></th><th>Instance attribute</th><th>Class attribute</th></tr></thead>
+            <tbody>
+              <tr><td>Defined</td><td><code>self.x =</code> in <code>__init__</code></td><td>directly in the class body</td></tr>
+              <tr><td>Shared?</td><td>no — one per object</td><td>yes — one for all</td></tr>
+            </tbody>
+          </table>
+          <p><strong><code>self</code> explained:</strong> it's the first parameter of every method and refers to "this particular object." Python passes it automatically when you call <code>a.method()</code>. <strong>Instance vs class attributes:</strong> <code>self.balance</code> is unique to each account; <code>bank</code> defined in the class body is shared by all. <strong>The mutable class-attribute trap:</strong> never write <code>class C: items = []</code> as a default — that list is shared across <em>every</em> instance. Create per-instance mutable state inside <code>__init__</code> (<code>self.items = []</code>) instead. <code>__init__</code> is technically an initializer (the object already exists); the actual creation is <code>__new__</code>, which you rarely touch.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Create a <code>BankAccount</code> class:</p>
+            <ol>
+              <li>Define <code>__init__</code> that accepts <code>owner</code> and an optional <code>balance</code> defaulting to 0.</li>
+              <li>Store both as instance attributes using <code>self</code>.</li>
+              <li>Raise a <code>ValueError</code> in the constructor if the starting balance is negative.</li>
+              <li>Create two accounts and confirm they hold independent data.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a <code>Product</code> class that tracks a class attribute <code>count</code> of how many products have been created. In <code>__init__</code>, accept <code>name</code> and <code>price</code>, validate that price is positive, assign a unique <code>id</code> based on the running count, and increment the class counter. Create several products and print each one’s id to confirm the counter is shared across all instances.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>The <code>__init__</code> method initializes a new object’s attributes and runs automatically when you create an instance.</li>
+              <li><code>self</code> refers to the instance being created and must be the first parameter of instance methods.</li>
+              <li>Constructor parameters can have default values, making arguments optional.</li>
+              <li>Validation logic (e.g. raising <code>ValueError</code>) belongs in <code>__init__</code> to reject invalid objects early.</li>
+              <li>Instance attributes (<code>self.x</code>) are per-object; class attributes are shared across all instances.</li>
+              <li>Python has no method overloading — only the last <code>__init__</code> defined takes effect; use default arguments instead.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Constructors</h2>
+          <ul class="interview-list">
+            <li>What is the purpose of the <code>__init__</code> method in Python?</li>
+            <li>Is <code>__init__</code> the actual constructor? How does it differ from <code>__new__</code>?</li>
+            <li>What is <code>self</code> and why is it the first parameter of instance methods?</li>
+            <li>How do you give constructor parameters default values?</li>
+            <li>What is the difference between a class attribute and an instance attribute?</li>
+            <li>Can a Python class have more than one <code>__init__</code> method?</li>
+            <li>How do you validate arguments passed to a constructor?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/oop/classes.html" class="topic-tag">🏛️ Classes</a>
+            <a href="/python/oop/encapsulation.html" class="topic-tag">🔒 Encapsulation</a>
+            <a href="/python/oop/inheritance.html" class="topic-tag">🧬 Inheritance</a>
+            <a href="/python/oop/magic-methods.html" class="topic-tag">✨ Magic Methods</a>
+            <a href="/python/functions/parameters.html" class="topic-tag">🎛️ Parameters</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Is <code>__init__</code> really the constructor? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not exactly. <code>__new__</code> actually creates and returns the new instance; <code>__init__</code> then initializes it. For everyday classes you only override <code>__init__</code>, which is why it is commonly called the constructor.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens if I don’t define <code>__init__</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Python supplies a default constructor that takes no extra arguments and creates an empty object. You can still add attributes later, but defining <code>__init__</code> lets you require and validate initial data.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why do I have to write <code>self</code> everywhere? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Python passes the instance explicitly as the first argument to instance methods. Naming it <code>self</code> is convention. It lets each method know which object’s data it is working with.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I call one constructor from another? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A subclass constructor can call its parent’s with <code>super().__init__(...)</code>. For alternative constructors on the same class, use <code>@classmethod</code> factory methods that build and return an instance.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/oop/classes.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Classes & Objects</span></a>
+          <a href="/python/oop/inheritance.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Inheritance</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo POS Models – Extending pos.order and Custom Models | ylearner</title>
+  <meta name="description" content="Extend Odoo POS Python models: add fields to pos.order and pos.config, send custom data to the browser, and receive data back from the POS frontend.">
+  <meta name="keywords" content="Odoo POS models, pos.order, pos.config, extend POS python, POS custom fields, _get_pos_ui_data, Odoo 19 POS">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/pos/pos-models.html">
+  <meta property="og:title" content="Odoo POS Models – Extending pos.order and Custom Models">
+  <meta property="og:description" content="Extend Odoo POS Python models: add fields to pos.order and pos.config, send custom data to the browser, and receive data back from the POS frontend.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/pos/pos-models.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo POS Models – Extending pos.order and Custom Models | ylearner">
+  <meta name="twitter:description" content="Extend Odoo POS Python models, add fields to pos.order, and send custom data to the POS browser frontend.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo POS Models – Extending pos.order and Custom Models",
+    "description": "Extend Odoo POS Python models: add fields to pos.order and pos.config, send custom data to the browser, and receive data back from the POS frontend.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo POS models, pos.order, pos.config, _get_pos_ui_data, custom fields POS",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/pos/pos-architecture.html">POS Development</a><span class="separator">›</span>
+          <span class="current">POS Models</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🖥️ POS Development</div>
+          <h1>Odoo POS Models – Extending pos.order and Custom Models</h1>
+          <p class="lesson-intro">Extending the POS on the Python side means adding fields to core models like <code>pos.order</code>, <code>pos.order.line</code>, and <code>pos.config</code>, controlling what data is sent to the browser, and writing methods that the JavaScript frontend calls via RPC.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="deep-posmodels">POS Data Models: Loaded to the Browser</h2>
+          <p>The Point of Sale is offline-first: it <em>preloads</em> the data it needs (products, prices, taxes, customers) into the browser at startup so sales work without a server round-trip. The consequence for developers: adding a field the POS uses means telling it to <em>load</em> that field.</p>
+          <pre><code class="language-javascript">// tell the POS to load an extra field on product.product
+import { registry } from "@web/core/registry";
+// in POS, models declare which fields load into the browser cache
+// (via the POS store / loaded models config)
+// then access it client-side:
+this.pos.db.get_product_by_id(id).x_my_field;</code></pre>
+          <table>
+            <thead><tr><th>Concept</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td>Loaded models</td><td>data cached in the browser at POS startup</td></tr>
+              <tr><td>pos.order / orderline</td><td>the client-side sale being built</td></tr>
+              <tr><td>Server sync</td><td>completed orders pushed back to Odoo</td></tr>
+            </tbody>
+          </table>
+          <p><strong>The offline-first consequence:</strong> unlike normal Odoo screens (which query the server on demand), the POS can't do that mid-sale — the network might be down. So it loads a defined set of models and fields into the browser <em>up front</em>. If you add a custom field to <code>product.product</code> and want it available in the POS, you must extend the POS's list of loaded fields — otherwise the browser simply doesn't have it, and it reads as <code>undefined</code>. This is the #1 POS customization gotcha. <strong>Two model worlds:</strong> there are the normal Python/Postgres models <em>and</em> their JavaScript representations in the POS (the cart, order, orderlines built client-side). Logic that must run during a sale (custom pricing, discounts) has to be implemented in <em>JavaScript</em> on the POS side, not only in Python. <strong>Sync:</strong> when a sale completes, the POS creates the real <code>pos.order</code> records on the server (queuing them if offline, syncing when reconnected). <strong>Takeaway:</strong> POS development is front-end-heavy and revolves around "what data is loaded into the browser, and where does logic run" — a different mindset from backend Odoo work.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Load a backend field into POS via the data loader.</li>
+              <li>Add a field to <code>product.product</code> for POS.</li>
+              <li>Access it in the POS JS.</li>
+              <li>Note that POS reads a snapshot.</li>
+              <li>Reflect a change after reloading the session.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Expose an extra backend field to the POS frontend by adding it to the POS data loader, then read it in the POS JS models. Explain how POS loads a snapshot of backend data at session start and how to add fields to that snapshot.</p>
+          </div>
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>Adding fields to <code>pos.order</code> and <code>pos.order.line</code></li>
+              <li>Overriding <code>_get_pos_ui_data()</code> to send a custom model's data</li>
+              <li>Writing <code>_order_fields()</code> to persist custom fields from the frontend</li>
+              <li>Exposing Python methods as RPC endpoints for the POS frontend</li>
+            </ul>
+          </div>
+
+          <h2 id="extending-pos-order">Extending pos.order</h2>
+          <p>To add a custom field to a POS order (e.g., a table number or membership ID), extend <code>pos.order</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo import models, fields
+
+class PosOrder(models.Model):
+    _inherit = 'pos.order'
+
+    membership_card = fields.Char(string='Membership Card', index=True)
+    loyalty_points_earned = fields.Integer(string='Loyalty Points Earned')</code></pre>
+          </div>
+          <p>Adding the field to the model is not enough — the field also needs to be persisted when the order is created from the UI (see <code>_order_fields</code> below).</p>
+
+          <h2 id="order-fields">Saving Custom Fields: _order_fields</h2>
+          <p>When the POS frontend submits an order to <code>/pos/create_from_ui</code>, Odoo calls <code>_order_fields()</code> to extract which fields from the JSON payload to write to the database. Override it to include your custom fields:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class PosOrder(models.Model):
+    _inherit = 'pos.order'
+
+    membership_card = fields.Char(string='Membership Card')
+
+    @api.model
+    def _order_fields(self, ui_order):
+        fields = super()._order_fields(ui_order)
+        fields['membership_card'] = ui_order.get('membership_card')
+        return fields</code></pre>
+          </div>
+          <p>The <code>ui_order</code> dict is the raw JSON sent by the browser. Extract your field from it and add it to the <code>fields</code> dict returned by super().</p>
+
+          <h2 id="extending-pos-config">Extending pos.config</h2>
+          <p>Configuration fields that appear in POS settings are added to <code>pos.config</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo import models, fields
+
+class PosConfig(models.Model):
+    _inherit = 'pos.config'
+
+    enable_loyalty = fields.Boolean(
+        string='Enable Loyalty Program',
+        default=False,
+    )
+    loyalty_points_per_currency = fields.Float(
+        string='Points per Currency Unit',
+        default=1.0,
+    )</code></pre>
+          </div>
+          <p>These fields are accessible in the frontend as <code>this.env.pos.config.enable_loyalty</code> — <code>pos.config</code> is always loaded in the POS data payload.</p>
+
+          <h2 id="get-pos-ui-data">Sending Custom Model Data: _get_pos_ui_data</h2>
+          <p>Override <code>_get_pos_ui_data()</code> on <code>pos.config</code> to include a custom model in the data sent to the browser at session open:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class PosConfig(models.Model):
+    _inherit = 'pos.config'
+
+    def _get_pos_ui_data(self, params):
+        data = super()._get_pos_ui_data(params)
+
+        # Add loyalty cards to the initial data
+        data['loyalty.card'] = self.env['loyalty.card'].search_read(
+            [('company_id', '=', self.company_id.id)],
+            fields=['id', 'partner_id', 'points', 'code'],
+        )
+        return data</code></pre>
+          </div>
+          <p>The key in the returned dict (<code>'loyalty.card'</code>) is what the JavaScript frontend uses to access the data as <code>this.env.pos.db.getBy('loyalty.card', ...)</code>.</p>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="rpc-methods">Exposing Python Methods via RPC</h2>
+          <p>For operations that must hit the server in real time (validating a card, checking external inventory), expose a Python method that the JS frontend can call:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo import models, api
+
+class PosOrder(models.Model):
+    _inherit = 'pos.order'
+
+    @api.model
+    def validate_loyalty_card(self, card_code):
+        """Called from POS frontend to validate a loyalty card."""
+        card = self.env['loyalty.card'].search([
+            ('code', '=', card_code),
+        ], limit=1)
+        if not card:
+            return {'valid': False, 'message': 'Card not found.'}
+        return {
+            'valid': True,
+            'points': card.points,
+            'partner_name': card.partner_id.name,
+        }</code></pre>
+          </div>
+          <p>From JavaScript, call this method using the ORM service:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const result = await this.env.services.orm.call(
+    'pos.order',
+    'validate_loyalty_card',
+    [cardCode],
+);
+if (result.valid) {
+    console.log(`Card valid — ${result.points} points`);
+}</code></pre>
+          </div>
+
+          <h2 id="order-line-fields">Extending pos.order.line</h2>
+          <p>Custom fields on order lines follow the same pattern — extend <code>pos.order.line</code> and override <code>_order_line_fields()</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class PosOrderLine(models.Model):
+    _inherit = 'pos.order.line'
+
+    is_promotional = fields.Boolean(string='Promotional Item')
+
+    @api.model
+    def _order_line_fields(self, line, session_id=None):
+        fields = super()._order_line_fields(line, session_id)
+        fields[1]['is_promotional'] = line[1].get('is_promotional', False)
+        return fields</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Extend <code>pos.order</code> / <code>pos.order.line</code> with fields, then override <code>_order_fields()</code> / <code>_order_line_fields()</code> to persist them</li>
+              <li>Override <code>_get_pos_ui_data()</code> on <code>pos.config</code> to include your model's data in the browser payload</li>
+              <li>Expose Python methods with <code>@api.model</code> for real-time server calls from the JS frontend</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How does POS get its backend data?</li>
+            <li>How do you add a field to the POS models?</li>
+            <li>When is POS data loaded?</li>
+            <li>Why doesn’t POS see live backend changes mid-session?</li>
+            <li>What is the POS models loader?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/pos/pos-architecture.html" class="topic-tag odoo-topic-tag">🖥️ POS Architecture</a>
+              <a href="/odoo/pos/pos-ui-components.html" class="topic-tag odoo-topic-tag">🖥️ POS UI Components</a>
+              <a href="/odoo/module/models-fields.html" class="topic-tag odoo-topic-tag">🐍 Models &amp; Fields</a>
+            </div>
+          </section>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">How do I add a field to the printed receipt? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Extend the receipt QWeb template in XML: inherit <code>point_of_sale.receipt</code> and use XPath to add your field. The field must be on <code>pos.order</code> and included in the data sent to the frontend so the receipt template can access it.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When should I use _get_pos_ui_data vs a real-time RPC call? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>_get_pos_ui_data</code> for data the POS needs at startup and that doesn't change often: loyalty cards, membership tiers, store-specific price rules. Use real-time RPC for data that changes during the session or requires server-side validation: payment terminal responses, stock checks, dynamic discounts.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I add a custom table to POS (like a custom model, not pos.order)? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — include your model's data in <code>_get_pos_ui_data()</code> and register it in the JavaScript side. The POS has a client-side "database" (<code>PosDB</code>) that indexes models by ID and allows fast lookups. Register your model there to make queries from the frontend fast.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a href="/odoo/pos/pos-architecture.html" class="lesson-nav-link">
+        <span class="nav-label">← Prev</span>
+        <span class="nav-title">POS Architecture</span>
+        </a>
+        <a href="/odoo/pos/pos-ui-components.html" class="lesson-nav-link next">
+        <span class="nav-label">Next →</span>
+        <span class="nav-title">POS UI Components</span>
+        </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

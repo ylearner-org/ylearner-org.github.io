@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CREATE TABLE – Defining Tables in SQL | ylearner</title>
+  <meta name="description" content="Learn the SQL CREATE TABLE statement — how to define columns, data types, primary keys, auto-increment, and use IF NOT EXISTS. Includes a full real-world users table example.">
+  <meta name="keywords" content="SQL CREATE TABLE, SQL define table, SQL primary key, SQL auto increment, SQL IF NOT EXISTS, CREATE TABLE syntax, SQL schema design">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/tables/create-table.html">
+  <meta property="og:title" content="CREATE TABLE – Defining Tables in SQL | ylearner">
+  <meta property="og:description" content="Master the SQL CREATE TABLE statement with column definitions, primary keys, AUTO_INCREMENT, and IF NOT EXISTS. Includes MySQL, PostgreSQL, and SQLite differences.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/tables/create-table.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CREATE TABLE – Defining Tables in SQL | ylearner">
+  <meta name="twitter:description" content="Master the SQL CREATE TABLE statement with column definitions, primary keys, AUTO_INCREMENT, and IF NOT EXISTS. Includes MySQL, PostgreSQL, and SQLite differences.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"CREATE TABLE – Defining Tables in SQL","description":"Learn how to create database tables using SQL CREATE TABLE with column definitions, data types, primary keys, and auto-increment values.","educationalLevel":"Beginner","keywords":"CREATE TABLE, SQL table definition, primary key, auto increment, IF NOT EXISTS","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/tables/create-table.html">Tables &amp; Schema</a><span class="separator">›</span>
+          <span class="current">CREATE TABLE</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🏗️ Tables &amp; Schema</div>
+          <h1>CREATE TABLE – Defining Tables in SQL</h1>
+          <p class="lesson-intro"><code>CREATE TABLE</code> is the DDL (Data Definition Language) command you use to define a new table's structure — its columns, data types, and constraints. Once you run it, the table exists in the database and is ready to accept rows. This lesson walks through the full syntax, primary keys, auto-increment IDs, and how the statement differs across MySQL, PostgreSQL, and SQLite.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="create-syntax">Basic CREATE TABLE Syntax</h2>
+          <p>The minimal <code>CREATE TABLE</code> statement lists the table name followed by column definitions inside parentheses. Each column definition specifies the column name and its data type.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">CREATE TABLE table_name (
+  column1  data_type  [constraints],
+  column2  data_type  [constraints],
+  ...
+  [table_constraints]
+);</code></pre>
+          </div>
+
+          <p>A simple example — a table to store product categories:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">CREATE TABLE categories (
+  id    INT          PRIMARY KEY,
+  name  VARCHAR(100) NOT NULL
+);</code></pre>
+          </div>
+
+          <h2 id="column-definitions">Column Definitions</h2>
+          <p>Each column definition can include: the column name, its data type, and optional inline constraints such as <code>NOT NULL</code>, <code>UNIQUE</code>, and <code>DEFAULT</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">CREATE TABLE products (
+  id          INT            NOT NULL,         -- cannot be NULL
+  name        VARCHAR(200)   NOT NULL,
+  price       DECIMAL(10,2)  NOT NULL,
+  description TEXT,                            -- allows NULL by default
+  stock       INT            DEFAULT 0,        -- default value
+  sku         VARCHAR(50)    UNIQUE,           -- must be unique across rows
+  created_at  TIMESTAMP      DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+          </div>
+
+          <h2 id="primary-key">Defining a PRIMARY KEY</h2>
+          <p>A primary key uniquely identifies each row. You can declare it inline (on the column) or at the table level for composite (multi-column) primary keys.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Inline primary key (single column)
+CREATE TABLE users (
+  id    INT  PRIMARY KEY,
+  email VARCHAR(255) NOT NULL
+);
+
+-- Table-level primary key (required for composite PKs)
+CREATE TABLE order_items (
+  order_id   INT NOT NULL,
+  product_id INT NOT NULL,
+  quantity   INT NOT NULL DEFAULT 1,
+  PRIMARY KEY (order_id, product_id)   -- composite primary key
+);</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="auto-increment">AUTO_INCREMENT / SERIAL / AUTOINCREMENT</h2>
+          <p>In practice, primary key IDs are generated automatically by the database rather than supplied by the application. Each database engine has its own syntax for this.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Database</th><th>Auto-increment syntax</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>MySQL / MariaDB</td><td><code>INT PRIMARY KEY AUTO_INCREMENT</code></td></tr>
+                <tr><td>PostgreSQL (legacy)</td><td><code>SERIAL</code> (shorthand for <code>INT</code> + sequence)</td></tr>
+                <tr><td>PostgreSQL (modern)</td><td><code>INT GENERATED ALWAYS AS IDENTITY</code></td></tr>
+                <tr><td>SQLite</td><td><code>INTEGER PRIMARY KEY</code> (rowid alias — always auto-increments)</td></tr>
+                <tr><td>SQL Server</td><td><code>INT IDENTITY(1,1)</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- MySQL / MariaDB
+CREATE TABLE users (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  email VARCHAR(255) NOT NULL
+);
+
+-- PostgreSQL (modern, preferred)
+CREATE TABLE users (
+  id    INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  email VARCHAR(255) NOT NULL
+);
+
+-- PostgreSQL (legacy shorthand)
+CREATE TABLE users (
+  id    SERIAL PRIMARY KEY,
+  email VARCHAR(255) NOT NULL
+);
+
+-- SQLite
+CREATE TABLE users (
+  id    INTEGER PRIMARY KEY,   -- INTEGER (not INT) triggers rowid alias
+  email TEXT NOT NULL
+);</code></pre>
+          </div>
+
+          <h2 id="if-not-exists">IF NOT EXISTS</h2>
+          <p>Running <code>CREATE TABLE</code> on a table that already exists throws an error. The <code>IF NOT EXISTS</code> clause makes the statement a no-op if the table is already present — useful in scripts and migrations.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Without IF NOT EXISTS — errors if table already exists:
+CREATE TABLE sessions ( ... );  -- ERROR if sessions exists
+
+-- With IF NOT EXISTS — safe to run multiple times:
+CREATE TABLE IF NOT EXISTS sessions (
+  id         CHAR(36)  PRIMARY KEY,  -- UUID
+  user_id    INT       NOT NULL,
+  expires_at TIMESTAMP NOT NULL
+);</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always use IF NOT EXISTS in migration scripts</strong>
+              <p>Migration scripts are often re-run (e.g., during testing or deployment retries). Including <code>IF NOT EXISTS</code> prevents the script from crashing if a table was already created in a previous run. It is a best practice in all database migration workflows.</p>
+            </div>
+          </div>
+
+          <h2 id="full-example">Full Real-World Example</h2>
+          <p>Here is a complete <code>users</code> table that combines everything covered in this lesson:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">CREATE TABLE IF NOT EXISTS users (
+  id          INT           PRIMARY KEY AUTO_INCREMENT,
+  email       VARCHAR(255)  NOT NULL UNIQUE,
+  first_name  VARCHAR(100)  NOT NULL,
+  last_name   VARCHAR(100)  NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  role        VARCHAR(50)   NOT NULL DEFAULT 'user',
+  is_active   TINYINT(1)    NOT NULL DEFAULT 1,
+  created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP
+                              ON UPDATE CURRENT_TIMESTAMP
+);</code></pre>
+          </div>
+
+          <p>Key points in this example:</p>
+          <ul>
+            <li><code>AUTO_INCREMENT</code> means the database assigns the <code>id</code> automatically — you never insert it manually.</li>
+            <li><code>email</code> is both <code>NOT NULL</code> (required) and <code>UNIQUE</code> (no duplicates).</li>
+            <li><code>role</code> has a default value of <code>'user'</code>, so it is optional in INSERT statements.</li>
+            <li><code>updated_at</code> uses <code>ON UPDATE CURRENT_TIMESTAMP</code> (MySQL) to automatically update when the row changes.</li>
+          </ul>
+
+          <h2 id="viewing-tables">Viewing Your Tables</h2>
+          <p>After creating a table, you can inspect it with these commands:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- MySQL: list all tables in the current database
+SHOW TABLES;
+
+-- MySQL: see the CREATE TABLE statement for a table
+SHOW CREATE TABLE users;
+
+-- MySQL: describe columns
+DESCRIBE users;
+-- or:
+DESC users;
+
+-- PostgreSQL: list tables in current schema
+\dt
+
+-- PostgreSQL: describe a table
+\d users
+
+-- SQLite: list tables
+.tables
+
+-- SQLite: show create statement
+.schema users
+
+-- Standard SQL (works in most databases)
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'your_database_name';</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-createtable">CREATE TABLE: Getting the Schema Right the First Time</h2>
+          <p><code>CREATE TABLE</code> defines columns, their types, and the constraints that guard your data. Decisions here are expensive to change later, so it pays to be deliberate.</p>
+          <pre><code class="language-sql">CREATE TABLE IF NOT EXISTS orders (
+  id          SERIAL      PRIMARY KEY,          -- auto-incrementing identity
+  customer_id INT         NOT NULL REFERENCES customers(id),
+  total       NUMERIC(10,2) NOT NULL CHECK (total &gt;= 0),
+  status      TEXT        NOT NULL DEFAULT 'pending',
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);</code></pre>
+          <table>
+            <thead><tr><th>Piece</th><th>Decision</th></tr></thead>
+            <tbody>
+              <tr><td>Primary key</td><td>every table needs one — <code>SERIAL</code>/identity or <code>UUID</code></td></tr>
+              <tr><td>Types</td><td><code>NUMERIC</code> for money, <code>TIMESTAMPTZ</code> for time</td></tr>
+              <tr><td>Constraints</td><td>bake rules in (<code>NOT NULL</code>, <code>CHECK</code>, <code>REFERENCES</code>)</td></tr>
+              <tr><td><code>IF NOT EXISTS</code></td><td>makes the script safe to re-run</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Design habits:</strong> give every table a primary key (queries, joins, and updates all rely on it). Push data rules into <em>constraints</em> at creation time — a <code>CHECK (total &gt;= 0)</code> or <code>NOT NULL</code> guarantees valid data no matter what code writes to it, far safer than hoping the app validates. Add <code>DEFAULT</code>s so partial inserts still produce sensible rows. Set foreign keys to make relationships explicit and prevent orphans.</p>
+          <p>This is <strong>DDL</strong> (Data Definition Language) — it changes structure, not rows. In production, apply schema changes through versioned migration files, not ad-hoc <code>CREATE</code>/<code>ALTER</code> statements, so every environment stays in sync.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create a table with a few columns.</li>
+              <li>Add a primary key.</li>
+              <li>Mark a column <code>NOT NULL</code>.</li>
+              <li>Add a <code>DEFAULT</code> value.</li>
+              <li>Verify the structure with DESCRIBE or a SELECT.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Create a <code>users</code> table with an auto-incrementing primary key, a unique email, a NOT NULL name, and a <code>created_at</code> defaulting to the current timestamp. Explain the role of each constraint.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>CREATE TABLE</code> defines a new table with column names, data types, and constraints.</li>
+              <li>Each column can have inline constraints: <code>NOT NULL</code>, <code>UNIQUE</code>, <code>DEFAULT</code>, <code>PRIMARY KEY</code>.</li>
+              <li>Use <strong>AUTO_INCREMENT</strong> (MySQL), <strong>SERIAL</strong> or <strong>GENERATED ALWAYS AS IDENTITY</strong> (PostgreSQL), or <strong>INTEGER PRIMARY KEY</strong> (SQLite) for auto-generated IDs.</li>
+              <li><code>IF NOT EXISTS</code> prevents errors when re-running scripts and is essential in migration files.</li>
+              <li>Composite primary keys are defined at the table level: <code>PRIMARY KEY (col1, col2)</code>.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the syntax of CREATE TABLE?</li>
+            <li>How do you define a primary key?</li>
+            <li>What does NOT NULL enforce?</li>
+            <li>How do you set a default value?</li>
+            <li>What is auto-increment / serial?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/tables/data-types.html" class="topic-tag sql-topic-tag">🗄️ SQL Data Types</a>
+            <a href="/sql/tables/alter-table.html" class="topic-tag sql-topic-tag">🗄️ ALTER TABLE</a>
+            <a href="/sql/tables/constraints.html" class="topic-tag sql-topic-tag">🗄️ Constraints</a>
+            <a href="/sql/tables/drop-table.html" class="topic-tag sql-topic-tag">🗄️ DROP TABLE</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What happens if I try to CREATE TABLE with a name that already exists? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Without <code>IF NOT EXISTS</code>, the database returns an error and the statement is aborted. The existing table is not modified. With <code>IF NOT EXISTS</code>, the database silently does nothing — no error, no change to the existing table. Note that <code>IF NOT EXISTS</code> will not tell you if the schema of the existing table matches what you defined; it just checks whether the table name exists.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I create a table from the result of a SELECT query? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — this is called <code>CREATE TABLE AS SELECT</code> (CTAS). Example: <code>CREATE TABLE active_users AS SELECT * FROM users WHERE is_active = 1;</code>. The new table inherits the columns and data from the query result, but <em>not</em> the indexes, constraints, or auto-increment from the source table. It is useful for creating summary tables, snapshots, or temporary analysis tables.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between SERIAL and GENERATED ALWAYS AS IDENTITY in PostgreSQL? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>SERIAL</code> is a PostgreSQL shorthand that creates an integer column and an attached sequence — it is not SQL standard. <code>GENERATED ALWAYS AS IDENTITY</code> is the SQL:2003-standard way and is preferred in modern PostgreSQL (v10+). The key practical difference: with <code>GENERATED ALWAYS</code>, you <em>cannot</em> manually insert a value into that column without using <code>OVERRIDING SYSTEM VALUE</code>, making it stricter. Use <code>GENERATED BY DEFAULT AS IDENTITY</code> if you sometimes need to supply values (e.g., during data migrations).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should every table have a primary key? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — almost always. A primary key guarantees that every row is uniquely identifiable, which is essential for JOINs, foreign key references, updates, and deletes. Without a primary key, you can end up with duplicate rows you cannot distinguish from each other. The main exceptions are pure staging/temporary tables where you are loading raw data before cleaning. In MySQL's InnoDB engine, the primary key also acts as the clustered index, so it has a direct impact on query performance.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/tables/data-types.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">SQL Data Types</span>
+          </a>
+          <a href="/sql/tables/alter-table.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">ALTER TABLE</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

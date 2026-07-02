@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL NULL Handling – IS NULL, COALESCE, NULLIF | ylearner</title>
+  <meta name="description" content="Understand SQL NULL values and how to handle them with IS NULL, COALESCE, NULLIF, IFNULL, and NVL. Learn three-valued logic and NULL behavior in expressions and aggregates.">
+  <meta name="keywords" content="SQL NULL, IS NULL SQL, COALESCE SQL, NULLIF SQL, IFNULL SQL, NULL handling SQL, three-valued logic SQL, SQL tutorial">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/functions/null-functions.html">
+  <meta property="og:title" content="SQL NULL Handling – IS NULL, COALESCE, NULLIF | ylearner">
+  <meta property="og:description" content="Learn SQL NULL handling: IS NULL, COALESCE, NULLIF, IFNULL, three-valued logic, and NULL behavior in expressions and GROUP BY.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/functions/null-functions.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL NULL Handling – IS NULL, COALESCE, NULLIF | ylearner">
+  <meta name="twitter:description" content="Learn SQL NULL handling: IS NULL, COALESCE, NULLIF, IFNULL, three-valued logic, and NULL behavior in expressions and GROUP BY.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL NULL Handling","description":"Learn how to handle NULL values in SQL using IS NULL, COALESCE, NULLIF, IFNULL, and NVL. Understand three-valued logic and NULL behavior in expressions, aggregates, and GROUP BY.","educationalLevel":"Intermediate","keywords":"SQL NULL, IS NULL, COALESCE, NULLIF, IFNULL","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/functions/null-functions.html">Functions</a><span class="separator">›</span>
+          <span class="current">NULL Handling</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ SQL Functions</div>
+          <h1>SQL NULL Handling – IS NULL, COALESCE, NULLIF</h1>
+          <p class="lesson-intro">NULL is one of the most misunderstood concepts in SQL. It does not mean zero or empty string — it means <em>unknown</em> or <em>missing</em>. Understanding how NULL propagates through expressions, aggregates, and comparisons is essential to writing correct SQL.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="null-concept">What is NULL?</h2>
+          <p>NULL represents an unknown, missing, or inapplicable value. It is not a value itself — it is the <em>absence</em> of a value. SQL uses three-valued logic: expressions evaluate to TRUE, FALSE, or UNKNOWN (which is what you get when NULL is involved in a comparison).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Any comparison with NULL returns UNKNOWN, not TRUE or FALSE
+SELECT NULL = NULL;      -- UNKNOWN (not TRUE!)
+SELECT NULL = 0;         -- UNKNOWN
+SELECT NULL != NULL;     -- UNKNOWN
+SELECT NULL > 5;         -- UNKNOWN
+
+-- Arithmetic with NULL always returns NULL
+SELECT 5 + NULL;         -- NULL
+SELECT NULL * 100;       -- NULL
+SELECT 'Hello' || NULL;  -- NULL (PostgreSQL)
+SELECT CONCAT('Hello', NULL);  -- NULL (MySQL) or 'Hello' depending on version</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>WHERE col = NULL never matches anything</strong>
+              <p>This is the most common NULL mistake. <code>WHERE manager_id = NULL</code> will return zero rows because the comparison evaluates to UNKNOWN, which is not TRUE. Always use <code>IS NULL</code> or <code>IS NOT NULL</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="is-null-check">IS NULL and IS NOT NULL</h2>
+          <p>The only correct way to test for NULL is with <code>IS NULL</code> and <code>IS NOT NULL</code>. These are the only predicates that handle the UNKNOWN state correctly.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Find employees without a manager (top-level managers)
+SELECT employee_id, name
+FROM employees
+WHERE manager_id IS NULL;
+
+-- Find employees who have a manager assigned
+SELECT employee_id, name
+FROM employees
+WHERE manager_id IS NOT NULL;
+
+-- Find customers with missing email addresses
+SELECT customer_id, name
+FROM customers
+WHERE email IS NULL;
+
+-- Combine NULL and non-NULL checks
+SELECT *
+FROM orders
+WHERE ship_date IS NULL      -- not yet shipped
+  AND order_date < CURDATE() - INTERVAL 7 DAY;  -- ordered more than 7 days ago</code></pre>
+          </div>
+
+          <h2 id="coalesce">COALESCE()</h2>
+          <p><code>COALESCE(v1, v2, v3, ...)</code> returns the first non-NULL value from the list. It is ANSI SQL and works in all databases. Use it to substitute default values for NULLs.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT COALESCE(NULL, NULL, 'first non-null', 'ignored');  -- 'first non-null'
+SELECT COALESCE(42, 'fallback');                           -- 42
+
+-- Replace NULL bonus with 0
+SELECT
+  employee_id,
+  name,
+  salary,
+  COALESCE(bonus, 0)           AS bonus,
+  salary + COALESCE(bonus, 0)  AS total_comp
+FROM employees;
+
+-- Cascade: try phone, then mobile, then email as contact
+SELECT
+  customer_id,
+  COALESCE(phone, mobile, email, 'No contact info') AS contact
+FROM customers;
+
+-- Use COALESCE to fix NULL-propagating CONCAT
+SELECT
+  CONCAT(first_name, ' ', COALESCE(middle_name, ''), ' ', last_name) AS full_name
+FROM employees;</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="nullif">NULLIF()</h2>
+          <p><code>NULLIF(a, b)</code> returns NULL if <code>a</code> equals <code>b</code>, otherwise returns <code>a</code>. Its primary use is preventing division-by-zero errors.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT NULLIF(5, 5);    -- NULL  (values are equal)
+SELECT NULLIF(5, 3);    -- 5     (values differ, return first arg)
+SELECT NULLIF(0, 0);    -- NULL
+
+-- Prevent division by zero
+SELECT
+  product_id,
+  total_revenue,
+  units_sold,
+  total_revenue / NULLIF(units_sold, 0) AS revenue_per_unit
+FROM sales;
+-- When units_sold = 0, NULLIF returns NULL, and NULL / anything = NULL
+-- This avoids a "division by zero" error crashing the query
+
+-- Treat empty string as NULL
+SELECT NULLIF(TRIM(notes), '') AS notes
+FROM orders;  -- empty or whitespace-only notes become NULL</code></pre>
+          </div>
+
+          <h2 id="ifnull-nvl">IFNULL() and NVL()</h2>
+          <p>These are database-specific shortcuts for the common <code>COALESCE(val, fallback)</code> pattern with exactly two arguments.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- MySQL: IFNULL(value, fallback_if_null)
+SELECT IFNULL(NULL, 'default');     -- 'default'
+SELECT IFNULL('hello', 'default');  -- 'hello'
+
+SELECT IFNULL(bonus, 0) AS bonus
+FROM employees;  -- same as COALESCE(bonus, 0)
+
+-- Oracle / some others: NVL(value, fallback)
+SELECT NVL(commission, 0) FROM employees;
+
+-- PostgreSQL: no IFNULL — use COALESCE
+SELECT COALESCE(bonus, 0) AS bonus FROM employees;
+
+-- SQL Server: ISNULL(value, fallback)
+SELECT ISNULL(manager_id, 0) AS manager FROM employees;</code></pre>
+          </div>
+
+          <h2 id="null-in-expressions">NULL in GROUP BY and Ordering</h2>
+          <p>NULLs in GROUP BY form their own group — all NULL values are treated as equal for grouping purposes. In ORDER BY, NULLs sort last by default in most databases (except PostgreSQL where NULLs are last by default for DESC, first for ASC).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- NULLs form their own group in GROUP BY
+SELECT department_id, COUNT(*) AS emp_count
+FROM employees
+GROUP BY department_id;
+-- Employees with NULL department_id are grouped together as a single NULL group
+
+-- Control NULL sort order in PostgreSQL
+SELECT name, manager_id
+FROM employees
+ORDER BY manager_id NULLS LAST;    -- NULLs at bottom
+ORDER BY manager_id NULLS FIRST;   -- NULLs at top
+
+-- MySQL: NULLs sort first in ASC by default
+-- Force NULLs last in MySQL
+SELECT name, manager_id
+FROM employees
+ORDER BY manager_id IS NULL, manager_id;   -- FALSE(0) sorts before TRUE(1)</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-nullfn">NULL: the Value That Isn't Equal to Anything</h2>
+          <p>NULL means "unknown / missing," not zero and not empty string. The rule that breaks queries: <strong>NULL is never equal to anything, including another NULL.</strong> So <code>NULL = NULL</code> is not true — it's "unknown."</p>
+          <pre><code class="language-sql">SELECT NULL = NULL;     -- NULL (unknown), NOT true
+SELECT NULL + 5;        -- NULL — arithmetic with NULL is NULL
+WHERE bonus = NULL      -- ❌ matches nothing
+WHERE bonus IS NULL     -- ✅ correct</code></pre>
+          <h3>Functions that tame NULL</h3>
+          <table>
+            <thead><tr><th>Function</th><th>Does</th></tr></thead>
+            <tbody>
+              <tr><td><code>COALESCE(a, b, c)</code></td><td>first non-NULL argument</td></tr>
+              <tr><td><code>NULLIF(a, b)</code></td><td>NULL if a = b, else a</td></tr>
+              <tr><td><code>col IS NULL</code></td><td>the only way to test for NULL</td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-sql">-- show 0 instead of NULL for customers with no orders
+SELECT name, COALESCE(SUM(amount), 0) AS spent
+FROM customers LEFT JOIN orders USING (customer_id)
+GROUP BY name;
+
+-- avoid divide-by-zero: NULLIF turns 0 into NULL (→ result NULL, no error)
+SELECT total / NULLIF(count, 0) AS avg_value FROM stats;</code></pre>
+          <p><strong>Also remember:</strong> aggregates skip NULLs — <code>AVG(col)</code> ignores NULL rows entirely (which is why <code>AVG</code> ≠ <code>SUM/COUNT(*)</code> when NULLs exist). <code>COUNT(col)</code> counts non-NULLs; <code>COUNT(*)</code> counts all rows.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Replace NULL with <code>COALESCE</code>.</li>
+              <li>Use <code>IFNULL</code> or <code>NVL</code>.</li>
+              <li>Test for NULL with <code>IS NULL</code>.</li>
+              <li>Avoid divide-by-zero with <code>NULLIF</code>.</li>
+              <li>Observe how NULL behaves in arithmetic.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>On a <code>customers</code> table where <code>phone</code> may be NULL, display 'N/A' for missing phones using COALESCE, and avoid a divide-by-zero with NULLIF. Explain three-valued logic and why <code>= NULL</code> never matches.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>NULL = unknown/missing</strong> — Not zero, not empty string. Any comparison with NULL yields UNKNOWN.</li>
+              <li><strong>Three-valued logic</strong> — SQL conditions can be TRUE, FALSE, or UNKNOWN. WHERE keeps only TRUE rows.</li>
+              <li><strong>IS NULL / IS NOT NULL</strong> — The only correct way to check for NULL.</li>
+              <li><strong>COALESCE(v1, v2, ...)</strong> — Returns first non-NULL. ANSI standard, use everywhere.</li>
+              <li><strong>NULLIF(a, b)</strong> — Returns NULL when a = b. Key use: prevent division-by-zero.</li>
+              <li><strong>IFNULL() / NVL() / ISNULL()</strong> — Database-specific two-argument COALESCE alternatives.</li>
+              <li><strong>NULL in GROUP BY</strong> — NULL values group together as their own single group.</li>
+              <li><strong>Aggregates ignore NULLs</strong> — Except COUNT(*) which counts all rows.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is NULL in SQL?</li>
+            <li>How do you replace NULL values?</li>
+            <li>What is the difference between COALESCE and IFNULL?</li>
+            <li>Why does <code>column = NULL</code> not work?</li>
+            <li>What does NULLIF do?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/functions/aggregate-functions.html" class="topic-tag sql-topic-tag">🗄️ Aggregate Functions</a>
+            <a href="/sql/functions/case-expression.html" class="topic-tag sql-topic-tag">🗄️ CASE Expression</a>
+            <a href="/sql/joins/left-right-join.html" class="topic-tag sql-topic-tag">🗄️ LEFT JOIN & NULLs</a>
+            <a href="/sql/filtering/where-clause.html" class="topic-tag sql-topic-tag">🗄️ WHERE Clause</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why does NULL = NULL return UNKNOWN and not TRUE?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>NULL means "unknown value". If you compare two unknown values, you cannot determine whether they are equal — they might be the same or different. SQL follows this logic strictly: comparing NULL with anything (including itself) results in UNKNOWN, not TRUE or FALSE. That is why <code>IS NULL</code> exists as a special predicate.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between COALESCE and IFNULL?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>COALESCE</code> accepts two or more arguments and is ANSI SQL — it works in all databases. <code>IFNULL</code> is MySQL-specific and only takes exactly two arguments. Functionally, <code>IFNULL(a, b)</code> is identical to <code>COALESCE(a, b)</code>. Prefer <code>COALESCE</code> for portability and when you need more than two fallback options.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How does NOT IN behave with NULLs?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>This is a subtle trap. If the IN list contains a NULL, <code>NOT IN</code> returns no rows — because <code>x != NULL</code> is UNKNOWN, and UNKNOWN is not TRUE. For example: <code>WHERE id NOT IN (1, 2, NULL)</code> returns zero rows regardless of the data. Always filter NULLs from subqueries used with NOT IN, or use NOT EXISTS instead which handles NULLs correctly.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can a PRIMARY KEY column contain NULL?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — PRIMARY KEY columns are implicitly NOT NULL. The purpose of a primary key is to uniquely identify each row, which requires a defined (non-unknown) value. If you declare a column as PRIMARY KEY, the database will reject NULL inserts. For optional identifiers, use a UNIQUE constraint with nullable columns, but be aware that UNIQUE allows multiple NULLs in most databases (since NULL != NULL).</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/functions/aggregate-functions.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Aggregate Functions</span>
+          </a>
+          <a href="/sql/functions/case-expression.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">CASE Expression</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

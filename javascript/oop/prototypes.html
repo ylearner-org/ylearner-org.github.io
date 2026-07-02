@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Prototypes – Prototype Chain &amp; Prototypal Inheritance | ylearner</title>
+  <meta name="description" content="Deep dive into JavaScript prototypes: [[Prototype]] internal slot, prototype chain lookup, Object.prototype, __proto__, Object.getPrototypeOf, Object.create(), prototype pollution warning, and ES6 classes as syntactic sugar.">
+  <meta name="keywords" content="javascript prototype, prototype chain javascript, [[Prototype]], Object.getPrototypeOf, __proto__, Object.create javascript, hasOwnProperty javascript, prototype pollution, prototypal inheritance">
+  <link rel="canonical" href="https://ylearner.org/javascript/oop/prototypes.html">
+  <meta property="og:title" content="JavaScript Prototypes – Prototype Chain &amp; Prototypal Inheritance | ylearner">
+  <meta property="og:description" content="Deep dive into JavaScript prototypes: prototype chain lookup, Object.prototype, __proto__, Object.create(), prototype pollution, and ES6 classes as syntactic sugar.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/oop/prototypes.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Prototypes – Prototype Chain &amp; Prototypal Inheritance | ylearner">
+  <meta name="twitter:description" content="Deep dive into JavaScript prototypes: prototype chain lookup, Object.prototype, __proto__, Object.create(), prototype pollution, and ES6 classes as syntactic sugar.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/oop/classes.html">OOP</a><span class="separator">›</span>
+          <span class="current">Prototypes</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🏗️ OOP</div>
+          <h1>JavaScript Prototypes – The Prototype Chain Explained</h1>
+          <p class="lesson-intro">Every JavaScript object has a hidden <code>[[Prototype]]</code> link to another object. When you access a property that doesn't exist on an object, the engine follows this chain until it either finds the property or reaches <code>null</code>. This <em>prototype chain</em> is the true engine of all inheritance in JavaScript — ES6 classes are merely friendly syntax on top of it. This lesson demystifies the chain with ASCII diagrams, code, and practical patterns.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 21 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-prototype">What Is [[Prototype]]?</h2>
+          <p>Every object in JavaScript has an internal property called <code>[[Prototype]]</code> (double brackets indicate it's an engine-level slot, not a regular property). For regular objects created with <code>{}</code>, this slot points to <code>Object.prototype</code>. For instances created with <code>new SomeClass()</code>, it points to <code>SomeClass.prototype</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const obj = { name: 'Alice' };
+
+// Standard way to read [[Prototype]]
+const proto = Object.getPrototypeOf(obj);
+console.log(proto === Object.prototype);    // true
+
+// __proto__ is the old, non-standard accessor (still works but deprecated)
+console.log(obj.__proto__ === Object.prototype); // true
+
+// Check if a property is own (on the object itself) vs inherited
+console.log(obj.hasOwnProperty('name'));    // true  — own property
+console.log(obj.hasOwnProperty('toString')); // false — inherited from Object.prototype
+
+// Verify toString lives on Object.prototype
+console.log(Object.prototype.hasOwnProperty('toString')); // true</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>true
+true
+true
+false
+true</pre>
+          </div>
+
+          <h2 id="chain-lookup">The Prototype Chain Lookup Algorithm</h2>
+          <p>When you access <code>obj.someProperty</code>, JavaScript follows these steps:</p>
+          <ol>
+            <li>Check if <code>obj</code> has an <strong>own property</strong> named <code>someProperty</code> → if yes, return it.</li>
+            <li>Follow <code>[[Prototype]]</code> to the next object in the chain.</li>
+            <li>Repeat step 1–2 until the property is found or <code>[[Prototype]]</code> is <code>null</code>.</li>
+            <li>If <code>null</code> is reached without finding the property, return <code>undefined</code>.</li>
+          </ol>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/*
+  Chain visualisation (ASCII):
+
+  rex (Dog instance)
+  ├─ name: 'Rex'
+  ├─ breed: 'Labrador'
+  └─ [[Prototype]] → Dog.prototype
+                     ├─ bark()
+                     └─ [[Prototype]] → Animal.prototype
+                                        ├─ eat()
+                                        ├─ sleep()
+                                        └─ [[Prototype]] → Object.prototype
+                                                           ├─ toString()
+                                                           ├─ hasOwnProperty()
+                                                           └─ [[Prototype]] → null
+*/
+
+class Animal {
+  eat()   { return `${this.name} is eating`; }
+  sleep() { return `${this.name} is sleeping`; }
+}
+
+class Dog extends Animal {
+  constructor(name, breed) {
+    super();
+    this.name  = name;
+    this.breed = breed;
+  }
+  bark() { return `${this.name} says: Woof!`; }
+}
+
+const rex = new Dog('Rex', 'Labrador');
+
+// Own property lookup
+console.log(rex.hasOwnProperty('name'));   // true  — on rex itself
+
+// One level up — Dog.prototype
+console.log(rex.bark());                   // found on Dog.prototype
+
+// Two levels up — Animal.prototype
+console.log(rex.eat());                    // found on Animal.prototype
+
+// Three levels up — Object.prototype
+console.log(rex.toString());              // found on Object.prototype
+
+// Not found anywhere → undefined (not an error)
+console.log(rex.fly);                     // undefined</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>true
+Rex says: Woof!
+Rex is eating
+[object Object]
+undefined</pre>
+          </div>
+
+          <h2 id="function-prototype">Function.prototype and Constructor.prototype</h2>
+          <p>Every function object has a <code>prototype</code> property (not to be confused with <code>[[Prototype]]</code>). When you call a function with <code>new</code>, the resulting instance's <code>[[Prototype]]</code> is set to that function's <code>prototype</code> property.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function Greeter(name) {
+  this.name = name;
+}
+
+// Methods added to .prototype are shared by all instances
+Greeter.prototype.hello = function () {
+  return `Hello, I'm ${this.name}`;
+};
+
+const g1 = new Greeter('Alice');
+const g2 = new Greeter('Bob');
+
+// Both instances share the SAME hello function (not copied)
+console.log(g1.hello === g2.hello);       // true — shared reference!
+console.log(g1.hello());
+console.log(g2.hello());
+
+// Instance's [[Prototype]] equals Greeter.prototype
+console.log(Object.getPrototypeOf(g1) === Greeter.prototype); // true
+
+// Greeter.prototype's [[Prototype]] is Object.prototype
+console.log(Object.getPrototypeOf(Greeter.prototype) === Object.prototype); // true</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>true
+Hello, I'm Alice
+Hello, I'm Bob
+true
+true</pre>
+          </div>
+
+          <h2 id="object-create">Object.create() for Prototypal Inheritance</h2>
+          <p><code>Object.create(proto)</code> creates a new object whose <code>[[Prototype]]</code> is set to <code>proto</code>. This is the most direct way to set up prototypal inheritance without classes.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const vehicleProto = {
+  start()  { return `${this.make} ${this.model} engine started`; },
+  stop()   { return `${this.make} ${this.model} engine stopped`; },
+  describe() { return `${this.year} ${this.make} ${this.model}`; }
+};
+
+function createVehicle(make, model, year) {
+  const v = Object.create(vehicleProto);
+  v.make  = make;
+  v.model = model;
+  v.year  = year;
+  return v;
+}
+
+const car = createVehicle('Toyota', 'Camry', 2023);
+console.log(car.describe());
+console.log(car.start());
+console.log(Object.getPrototypeOf(car) === vehicleProto); // true
+
+// Null prototype — object with NO inherited properties
+const pure = Object.create(null);
+pure.key = 'value';
+console.log(pure.key);           // value
+console.log(pure.toString);      // undefined — no Object.prototype!</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>2023 Toyota Camry
+Toyota Camry engine started
+true
+value
+undefined</pre>
+          </div>
+
+          <h2 id="own-vs-inherited">Own vs Inherited Properties</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Method / Operator</th><th>Sees own props</th><th>Sees inherited props</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td><code>hasOwnProperty(key)</code></td><td>Yes</td><td>No</td><td>Best way to check own</td></tr>
+                <tr><td><code>Object.keys(obj)</code></td><td>Yes (enumerable)</td><td>No</td><td>Most common iteration</td></tr>
+                <tr><td><code>Object.getOwnPropertyNames(obj)</code></td><td>Yes (all)</td><td>No</td><td>Includes non-enumerable</td></tr>
+                <tr><td><code>for...in</code></td><td>Yes</td><td>Yes</td><td>Iterates full chain</td></tr>
+                <tr><td><code>in</code> operator</td><td>Yes</td><td>Yes</td><td><code>'toString' in obj</code> is true</td></tr>
+                <tr><td><code>JSON.stringify</code></td><td>Yes (enumerable)</td><td>No</td><td>Safe for serialisation</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="classes-as-sugar">Classes Are Syntactic Sugar Over Prototypes</h2>
+          <p>ES6 classes don't introduce a new inheritance model. They are convenient syntax for setting up function constructors and linking <code>.prototype</code> chains. You can verify this:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Animal {
+  constructor(name) { this.name = name; }
+  speak() { return `${this.name} makes a noise.`; }
+}
+
+class Dog extends Animal {
+  speak() { return `${this.name} barks.`; }
+}
+
+const d = new Dog('Rex');
+
+// Under the hood — prototype chain
+console.log(typeof Dog);                          // 'function' — class IS a function
+console.log(Dog.prototype.constructor === Dog);   // true
+console.log(Object.getPrototypeOf(Dog) === Animal); // true  — static chain
+console.log(Object.getPrototypeOf(Dog.prototype) === Animal.prototype); // true — instance chain
+console.log(d.speak());</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>function
+true
+true
+true
+Rex barks.</pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content"><strong>Prototype Pollution (Security Warning)</strong><p>Never allow user-controlled data to set properties via key paths like <code>obj['__proto__']['admin'] = true</code>. This is the <em>prototype pollution</em> attack: it mutates <code>Object.prototype</code> and affects every plain object in the application. Always sanitise keys and use <code>Object.create(null)</code> for lookup maps in security-sensitive code.</p></div>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>Use Object.hasOwn() in modern code</strong><p>The newer <code>Object.hasOwn(obj, key)</code> is safer than <code>obj.hasOwnProperty(key)</code> because it works even on objects created with <code>Object.create(null)</code> (which have no inherited <code>hasOwnProperty</code> method). Available in Node 16+ and all modern browsers.</p></div>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="deep-proto">The Prototype Chain: How JS Really Does Inheritance</h2>
+          <p>JavaScript has no classes under the hood — <code>class</code> is syntax sugar over <strong>prototypes</strong>. Every object has a hidden link (<code>[[Prototype]]</code>) to another object. Look up a property and JS walks that chain until it finds it or hits <code>null</code>.</p>
+          <pre><code class="language-javascript">const arr = [1, 2, 3];
+arr.map(...)   // `map` isn't on arr — found on Array.prototype
+// chain: arr → Array.prototype → Object.prototype → null</code></pre>
+          <h3><code>prototype</code> vs <code>__proto__</code> — the classic confusion</h3>
+          <table>
+            <thead><tr><th>Property</th><th>Lives on</th><th>Means</th></tr></thead>
+            <tbody>
+              <tr><td><code>Fn.prototype</code></td><td>constructor functions</td><td>the object future instances will inherit from</td></tr>
+              <tr><td><code>obj.__proto__</code></td><td>every object</td><td>the object this one actually inherits from</td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-javascript">function Dog(name) { this.name = name; }
+Dog.prototype.bark = () => "Woof";   // shared by ALL dogs, stored once
+const d = new Dog("Rex");
+d.bark();                    // Woof — found on Dog.prototype
+d.__proto__ === Dog.prototype;  // true</code></pre>
+          <p>Methods on the prototype are shared by every instance (one copy in memory), while properties set with <code>this.x</code> are per-instance.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Without using the <code>class</code> keyword, create a prototype-based inheritance chain for <code>Person → Employee → Manager</code>:</p>
+            <ul>
+              <li>Use function constructors and <code>.prototype</code> assignment for methods.</li>
+              <li>Set up the chain with <code>Object.create(Person.prototype)</code>.</li>
+              <li>Add a method to each level and verify the full chain with <code>Object.getPrototypeOf()</code>.</li>
+              <li>Then recreate the same hierarchy using ES6 <code>class</code> and confirm the runtime behaviour is identical.</li>
+            </ul>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a function <code>getFullChain(obj)</code> that returns an array of all objects in the prototype chain of <code>obj</code>, from the object itself up to (but not including) <code>null</code>. Each entry should include the constructor name and a list of own method names. Test it on a three-level class hierarchy.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Every object has a <code>[[Prototype]]</code> link; property lookups walk this chain until <code>null</code>.</li>
+              <li>Use <code>Object.getPrototypeOf(obj)</code> — not <code>obj.__proto__</code> — to inspect the chain.</li>
+              <li><code>Object.prototype</code> is at the top; it inherits from <code>null</code>.</li>
+              <li><code>hasOwnProperty</code> / <code>Object.hasOwn</code> check only the object itself, not the chain.</li>
+              <li><code>Object.create(proto)</code> creates objects with an explicit prototype — pure prototypal inheritance without classes.</li>
+              <li>ES6 classes are syntactic sugar; the runtime still uses the same prototype mechanism.</li>
+              <li>Prototype pollution is a security vulnerability — never allow arbitrary key writes to prototypes.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between <code>__proto__</code> and <code>Object.getPrototypeOf()</code>?</li>
+            <li>What is at the top of every prototype chain in JavaScript?</li>
+            <li>What does <code>Object.create(null)</code> produce and when is it useful?</li>
+            <li>How do <code>hasOwnProperty</code> and the <code>in</code> operator differ?</li>
+            <li>Are ES6 classes a different inheritance system from prototypes?</li>
+            <li>What is prototype pollution and how can you prevent it?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/javascript/oop/inheritance.html" class="topic-tag">Inheritance</a>
+            <a href="/javascript/oop/polymorphism.html" class="topic-tag">Polymorphism</a>
+            <a href="/javascript/oop/constructors.html" class="topic-tag">Constructors</a>
+            <a href="/javascript/advanced/callbacks.html" class="topic-tag">Callbacks</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between prototype and [[Prototype]]? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>Function.prototype</code> is a regular property on <em>function objects</em> that becomes the <code>[[Prototype]]</code> of instances created with <code>new</code>. <code>[[Prototype]]</code> is the internal slot on every object that forms the inheritance chain. They are related but distinct: <code>Function.prototype</code> is the source; <code>[[Prototype]]</code> is the link.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I change an object's prototype after creation? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, with <code>Object.setPrototypeOf(obj, newProto)</code>. However, this is a very slow operation because the engine must invalidate its internal optimisations. Prefer setting the prototype at creation time via <code>Object.create()</code> or the <code>class</code> syntax.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why is for...in sometimes dangerous? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>for...in</code> iterates all enumerable properties including inherited ones. If someone has polluted a prototype (e.g., added a custom property to <code>Object.prototype</code>), it will appear in every <code>for...in</code> loop. Always guard with <code>Object.hasOwn(obj, key)</code> or use <code>Object.keys()</code> instead.</p></div>
+            </div>
+          </section>
+
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/oop/polymorphism.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Polymorphism</span></a>
+          <a href="/javascript/oop/quiz.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">📝 Section Quiz</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Models and Fields – Python ORM Guide | ylearner</title>
+  <meta name="description" content="Learn how to define Odoo models and fields using the Python ORM — scalar types, relational fields, field attributes, computed fields, and a complete working model example.">
+  <meta name="keywords" content="Odoo models, Odoo fields, Odoo ORM, fields.Char, fields.Many2one, fields.One2many, fields.Many2many, computed fields, Odoo Python model, Odoo tutorial">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/module/models-fields.html">
+  <meta property="og:title" content="Odoo Models and Fields – Python ORM Guide">
+  <meta property="og:description" content="Learn how to define Odoo models and fields using the Python ORM — scalar types, relational fields, field attributes, computed fields, and a complete working model example.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/module/models-fields.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Models and Fields – Python ORM Guide | ylearner">
+  <meta name="twitter:description" content="Learn how to define Odoo models and fields using the Python ORM — scalar types, relational fields, field attributes, computed fields, and a complete working model example.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Models and Fields – Python ORM Guide",
+    "description": "Learn how to define Odoo models and fields using the Python ORM — scalar types, relational fields, field attributes, computed fields.",
+    "educationalLevel": "Beginner",
+    "keywords": "Odoo models, Odoo fields, ORM, Many2one, One2many, Many2many, computed fields",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/module/module-structure.html">Module Development</a><span class="separator">›</span>
+          <span class="current">Models &amp; Fields</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Module Development</div>
+          <h1>Odoo Models and Fields – Building Your Data Layer</h1>
+          <p class="lesson-intro">In Odoo, a <strong>model</strong> is a Python class that maps to a PostgreSQL table. Every field you define on the class becomes a column in that table. The ORM handles all SQL — you never write CREATE TABLE, INSERT, or SELECT directly. This page covers how to define models, all field types, field attributes, and how to create your first working model.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 30 min</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <!-- Section 1: Defining a Model -->
+          <h2 id="defining-a-model">Defining a Model</h2>
+          <p>A model is a Python class that inherits from <code>models.Model</code>. The class attributes starting with an underscore are class-level configuration; the rest are field definitions:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">from odoo import models, fields
+
+class LibraryBook(models.Model):
+    _name = 'library.book'            # Technical name → table: library_book
+    _description = 'Library Book'     # Human-readable, shown in UI
+    _order = 'name asc'               # Default sort order for list views
+    _rec_name = 'name'                # Field used as display name (default: 'name')
+
+    name = fields.Char(string='Title', required=True)
+    author = fields.Char(string='Author')
+    isbn = fields.Char(string='ISBN')
+    price = fields.Float(string='Price')
+    active = fields.Boolean(default=True)  # active=False archives the record</code></pre>
+          </div>
+
+          <p>Key class attributes:</p>
+          <ul>
+            <li><strong><code>_name</code></strong> — dot-notation technical name; maps to a PostgreSQL table (<code>library.book</code> → <code>library_book</code>)</li>
+            <li><strong><code>_description</code></strong> — human-readable name shown in the UI and technical menus</li>
+            <li><strong><code>_order</code></strong> — default ORDER BY clause for searches (<code>'name asc'</code>, <code>'create_date desc'</code>)</li>
+            <li><strong><code>_rec_name</code></strong> — which field is used as the record's display name in Many2one dropdowns (default: <code>name</code>)</li>
+            <li><strong><code>_inherit</code></strong> — inheritance; covered in the Model Inheritance lesson</li>
+          </ul>
+
+          <!-- Section 2: Automatic Fields -->
+          <h2 id="automatic-fields">Automatic Fields</h2>
+          <p>Odoo adds these fields to every model automatically — you never declare them:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Field</th><th>Type</th><th>Value</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>id</code></td><td>Integer</td><td>Auto-increment primary key</td></tr>
+                <tr><td><code>create_date</code></td><td>Datetime</td><td>When the record was created</td></tr>
+                <tr><td><code>create_uid</code></td><td>Many2one (<code>res.users</code>)</td><td>Who created it</td></tr>
+                <tr><td><code>write_date</code></td><td>Datetime</td><td>Last modification time</td></tr>
+                <tr><td><code>write_uid</code></td><td>Many2one (<code>res.users</code>)</td><td>Who last modified it</td></tr>
+                <tr><td><code>display_name</code></td><td>Char (computed)</td><td>Result of <code>name_get()</code> — shown in dropdowns</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- AD BLOCK -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <!-- Section 3: Scalar Field Types -->
+          <h2 id="scalar-fields">Scalar Field Types</h2>
+          <p>Scalar fields map to a single database column:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># String fields
+name = fields.Char(string='Name', size=100, required=True)
+description = fields.Text(string='Description')           # multi-line
+body_html = fields.Html(string='Content')                 # rich text
+code = fields.Char(string='Reference', default='New')
+
+# Numeric fields
+quantity = fields.Integer(string='Qty', default=0)
+price = fields.Float(string='Price', digits=(16, 2))      # (total digits, decimal places)
+amount = fields.Monetary(string='Amount',
+                         currency_field='currency_id')    # uses currency_id for symbol
+
+# Date/time fields
+start_date = fields.Date(string='Start Date')
+created_at = fields.Datetime(string='Created At')
+
+# Boolean
+active = fields.Boolean(default=True)   # used for archive/unarchive
+is_premium = fields.Boolean(string='Premium Member', default=False)
+
+# Binary (file storage)
+cover_image = fields.Binary(string='Cover Image', attachment=True)
+document = fields.Binary(string='Document', attachment=True)
+
+# Selection (dropdown with fixed choices)
+state = fields.Selection([
+    ('draft', 'Draft'),
+    ('confirmed', 'Confirmed'),
+    ('borrowed', 'Borrowed'),
+    ('returned', 'Returned'),
+    ('lost', 'Lost'),
+], string='State', default='draft', required=True)</code></pre>
+          </div>
+
+          <!-- Section 4: Relational Fields -->
+          <h2 id="relational-fields">Relational Field Types</h2>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># Many2one: foreign key — "this book has one author (a res.partner record)"
+author_id = fields.Many2one(
+    'res.partner',
+    string='Author',
+    ondelete='restrict',     # prevent deleting the partner if books reference them
+    domain=[('is_author', '=', True)],
+)
+
+# One2many: reverse FK — "this book has many copies"
+copy_ids = fields.One2many(
+    'library.book.copy',     # the target model
+    'book_id',               # the Many2one field on the target model
+    string='Copies',
+)
+
+# Many2many: junction table — "a book can have many tags; a tag can belong to many books"
+tag_ids = fields.Many2many(
+    'library.tag',
+    'library_book_tag_rel',  # junction table name (optional, auto-generated if omitted)
+    'book_id',               # column in junction table for this model
+    'tag_id',                # column in junction table for the related model
+    string='Tags',
+)</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Field</th><th>DB column</th><th>Use case</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>Many2one</code></td><td>Integer FK column</td><td>N records → 1 record (book → author)</td></tr>
+                <tr><td><code>One2many</code></td><td>No column (reverse of Many2one)</td><td>1 record → N records (book → copies)</td></tr>
+                <tr><td><code>Many2many</code></td><td>Junction table</td><td>N records → N records (books ↔ tags)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p><strong><code>ondelete</code> options for Many2one:</strong></p>
+          <ul>
+            <li><code>'cascade'</code> — delete the child record when the parent is deleted</li>
+            <li><code>'restrict'</code> — block deletion if children exist (default; safest)</li>
+            <li><code>'set null'</code> — set the FK column to NULL when the parent is deleted</li>
+          </ul>
+
+          <!-- Section 5: Field Attributes -->
+          <h2 id="field-attributes">Common Field Attributes</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Attribute</th><th>Effect</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>string='Label'</code></td><td>Field label shown in UI (default: field name formatted)</td></tr>
+                <tr><td><code>required=True</code></td><td>Cannot save with empty value</td></tr>
+                <tr><td><code>readonly=True</code></td><td>Display only; user cannot edit</td></tr>
+                <tr><td><code>store=True</code></td><td>Computed field: save result to DB column (searchable/sortable)</td></tr>
+                <tr><td><code>index=True</code></td><td>Create a DB index for faster searches</td></tr>
+                <tr><td><code>default=value</code></td><td>Default value on new record creation</td></tr>
+                <tr><td><code>default=lambda self: self.env.user</code></td><td>Dynamic default using a lambda</td></tr>
+                <tr><td><code>copy=False</code></td><td>Don't copy this field when duplicating a record</td></tr>
+                <tr><td><code>tracking=True</code></td><td>Log changes in chatter (requires <code>mail.thread</code>)</td></tr>
+                <tr><td><code>groups='base.group_user'</code></td><td>Restrict visibility to specific user groups</td></tr>
+                <tr><td><code>help='tooltip text'</code></td><td>Tooltip shown on hover in the form view</td></tr>
+                <tr><td><code>domain=[...]</code></td><td>Filter options for relational fields</td></tr>
+                <tr><td><code>context={}</code></td><td>Pass context to the related model's view</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Section 6: Computed Fields Intro -->
+          <h2 id="computed-fields-intro">Introduction to Computed Fields</h2>
+          <p>Computed fields derive their value from other fields instead of storing user input. Full coverage is in the Backend section — here is a brief introduction to the pattern:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">total_value = fields.Float(
+    string='Total Value',
+    compute='_compute_total_value',
+    store=True,    # True = saved to DB (recalculated when depends change)
+                   # False = calculated on-the-fly, not stored
+)
+
+@api.depends('price', 'quantity')
+def _compute_total_value(self):
+    for record in self:
+        record.total_value = record.price * record.quantity</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always loop over <code>self</code></strong>
+              <p>In Odoo, methods like <code>_compute_*</code> always receive a recordset — <code>self</code> can be one record or many. Always write a <code>for record in self:</code> loop; never assume <code>self</code> is a single record. This ensures your code works correctly in list operations and batch processing.</p>
+            </div>
+          </div>
+
+          <!-- Section 7: Complete Model Example -->
+          <h2 id="model-example">Complete Model Example</h2>
+          <p>Here is a full working model incorporating all common patterns covered on this page:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">from odoo import models, fields, api
+from odoo.exceptions import ValidationError
+
+class LibraryBook(models.Model):
+    _name = 'library.book'
+    _description = 'Library Book'
+    _order = 'name asc'
+    _inherit = ['mail.thread', 'mail.activity.mixin']  # adds chatter
+
+    # ── Basic fields ───────────────────────────────────────────────────────────
+    name = fields.Char(string='Title', required=True, tracking=True)
+    isbn = fields.Char(string='ISBN', size=13, index=True, copy=False)
+    author_id = fields.Many2one('res.partner', string='Author',
+                                domain=[('is_company', '=', False)])
+    publisher_id = fields.Many2one('res.partner', string='Publisher',
+                                   domain=[('is_company', '=', True)])
+    publish_date = fields.Date(string='Publish Date')
+    price = fields.Float(string='Price', digits=(16, 2))
+    currency_id = fields.Many2one('res.currency', default=lambda self: self.env.company.currency_id)
+    amount = fields.Monetary(string='Amount', currency_field='currency_id')
+
+    # ── Categorisation ─────────────────────────────────────────────────────────
+    category_id = fields.Many2one('library.category', string='Category')
+    tag_ids = fields.Many2many('library.tag', string='Tags')
+
+    # ── State ──────────────────────────────────────────────────────────────────
+    state = fields.Selection([
+        ('available', 'Available'),
+        ('borrowed', 'Borrowed'),
+        ('lost', 'Lost'),
+    ], default='available', required=True, tracking=True)
+    active = fields.Boolean(default=True)
+
+    # ── Computed ───────────────────────────────────────────────────────────────
+    copy_count = fields.Integer(string='Copies', compute='_compute_copy_count', store=True)
+    copy_ids = fields.One2many('library.book.copy', 'book_id', string='Copies')
+
+    @api.depends('copy_ids')
+    def _compute_copy_count(self):
+        for book in self:
+            book.copy_count = len(book.copy_ids)
+
+    # ── Description ────────────────────────────────────────────────────────────
+    description = fields.Html(string='Description')
+    internal_note = fields.Text(string='Internal Notes')</code></pre>
+          </div>
+
+          <!-- Section 8: Summary -->
+          <h2 id="deep-fields">Models and Fields: the Backbone of Every Odoo Module</h2>
+          <p>An Odoo model is a Python class that maps to a PostgreSQL table. Each <code>fields.*</code> attribute becomes a column. The ORM handles SQL for you — you declare structure and behavior, Odoo generates the table.</p>
+          <pre><code class="language-python">from odoo import models, fields
+
+class Course(models.Model):
+    _name = "school.course"          # table: school_course
+    _description = "Course"
+
+    name = fields.Char(required=True)
+    seats = fields.Integer(default=20)
+    active = fields.Boolean(default=True)      # enables archiving
+    teacher_id = fields.Many2one("res.partner")   # link to one
+    student_ids = fields.One2many("school.student", "course_id")  # many back</code></pre>
+          <table>
+            <thead><tr><th>Field</th><th>Stores</th></tr></thead>
+            <tbody>
+              <tr><td><code>Char</code> / <code>Text</code></td><td>short / long string</td></tr>
+              <tr><td><code>Many2one</code></td><td>link to one record (a foreign key)</td></tr>
+              <tr><td><code>One2many</code></td><td>reverse of a Many2one (virtual)</td></tr>
+              <tr><td><code>Many2many</code></td><td>link table both ways</td></tr>
+              <tr><td><code>Selection</code></td><td>dropdown of fixed choices</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Key attrs:</strong> <code>required</code>, <code>default</code>, <code>readonly</code>, and <code>compute</code> (value derived from other fields). Set <code>store=True</code> on a computed field only when you need to search or group by it — otherwise it's calculated on the fly. Naming <code>_id</code>/<code>_ids</code> suffixes on relation fields is the convention every Odoo dev expects.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Define a model that inherits <code>models.Model</code>.</li>
+              <li>Set its <code>_name</code>.</li>
+              <li>Add Char, Integer, and Boolean fields.</li>
+              <li>Add a Many2one field.</li>
+              <li>Add field attributes like <code>required</code> and <code>default</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Create a model (e.g. <code>library.book</code>) with <code>_name</code>, typed fields (Char, Integer, Selection, Many2one), and attributes like <code>required</code> and <code>default</code>. Explain how <code>_name</code> maps to a database table and the difference between stored and related fields.</p>
+          </div>
+
+          <div class="summary-box" id="summary">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li>A model is a Python class extending <code>models.Model</code>; <code>_name</code> determines the PostgreSQL table name (dots become underscores).</li>
+              <li>Odoo adds <code>id</code>, <code>create_date</code>, <code>create_uid</code>, <code>write_date</code>, <code>write_uid</code> automatically — never declare them.</li>
+              <li>Scalar fields: <code>Char</code>, <code>Text</code>, <code>Html</code>, <code>Integer</code>, <code>Float</code>, <code>Monetary</code>, <code>Date</code>, <code>Datetime</code>, <code>Boolean</code>, <code>Binary</code>, <code>Selection</code>.</li>
+              <li>Relational fields: <code>Many2one</code> (FK column), <code>One2many</code> (reverse FK, no column), <code>Many2many</code> (junction table).</li>
+              <li>Common attributes: <code>required</code>, <code>readonly</code>, <code>store</code>, <code>index</code>, <code>default</code>, <code>tracking</code>, <code>domain</code>, <code>copy</code>.</li>
+              <li>Computed fields use <code>@api.depends</code> + a method that loops <code>for record in self:</code> and sets <code>record.field = value</code>.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you define a model in Odoo?</li>
+            <li>What does <code>_name</code> do?</li>
+            <li>Name five Odoo field types.</li>
+            <li>What is a Many2one field?</li>
+            <li>What does the <code>required</code> attribute enforce?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/odoo/module/module-structure.html" class="topic-tag odoo-topic-tag">🐍 Module Structure</a>
+            <a href="/odoo/module/manifest-file.html" class="topic-tag odoo-topic-tag">🐍 Manifest File</a>
+            <a href="/odoo/module/basic-views.html" class="topic-tag odoo-topic-tag">🐍 Basic Views</a>
+            <a href="/odoo/backend/computed-fields.html" class="topic-tag odoo-topic-tag">🐍 Computed Fields</a>
+            <a href="/odoo/backend/model-inheritance.html" class="topic-tag odoo-topic-tag">🐍 Model Inheritance</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>fields.Char</code> and <code>fields.Text</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>Char</code> is for short strings (max ~255 chars, single-line input in the UI). <code>Text</code> is for longer, multi-line content (textarea in the UI, no length limit). Both store as VARCHAR/TEXT in PostgreSQL.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Do I need to run <code>python manage.py migrate</code> like Django? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. Odoo handles all database schema changes automatically when you install or upgrade a module. Adding a new field to a model and upgrading the module (<code>-u module_name</code>) automatically adds the column to the PostgreSQL table.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What does <code>active = fields.Boolean(default=True)</code> do specially? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The <code>active</code> field is magic in Odoo — any model with an <code>active</code> field automatically filters out records where <code>active=False</code> from all searches and views. Setting <code>active=False</code> archives the record. Users can see archived records by adding the "Archived" filter in the search bar.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>store=True</code> and <code>store=False</code> on a computed field? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>store=True</code> saves the computed value to the database column — making it searchable, sortable, and usable in domain filters. It recalculates when the <code>@api.depends</code> fields change. <code>store=False</code> calculates on-the-fly every time the field is read — not stored, not searchable, but always fresh. Use <code>store=True</code> for values used in filters or reports.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I add fields to an existing Odoo model like <code>sale.order</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — use model inheritance with <code>_inherit = 'sale.order'</code> to add your custom fields to an existing model. Your fields are added as new columns to the existing table. This is covered in detail in the Model Inheritance lesson.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/module/manifest-file.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Manifest File</span>
+          </a>
+          <a href="/odoo/module/basic-views.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Basic Views</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

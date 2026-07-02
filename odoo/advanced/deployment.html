@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Deployment and Upgrades – Production Best Practices | ylearner</title>
+  <meta name="description" content="Deploy and upgrade Odoo modules safely: odoo-bin -u, data migration scripts, pre/post install hooks, module versioning, and production upgrade checklist.">
+  <meta name="keywords" content="Odoo deployment, odoo-bin -u, module upgrade, migration script, pre_init_hook, post_init_hook, production deployment, Odoo 19">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/advanced/deployment.html">
+  <meta property="og:title" content="Odoo Deployment and Upgrades – Production Best Practices">
+  <meta property="og:description" content="Deploy and upgrade Odoo modules safely: odoo-bin -u, data migration scripts, pre/post install hooks, module versioning, and production upgrade checklist.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/advanced/deployment.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Deployment and Upgrades – Production Best Practices | ylearner">
+  <meta name="twitter:description" content="Deploy and upgrade Odoo modules safely with odoo-bin -u, migration scripts, and pre/post install hooks.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Deployment and Upgrades – Production Best Practices",
+    "description": "Deploy and upgrade Odoo modules safely: odoo-bin -u, data migration scripts, pre/post install hooks, module versioning, and production upgrade checklist.",
+    "educationalLevel": "Advanced",
+    "keywords": "Odoo deployment, odoo-bin -u, migration script, pre_init_hook, post_init_hook, upgrade",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/advanced/performance-caching.html">Advanced Topics</a><span class="separator">›</span>
+          <span class="current">Deployment &amp; Upgrades</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚡ Advanced Topics</div>
+          <h1>Odoo Deployment and Upgrades – Production Best Practices</h1>
+          <p class="lesson-intro">Deploying and upgrading Odoo modules in production requires care: the wrong approach can corrupt data or leave the system in an inconsistent state. The key tools are the <code>version</code> field in <code>__manifest__.py</code>, migration scripts, and install/upgrade hooks that run before and after module loading.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="deep-deployment">Deploying Odoo to Production</h2>
+          <p>Running Odoo for real is very different from dev mode. Production needs a proper process setup, a reverse proxy, workers tuned to your load, and — above all — backups and security hardening.</p>
+          <table>
+            <thead><tr><th>Component</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td>Reverse proxy (Nginx)</td><td>HTTPS, static files, buffering</td></tr>
+              <tr><td>Workers (multi-process)</td><td>handle concurrent requests</td></tr>
+              <tr><td>PostgreSQL (tuned/separate)</td><td>the data — back it up</td></tr>
+              <tr><td>Process manager (systemd)</td><td>keep Odoo running, restart on crash</td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-text"># key production settings in odoo.conf
+workers = 4              # &gt;0 enables multiprocessing (not dev mode)
+proxy_mode = True        # trust the Nginx reverse proxy
+admin_passwd = &lt;strong&gt;  # protect the database manager!
+list_db = False          # hide the database list</code></pre>
+          <p><strong>Dev vs production is a real shift:</strong> in dev you run a single process with <code>--dev=all</code>; production sets <code>workers &gt; 0</code> to run multiple processes for concurrency, disables dev auto-reload, and runs behind Nginx for HTTPS and to serve static assets efficiently. Configure <code>proxy_mode = True</code> so Odoo trusts the proxy's headers. <strong>Security hardening is non-negotiable:</strong> set a strong <code>admin_passwd</code> (it guards the database-manager where anyone could otherwise create/drop/duplicate databases), set <code>list_db = False</code> to hide database names, always serve over HTTPS, and keep the server and Odoo patched. <strong>Backups are the thing you must not skip:</strong> automate regular PostgreSQL dumps <em>and</em> filestore backups (attachments live on disk, not in the DB), and test that you can actually restore them. <strong>Upgrades:</strong> test on a staging copy first — module and version upgrades can break customizations. <strong>Managed hosting</strong> (Odoo.sh) handles much of this for you at the cost of some control; self-hosting gives control but shifts all this responsibility onto you.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Set up a production config file.</li>
+              <li>Run Odoo behind an Nginx reverse proxy.</li>
+              <li>Run it as a systemd service.</li>
+              <li>Set workers for multiprocessing.</li>
+              <li>Enable HTTPS.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Outline a production deployment: Odoo behind an Nginx reverse proxy with HTTPS, running as a systemd service with multiple workers, a dedicated PostgreSQL, and a secured config (<code>proxy_mode</code>, admin password, filtered databases). Explain why workers and a reverse proxy matter in production.</p>
+          </div>
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>Module versioning and what triggers an upgrade</li>
+              <li>The upgrade process: what <code>odoo-bin -u</code> does</li>
+              <li>Writing migration scripts for data changes</li>
+              <li>Using <code>pre_init_hook</code> and <code>post_init_hook</code></li>
+              <li>Production deployment checklist</li>
+            </ul>
+          </div>
+
+          <h2 id="module-versioning">Module Versioning</h2>
+          <p>The <code>version</code> field in <code>__manifest__.py</code> controls when migration scripts run. Use the format <code>major.minor.patch.module_version</code> where the first 3 numbers match the Odoo version:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">{
+    'name': 'Library Management',
+    'version': '19.0.1.0.1',  # Odoo 19, module version 1.0.1
+    # When you change module_version (last 2 numbers),
+    # Odoo will run migration scripts on next -u
+}</code></pre>
+          </div>
+          <p>When you run <code>odoo-bin -u my_module</code>, Odoo compares the installed version with the manifest version. If they differ, it runs migration scripts for all intermediate versions before applying the new code.</p>
+
+          <h2 id="upgrade-process">The Upgrade Process</h2>
+          <p>Running <code>odoo-bin -u my_module</code> does the following in order:</p>
+          <ol>
+            <li>Load existing database state (old version)</li>
+            <li>Run <code>pre_migrate()</code> scripts (if version changed)</li>
+            <li>Apply new field definitions (ALTER TABLE for new columns)</li>
+            <li>Load XML data files marked with <code>noupdate="0"</code></li>
+            <li>Run <code>post_migrate()</code> scripts</li>
+            <li>Run <code>post_init_hook</code> (if first install) or upgrade callbacks</li>
+          </ol>
+          <p>XML data files with <code>noupdate="1"</code> are loaded only on first install and never again on upgrade — use this for default data that users may have modified.</p>
+
+          <h2 id="migration-scripts">Migration Scripts</h2>
+          <p>Migration scripts handle data transformations when your module's data model changes. Place them in <code>migrations/19.0.1.0.1/</code> (version-specific folder):</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># migrations/19.0.1.0.1/pre_migrate.py
+# Runs BEFORE new field definitions are applied
+def migrate(cr, version):
+    """Rename column before ORM recreates it."""
+    if not version:
+        return  # first install, skip
+    cr.execute("""
+        ALTER TABLE library_book
+        RENAME COLUMN old_field_name TO new_field_name
+    """)
+
+# migrations/19.0.1.0.1/post_migrate.py
+# Runs AFTER new field definitions and XML data loading
+def migrate(cr, version):
+    """Backfill new column from existing data."""
+    if not version:
+        return
+    cr.execute("""
+        UPDATE library_book
+        SET full_title = title || ' by ' || author
+        WHERE full_title IS NULL
+    """)</code></pre>
+          </div>
+          <p>Migration scripts receive the database cursor (<code>cr</code>), not the ORM environment — use raw SQL. The <code>version</code> argument is the previously installed version. If <code>version is None</code>, this is a fresh install.</p>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="install-hooks">Install and Upgrade Hooks</h2>
+          <p>Hooks in <code>__manifest__.py</code> run Python functions at specific points during install/upgrade:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># __manifest__.py
+{
+    'name': 'Library Management',
+    'version': '19.0.1.0.0',
+    'pre_init_hook': 'pre_init_hook',
+    'post_init_hook': 'post_init_hook',
+    'post_load': 'post_load',
+}
+
+# __init__.py
+def pre_init_hook(env):
+    """Runs before module tables are created.
+    Use for checks or pre-setup only — tables don't exist yet.
+    """
+    pass
+
+def post_init_hook(env):
+    """Runs after first install only.
+    Tables exist; create default records here.
+    """
+    env['library.category'].create({'name': 'General'})
+
+def post_load():
+    """Runs after module code is loaded but before install.
+    Use for monkey-patching third-party libraries.
+    """
+    pass</code></pre>
+          </div>
+
+          <h2 id="production-checklist">Production Deployment Checklist</h2>
+          <table>
+            <thead><tr><th>Step</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Backup production database before any upgrade</td></tr>
+              <tr><td>2</td><td>Test upgrade on a copy of production data first</td></tr>
+              <tr><td>3</td><td>Put Odoo in maintenance mode (stop web workers)</td></tr>
+              <tr><td>4</td><td>Deploy new module code to the server</td></tr>
+              <tr><td>5</td><td>Run <code>odoo-bin -u my_module --stop-after-init</code></td></tr>
+              <tr><td>6</td><td>Check logs for errors before restarting web workers</td></tr>
+              <tr><td>7</td><td>Start web workers and verify functionality</td></tr>
+              <tr><td>8</td><td>Clear browser cache / asset regeneration if needed</td></tr>
+            </tbody>
+          </table>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Bump the last two version numbers in <code>__manifest__.py</code> to trigger migration scripts</li>
+              <li>Put pre-migration data transforms in <code>pre_migrate.py</code>; post-migration backfills in <code>post_migrate.py</code></li>
+              <li>Always backup and test on a production data copy before upgrading live</li>
+              <li>Use <code>noupdate="1"</code> on XML records that users may have modified</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you deploy Odoo to production?</li>
+            <li>What is the role of a reverse proxy like Nginx?</li>
+            <li>What does <code>proxy_mode</code> do?</li>
+            <li>How do workers affect performance?</li>
+            <li>How do you secure an Odoo production instance?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/advanced/testing.html" class="topic-tag odoo-topic-tag">⚡ Testing</a>
+              <a href="/odoo/advanced/performance-caching.html" class="topic-tag odoo-topic-tag">⚡ Performance &amp; Caching</a>
+              <a href="/odoo/module/module-structure.html" class="topic-tag odoo-topic-tag">🐍 Module Structure</a>
+            </div>
+          </section>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What happens if a migration script fails? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Odoo wraps the upgrade in a database transaction. If a migration script raises an exception, the transaction is rolled back and the upgrade fails — your database remains in the pre-upgrade state. Fix the script and re-run. This is why testing on a copy first is critical: a failing migration on production could require a database restore.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When should I use a migration script vs a post_init_hook? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>post_init_hook</code> runs only on the first install and uses the ORM environment. Migration scripts run on every version bump and use raw SQL (no ORM). Use hooks for initial data seeding after install. Use migration scripts for structural changes (column renames, data transformations) when upgrading from a previous version.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I handle removing a field safely? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>To remove a field: (1) in the new version, remove the field from your model Python class; (2) in the pre_migrate script, optionally save any data you need before the column is dropped; (3) Odoo does NOT automatically drop old columns — the column stays in PostgreSQL but becomes invisible to the ORM. If you need to clean up, add a post_migrate script that runs <code>ALTER TABLE ... DROP COLUMN ...</code>.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a href="/odoo/advanced/testing.html" class="lesson-nav-link">
+        <span class="nav-label">← Prev</span>
+        <span class="nav-title">Testing Odoo Modules</span>
+        </a>
+        <a href="/odoo/advanced/quiz.html" class="lesson-nav-link next">
+        <span class="nav-label">Next →</span>
+        <span class="nav-title">📝 Take a Quiz</span>
+        </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

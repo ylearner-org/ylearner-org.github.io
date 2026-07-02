@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Weather App – OpenWeatherMap API Project | ylearner</title>
+  <meta name="description" content="Build a Python weather app using OpenWeatherMap API: current weather, 5-day forecast, formatted CLI output.">
+  <meta name="keywords" content="python weather app project, python openweathermap, python api project, python weather api tutorial">
+  <link rel="canonical" href="https://ylearner.org/python/projects/weather-app.html">
+  <meta property="og:title" content="Python Weather App – OpenWeatherMap API Project | ylearner">
+  <meta property="og:description" content="Build a Python weather app using OpenWeatherMap API: current weather, 5-day forecast, formatted CLI output.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/projects/weather-app.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Weather App – OpenWeatherMap API Project | ylearner">
+  <meta name="twitter:description" content="Build a Python weather app using OpenWeatherMap API: current weather, 5-day forecast, formatted CLI output.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Weather App Project","description":"Python weather app using OpenWeatherMap API with current weather and 5-day forecast.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/projects/calculator.html">Projects</a><span class="separator">›</span><span class="current">Weather App</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌤️ Projects</div>
+          <h1>Python Weather App – API Project</h1>
+          <p class="lesson-intro">Consume the OpenWeatherMap API to get current conditions and forecasts. Teaches API consumption, JSON parsing, and formatted CLI output.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Projects</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="setup">Get API Key</h2>
+          <p>Register at <strong>openweathermap.org</strong> → API keys. Free tier = 1,000 calls/day.</p>
+          <h2 id="code">Complete Implementation</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import os, requests
+from datetime import datetime
+
+API_KEY = os.getenv("OPENWEATHER_API_KEY", "your_key_here")
+BASE = "https://api.openweathermap.org/data/2.5"
+
+def get_current(city, units="metric"):
+    r = requests.get(f"{BASE}/weather", params={"q": city, "appid": API_KEY, "units": units}, timeout=10)
+    r.raise_for_status()
+    return r.json()
+
+def get_forecast(city, units="metric"):
+    r = requests.get(f"{BASE}/forecast", params={"q": city, "appid": API_KEY, "units": units, "cnt": 40}, timeout=10)
+    r.raise_for_status()
+    return r.json()["list"]
+
+def display_current(d, units):
+    sym = "°C" if units == "metric" else "°F"
+    print(f"\n{'='*40}")
+    print(f"  {d['name']}, {d['sys']['country']}")
+    print(f"  {d['weather'][0]['description'].title()}")
+    print(f"  Temp: {d['main']['temp']}{sym}  (feels like {d['main']['feels_like']}{sym})")
+    print(f"  Humidity: {d['main']['humidity']}%  Wind: {d['wind']['speed']} m/s")
+    print("="*40)
+
+def display_forecast(forecast, units):
+    sym = "°C" if units == "metric" else "°F"
+    print("\n5-Day Forecast:")
+    seen = set()
+    for entry in forecast:
+        dt = datetime.fromtimestamp(entry["dt"])
+        if dt.hour == 12 and dt.date() not in seen:
+            seen.add(dt.date())
+            print(f"  {dt.strftime('%a %b %d')}: {entry['main']['temp']}{sym}  {entry['weather'][0]['description']}")
+
+city = input("City: ").strip()
+units = input("Units metric/imperial [metric]: ").strip() or "metric"
+try:
+    display_current(get_current(city, units), units)
+    display_forecast(get_forecast(city, units), units)
+except requests.HTTPError as e:
+    print(f"Error {e.response.status_code}: city not found or invalid API key")</code></pre></div>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Bash</span><button class="copy-btn">Copy</button></div><pre><code class="language-bash">export OPENWEATHER_API_KEY=your_key_here
+python weather.py</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> Store the API key in .env and load with python-dotenv — never commit API keys to git.</div>
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Extend the weather app:</p>
+            <ol>
+              <li>Let the user enter any city name and fetch its current weather.</li>
+              <li>Display temperature, conditions, and humidity in a readable format.</li>
+              <li>Handle an invalid city or network error gracefully.</li>
+              <li>Cache the last result so repeated lookups are instant.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a richer weather tool: show a multi-day forecast, let the user pick Celsius or Fahrenheit, and keep their API key in an environment variable instead of the code. Add robust error handling for bad input, network failures, and rate limits, plus a short retry. Bonus: cache responses for a few minutes and display the data as a small chart.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>This project consumes a weather REST API and displays current conditions.</li>
+              <li>The <code>requests</code> library fetches data; the JSON response is parsed for the fields you need.</li>
+              <li>API keys belong in environment variables or config, never hard-coded.</li>
+              <li>Network errors, invalid cities, and rate limits are handled gracefully.</li>
+              <li>Caching avoids redundant calls and speeds up repeated lookups.</li>
+              <li>It can grow with forecasts, unit switching, and charts.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Building a Weather App</h2>
+          <ul class="interview-list">
+            <li>How do you call a third-party REST API from Python?</li>
+            <li>How should you store and protect an API key?</li>
+            <li>How do you parse and use a JSON API response?</li>
+            <li>How do you handle network errors and bad responses?</li>
+            <li>Why and how would you cache API results?</li>
+            <li>How do you respect API rate limits?</li>
+            <li>How would you let users switch units or locations?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/real-world/rest-api.html" class="topic-tag">🔗 REST APIs</a>
+            <a href="/python/intermediate/json.html" class="topic-tag">📄 JSON</a>
+            <a href="/python/intermediate/exception-handling.html" class="topic-tag">⚠️ Exception Handling</a>
+            <a href="/python/beginner/user-input.html" class="topic-tag">⌨️ User Input</a>
+            <a href="/python/intermediate/virtual-environments.html" class="topic-tag">🧪 Virtual Environments</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Where should I keep my API key? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Never hard-code it in the source or commit it to git. Store it in an environment variable (read with <code>os.environ</code>) or a <code>.env</code> file loaded by <code>python-dotenv</code>, and keep that file out of version control.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I handle a city that doesn’t exist? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Check the response status code and body — most weather APIs return an error (e.g. 404) for unknown cities. Detect it and show a friendly message instead of crashing on missing JSON fields.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why cache the weather data? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Weather changes slowly and APIs limit how many calls you can make. Caching a result for a few minutes avoids hitting rate limits, reduces latency for repeated lookups, and is gentler on the provider.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens if the network request fails? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Wrap the call in <code>try/except</code> for <code>requests</code> exceptions (timeouts, connection errors), show a clear message, and optionally retry a couple of times with a short delay for transient failures.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/projects/expense-tracker.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Expense Tracker</span>
+          </a>
+          <a href="/python/projects/file-organizer.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">File Organizer</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

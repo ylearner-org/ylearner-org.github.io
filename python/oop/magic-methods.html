@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Magic Methods (Dunder Methods) – Complete Guide | ylearner | ylearner</title>
+  <meta name="description" content="Learn Python magic methods (__str__, __repr__, __len__, __add__, __eq__, __lt__, __enter__, __exit__) with real examples and when to implement each.">
+  <meta name="keywords" content="python magic methods, python dunder methods, python __str__, python __repr__, python __len__, python special methods">
+  <link rel="canonical" href="https://ylearner.org/python/oop/magic-methods.html">
+  <meta property="og:title" content="Python Magic Methods (Dunder Methods) – Complete Guide | ylearner">
+  <meta property="og:description" content="Learn Python magic methods (__str__, __repr__, __len__, __add__, __eq__, __lt__, __enter__, __exit__) with real examples and when to implement each.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/oop/magic-methods.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Magic Methods (Dunder Methods) – Complete Guide | ylearner">
+  <meta name="twitter:description" content="Learn Python magic methods (__str__, __repr__, __len__, __add__, __eq__, __lt__, __enter__, __exit__) with real examples and when to implement each.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Magic Methods – Dunder Methods Explained","description":"Learn Python magic methods (__str__, __repr__, __len__, __add__, __eq__, __lt__, __enter__, __exit__) with real examples and when to implement each.","educationalLevel":"Advanced","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/oop/classes.html">OOP</a><span class="separator">›</span><span class="current">Magic Methods</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🏗️ OOP</div>
+          <h1>Python Magic Methods – Dunder Methods Explained</h1>
+          <p class="lesson-intro">Magic methods (also called dunder methods — double underscore) are special Python methods that define how objects behave with built-in operations. They let you define what happens when you print an object, add two objects, compare them, use them in a <code>with</code> statement, or iterate over them.</p>
+          <div class="lesson-meta"><span>⏱️ 22 min read</span><span>🎯 Advanced</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="str-repr">__str__ and __repr__</h2>
+          <p><code>__str__</code>: human-readable string (for print). <code>__repr__</code>: developer representation (unambiguous, for debugging).</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Point:
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+    def __str__(self):
+        return f"Point({self.x}, {self.y})"
+
+    def __repr__(self):
+        return f"Point(x={self.x!r}, y={self.y!r})"
+
+p = Point(3, 4)
+print(str(p))   # Point(3, 4)      — uses __str__
+print(repr(p))  # Point(x=3, y=4)  — uses __repr__
+print(p)        # Point(3, 4)      — print uses __str__</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Point(3, 4)
+Point(x=3, y=4)
+Point(3, 4)</div>
+
+          <h2 id="comparison">Comparison Methods</h2>
+          <p>Define how objects are compared with ==, <, >, <=, >= operators.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Temperature:
+    def __init__(self, celsius):
+        self.celsius = celsius
+
+    def __eq__(self, other):
+        return self.celsius == other.celsius
+
+    def __lt__(self, other):
+        return self.celsius < other.celsius
+
+    def __le__(self, other):
+        return self.celsius <= other.celsius
+
+t1 = Temperature(25)
+t2 = Temperature(30)
+
+print(t1 == t2)   # False
+print(t1 < t2)    # True
+temps = [Temperature(30), Temperature(10), Temperature(20)]
+print([t.celsius for t in sorted(temps)])  # [10, 20, 30]</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>False
+True
+[10, 20, 30]</div>
+
+          <h2 id="arithmetic">Arithmetic Methods</h2>
+          <p>Make + - * / work on your objects.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Money:
+    def __init__(self, amount, currency="USD"):
+        self.amount = amount
+        self.currency = currency
+
+    def __add__(self, other):
+        if self.currency != other.currency:
+            raise ValueError("Cannot add different currencies")
+        return Money(self.amount + other.amount, self.currency)
+
+    def __str__(self):
+        return f"{self.currency} {self.amount:.2f}"
+
+wallet = Money(50) + Money(30)
+print(wallet)   # USD 80.00</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>USD 80.00</div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="container">Container Methods</h2>
+          <p><code>__len__</code>, <code>__getitem__</code>, <code>__contains__</code> make custom objects behave like sequences.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">class Library:
+    def __init__(self):
+        self._books = []
+
+    def add(self, book): self._books.append(book)
+    def __len__(self): return len(self._books)
+    def __getitem__(self, idx): return self._books[idx]
+    def __contains__(self, book): return book in self._books
+
+lib = Library()
+lib.add("Python Crash Course")
+lib.add("Fluent Python")
+
+print(len(lib))                    # 2
+print(lib[0])                      # Python Crash Course
+print("Fluent Python" in lib)      # True</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>2
+Python Crash Course
+True</div>
+
+          <h2 id="deep-magic">Dunder Methods: Making Your Objects Feel Built-in</h2>
+          <p>"Magic" (dunder) methods let your class hook into Python's syntax. Define <code>__add__</code> and <code>+</code> works on your objects; define <code>__len__</code> and <code>len()</code> works. You're not calling them directly — the interpreter does.</p>
+          <pre><code class="language-python">class Money:
+    def __init__(self, amt): self.amt = amt
+    def __repr__(self): return f"Money({self.amt})"    # for developers
+    def __str__(self):  return f"${self.amt:.2f}"      # for users
+    def __add__(self, other): return Money(self.amt + other.amt)
+    def __eq__(self, other):  return self.amt == other.amt
+
+print(Money(5) + Money(3))   # $8.00 — uses __add__ then __str__</code></pre>
+          <h3>Two pairings people get wrong</h3>
+          <ul>
+            <li><strong><code>__str__</code> vs <code>__repr__</code>:</strong> <code>str()</code>/<code>print</code> use <code>__str__</code> (readable); the REPL and containers use <code>__repr__</code> (unambiguous, ideally reconstructable). Define <code>__repr__</code> at minimum — it's the fallback for both.</li>
+            <li><strong><code>__eq__</code> + <code>__hash__</code>:</strong> define <code>__eq__</code> and Python sets <code>__hash__</code> to <code>None</code>, making instances unhashable (can't go in sets/dict keys). If two equal objects should hash the same, define <code>__hash__</code> too.</li>
+          </ul>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Create a <code>Vector</code> class representing a 2D vector:</p>
+            <ol>
+              <li>Implement <code>__init__(self, x, y)</code>.</li>
+              <li>Add <code>__repr__</code> so the object prints as <code>Vector(2, 3)</code>.</li>
+              <li>Implement <code>__add__</code> so two vectors can be added with <code>+</code>.</li>
+              <li>Implement <code>__eq__</code> so two vectors with the same components compare equal.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a <code>Playlist</code> class that wraps a list of songs and behaves like a container. Implement <code>__len__</code>, <code>__getitem__</code> (so you can index and iterate it), <code>__contains__</code> (so <code>in</code> works), and <code>__str__</code> for a friendly printout. Demonstrate looping over the playlist with a <code>for</code> loop, checking membership, and printing its length.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Magic (dunder) methods have double underscores and let your objects integrate with Python’s built-in syntax.</li>
+              <li><code>__str__</code> gives a readable string for users; <code>__repr__</code> gives an unambiguous string for developers.</li>
+              <li>Comparison methods (<code>__eq__</code>, <code>__lt__</code>, …) enable operators like <code>==</code> and <code>&lt;</code>.</li>
+              <li>Arithmetic methods (<code>__add__</code>, <code>__mul__</code>, …) implement operator overloading.</li>
+              <li>Container methods (<code>__len__</code>, <code>__getitem__</code>, <code>__contains__</code>) make objects behave like lists or dicts.</li>
+              <li>Implementing <code>__repr__</code> aids debugging because it is what the REPL and containers display.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Magic Methods</h2>
+          <ul class="interview-list">
+            <li>What are magic (dunder) methods in Python?</li>
+            <li>What is the difference between <code>__str__</code> and <code>__repr__</code>?</li>
+            <li>Which magic methods let you use the <code>+</code> and <code>==</code> operators on your objects?</li>
+            <li>How do you make a custom object work with <code>len()</code> and the <code>in</code> operator?</li>
+            <li>What magic methods make an object iterable?</li>
+            <li>What does <code>__call__</code> do?</li>
+            <li>Why is implementing <code>__repr__</code> considered good practice?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/oop/classes.html" class="topic-tag">🏛️ Classes</a>
+            <a href="/python/oop/constructors.html" class="topic-tag">🔨 Constructors</a>
+            <a href="/python/oop/polymorphism.html" class="topic-tag">🎭 Polymorphism</a>
+            <a href="/python/oop/encapsulation.html" class="topic-tag">🔒 Encapsulation</a>
+            <a href="/python/data-structures/lists.html" class="topic-tag">📚 Lists</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>__str__</code> and <code>__repr__</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>__str__</code> is for an informal, readable representation shown by <code>print()</code> and <code>str()</code>. <code>__repr__</code> is for an unambiguous, developer-facing representation shown in the REPL and by containers. If you only define one, define <code>__repr__</code> — <code>str()</code> falls back to it.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Are magic methods called directly? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Rarely. You usually trigger them through syntax: <code>a + b</code> calls <code>a.__add__(b)</code>, <code>len(x)</code> calls <code>x.__len__()</code>. Python invokes them for you when you use the corresponding operator or built-in.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is operator overloading? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Defining magic methods like <code>__add__</code> or <code>__mul__</code> so standard operators work on your own objects. It lets a <code>Vector + Vector</code> or <code>Money * 2</code> read naturally instead of needing named methods.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I make my object iterable? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Implement <code>__iter__</code> (returning an iterator) or, more simply, <code>__getitem__</code> with integer indexes starting at 0. Either lets a <code>for</code> loop walk through your object.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/oop/abstraction.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Abstraction</span></a>
+          <a href="/python/oop/quiz.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">📝 Section Quiz</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

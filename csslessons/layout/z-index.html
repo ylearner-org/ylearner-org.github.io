@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Z-index – Stacking Order and Stacking Contexts Explained | ylearner</title>
+  <meta name="description" content="Master CSS z-index: stacking order, stacking contexts, how z-index interacts with position, opacity, transform, and how to build a z-index scale for your project.">
+  <meta name="keywords" content="CSS z-index, CSS stacking context, CSS stacking order, z-index not working, CSS layers, CSS z-index tutorial, CSS position z-index">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/csslessons/layout/z-index.html">
+  <meta property="og:title" content="CSS Z-index – Stacking Order and Contexts | ylearner">
+  <meta property="og:description" content="z-index, stacking order, stacking contexts — complete guide to controlling element layers in CSS.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/csslessons/layout/z-index.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CSS Z-index Deep Dive | ylearner">
+  <meta name="twitter:description" content="z-index, stacking contexts, why z-index 9999 sometimes fails — complete guide.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "CSS Z-index and Stacking Contexts",
+    "description": "Complete guide to CSS z-index — stacking order, stacking contexts, what creates a stacking context, and building a z-index scale for your project.",
+    "educationalLevel": "Beginner",
+    "keywords": "CSS z-index, stacking context, CSS layers, stacking order",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+  <style>
+    .stack-demo { position:relative; height:140px; margin:1rem 0 1.5rem; }
+    .stack-box { position:absolute; width:120px; height:80px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.8rem; color:white; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/csslessons/what-is-css.html">CSS</a><span class="separator">›</span>
+          <a href="/csslessons/layout/display.html">CSS Layout</a><span class="separator">›</span>
+          <span class="current">CSS Z-index</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">📐 CSS Layout</div>
+          <h1>CSS Z-index – Stacking Order and Stacking Contexts</h1>
+          <p class="lesson-intro">Why does your modal appear behind the dropdown? Why does setting <code>z-index: 9999</code> sometimes not work? The answer lies in one of CSS's least-understood mechanisms: <strong>stacking contexts</strong>. Z-index controls the stacking order of overlapping elements, but it only works within the rules of its stacking context. In this lesson you will learn exactly how z-index works, what creates a stacking context, and how to build a maintainable z-index system for your project.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Beginner–Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 6 of 6</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="how-z-index-works">How z-index Works</h2>
+          <p>Z-index controls the stacking order of elements on the Z-axis (depth — toward/away from the viewer). Higher values appear on top of lower values.</p>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>z-index only works on positioned elements</strong>
+              <p>An element must have <code>position</code> set to <code>relative</code>, <code>absolute</code>, <code>fixed</code>, or <code>sticky</code> for <code>z-index</code> to have any effect. On <code>position: static</code> elements, z-index is completely ignored.</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – z-index basics</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* z-index works on positioned elements only */
+.box-a {
+  position: absolute;
+  z-index: 1;      /* below box-b */
+}
+
+.box-b {
+  position: absolute;
+  z-index: 2;      /* above box-a */
+}
+
+/* Negative z-index — behind normal flow elements */
+.watermark {
+  position: absolute;
+  z-index: -1;
+}
+
+/* z-index: auto — removed from stacking context participation */
+.item { position: relative; z-index: auto; }
+
+/* Without z-index on positioned elements:
+   later elements in source order appear on top */</code></pre>
+          </div>
+
+          <div class="stack-demo">
+            <div class="stack-box" style="background:#1572B6;z-index:1;left:0;top:10px;">z-index: 1</div>
+            <div class="stack-box" style="background:#c62828;z-index:3;left:60px;top:30px;">z-index: 3</div>
+            <div class="stack-box" style="background:#2e7d32;z-index:2;left:120px;top:20px;">z-index: 2</div>
+          </div>
+
+          <h2 id="default-stacking">Default Stacking Order (No z-index)</h2>
+          <p>Without z-index, the browser stacks elements in this order (back to front):</p>
+          <ol>
+            <li>Background and borders of the root element</li>
+            <li>Block-level elements in normal flow (back to front in source order)</li>
+            <li>Floated elements</li>
+            <li>Inline elements in normal flow</li>
+            <li>Positioned elements (without z-index or z-index: auto) — in source order</li>
+          </ol>
+          <p>The later an element appears in the HTML source, the higher it stacks (all else equal).</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Source order stacking</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Without z-index, the second positioned element appears on top */
+.red-box  { position: absolute; top: 10px; left: 10px; }
+.blue-box { position: absolute; top: 30px; left: 30px; }
+/* blue-box appears on top because it's later in the source */</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="stacking-context">Stacking Contexts – The Key Concept</h2>
+          <p>A <strong>stacking context</strong> is an isolated layer in the page's z-axis hierarchy. Elements inside a stacking context are stacked <em>relative to each other</em>, not relative to the entire page. The stacking context as a whole is then treated as a single flat element by its parent context.</p>
+
+          <p>This is why <code>z-index: 9999</code> sometimes fails — if the element is inside a stacking context, its z-index only matters within that context, not against elements outside it.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Stacking context failure example</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Parent creates a stacking context (opacity &lt; 1) */
+.parent {
+  opacity: 0.99;       /* creates a stacking context! */
+  position: relative;
+  z-index: 1;
+}
+
+/* Child has huge z-index but is trapped inside parent's context */
+.modal-inside-parent {
+  position: absolute;
+  z-index: 9999;       /* only competes within .parent, not the global page */
+}
+
+/* An element outside .parent with z-index: 2 will appear ABOVE
+   the modal, even though modal has z-index: 9999 */
+.outside-element {
+  position: relative;
+  z-index: 2;          /* beats parent's z-index: 1, so it's on top */
+}</code></pre>
+          </div>
+
+          <h2 id="what-creates-context">What Creates a Stacking Context</h2>
+          <p>A new stacking context is created when an element has:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Stacking context triggers</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* The most common triggers: */
+
+/* 1. Position + z-index (not auto) */
+position: relative; z-index: 1;
+position: absolute; z-index: 0;
+position: fixed;    /* always creates a context (z-index not needed) */
+position: sticky;   /* always creates a context */
+
+/* 2. Opacity less than 1 */
+opacity: 0.99;   /* even 0.99 creates a context! */
+
+/* 3. Transform (not none) */
+transform: translateX(0);  /* even a no-op transform creates context */
+transform: rotate(0deg);
+
+/* 4. Filter (not none) */
+filter: blur(0px);
+
+/* 5. will-change targeting an above property */
+will-change: transform;
+will-change: opacity;
+
+/* 6. isolation: isolate — explicitly create a context */
+isolation: isolate;  /* clean way to create a context intentionally */
+
+/* 7. Various others */
+mix-blend-mode: /* any value other than normal */;
+clip-path: /* any value other than none */;
+-webkit-overflow-scrolling: touch;</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Use isolation: isolate to intentionally scope z-index</strong>
+              <p><code>isolation: isolate</code> creates a stacking context without any visual side effects (unlike opacity or transform). Use it when you want a component's internal z-index values to be isolated from the rest of the page — preventing z-index conflicts in large applications.</p>
+            </div>
+          </div>
+
+          <h2 id="debugging">Debugging z-index Issues</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Debugging checklist</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Step 1: Is position set? z-index only works on positioned elements */
+.problem-element { position: relative; } /* or absolute/fixed/sticky */
+
+/* Step 2: Is an ancestor creating a stacking context? */
+/* Check ancestors for: opacity &lt; 1, transform, filter, will-change */
+/* Open DevTools → look for "Stacking Context" badge in Layers panel */
+
+/* Step 3: Is isolation: isolate needed? */
+.component { isolation: isolate; }
+
+/* Step 4: Use a z-index scale and stick to it */
+:root {
+  --z-behind:   -1;
+  --z-base:      0;
+  --z-raised:    1;
+  --z-dropdown: 10;
+  --z-sticky:   20;
+  --z-fixed:    30;
+  --z-overlay:  40;
+  --z-modal:    50;
+  --z-toast:    60;
+  --z-tooltip:  70;
+}</code></pre>
+          </div>
+
+          <h2 id="z-index-scale">Building a Z-index Scale</h2>
+          <p>Ad-hoc z-index values (z-index: 9999, z-index: 99999) lead to maintenance nightmares. Define a design system scale at the start of every project:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Production z-index system</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Define at :root */
+:root {
+  --z-behind:    -1;   /* watermarks, decorative backgrounds */
+  --z-base:       0;   /* default positioned elements */
+  --z-raised:     1;   /* slightly elevated cards */
+  --z-dropdown: 100;   /* dropdowns, select menus */
+  --z-sticky:   200;   /* sticky headers, sticky sidebar */
+  --z-fixed:    300;   /* fixed header, fixed fab buttons */
+  --z-overlay:  400;   /* modal backdrop/overlay */
+  --z-modal:    500;   /* modal dialog */
+  --z-toast:    600;   /* toast notifications */
+  --z-tooltip:  700;   /* tooltips (always on top) */
+}
+
+/* Use in components */
+.site-header   { position: sticky; top: 0; z-index: var(--z-sticky); }
+.dropdown-menu { position: absolute; z-index: var(--z-dropdown); }
+.modal-overlay { position: fixed; inset: 0; z-index: var(--z-overlay); }
+.modal         { position: fixed; z-index: var(--z-modal); }
+.toast         { position: fixed; z-index: var(--z-toast); }</code></pre>
+          </div>
+
+          <h2 id="deep-zindex">z-index: Why Your "999999" Sometimes Does Nothing</h2>
+          <p>Two rules explain nearly every z-index frustration. First: <strong><code>z-index</code> only works on positioned elements</strong> (<code>position</code> other than <code>static</code>). Set z-index on a static element and it's ignored. Second: z-index is <em>relative to a stacking context</em>, not the whole page.</p>
+          <pre><code class="language-css">.modal {
+  position: fixed;   /* required — z-index is ignored on static */
+  z-index: 100;
+}</code></pre>
+          <h3>The trap: a child can't escape its parent's context</h3>
+          <p>If a parent creates a stacking context (via <code>position</code>+<code>z-index</code>, <code>opacity &lt; 1</code>, <code>transform</code>, <code>filter</code>, etc.), its children are stacked <em>within</em> it. A child with <code>z-index: 999999</code> still sits below a sibling of its <em>parent</em> that has a higher context — no matter how huge the number:</p>
+          <pre><code class="language-css">.card   { transform: scale(1);  }  /* ⚠️ creates a stacking context! */
+.badge  { z-index: 999999; }        /* trapped inside .card — can't cover siblings */</code></pre>
+          <p><strong>Debug approach:</strong> when a high z-index "doesn't work," look up the DOM for an ancestor with <code>transform</code>, <code>opacity</code>, or <code>filter</code> that created a context boundary. Keep z-index values small and organized (10/20/30) instead of escalating to 9999 — the number rarely is the real problem.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Overlap two positioned boxes and control which is on top with <code>z-index</code>.</li>
+              <li>Confirm <code>z-index</code> needs a positioned element to work.</li>
+              <li>Create a modal overlay above the page content.</li>
+              <li>Stack three elements in a chosen order.</li>
+              <li>Trigger a new stacking context and observe its effect.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a modal dialog: a full-screen semi-transparent overlay above the page and a centered dialog box above the overlay, with correct <code>z-index</code> layering. Explain why <code>z-index</code> only works on positioned elements and what a stacking context is.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>z-index</strong> only works on positioned elements (<code>position</code> ≠ <code>static</code>).</li>
+              <li>Higher z-index = appears on top. Negative z-index = behind normal flow.</li>
+              <li>Without z-index, later elements in source order stack on top.</li>
+              <li><strong>Stacking context</strong> — an isolated z-axis layer. Created by: position+z-index, opacity&lt;1, transform, filter, will-change, isolation:isolate.</li>
+              <li>Elements inside a stacking context compete with each other, not the global page.</li>
+              <li><strong>isolation: isolate</strong> — explicitly creates a stacking context with no visual side effects.</li>
+              <li>Use CSS custom properties to define a z-index scale. Never use random large numbers.</li>
+              <li>Debug in Chrome DevTools → Layers panel to see stacking contexts.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does <code>z-index</code> control?</li>
+            <li>Why does <code>z-index</code> require a <code>position</code> other than <code>static</code>?</li>
+            <li>What is a stacking context?</li>
+            <li>How can a parent’s stacking context trap a child’s <code>z-index</code>?</li>
+            <li>What is the default stacking order without <code>z-index</code>?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/csslessons/layout/position.html" class="topic-tag css-topic-tag">🎨 CSS Position</a>
+            <a href="/csslessons/layout/display.html" class="topic-tag css-topic-tag">🎨 CSS Display</a>
+            <a href="/csslessons/responsive/media-queries.html" class="topic-tag css-topic-tag">🎨 Media Queries</a>
+            <a href="/csslessons/effects/transitions.html" class="topic-tag css-topic-tag">🎨 CSS Transitions</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why doesn't z-index: 9999 work? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The most common cause: a stacking context. If any ancestor of your element has <code>opacity &lt; 1</code>, <code>transform</code>, <code>filter</code>, <code>will-change</code>, or is a positioned element with a z-index value, that ancestor creates a stacking context. Your element's z-index only competes within that context — not against the rest of the page. The fix: move the element higher in the DOM (out of the problematic ancestor), or check and remove the context-creating property from the ancestor.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is isolation: isolate for? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>isolation: isolate</code> creates a stacking context intentionally and cleanly — no side effects like opacity or transform create. It's used on components where you want the internal z-index values to be scoped: a card component might have <code>isolation: isolate</code> so its badge overlay (z-index: 1) doesn't conflict with the page's modal (z-index: 500). It's the "clean" way to create isolated z-index namespaces.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I find which ancestor is creating a stacking context? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In Chrome DevTools: open the Layers panel (three-dot menu → More tools → Layers). This shows all stacking contexts as separate layers with their reasons. Alternatively, in the Elements panel, stacking contexts are sometimes indicated. The manual approach: walk up the DOM tree and check each ancestor for <code>opacity &lt; 1</code>, <code>transform</code>, <code>filter</code>, <code>will-change</code>, <code>position + z-index</code>, <code>isolation: isolate</code>, and <code>mix-blend-mode</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can z-index be a decimal or negative number? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Decimals are technically invalid — z-index must be an integer. Negative integers are valid and place the element behind its stacking context's background. <code>z-index: -1</code> on a positioned element places it behind unpositioned siblings (behind normal flow) but still above the parent's background. This is useful for decorative background elements that should appear behind the content but inside the parent.</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/csslessons/layout/float.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">CSS Float</span>
+          </a>
+          <a href="/csslessons/layout/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

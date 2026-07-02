@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Multi-Company Support – company_id, company_dependent, and Record Rules | ylearner</title>
+  <meta name="description" content="Build multi-company-aware Odoo modules: add company_id fields, use company_dependent fields, write record rules for multi-company isolation, and handle allowed_company_ids.">
+  <meta name="keywords" content="Odoo multi-company, company_id field, company_dependent, allowed_company_ids, record rules multi-company, Odoo 19 multi-company">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/advanced/multi-company.html">
+  <meta property="og:title" content="Odoo Multi-Company Support – company_id, company_dependent, and Record Rules">
+  <meta property="og:description" content="Build multi-company-aware Odoo modules: add company_id fields, use company_dependent fields, write record rules for multi-company isolation, and handle allowed_company_ids.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/advanced/multi-company.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Multi-Company Support – company_id, company_dependent, and Record Rules | ylearner">
+  <meta name="twitter:description" content="Build Odoo multi-company modules: company_id, company_dependent fields, record rules, allowed_company_ids.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Multi-Company Support – company_id, company_dependent, and Record Rules",
+    "description": "Build multi-company-aware Odoo modules: add company_id fields, use company_dependent fields, write record rules for multi-company isolation, and handle allowed_company_ids.",
+    "educationalLevel": "Advanced",
+    "keywords": "Odoo multi-company, company_id, company_dependent, allowed_company_ids, record rules",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/advanced/performance-caching.html">Advanced Topics</a><span class="separator">›</span>
+          <span class="current">Multi-Company Support</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚡ Advanced Topics</div>
+          <h1>Odoo Multi-Company Support – company_id, company_dependent, and Record Rules</h1>
+          <p class="lesson-intro">Multi-company support allows a single Odoo database to host multiple independent companies. Each user can switch between companies; records are scoped to a company or shared across companies. Building a module that works correctly in multi-company environments requires following specific patterns.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="deep-multicompany">Multi-Company: Isolating Data Between Companies</h2>
+          <p>One Odoo database can host several companies. The mechanism that keeps Company A's data from leaking into Company B is the <code>company_id</code> field plus <strong>record rules</strong> that filter by the user's allowed companies.</p>
+          <pre><code class="language-python">class SaleOrder(models.Model):
+    _inherit = "sale.order"
+    # standard pattern: default to the active company
+    company_id = fields.Many2one(
+        "res.company", default=lambda self: self.env.company)</code></pre>
+          <table>
+            <thead><tr><th>Concept</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td><code>company_id</code> field</td><td>tags each record with its owning company</td></tr>
+              <tr><td>company record rule</td><td>filters records to the user's <code>allowed_company_ids</code></td></tr>
+              <tr><td><code>self.env.company</code></td><td>the currently active company</td></tr>
+              <tr><td><code>self.env.companies</code></td><td>all companies the user selected</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Shared vs isolated data:</strong> some models are company-specific (orders, invoices — carry a <code>company_id</code>); others are shared across all companies (products, partners often are). When you add a company-specific model, include a <code>company_id</code> field <em>and</em> a matching record rule, or users will see every company's records.</p>
+          <p><strong>The active-company gotcha:</strong> a user can have several companies enabled at once (<code>allowed_company_ids</code>), and <code>self.env.company</code> is just the <em>primary</em> active one. Always default new records to <code>self.env.company</code> and be careful with cross-company references — linking a record in Company A to one in Company B is a common source of subtle bugs. Test with a real multi-company setup.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Enable multiple companies.</li>
+              <li>Add a <code>company_id</code> field to a model.</li>
+              <li>Add a multi-company record rule.</li>
+              <li>Switch the active company.</li>
+              <li>Share a record across companies.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Make a custom model multi-company aware: add a <code>company_id</code> field with a default and a record rule so users see only their company’s records. Explain how <code>company_id</code> and record rules enforce isolation and how allowed companies differ from the active company.</p>
+          </div>
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>How multi-company works in Odoo: <code>allowed_company_ids</code> and the company switcher</li>
+              <li>Adding <code>company_id</code> to a custom model</li>
+              <li><code>company_dependent</code> fields for per-company configuration</li>
+              <li>Writing record rules that enforce company isolation</li>
+              <li>Common multi-company pitfalls and how to avoid them</li>
+            </ul>
+          </div>
+
+          <h2 id="how-multi-company-works">How Multi-Company Works</h2>
+          <p>In a multi-company Odoo instance, each user has a primary company and a set of <em>allowed companies</em>. The current company context is in <code>self.env.company</code> and the allowed set is in <code>self.env.companies</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">self.env.company        # the currently active company (res.company)
+self.env.companies      # all companies the user has switched to (recordset)
+self.env.company.id     # the active company ID
+self.env.companies.ids  # list of allowed company IDs</code></pre>
+          </div>
+          <p>When a user has multiple companies active, ORM searches automatically include records from all active companies (if record rules are set up correctly).</p>
+
+          <h2 id="company-id-field">Adding company_id to Your Model</h2>
+          <p>Use the standard <code>company_id</code> field name with <code>res.company</code> as the comodel:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo import models, fields
+
+class LibraryBook(models.Model):
+    _name = 'library.book'
+    _description = 'Library Book'
+
+    name = fields.Char(string='Title', required=True)
+
+    company_id = fields.Many2one(
+        'res.company',
+        string='Company',
+        required=True,
+        default=lambda self: self.env.company,
+        index=True,
+    )</code></pre>
+          </div>
+          <p>The default <code>lambda self: self.env.company</code> sets the company to the user's current active company when creating a new record.</p>
+
+          <h2 id="record-rules">Multi-Company Record Rules</h2>
+          <p>A record rule enforces that users can only see records from their allowed companies:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;record id="rule_library_book_company" model="ir.rule"&gt;
+  &lt;field name="name"&gt;Library Book: multi-company rule&lt;/field&gt;
+  &lt;field name="model_id" ref="model_library_book"/&gt;
+  &lt;field name="domain_force"&gt;
+    ['|',
+      ('company_id', '=', False),
+      ('company_id', 'in', company_ids)]
+  &lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+          <p>The domain <code>('company_id', '=', False)</code> allows shared records (no company) to be visible to everyone. <code>company_ids</code> is a special variable in record rule domains that resolves to the user's allowed company IDs at evaluation time.</p>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="company-dependent">company_dependent Fields</h2>
+          <p>Some configuration fields should have different values per company without duplicating records. Use <code>company_dependent=True</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">class LibraryConfig(models.TransientModel):
+    _inherit = 'res.config.settings'
+
+    library_late_fee = fields.Float(
+        string='Late Fee per Day',
+        config_parameter='library.late_fee',
+        company_dependent=True,  # each company has its own value
+    )</code></pre>
+          </div>
+          <p>With <code>company_dependent=True</code>, each company stores its own value for the field. When you read the field, Odoo automatically returns the value for <code>self.env.company</code>. The field type must be one of: <code>Char</code>, <code>Float</code>, <code>Integer</code>, <code>Boolean</code>, <code>Date</code>, <code>Datetime</code>, <code>Selection</code>, or <code>Many2one</code>.</p>
+
+          <h2 id="pitfalls">Common Multi-Company Pitfalls</h2>
+          <table>
+            <thead><tr><th>Mistake</th><th>Symptom</th><th>Fix</th></tr></thead>
+            <tbody>
+              <tr><td>Hardcoding <code>company_id=1</code></td><td>Data only works for main company</td><td>Always use <code>self.env.company.id</code></td></tr>
+              <tr><td>No record rule on company_id</td><td>Users see other companies' data</td><td>Add <code>ir.rule</code> with <code>company_ids</code> domain</td></tr>
+              <tr><td>Forgetting <code>| company_id=False</code> in rule</td><td>Shared configuration invisible</td><td>Always add the False alternative</td></tr>
+              <tr><td>sudo() bypasses record rules</td><td>Multi-company isolation broken</td><td>Add company filter explicitly in sudo() searches</td></tr>
+            </tbody>
+          </table>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Use <code>self.env.company</code> (not hardcoded IDs) for the current company</li>
+              <li>Add a <code>company_id</code> Many2one field with a default lambda and a matching record rule</li>
+              <li>Record rule domain: <code>['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</code></li>
+              <li>Use <code>company_dependent=True</code> for configuration fields that differ per company</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How does Odoo support multiple companies?</li>
+            <li>What field makes a model multi-company aware?</li>
+            <li>How is data isolated between companies?</li>
+            <li>What is the difference between the active company and allowed companies?</li>
+            <li>How do you share a record across companies?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/advanced/performance-caching.html" class="topic-tag odoo-topic-tag">⚡ Performance &amp; Caching</a>
+              <a href="/odoo/advanced/testing.html" class="topic-tag odoo-topic-tag">⚡ Testing</a>
+              <a href="/odoo/module/security-access.html" class="topic-tag odoo-topic-tag">🐍 Security &amp; Access Rights</a>
+            </div>
+          </section>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What's the difference between company_id and the branches feature? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The <code>company_id</code> field is Odoo's core multi-company mechanism — each company is a fully independent accounting entity. Odoo 17+ introduced "branches" as a lighter-weight sub-company structure for organizations that share accounting but have different operational units. Branches use the same mechanism but with a different UX and less strict isolation.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I create records for a specific company from code? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>self.with_company(target_company).env['my.model'].create({...})</code>. This sets the environment's company to <code>target_company</code> for that context. Alternatively, explicitly set <code>'company_id': target_company.id</code> in the create vals. The first approach is safer as it also affects defaults of related records created during that operation.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can a record belong to multiple companies? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Standard records with <code>company_id</code> belong to one company (or none for shared records). Some models like <code>res.partner</code> and <code>product.template</code> use <code>company_ids</code> (Many2many) instead to allow a record to be accessible across multiple companies. Use Many2many for resources that need to be shared selectively across companies.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a href="/odoo/advanced/performance-caching.html" class="lesson-nav-link">
+        <span class="nav-label">← Prev</span>
+        <span class="nav-title">Performance &amp; Caching</span>
+        </a>
+        <a href="/odoo/advanced/testing.html" class="lesson-nav-link next">
+        <span class="nav-label">Next →</span>
+        <span class="nav-title">Testing Odoo Modules</span>
+        </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

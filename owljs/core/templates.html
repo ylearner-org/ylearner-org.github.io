@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS Template Syntax – QWeb Directives Complete Guide | ylearner</title>
+  <meta name="description" content="Master OWL JS QWeb template syntax: t-esc, t-raw, t-if, t-elif, t-else, t-foreach, t-as, t-key, t-set, t-call, t-att, and the xml tagged template literal. Full tutorial with examples.">
+  <meta name="keywords" content="OWL JS template syntax, QWeb directives, OWL t-esc, OWL t-if t-foreach, OWL t-att, OWL xml template, QWeb OWL tutorial, Odoo Web Library templates, OWL t-call, OWL t-set">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/owljs/core/templates.html">
+  <meta property="og:title" content="OWL JS QWeb Template Syntax – Complete Guide | ylearner">
+  <meta property="og:description" content="All QWeb directives in OWL JS explained: t-esc, t-raw, t-if/elif/else, t-foreach, t-key, t-set, t-call, t-att, and structural t tags.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/owljs/core/templates.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS QWeb Templates Complete Reference | ylearner">
+  <meta name="twitter:description" content="t-esc, t-raw, t-if, t-foreach, t-set, t-call, t-att — every QWeb directive with examples.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS Template Syntax (QWeb)",
+    "description": "Complete guide to OWL JS QWeb template directives: t-esc, t-raw, t-if/elif/else, t-foreach, t-key, t-set, t-call, t-att, and structural t tags with real examples.",
+    "educationalLevel": "Beginner",
+    "keywords": "OWL JS QWeb, t-foreach, t-if, t-esc, template directives, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/core/components.html">Core Concepts</a><span class="separator">›</span>
+          <span class="current">Template Syntax (QWeb)</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Core Concepts</div>
+          <h1>OWL JS Template Syntax – QWeb Directives Reference</h1>
+          <p class="lesson-intro">OWL uses <strong>QWeb</strong> — Odoo's XML-based template language — for all component rendering. QWeb directives are XML attributes that start with <code>t-</code> and give the template engine instructions: render this text, loop over these items, show this block conditionally. Unlike JSX (React) or Vue's template syntax, QWeb is processed at compile time into a fast render function. This lesson is your complete reference for every directive you will use in day-to-day OWL development.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 2 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="qweb-overview">How QWeb Templates Work</h2>
+          <p>A QWeb template is an XML string defined with the <code>xml``</code> tagged template literal. OWL compiles it once into a JavaScript render function. At render time that function produces a virtual DOM tree, which OWL diffs against the previous tree to update the real DOM efficiently.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – template registration</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml } from "@odoo/owl";
+
+class MyComp extends Component {
+  // xml`` registers and compiles the template
+  static template = xml`
+    &lt;div class="my-comp"&gt;
+      Hello, &lt;span t-esc="props.name"/&gt;!
+    &lt;/div&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>The template scope</strong>
+              <p>Inside a template, the component instance is the implicit <code>this</code>. You access <code>props</code>, <code>state</code>, computed getters, and methods directly — without writing <code>this.</code>. The template engine injects these from the component instance at render time.</p>
+            </div>
+          </div>
+
+          <h2 id="t-esc-raw">Text Output: t-esc and t-raw</h2>
+
+          <h3 id="t-esc">t-esc — Safe HTML-escaped output</h3>
+          <p>Use <code>t-esc</code> for all text content. It HTML-escapes the value, preventing XSS attacks.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – t-esc</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Render a prop value --&gt;
+&lt;span t-esc="props.username"/&gt;
+
+&lt;!-- Render a state value --&gt;
+&lt;p t-esc="state.count"/&gt;
+
+&lt;!-- Any JS expression --&gt;
+&lt;span t-esc="props.price.toFixed(2) + ' USD'"/&gt;
+
+&lt;!-- Inside text content using t tag --&gt;
+&lt;p&gt;Hello, &lt;t t-esc="props.name"/&gt;! You have &lt;t t-esc="state.messages.length"/&gt; messages.&lt;/p&gt;</code></pre>
+          </div>
+
+          <h3 id="t-raw">t-raw — Raw HTML output (use with caution)</h3>
+          <p><code>t-raw</code> renders the value as raw HTML without escaping. Only use it when you own and trust the HTML source (e.g., sanitized content from your own backend). Never use it with user-generated content.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – t-raw</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- ONLY for trusted, sanitized HTML --&gt;
+&lt;div t-raw="props.sanitizedHtmlContent"/&gt;</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>t-raw is an XSS risk</strong>
+              <p>Never use <code>t-raw</code> with user input or any string you did not generate and sanitize yourself. If the value contains <code>&lt;script&gt;...&lt;/script&gt;</code>, it will execute. Prefer <code>t-esc</code> in all cases unless you have a specific need for raw HTML from a trusted source.</p>
+            </div>
+          </div>
+
+          <h2 id="t-if">Conditional Rendering: t-if, t-elif, t-else</h2>
+          <p>These work exactly like an <code>if/else if/else</code> chain. The element (and all its children) is only rendered when the condition is truthy.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – conditional rendering</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Basic t-if --&gt;
+&lt;p t-if="state.isLoading"&gt;Loading…&lt;/p&gt;
+
+&lt;!-- t-if / t-else --&gt;
+&lt;div t-if="props.user"&gt;
+  Welcome, &lt;t t-esc="props.user.name"/&gt;
+&lt;/div&gt;
+&lt;div t-else=""&gt;Please log in.&lt;/div&gt;
+
+&lt;!-- t-if / t-elif / t-else --&gt;
+&lt;span t-if="props.score &gt;= 90"&gt;A&lt;/span&gt;
+&lt;span t-elif="props.score &gt;= 80"&gt;B&lt;/span&gt;
+&lt;span t-elif="props.score &gt;= 70"&gt;C&lt;/span&gt;
+&lt;span t-else=""&gt;F&lt;/span&gt;
+
+&lt;!-- Conditional on &lt;t&gt; (no DOM output, just structural) --&gt;
+&lt;t t-if="state.hasError"&gt;
+  &lt;div class="alert"&gt;&lt;t t-esc="state.errorMessage"/&gt;&lt;/div&gt;
+&lt;/t&gt;</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>t-else must immediately follow t-if or t-elif</strong>
+              <p>The <code>t-else</code> element must be the next sibling of the <code>t-if</code> or <code>t-elif</code> element in the XML. No other elements or whitespace-only text nodes may appear between them.</p>
+            </div>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="t-foreach">List Rendering: t-foreach, t-as, t-key</h2>
+          <p>These three directives always appear together. <code>t-foreach</code> specifies the iterable, <code>t-as</code> names the loop variable, and <code>t-key</code> provides the unique identifier for each item.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – list rendering</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Basic array loop —  t-key should be a stable unique value --&gt;
+&lt;ul&gt;
+  &lt;li t-foreach="state.items" t-as="item" t-key="item.id"&gt;
+    &lt;t t-esc="item.name"/&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- Loop over numbers (0..4) --&gt;
+&lt;div t-foreach="[0,1,2,3,4]" t-as="n" t-key="n"&gt;
+  &lt;t t-esc="n"/&gt;
+&lt;/div&gt;
+
+&lt;!-- Access loop index with _index suffix --&gt;
+&lt;li t-foreach="props.tags" t-as="tag" t-key="tag_index"&gt;
+  #&lt;t t-esc="tag_index + 1"/&gt;: &lt;t t-esc="tag"/&gt;
+&lt;/li&gt;
+
+&lt;!-- Loop on a sub-component --&gt;
+&lt;ProductCard
+  t-foreach="state.products"
+  t-as="product"
+  t-key="product.id"
+  name="product.name"
+  price="product.price"
+/&gt;</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Always use a stable, unique t-key</strong>
+              <p>OWL uses <code>t-key</code> to match old vdom nodes to new ones during re-renders. Using <code>_index</code> as the key when items can be deleted or reordered causes subtle bugs — OWL reuses DOM nodes incorrectly. Use a real unique identifier from your data (like <code>item.id</code>) whenever possible.</p>
+            </div>
+          </div>
+
+          <h3 id="foreach-variables">Special Variables in t-foreach</h3>
+          <p>Inside a <code>t-foreach</code> loop, OWL automatically provides helper variables using the <code>t-as</code> name as a prefix:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Variable</th><th>Description</th><th>Example (t-as="item")</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>item</code></td><td>Current element</td><td><code>item.name</code></td></tr>
+                <tr><td><code>item_index</code></td><td>Zero-based loop index</td><td><code>item_index</code></td></tr>
+                <tr><td><code>item_first</code></td><td>True for the first element</td><td><code>item_first</code></td></tr>
+                <tr><td><code>item_last</code></td><td>True for the last element</td><td><code>item_last</code></td></tr>
+                <tr><td><code>item_value</code></td><td>For Object.entries loops, the value</td><td><code>item_value</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="t-set">Variable Definition: t-set</h2>
+          <p><code>t-set</code> defines a local template variable, scoped to the current block. Useful for extracting repeated expressions or computed values.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – t-set</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Define a variable with t-value (JS expression) --&gt;
+&lt;t t-set="fullName" t-value="props.firstName + ' ' + props.lastName"/&gt;
+&lt;span t-esc="fullName"/&gt;
+
+&lt;!-- Define a variable with body (renders to HTML string) --&gt;
+&lt;t t-set="badge"&gt;
+  &lt;span class="badge"&gt;Admin&lt;/span&gt;
+&lt;/t&gt;
+&lt;div&gt;&lt;t t-raw="badge"/&gt;&lt;/div&gt;
+
+&lt;!-- Useful for DRY: compute once, use multiple times --&gt;
+&lt;t t-set="isExpired" t-value="props.expiryDate &lt; Date.now()"/&gt;
+&lt;span t-if="isExpired" class="expired-badge"&gt;Expired&lt;/span&gt;
+&lt;p t-if="isExpired"&gt;This offer has expired.&lt;/p&gt;</code></pre>
+          </div>
+
+          <h2 id="t-att">Dynamic Attributes: t-att and t-att-*</h2>
+          <p>Use <code>t-att-[attrname]</code> to set a single attribute to a JavaScript expression. Use <code>t-att</code> to set multiple attributes from an object.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – dynamic attributes</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- t-att-[name]: single dynamic attribute --&gt;
+&lt;img t-att-src="props.imageUrl" t-att-alt="props.imageAlt"/&gt;
+&lt;a t-att-href="'/users/' + props.userId"&gt;View profile&lt;/a&gt;
+&lt;input t-att-disabled="state.isLoading"/&gt;
+
+&lt;!-- t-att-class: conditional classes (object syntax) --&gt;
+&lt;div t-att-class="{
+  'card': true,
+  'card--active': state.isActive,
+  'card--error': state.hasError,
+  'card--loading': state.isLoading
+}"&gt;&lt;/div&gt;
+
+&lt;!-- t-att-class: string concatenation --&gt;
+&lt;span t-att-class="'badge badge--' + props.color"/&gt;
+
+&lt;!-- t-att: spread multiple attributes from an object --&gt;
+&lt;input t-att="{ type: 'text', placeholder: props.placeholder, disabled: state.isDisabled }"/&gt;</code></pre>
+          </div>
+
+          <h2 id="t-call">Template Reuse: t-call</h2>
+          <p><code>t-call</code> renders another named template inline. Useful for sharing template fragments across components without creating a full child component.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – t-call example</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml } from "@odoo/owl";
+
+// A reusable template fragment
+const loadingTemplate = xml`
+  &lt;div class="loading-spinner"&gt;
+    &lt;span&gt;Loading…&lt;/span&gt;
+  &lt;/div&gt;
+`;
+
+class Dashboard extends Component {
+  static template = xml`
+    &lt;div&gt;
+      &lt;t t-if="state.isLoading"&gt;
+        &lt;t t-call="${loadingTemplate}"/&gt;
+      &lt;/t&gt;
+      &lt;t t-else=""&gt;
+        &lt;h1&gt;Dashboard Content&lt;/h1&gt;
+      &lt;/t&gt;
+    &lt;/div&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <h2 id="t-ref">DOM References: t-ref</h2>
+          <p><code>t-ref</code> gives a named reference to a real DOM element. Access it in methods via <code>this.refs.myName</code>. Covered fully in the <a href="/owljs/templates/refs.html">Refs lesson</a>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML + JavaScript – t-ref quick example</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class SearchBox extends Component {
+  static template = xml`
+    &lt;div&gt;
+      &lt;input t-ref="searchInput" type="text" placeholder="Search…"/&gt;
+      &lt;button t-on-click="focusInput"&gt;Focus&lt;/button&gt;
+    &lt;/div&gt;
+  `;
+
+  focusInput() {
+    this.refs.searchInput.focus();  // direct DOM access
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="t-structural">The &lt;t&gt; Structural Tag</h2>
+          <p>The <code>&lt;t&gt;</code> tag is a virtual node — it produces no DOM output. Use it to apply a directive without adding a wrapper element, or to group multiple elements under a single conditional or loop:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – t tag uses</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Conditional without a wrapper element --&gt;
+&lt;t t-if="state.isAdmin"&gt;
+  &lt;button&gt;Delete&lt;/button&gt;
+  &lt;button&gt;Edit&lt;/button&gt;
+&lt;/t&gt;
+
+&lt;!-- Interpolation inside text --&gt;
+&lt;p&gt;You have &lt;t t-esc="state.count"/&gt; unread messages.&lt;/p&gt;
+
+&lt;!-- t-set without rendering anything --&gt;
+&lt;t t-set="greeting" t-value="'Hello, ' + props.name"/&gt;</code></pre>
+          </div>
+
+          <h2 id="directives-reference">QWeb Directives Quick Reference</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Directive</th><th>Purpose</th><th>Quick Example</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>t-esc</code></td><td>HTML-safe text output</td><td><code>t-esc="props.name"</code></td></tr>
+                <tr><td><code>t-raw</code></td><td>Raw HTML output (trusted only)</td><td><code>t-raw="props.htmlContent"</code></td></tr>
+                <tr><td><code>t-if</code></td><td>Conditional render</td><td><code>t-if="state.show"</code></td></tr>
+                <tr><td><code>t-elif</code></td><td>Else-if branch</td><td><code>t-elif="x &gt; 5"</code></td></tr>
+                <tr><td><code>t-else</code></td><td>Fallback branch</td><td><code>t-else=""</code></td></tr>
+                <tr><td><code>t-foreach</code></td><td>Loop over array/object</td><td><code>t-foreach="state.items"</code></td></tr>
+                <tr><td><code>t-as</code></td><td>Loop variable name</td><td><code>t-as="item"</code></td></tr>
+                <tr><td><code>t-key</code></td><td>Stable identity for list items</td><td><code>t-key="item.id"</code></td></tr>
+                <tr><td><code>t-set</code></td><td>Define local variable</td><td><code>t-set="x" t-value="expr"</code></td></tr>
+                <tr><td><code>t-att-[name]</code></td><td>Dynamic attribute</td><td><code>t-att-href="url"</code></td></tr>
+                <tr><td><code>t-att</code></td><td>Multiple dynamic attributes</td><td><code>t-att="attrObj"</code></td></tr>
+                <tr><td><code>t-att-class</code></td><td>Conditional CSS classes</td><td><code>t-att-class="{ active: isOn }"</code></td></tr>
+                <tr><td><code>t-ref</code></td><td>DOM reference</td><td><code>t-ref="inputEl"</code></td></tr>
+                <tr><td><code>t-call</code></td><td>Include another template</td><td><code>t-call="${tmplKey}"</code></td></tr>
+                <tr><td><code>t-on-[event]</code></td><td>Event listener</td><td><code>t-on-click="handleClick"</code></td></tr>
+                <tr><td><code>t-model</code></td><td>Two-way input binding</td><td><code>t-model="state.value"</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="deep-owltmpl">OWL Templates: QWeb Directives in the DOM</h2>
+          <p>OWL templates are XML using QWeb directives (<code>t-</code> attributes) to bind data, loop, and branch. They compile to fast DOM-updating functions. The expressions read from the component instance — <code>state</code>, <code>props</code>, and your methods.</p>
+          <pre><code class="language-javascript">static template = xml`
+  &lt;div&gt;
+    &lt;p t-if="state.loggedIn"&gt;Welcome, &lt;t t-esc="state.name"/&gt;&lt;/p&gt;
+    &lt;p t-else=""&gt;Please log in&lt;/p&gt;
+    &lt;button t-att-disabled="state.busy" t-on-click="save"&gt;Save&lt;/button&gt;
+    &lt;li t-foreach="state.items" t-as="item" t-key="item.id"&gt;
+      &lt;t t-esc="item.label"/&gt;
+    &lt;/li&gt;
+  &lt;/div&gt;`;</code></pre>
+          <table>
+            <thead><tr><th>Directive</th><th>Does</th></tr></thead>
+            <tbody>
+              <tr><td><code>t-esc</code></td><td>insert text, <strong>escaped</strong> (safe)</td></tr>
+              <tr><td><code>t-out</code></td><td>insert raw HTML (only for trusted content)</td></tr>
+              <tr><td><code>t-if</code> / <code>t-else</code></td><td>conditional rendering</td></tr>
+              <tr><td><code>t-foreach</code> + <code>t-key</code></td><td>loop (key required)</td></tr>
+              <tr><td><code>t-att-x</code></td><td>dynamic attribute</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Two rules people hit:</strong> a template must have a <em>single root element</em> — wrap siblings in a <code>&lt;div&gt;</code> or <code>&lt;t&gt;</code>. And prefer <code>t-esc</code> over <code>t-out</code>: <code>t-esc</code> escapes HTML and blocks injection, while <code>t-out</code> renders raw markup and can open an XSS hole if the data isn't trusted.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a <code>FilterableList</code> component that uses all the key directives from this lesson:</p>
+            <ol>
+              <li>State: an array of <code>{ id, name, category }</code> objects, plus a <code>filter</code> string (default <code>""</code>).</li>
+              <li>Use <code>t-set</code> to compute <code>filteredItems</code> (or use a getter — both work).</li>
+              <li>Use <code>t-foreach</code> with <code>t-key="item.id"</code> to render the filtered list.</li>
+              <li>Use <code>t-if / t-else</code> to show "No results" when the filtered list is empty.</li>
+              <li>Use <code>t-att-class</code> to highlight items where <code>item.category === 'featured'</code>.</li>
+              <li>Use <code>t-esc</code> for all text output. Do not use <code>t-raw</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write an OWL/QWeb template that interpolates data (<code>t-esc</code>), sets a dynamic attribute (<code>t-att-class</code>), and renders raw HTML safely (<code>t-out</code>). Explain the difference between <code>t-esc</code> and <code>t-out</code> and why escaping matters.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>xml``</code> is a tagged template literal that compiles and registers the QWeb template string. Always use it — never a plain string.</li>
+              <li><code>t-esc</code> renders text safely (HTML-escaped). Always prefer it over <code>t-raw</code>.</li>
+              <li><code>t-if / t-elif / t-else</code> provide conditional rendering. Elements with a false condition are removed from the DOM entirely.</li>
+              <li><code>t-foreach</code> + <code>t-as</code> + <code>t-key</code> is the complete loop trio. Always provide a stable unique <code>t-key</code>.</li>
+              <li><code>t-set</code> defines a local template variable — useful to extract repeated expressions.</li>
+              <li><code>t-att-class</code> accepts an object of <code>{ className: boolExpr }</code> for conditional classes.</li>
+              <li>The <code>&lt;t&gt;</code> tag is structural — it applies directives without producing a DOM node.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What templating language does OWL use?</li>
+            <li>What does <code>t-esc</code> do?</li>
+            <li>What is the difference between <code>t-esc</code> and <code>t-out</code>?</li>
+            <li>How do you set dynamic attributes?</li>
+            <li>How are templates compiled?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/owljs/core/components.html" class="topic-tag owl-topic-tag">🦉 Components</a>
+            <a href="/owljs/core/events.html" class="topic-tag owl-topic-tag">🦉 Event Handling</a>
+            <a href="/owljs/templates/conditional.html" class="topic-tag owl-topic-tag">🦉 Conditional Rendering</a>
+            <a href="/owljs/templates/list-rendering.html" class="topic-tag owl-topic-tag">🦉 List Rendering (t-foreach)</a>
+            <a href="/owljs/templates/input-binding.html" class="topic-tag owl-topic-tag">🦉 Input Binding (t-model)</a>
+            <a href="/owljs/templates/dynamic-attrs.html" class="topic-tag owl-topic-tag">🦉 Dynamic Attributes</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between t-esc and just writing the value in text? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Plain text in a QWeb template is treated as a literal string, not a JavaScript expression. If you write <code>&lt;span&gt;props.name&lt;/span&gt;</code>, the browser renders the string "props.name". To render the <em>value</em> of <code>props.name</code>, you must use a <code>t-esc</code> attribute or wrap it in a <code>&lt;t t-esc="props.name"/&gt;</code> tag. Think of <code>t-esc</code> as the QWeb equivalent of <code>{{ props.name }}</code> in Vue or <code>{props.name}</code> in JSX.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use JavaScript expressions inside t-if, t-foreach, etc.? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — the attribute values of all <code>t-*</code> directives are JavaScript expressions evaluated in the component's scope. You can use ternary operators, method calls, array methods, template literals (with the inner quotes), logical operators, comparisons, and so on. The only restriction is that it must be a single expression, not a statement (no <code>let x = 5; return x;</code>).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does t-att-class with an object need boolean values? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>OWL applies a class name only when its value is truthy. The object form <code>{ 'active': state.isActive, 'error': hasError }</code> lets you control multiple independent classes in one expression. OWL merges the object with any static <code>class</code> attribute on the same element, so you can mix static and dynamic classes: <code>class="btn" t-att-class="{ 'btn--primary': isPrimary }"</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can QWeb templates have comments? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — standard XML comments <code>&lt;!-- ... --&gt;</code> work inside QWeb templates. They are stripped during compilation and do not appear in the rendered HTML. Use them freely to document complex template sections.</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/core/components.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Components &amp; Classes</span>
+          </a>
+          <a href="/owljs/core/props.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Props</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Symbols – Unique Keys &amp; Well-Known Symbols | ylearner</title>
+  <meta name="description" content="Master JavaScript Symbols: Symbol() uniqueness, Symbol.for() global registry, Symbol.keyFor(), Symbol as object keys, non-enumerable properties, well-known symbols (Symbol.iterator, Symbol.toPrimitive, Symbol.hasInstance, Symbol.toStringTag), and practical metaprogramming.">
+  <meta name="keywords" content="javascript symbols, Symbol.for javascript, Symbol.iterator javascript, Symbol.toPrimitive, Symbol.toStringTag, well-known symbols javascript, symbol as object key, non-enumerable symbol properties">
+  <link rel="canonical" href="https://ylearner.org/javascript/advanced/symbols.html">
+  <meta property="og:title" content="JavaScript Symbols – Unique Keys &amp; Well-Known Symbols | ylearner">
+  <meta property="og:description" content="Master JavaScript Symbols: unique values, global registry, non-enumerable keys, and well-known symbols for metaprogramming.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/advanced/symbols.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Symbols – Unique Keys &amp; Well-Known Symbols | ylearner">
+  <meta name="twitter:description" content="Master JavaScript Symbols: unique values, global registry, non-enumerable keys, and well-known symbols for metaprogramming.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/advanced/callbacks.html">Advanced JS</a><span class="separator">›</span>
+          <span class="current">Symbols</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🚀 Advanced JS</div>
+          <h1>JavaScript Symbols – Unique Values and Metaprogramming Hooks</h1>
+          <p class="lesson-intro">Introduced in ES6, <code>Symbol</code> is the seventh primitive type in JavaScript. Every Symbol value is guaranteed unique — even two Symbols with the same description are not equal. This uniqueness makes Symbols ideal as collision-free object keys, private-ish properties, and hooks into JavaScript's built-in behaviour through <em>well-known symbols</em> like <code>Symbol.iterator</code>, <code>Symbol.toPrimitive</code>, and <code>Symbol.hasInstance</code>.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 19 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="symbol-basics">Symbol Basics – Always Unique</h2>
+          <p>Call <code>Symbol(description)</code> to create a new unique symbol. The optional description string is for debugging only — it is not part of the symbol's identity.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const s1 = Symbol('mySymbol');
+const s2 = Symbol('mySymbol');
+
+console.log(s1 === s2);           // false — different symbols!
+console.log(typeof s1);           // 'symbol'
+console.log(s1.description);      // 'mySymbol'
+console.log(s1.toString());       // 'Symbol(mySymbol)'
+
+// Cannot coerce to string with + (throws TypeError)
+try {
+  const str = 'prefix:' + s1;    // TypeError
+} catch (e) {
+  console.error(e.message);
+}
+
+// Use String() or .toString() explicitly
+console.log(String(s1));          // 'Symbol(mySymbol)'
+console.log(`${s1.description}`); // 'mySymbol'  (access description, not coerce)</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>false
+symbol
+mySymbol
+Symbol(mySymbol)
+Cannot convert a Symbol value to a string
+Symbol(mySymbol)
+mySymbol</pre>
+          </div>
+
+          <h2 id="symbols-as-keys">Symbols as Object Property Keys</h2>
+          <p>Symbol-keyed properties do not show up in <code>Object.keys()</code>, <code>for...in</code>, or <code>JSON.stringify()</code>. This makes them ideal for adding metadata or extension points to objects without polluting their enumerable property list.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const ID      = Symbol('id');
+const VERSION = Symbol('version');
+
+const user = {
+  name:    'Alice',
+  email:   'alice@example.com',
+  [ID]:    42,          // symbol key — not enumerable via Object.keys
+  [VERSION]: '2.1.0'
+};
+
+// String keys — visible
+console.log(Object.keys(user));         // ['name', 'email']
+console.log(JSON.stringify(user));      // {"name":"Alice","email":"alice@example.com"}
+
+// Symbol keys — hidden from enumeration but directly accessible
+console.log(user[ID]);                  // 42
+console.log(user[VERSION]);             // '2.1.0'
+
+// Retrieve symbol keys explicitly
+console.log(Object.getOwnPropertySymbols(user)); // [Symbol(id), Symbol(version)]
+
+// Reflect.ownKeys gets ALL keys (string + symbol)
+console.log(Reflect.ownKeys(user));     // ['name', 'email', Symbol(id), Symbol(version)]</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>['name', 'email']
+{"name":"Alice","email":"alice@example.com"}
+42
+2.1.0
+[Symbol(id), Symbol(version)]
+['name', 'email', Symbol(id), Symbol(version)]</pre>
+          </div>
+
+          <h2 id="symbol-for">Symbol.for() – The Global Registry</h2>
+          <p><code>Symbol.for(key)</code> creates (or retrieves) a symbol from a global, cross-realm registry. Two calls with the same key return the exact same symbol, making it useful for sharing symbols across modules or iframes.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Symbol.for() uses a global registry
+const a = Symbol.for('app.theme');
+const b = Symbol.for('app.theme');
+
+console.log(a === b);           // true — same registry entry!
+
+// Vs Symbol() — always unique
+const c = Symbol('app.theme');
+const d = Symbol('app.theme');
+console.log(c === d);           // false
+
+// Look up the registry key for a Symbol.for symbol
+console.log(Symbol.keyFor(a));  // 'app.theme'
+console.log(Symbol.keyFor(c));  // undefined — not in registry
+
+// Practical: sharing a protocol key across modules
+const DISPOSABLE = Symbol.for('Symbol.disposable');  // shared protocol key
+class Connection {
+  [DISPOSABLE]() { console.log('Connection closed'); }
+}
+const conn = new Connection();
+conn[Symbol.for('Symbol.disposable')]();</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>true
+false
+app.theme
+undefined
+Connection closed</pre>
+          </div>
+
+          <h2 id="well-known-symbols">Well-Known Symbols</h2>
+          <p>JavaScript defines a set of built-in symbols on the <code>Symbol</code> object that serve as hooks into language-level behaviour. Implementing these on your class changes how JavaScript treats your objects.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Well-Known Symbol</th><th>Hook</th><th>Used by</th></tr></thead>
+              <tbody>
+                <tr><td><code>Symbol.iterator</code></td><td>Makes object iterable</td><td><code>for...of</code>, spread, destructuring</td></tr>
+                <tr><td><code>Symbol.toPrimitive</code></td><td>Custom type coercion</td><td><code>+</code>, <code>-</code>, template literals, comparisons</td></tr>
+                <tr><td><code>Symbol.hasInstance</code></td><td>Customise <code>instanceof</code></td><td><code>instanceof</code> operator</td></tr>
+                <tr><td><code>Symbol.toStringTag</code></td><td>Custom <code>[object X]</code> tag</td><td><code>Object.prototype.toString.call(obj)</code></td></tr>
+                <tr><td><code>Symbol.species</code></td><td>Constructor for derived objects</td><td><code>map()</code>, <code>filter()</code>, <code>slice()</code> on subclasses</td></tr>
+                <tr><td><code>Symbol.asyncIterator</code></td><td>Makes object async iterable</td><td><code>for await...of</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="symbol-iterator-custom">Custom Symbol.iterator</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class NumberRange {
+  constructor(from, to) {
+    this.from = from;
+    this.to   = to;
+  }
+
+  [Symbol.iterator]() {
+    let current = this.from;
+    const last  = this.to;
+    return {
+      next() {
+        if (current &lt;= last) {
+          return { value: current++, done: false };
+        }
+        return { value: undefined, done: true };
+      }
+    };
+  }
+}
+
+const range = new NumberRange(1, 5);
+console.log([...range]);                  // [1, 2, 3, 4, 5]
+for (const n of range) process.stdout.write(n + ' ');
+console.log();
+const [first, second] = range;           // destructuring
+console.log(first, second);</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>[1, 2, 3, 4, 5]
+1 2 3 4 5
+1 2</pre>
+          </div>
+
+          <h2 id="symbol-toprimitive-tostring">Symbol.toPrimitive and Symbol.toStringTag</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Money {
+  constructor(amount, currency) {
+    this.amount   = amount;
+    this.currency = currency;
+  }
+
+  // Called when JS needs a primitive from this object
+  [Symbol.toPrimitive](hint) {
+    if (hint === 'number') return this.amount;
+    if (hint === 'string') return `${this.amount} ${this.currency}`;
+    // default hint (e.g., ==, +)
+    return this.amount;
+  }
+
+  // Changes [object Object] in toString output
+  get [Symbol.toStringTag]() {
+    return 'Money';
+  }
+}
+
+const price = new Money(29.99, 'USD');
+
+console.log(+price);                            // 29.99 (number hint)
+console.log(`${price}`);                        // '29.99 USD' (string hint)
+console.log(price + 10);                        // 39.99 (default hint)
+console.log(Object.prototype.toString.call(price)); // [object Money]
+
+// Symbol.hasInstance: customise instanceof
+class EvenNumber {
+  static [Symbol.hasInstance](value) {
+    return Number.isInteger(value) &amp;&amp; value % 2 === 0;
+  }
+}
+
+console.log(4  instanceof EvenNumber);   // true
+console.log(7  instanceof EvenNumber);   // false
+console.log(0  instanceof EvenNumber);   // true</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>
+            <pre>29.99
+29.99 USD
+39.99
+[object Money]
+true
+false
+true</pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>Symbol.toPrimitive hint values</strong><p>The <code>hint</code> parameter is <code>'number'</code> (numeric context: unary <code>+</code>, arithmetic), <code>'string'</code> (string context: template literal, <code>String()</code>), or <code>'default'</code> (ambiguous: <code>+</code> with mixed operands, loose equality <code>==</code>). Always handle all three cases for predictable coercion.</p></div>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content"><strong>Symbol properties are not truly private</strong><p>Symbol-keyed properties are not private — anyone with a reference to the Symbol can access the property. <code>Object.getOwnPropertySymbols()</code> also exposes them. For true privacy, use private class fields (<code>#field</code>). Symbols are best used for avoiding name collisions, not for data hiding.</p></div>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="deep-symbols">Symbols: Guaranteed-Unique Keys</h2>
+          <p><code>Symbol()</code> creates a primitive that is <strong>always unique</strong> — even two symbols with the same description are different. Their main use: object keys that can never collide with existing or future keys, even from other libraries.</p>
+          <pre><code class="language-javascript">const id = Symbol("id");
+const user = { name: "Ann", [id]: 123 };   // symbol key
+user[id];                 // 123
+Symbol("x") === Symbol("x");   // false — always unique
+
+Object.keys(user);        // ["name"] — symbol keys are hidden here
+JSON.stringify(user);     // {"name":"Ann"} — symbols excluded</code></pre>
+          <p>Symbol keys don't appear in <code>Object.keys</code>, <code>for...in</code>, or <code>JSON.stringify</code> — handy for "hidden" metadata that won't interfere with normal iteration.</p>
+          <h3>Well-known symbols customize built-in behavior</h3>
+          <pre><code class="language-javascript">const range = {
+  [Symbol.iterator]() {    // makes the object iterable
+    let n = 0;
+    return { next: () => n < 3 ? {value: n++, done: false} : {done: true} };
+  }
+};
+[...range];   // [0, 1, 2]</code></pre>
+          <p>Defining <code>Symbol.iterator</code> is what lets your object work with <code>for...of</code> and spread. Other well-knowns (<code>Symbol.asyncIterator</code>, <code>Symbol.hasInstance</code>) hook into more language features.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Create a <code>LinkedList</code> class that implements <code>Symbol.iterator</code> to make instances iterable. The iterator should traverse nodes from head to tail. Test with <code>for...of</code>, spread (<code>[...list]</code>), and destructuring. Add a <code>Symbol.toStringTag</code> getter so <code>Object.prototype.toString.call(list)</code> returns <code>'[object LinkedList]'</code>.</p>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Implement a <code>Unit</code> class (for physical units like metres, seconds, kilograms) that uses <code>Symbol.toPrimitive</code> for numeric and string coercions, <code>Symbol.toStringTag</code> for a custom tag, and a static <code>Symbol.hasInstance</code> that returns <code>true</code> for any object with a <code>value</code> and <code>unit</code> property. Demonstrate arithmetic between two units of the same type and error handling for incompatible units.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Every <code>Symbol()</code> call produces a unique primitive value — even with the same description.</li>
+              <li><code>Symbol.for(key)</code> uses a global registry; same key always returns the same symbol.</li>
+              <li>Symbol keys are non-enumerable: hidden from <code>Object.keys()</code>, <code>for...in</code>, and <code>JSON.stringify()</code>.</li>
+              <li>Retrieve symbol keys with <code>Object.getOwnPropertySymbols()</code> or <code>Reflect.ownKeys()</code>.</li>
+              <li>Well-known symbols hook into language behaviour: <code>Symbol.iterator</code>, <code>Symbol.toPrimitive</code>, <code>Symbol.hasInstance</code>, <code>Symbol.toStringTag</code>.</li>
+              <li>Symbols prevent property name collisions but are not a privacy mechanism.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a Symbol and why is every Symbol unique?</li>
+            <li>What is the difference between Symbol() and Symbol.for()?</li>
+            <li>Why are Symbol-keyed properties hidden from Object.keys() and JSON.stringify()?</li>
+            <li>What are well-known symbols? Name three and explain what each does.</li>
+            <li>Are Symbol-keyed properties truly private? How do you access them?</li>
+            <li>When would you use Symbol.for() instead of Symbol()?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/javascript/advanced/proxy-reflect.html" class="topic-tag">Proxy &amp; Reflect</a>
+            <a href="/javascript/advanced/generators.html" class="topic-tag">Generators</a>
+            <a href="/javascript/advanced/event-loop.html" class="topic-tag">Event Loop</a>
+            <a href="/javascript/dom/dom-manipulation.html" class="topic-tag">DOM Manipulation</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can Symbol values be converted to strings? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not implicitly — concatenating a Symbol with a string using <code>+</code> throws a <code>TypeError</code>. You must explicitly call <code>String(sym)</code> or <code>sym.toString()</code>. This strict behaviour prevents accidental key confusion when symbols are mixed with string keys.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Do Symbol-keyed properties survive JSON.stringify / JSON.parse? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. <code>JSON.stringify</code> skips all Symbol-keyed properties, so they are lost in serialisation. This makes Symbols useful for metadata that should only live in memory — runtime IDs, framework internals, debug tags — and not be persisted to JSON.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is Symbol.species and when would you use it? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>Symbol.species</code> lets you control what constructor methods like <code>map()</code>, <code>filter()</code>, and <code>slice()</code> use to create derived objects when called on a subclass. For example, if you subclass <code>Array</code> and don't want <code>filter()</code> to return instances of your subclass (to avoid carrying over extra state), override <code>static get [Symbol.species]() { return Array; }</code>.</p></div>
+            </div>
+          </section>
+
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/advanced/proxy-reflect.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Proxy &amp; Reflect</span></a>
+          <a href="/javascript/advanced/quiz.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">📝 Section Quiz</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

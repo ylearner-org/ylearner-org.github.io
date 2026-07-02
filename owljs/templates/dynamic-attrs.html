@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS Dynamic Attributes – t-att, t-att-class, t-att-style | ylearner</title>
+  <meta name="description" content="Complete guide to OWL JS dynamic attributes: t-att-[name] for single attributes, t-att for multiple, t-att-class with object syntax, t-att-style with objects, conditional disabled/checked/selected, and ARIA attributes.">
+  <meta name="keywords" content="OWL JS t-att, OWL dynamic attributes, OWL t-att-class, OWL t-att-style, OWL conditional class, OWL JS dynamic attribute tutorial, Odoo Web Library t-att, OWL class binding">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/owljs/templates/dynamic-attrs.html">
+  <meta property="og:title" content="OWL JS Dynamic Attributes – t-att, t-att-class, t-att-style | ylearner">
+  <meta property="og:description" content="t-att-[name], t-att for multi-attribute objects, t-att-class with object syntax, t-att-style, ARIA attrs — complete OWL JS dynamic attribute guide.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/owljs/templates/dynamic-attrs.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS t-att Dynamic Attributes Complete Guide | ylearner">
+  <meta name="twitter:description" content="t-att-class, t-att-style, t-att-disabled — all dynamic attribute patterns in OWL JS with real examples.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS Dynamic Attributes (t-att)",
+    "description": "Complete guide to OWL JS dynamic attributes: t-att-[name], t-att for multiple attributes, t-att-class with object syntax, t-att-style, conditional form attributes, and accessible ARIA attributes.",
+    "educationalLevel": "Beginner",
+    "keywords": "OWL JS t-att, dynamic attributes, t-att-class, t-att-style, conditional attributes, ARIA, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/templates/conditional.html">Dynamic Templates</a><span class="separator">›</span>
+          <span class="current">Dynamic Attributes (t-att)</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Dynamic Templates</div>
+          <h1>OWL JS Dynamic Attributes – t-att, t-att-class, t-att-style</h1>
+          <p class="lesson-intro">Static HTML attributes are fine for values that never change, but most real-world components need attributes that respond to state or props. OWL provides two directives for this: <code>t-att-[name]</code> sets a single attribute to a JavaScript expression, and <code>t-att</code> sets multiple attributes from an object. The most commonly used variant is <code>t-att-class</code>, which accepts an object of <code>{ "className": boolExpr }</code> for conditional CSS classes. This lesson covers every form of dynamic attribute binding with practical examples.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 16 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 4 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="t-att-single">t-att-[name] — Single Attribute</h2>
+          <p>Replace any static attribute with <code>t-att-[name]</code> and set its value to a JavaScript expression. The expression is evaluated in the component's scope.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – t-att-* examples</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- src and alt from props --&gt;
+&lt;img t-att-src="props.avatarUrl" t-att-alt="props.userName + ' avatar'"/&gt;
+
+&lt;!-- href built from expression --&gt;
+&lt;a t-att-href="'/products/' + props.productId"&gt;View product&lt;/a&gt;
+
+&lt;!-- Conditional disabled --&gt;
+&lt;button t-att-disabled="state.isLoading || !state.isValid"&gt;Submit&lt;/button&gt;
+
+&lt;!-- Tabindex from state --&gt;
+&lt;div t-att-tabindex="state.isInteractive ? 0 : -1"&gt;&lt;/div&gt;
+
+&lt;!-- data-* attributes --&gt;
+&lt;div t-att-data-id="item.id" t-att-data-category="item.category"&gt;&lt;/div&gt;
+
+&lt;!-- Input type from props --&gt;
+&lt;input t-att-type="props.inputType" t-att-placeholder="props.placeholder"/&gt;</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Boolean attributes (disabled, checked, readonly, required)</strong>
+              <p>For boolean HTML attributes, <code>t-att-disabled="false"</code> removes the attribute entirely (correct behavior). <code>t-att-disabled="true"</code> adds <code>disabled="disabled"</code>. You never need to set <code>disabled="false"</code> in HTML — absence of the attribute means not disabled. OWL handles this correctly for all boolean attributes.</p>
+            </div>
+          </div>
+
+          <h2 id="t-att-class">t-att-class — Conditional CSS Classes</h2>
+          <p><code>t-att-class</code> is the most commonly used dynamic attribute in OWL. It accepts three forms:</p>
+
+          <h3 id="class-object">Object syntax (recommended)</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – t-att-class object syntax</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Each key is a class name, each value is a boolean expression --&gt;
+&lt;div t-att-class="{
+  'card':          true,
+  'card--active':  state.isActive,
+  'card--error':   state.hasError,
+  'card--loading': state.isLoading,
+  'card--large':   props.size === 'large'
+}"&gt;&lt;/div&gt;
+
+&lt;!-- Mix with static class attribute --&gt;
+&lt;button class="btn" t-att-class="{
+  'btn--primary':   props.variant === 'primary',
+  'btn--secondary': props.variant === 'secondary',
+  'btn--disabled':  props.disabled
+}"&gt;
+  &lt;t t-esc="props.label"/&gt;
+&lt;/button&gt;</code></pre>
+          </div>
+
+          <h3 id="class-string">String expression</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – t-att-class string expression</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Build class name string dynamically --&gt;
+&lt;span t-att-class="'badge badge--' + props.status"/&gt;
+&lt;!-- Renders: class="badge badge--active" (or "badge--pending", etc.) --&gt;
+
+&lt;!-- Ternary --&gt;
+&lt;div t-att-class="state.isOpen ? 'panel panel--open' : 'panel panel--closed'"/&gt;</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="t-att-style">t-att-style — Inline Styles</h2>
+          <p><code>t-att-style</code> accepts either a CSS string or a style object:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – t-att-style</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- String form --&gt;
+&lt;div t-att-style="'background-color: ' + props.color + '; opacity: ' + state.opacity"/&gt;
+
+&lt;!-- Object form (keys are camelCase CSS property names) --&gt;
+&lt;div t-att-style="{
+  backgroundColor: props.color,
+  opacity:         state.opacity,
+  transform:       'translateX(' + state.offsetX + 'px)',
+  display:         state.visible ? 'block' : 'none'
+}"/&gt;
+
+&lt;!-- Progress bar width --&gt;
+&lt;div class="progress-bar"&gt;
+  &lt;div
+    class="progress-fill"
+    t-att-style="{ width: state.progress + '%' }"
+  /&gt;
+&lt;/div&gt;
+
+&lt;!-- Avatar with dynamic background image --&gt;
+&lt;div class="avatar" t-att-style="{
+  backgroundImage: 'url(' + props.avatarUrl + ')',
+  width:           props.size + 'px',
+  height:          props.size + 'px'
+}"/&gt;</code></pre>
+          </div>
+
+          <h2 id="t-att-multi">t-att — Multiple Attributes from Object</h2>
+          <p>When you need to set many attributes at once from a computed object, use <code>t-att</code> (without a suffix):</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – t-att spread</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- All attributes from an object expression --&gt;
+&lt;input t-att="inputAttrs"/&gt;</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – computed attrs object</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class DynamicInput extends Component {
+  get inputAttrs() {
+    return {
+      type:        this.props.type || "text",
+      placeholder: this.props.placeholder || "",
+      disabled:    this.state.isLoading,
+      maxlength:   this.props.maxLength,
+      autocomplete: "off",
+    };
+  }
+
+  static template = xml`
+    &lt;input t-att="inputAttrs"/&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <h2 id="aria-attributes">Accessible ARIA Attributes</h2>
+          <p>ARIA attributes are critical for accessibility and are commonly dynamic — they should reflect current state:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – dynamic ARIA attributes</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Accordion button --&gt;
+&lt;button
+  t-att-aria-expanded="state.isOpen ? 'true' : 'false'"
+  t-att-aria-controls="'panel-' + props.id"
+  t-on-click="toggle"
+&gt;
+  &lt;t t-esc="props.title"/&gt;
+&lt;/button&gt;
+&lt;div
+  t-att-id="'panel-' + props.id"
+  t-att-aria-hidden="state.isOpen ? 'false' : 'true'"
+  t-if="state.isOpen"
+&gt;
+  &lt;t t-slot="default"/&gt;
+&lt;/div&gt;
+
+&lt;!-- Loading spinner --&gt;
+&lt;div
+  role="status"
+  t-att-aria-label="state.isLoading ? 'Loading…' : 'Content loaded'"
+  t-att-aria-busy="state.isLoading ? 'true' : 'false'"
+&gt;&lt;/div&gt;
+
+&lt;!-- Tab panel --&gt;
+&lt;button
+  role="tab"
+  t-att-aria-selected="props.activeTab === props.tabId ? 'true' : 'false'"
+  t-att-tabindex="props.activeTab === props.tabId ? 0 : -1"
+&gt;
+  &lt;t t-esc="props.label"/&gt;
+&lt;/button&gt;</code></pre>
+          </div>
+
+          <h2 id="real-world-patterns">Real-World Component Patterns</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – Button component with all dynamic attrs</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class Button extends Component {
+  static template = xml`
+    &lt;button
+      t-att-class="{
+        'btn':              true,
+        'btn--primary':     props.variant === 'primary',
+        'btn--secondary':   props.variant === 'secondary',
+        'btn--danger':      props.variant === 'danger',
+        'btn--loading':     props.loading,
+        'btn--icon-only':   !props.label
+      }"
+      t-att-disabled="props.disabled || props.loading"
+      t-att-type="props.type || 'button'"
+      t-att-aria-busy="props.loading ? 'true' : 'false'"
+      t-att-aria-label="props.ariaLabel || props.label"
+      t-on-click="props.onClick"
+    &gt;
+      &lt;span t-if="props.loading" class="spinner" aria-hidden="true"/&gt;
+      &lt;span t-if="props.icon" t-esc="props.icon" aria-hidden="true"/&gt;
+      &lt;span t-if="props.label" t-esc="props.label"/&gt;
+    &lt;/button&gt;
+  `;
+
+  static props = {
+    label:     { type: String, optional: true },
+    variant:   { type: String, optional: true },
+    type:      { type: String, optional: true },
+    disabled:  { type: Boolean, optional: true },
+    loading:   { type: Boolean, optional: true },
+    icon:      { type: String, optional: true },
+    ariaLabel: { type: String, optional: true },
+    onClick:   { type: Function, optional: true },
+  };
+
+  static defaultProps = {
+    variant:  "primary",
+    disabled: false,
+    loading:  false,
+    onClick:  () =&gt; {},
+  };
+}</code></pre>
+          </div>
+
+          <h2 id="deep-dynattr">Dynamic Attributes: t-att, t-att-, and t-attf-</h2>
+          <p>Templates often need attributes whose values come from data — a dynamic <code>href</code>, a conditional class, a computed style. OWL offers three directives, and picking the right one keeps templates clean.</p>
+          <table>
+            <thead><tr><th>Directive</th><th>Value is</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td><code>t-att-NAME</code></td><td>a JS expression</td><td><code>t-att-href="url"</code></td></tr>
+              <tr><td><code>t-attf-NAME</code></td><td>a string with <code>{{ }}</code> interpolation</td><td><code>t-attf-class="btn btn-{{size}}"</code></td></tr>
+              <tr><td><code>t-att</code></td><td>an object of many attrs</td><td><code>t-att="attrs"</code></td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-javascript">static template = xml`
+  &lt;a t-att-href="state.url"&gt;Link&lt;/a&gt;                    &lt;!-- expression --&gt;
+  &lt;div t-attf-class="card card-{{ props.variant }}"&gt;    &lt;!-- interpolation --&gt;
+  &lt;input t-att-disabled="state.busy"/&gt;                  &lt;!-- boolean attr --&gt;
+  &lt;div t-att="{ id: state.id, title: state.tip }"/&gt;    &lt;!-- object of attrs --&gt;`;</code></pre>
+          <p><strong>Choosing between them:</strong> use <code>t-att-x</code> when the whole value is one expression; use <code>t-attf-x</code> when you're building a string that <em>mixes</em> static text and dynamic parts (the classic case is a class name with a variable suffix). <strong>Boolean attributes</strong> are handled smartly: <code>t-att-disabled="false"</code> removes the attribute entirely (rather than rendering <code>disabled="false"</code>), matching how HTML boolean attributes actually work. For conditional classes, <code>t-attf-class</code> with a ternary or an object-style expression keeps logic in the template readable — but push anything complex into a getter on the component.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build an accessible <code>Accordion</code> component using dynamic attributes:</p>
+            <ol>
+              <li>Props: <code>items</code> — array of <code>{ id, title, content }</code>.</li>
+              <li>State: <code>openId</code> — the ID of the currently open panel (or <code>null</code>).</li>
+              <li>For each item render a <code>&lt;button&gt;</code> header and a content panel. Use <code>t-att-aria-expanded</code>, <code>t-att-aria-controls</code>, <code>t-att-id</code>, and <code>t-att-aria-labelledby</code> for full ARIA compliance.</li>
+              <li>Use <code>t-att-class</code> with object syntax to add an <code>is-open</code> class to the active panel header and content.</li>
+              <li>Use <code>t-att-style</code> to animate the max-height of the content panel (0 when closed, a fixed value when open).</li>
+              <li>Clicking an open item closes it; clicking another opens it and closes the previous one.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Bind attributes dynamically: a <code>t-att-class</code> that toggles based on state, a <code>t-att-disabled</code> on a button, and a dynamic <code>t-att-style</code>. Explain <code>t-att-</code>, <code>t-attf-</code>, and object-syntax class binding.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>t-att-[name]="expression"</code> sets any attribute dynamically — works for all HTML attributes including <code>src</code>, <code>href</code>, <code>disabled</code>, <code>tabindex</code>, <code>data-*</code>, <code>aria-*</code>.</li>
+              <li><code>t-att-class="{className: boolExpr}"</code> — object syntax adds/removes classes conditionally. OWL merges with any static <code>class</code> attribute on the same element.</li>
+              <li><code>t-att-class="'base ' + conditionalPart"</code> — string expression for dynamic class names (BEM modifier pattern).</li>
+              <li><code>t-att-style="{camelCaseProp: value}"</code> — object syntax for inline styles. Key names are camelCase JavaScript property names.</li>
+              <li><code>t-att="{attr1: val1, attr2: val2}"</code> — set multiple attributes from a computed object in one directive.</li>
+              <li>For boolean attributes (<code>disabled</code>, <code>required</code>, <code>checked</code>): a falsy expression removes the attribute entirely — the correct HTML behavior.</li>
+              <li>Always add dynamic ARIA attributes to interactive components for accessibility.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you set a dynamic attribute in OWL?</li>
+            <li>What is <code>t-att-</code>?</li>
+            <li>What is the difference between <code>t-att-</code> and <code>t-attf-</code>?</li>
+            <li>How do you toggle a CSS class?</li>
+            <li>How do you bind an inline style?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/owljs/core/templates.html" class="topic-tag owl-topic-tag">🦉 Template Syntax (QWeb)</a>
+            <a href="/owljs/templates/conditional.html" class="topic-tag owl-topic-tag">🦉 Conditional Rendering</a>
+            <a href="/owljs/templates/refs.html" class="topic-tag owl-topic-tag">🦉 Refs (t-ref)</a>
+            <a href="/owljs/core/props.html" class="topic-tag owl-topic-tag">🦉 Props</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I use both class and t-att-class on the same element? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — OWL merges them. The static <code>class</code> attribute always applies; <code>t-att-class</code> adds or removes classes on top of it. For example, <code>class="btn" t-att-class="{ 'btn--active': isActive }"</code> always has the <code>btn</code> class and conditionally has <code>btn--active</code>. This is the standard pattern for base classes + modifier classes.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between t-att-disabled="false" and not having the attribute? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In the resulting HTML, they are equivalent — both mean "not disabled". OWL removes attributes whose expression evaluates to <code>false</code>, <code>null</code>, or <code>undefined</code>. This means <code>t-att-disabled="state.isLoading"</code> correctly removes the <code>disabled</code> attribute when <code>isLoading</code> is false, and adds it when true. You never need a separate <code>t-if</code> to conditionally add boolean attributes.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why use t-att-style instead of a static style attribute? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A static <code>style</code> attribute can only hold a fixed string — you cannot embed JavaScript expressions in it. <code>t-att-style</code> lets the style values come from state, props, or computed values. For example, a progress bar's width must change dynamically: <code>t-att-style="{ width: state.progress + '%' }"</code>. Prefer CSS classes over inline styles when possible — use <code>t-att-style</code> only for values that genuinely cannot be expressed with predefined classes (like exact pixel positions, user-defined colors, or computed widths).</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/templates/input-binding.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Input Binding (t-model)</span>
+          </a>
+          <a href="/owljs/templates/refs.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Refs (t-ref)</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

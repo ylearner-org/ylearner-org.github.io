@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Joins Overview – Combining Tables | ylearner</title>
+  <meta name="description" content="Understand SQL joins: INNER JOIN, LEFT JOIN, RIGHT JOIN, FULL OUTER JOIN, SELF JOIN, and CROSS JOIN. Comparison table, Venn diagrams, and guidance on choosing the right join.">
+  <meta name="keywords" content="SQL joins overview, SQL JOIN types, INNER JOIN LEFT JOIN RIGHT JOIN, SQL join comparison, SQL tutorial, joining tables SQL">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/joins/joins-overview.html">
+  <meta property="og:title" content="SQL Joins Overview – Combining Tables | ylearner">
+  <meta property="og:description" content="Overview of all SQL join types: INNER, LEFT, RIGHT, FULL OUTER, SELF, and CROSS JOIN with comparison table and Venn diagrams.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/joins/joins-overview.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL Joins Overview – Combining Tables | ylearner">
+  <meta name="twitter:description" content="Overview of all SQL join types: INNER, LEFT, RIGHT, FULL OUTER, SELF, and CROSS JOIN with comparison table and Venn diagrams.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Joins Overview","description":"Overview of SQL join types: INNER JOIN, LEFT JOIN, RIGHT JOIN, FULL OUTER JOIN, SELF JOIN, and CROSS JOIN with comparison table and visual diagrams.","educationalLevel":"Beginner","keywords":"SQL joins, INNER JOIN, LEFT JOIN, RIGHT JOIN, FULL OUTER JOIN","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/joins/joins-overview.html">Joins</a><span class="separator">›</span>
+          <span class="current">Joins Overview</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔗 Joins</div>
+          <h1>SQL Joins Overview – Combining Tables</h1>
+          <p class="lesson-intro">Relational databases store data in separate tables to avoid repetition. Joins are the mechanism to bring that data back together for queries. Understanding each join type — and when to choose one over another — is one of the most important SQL skills you will develop.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-are-joins">What Are Joins?</h2>
+          <p>A join combines rows from two or more tables based on a related column — typically a foreign key relationship. Instead of storing department names in the employees table (creating duplication), you store department IDs and join to a departments table when you need the name.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Without a join — you see IDs, not names
+SELECT employee_id, name, dept_id
+FROM employees;
+-- employee_id | name    | dept_id
+--           1 | Alice   |       2
+--           2 | Bob     |       1
+
+-- With INNER JOIN — departments table is brought in
+SELECT e.name, d.dept_name
+FROM employees e
+INNER JOIN departments d ON e.dept_id = d.id;
+-- name  | dept_name
+-- Alice | Marketing
+-- Bob   | Engineering</code></pre>
+          </div>
+
+          <h2 id="join-types-table">All SQL Join Types</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Join Type</th><th>What It Returns</th><th>Typical Use Case</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>INNER JOIN</strong></td>
+                  <td>Only rows with matching values in both tables</td>
+                  <td>Get employees with their department name (must have a department)</td>
+                </tr>
+                <tr>
+                  <td><strong>LEFT JOIN</strong></td>
+                  <td>All rows from the left table; NULL for unmatched right columns</td>
+                  <td>List all employees, showing department name if assigned</td>
+                </tr>
+                <tr>
+                  <td><strong>RIGHT JOIN</strong></td>
+                  <td>All rows from the right table; NULL for unmatched left columns</td>
+                  <td>List all departments, even those with no employees</td>
+                </tr>
+                <tr>
+                  <td><strong>FULL OUTER JOIN</strong></td>
+                  <td>All rows from both tables; NULLs on both sides for unmatched rows</td>
+                  <td>Find mismatches between two datasets</td>
+                </tr>
+                <tr>
+                  <td><strong>SELF JOIN</strong></td>
+                  <td>A table joined to itself using different aliases</td>
+                  <td>Employee–manager hierarchy in the same table</td>
+                </tr>
+                <tr>
+                  <td><strong>CROSS JOIN</strong></td>
+                  <td>Every combination of rows (Cartesian product)</td>
+                  <td>Generate all size/colour product combinations</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="sample-tables">Sample Tables Used in This Section</h2>
+          <p>All join examples in this section use two tables: <code>employees</code> and <code>departments</code>. Here is their structure and sample data:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">CREATE TABLE departments (
+  id        INT PRIMARY KEY,
+  dept_name VARCHAR(50)
+);
+
+CREATE TABLE employees (
+  id         INT PRIMARY KEY,
+  name       VARCHAR(100),
+  dept_id    INT,          -- FK to departments.id (nullable = no department)
+  manager_id INT,          -- FK to employees.id (self-referencing)
+  salary     DECIMAL(10,2)
+);
+
+-- Sample data
+INSERT INTO departments VALUES
+  (1, 'Engineering'),
+  (2, 'Marketing'),
+  (3, 'HR'),
+  (4, 'Finance');          -- No employees in Finance
+
+INSERT INTO employees VALUES
+  (1, 'Alice',   2, NULL, 85000),   -- Marketing, no manager
+  (2, 'Bob',     1,    1, 72000),   -- Engineering, reports to Alice
+  (3, 'Carol',   1,    1, 68000),   -- Engineering, reports to Alice
+  (4, 'Dave',    3,    1, 55000),   -- HR, reports to Alice
+  (5, 'Eve',  NULL, NULL, 45000);   -- No department assigned</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Notice the two edge cases</strong>
+              <p>Eve (id=5) has no department (dept_id is NULL). Finance (id=4) has no employees. These edge cases will appear in different results depending on which join type you use — pay attention to them as you work through each lesson.</p>
+            </div>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="venn-diagrams">Venn Diagrams</h2>
+          <p>Venn diagrams help visualise which rows each join type returns. In the diagrams below, circle A = left table, circle B = right table, and the shaded area = rows returned.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Text – ASCII Venn Diagrams</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">INNER JOIN             LEFT JOIN
+   A    B                  A    B
+ (   |##|   )            (###|##|   )
+     ↑                       ↑
+  overlap only           all of A + overlap
+
+RIGHT JOIN             FULL OUTER JOIN
+   A    B                  A    B
+ (   |##|###)            (###|##|###)
+           ↑             ↑         ↑
+  overlap + all B     everything from both</code></pre>
+          </div>
+
+          <h2 id="choosing-join">Choosing the Right Join</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Question</th><th>Use</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>"Show me employees AND their department (must have one)"</td><td>INNER JOIN</td></tr>
+                <tr><td>"Show all employees — department if they have one, otherwise NULL"</td><td>LEFT JOIN</td></tr>
+                <tr><td>"Show all departments — employees if any exist, otherwise NULL"</td><td>RIGHT JOIN or LEFT JOIN (swap table order)</td></tr>
+                <tr><td>"Show everything from both tables, matched where possible"</td><td>FULL OUTER JOIN</td></tr>
+                <tr><td>"Find employees with no department assigned"</td><td>LEFT JOIN + WHERE dept.id IS NULL</td></tr>
+                <tr><td>"Show employee with their manager's name (same table)"</td><td>SELF JOIN</td></tr>
+                <tr><td>"Generate all possible combinations of two lists"</td><td>CROSS JOIN</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Prefer LEFT JOIN over RIGHT JOIN</strong>
+              <p>RIGHT JOIN and LEFT JOIN are semantically identical — you can always rewrite a RIGHT JOIN as a LEFT JOIN by swapping the table order. Most SQL developers use exclusively LEFT JOIN for consistency and readability. Mixing LEFT and RIGHT JOINs in the same query is confusing and should be avoided.</p>
+            </div>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-joinsov">Joins Overview: Combining Rows Across Tables</h2>
+          <p>Normalization splits data across tables to avoid duplication; <strong>joins</strong> stitch it back together for a query. The join <em>type</em> decides which rows survive when there's no match.</p>
+          <table>
+            <thead><tr><th>Join</th><th>Returns</th></tr></thead>
+            <tbody>
+              <tr><td><code>INNER</code></td><td>only rows matching in both tables</td></tr>
+              <tr><td><code>LEFT</code></td><td>all left rows + matches (NULL if none)</td></tr>
+              <tr><td><code>RIGHT</code></td><td>all right rows + matches</td></tr>
+              <tr><td><code>FULL OUTER</code></td><td>all rows from both (NULL where unmatched)</td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-sql">SELECT o.id, c.name
+FROM orders o
+INNER JOIN customers c ON c.id = o.customer_id;   -- the ON is the match rule</code></pre>
+          <p><strong>The mental model:</strong> a join matches each row of one table to rows of another based on the <code>ON</code> condition (usually a foreign key = primary key). <code>INNER</code> keeps only pairs that match — the default and most common. <code>LEFT</code> keeps every row on the left even without a match, filling the right side with NULLs — essential for "show all customers, including those with zero orders" and for finding orphans (<code>WHERE right.id IS NULL</code>). <strong>The #1 join bug — missing ON:</strong> forget the <code>ON</code> clause (or list tables comma-separated) and you get a <em>cross join</em> — every row paired with every row, an explosion of results. Always specify the match condition. <strong>Filtering caution:</strong> putting a right-table condition in <code>WHERE</code> can turn a LEFT JOIN back into an INNER JOIN (because <code>NULL</code> fails the test) — put such conditions in the <code>ON</code> clause instead. Alias tables so the query stays readable.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>List the join types (INNER, LEFT, RIGHT, FULL, CROSS).</li>
+              <li>Identify a join key between two tables.</li>
+              <li>Sketch a Venn diagram of INNER vs LEFT.</li>
+              <li>Write a basic two-table join.</li>
+              <li>Note what an <code>ON</code> clause does.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Given <code>customers</code> and <code>orders</code>, write an INNER JOIN to list customers with orders, and a LEFT JOIN to list all customers including those without orders. Explain how each join type decides which rows survive.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Joins combine rows</strong> from two or more tables based on a matching column condition.</li>
+              <li><strong>INNER JOIN</strong> — Only matched rows. Most common join type.</li>
+              <li><strong>LEFT JOIN</strong> — All left rows + matched right rows (NULLs for unmatched right).</li>
+              <li><strong>RIGHT JOIN</strong> — All right rows + matched left rows (equivalent to swapped LEFT JOIN).</li>
+              <li><strong>FULL OUTER JOIN</strong> — All rows from both tables; NULLs where no match.</li>
+              <li><strong>SELF JOIN</strong> — A table joined to itself; requires aliases to distinguish instances.</li>
+              <li><strong>CROSS JOIN</strong> — Cartesian product. Every row × every row. No join condition.</li>
+              <li>Use table aliases (<code>e</code>, <code>d</code>) to keep multi-table queries readable.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a SQL join?</li>
+            <li>What are the main types of joins?</li>
+            <li>What does the ON clause specify?</li>
+            <li>What is the difference between INNER and OUTER joins?</li>
+            <li>What is a join key?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/joins/inner-join.html" class="topic-tag sql-topic-tag">🗄️ INNER JOIN</a>
+            <a href="/sql/joins/left-right-join.html" class="topic-tag sql-topic-tag">🗄️ LEFT & RIGHT JOIN</a>
+            <a href="/sql/joins/full-outer-join.html" class="topic-tag sql-topic-tag">🗄️ FULL OUTER JOIN</a>
+            <a href="/sql/joins/self-join.html" class="topic-tag sql-topic-tag">🗄️ Self Join</a>
+            <a href="/sql/joins/cross-join.html" class="topic-tag sql-topic-tag">🗄️ CROSS JOIN</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">How many tables can I join in a single query?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>There is no hard ANSI limit on the number of tables you can join. In practice, most databases handle dozens of joins. However, each join multiplies query complexity, and very large joins can become slow. If you find yourself joining 10+ tables, consider whether a subquery, CTE, or view might make the query more manageable and easier to optimise.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between ON and USING in a JOIN?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>ON e.dept_id = d.id</code> — explicit: name the column from each table. Use when column names differ between tables. <code>USING (dept_id)</code> — shorthand when both tables have a column with the same name. <code>USING</code> also deduplicates the join column in SELECT * (it appears once). <code>ON</code> is more flexible and more commonly used.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is JOIN without INNER, LEFT, or RIGHT an INNER JOIN?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — <code>JOIN</code> alone defaults to <code>INNER JOIN</code> in all major databases. Many developers write <code>JOIN</code> as a shorthand since INNER is the most common join type. For LEFT and RIGHT joins, the keyword is always required. Being explicit with <code>INNER JOIN</code> is slightly more readable when teaching or documenting.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the old comma-style join syntax?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Older SQL (pre-ANSI 1992) used comma-separated tables in FROM with the join condition in WHERE: <code>FROM employees e, departments d WHERE e.dept_id = d.id</code>. This is a CROSS JOIN filtered by WHERE — functionally identical to INNER JOIN but harder to read and easier to write accidental Cartesian products. Always use explicit JOIN syntax; avoid the comma style in new code.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/functions/quiz.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+          <a href="/sql/joins/inner-join.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">INNER JOIN</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

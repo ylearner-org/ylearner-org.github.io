@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Normalization – 1NF, 2NF, 3NF Explained | ylearner</title>
+  <meta name="description" content="Learn database normalization with clear examples. Understand 1NF, 2NF, 3NF, and BCNF — how to eliminate data redundancy, update anomalies, and design robust relational schemas.">
+  <meta name="keywords" content="SQL normalization, 1NF, 2NF, 3NF, BCNF, database normalization, normal forms, reduce redundancy, denormalization, functional dependency">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/advanced/normalization.html">
+  <meta property="og:title" content="SQL Normalization – 1NF, 2NF, 3NF Explained | ylearner">
+  <meta property="og:description" content="Step-by-step guide to database normalization: 1NF, 2NF, 3NF, and BCNF with examples, anomalies, and when to denormalize for performance.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/advanced/normalization.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL Normalization – 1NF, 2NF, 3NF Explained | ylearner">
+  <meta name="twitter:description" content="Step-by-step guide to database normalization: 1NF, 2NF, 3NF, and BCNF with examples, anomalies, and when to denormalize for performance.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Normalization","description":"Database normalization — 1NF, 2NF, 3NF, BCNF with practical examples and anomalies explained.","educationalLevel":"Intermediate","keywords":"normalization, 1NF, 2NF, 3NF, BCNF, database design","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <span>Advanced SQL</span><span class="separator">›</span>
+          <span class="current">Normalization</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Advanced SQL</div>
+          <h1>SQL Normalization – 1NF, 2NF, 3NF Explained</h1>
+          <p class="lesson-intro">Normalization is the process of organizing your database tables to minimize data redundancy and prevent data integrity problems. Each "normal form" (1NF, 2NF, 3NF) adds a stricter rule on top of the previous one. This lesson walks through all three levels with a concrete example, explains the anomalies they prevent, and covers when to intentionally denormalize.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-normalization">What Is Normalization?</h2>
+          <p><strong>Normalization</strong> is a systematic approach to designing relational database tables so that data is stored in one place and one place only — no duplication. When the same fact is stored in multiple places, updating it requires changing multiple rows, and forgetting one creates inconsistency.</p>
+
+          <p>The normalization process is guided by a series of rules called <strong>normal forms</strong>. Each form builds on the previous, adding a stricter constraint. In practice, most production databases aim for <strong>Third Normal Form (3NF)</strong>.</p>
+
+          <h2 id="unnormalized-example">Starting Point: An Unnormalized Table</h2>
+          <p>Imagine an e-commerce system that tracks orders in a single table:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Unnormalized</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- A flat, unnormalized "God table" — everything in one place
+CREATE TABLE orders_flat (
+  order_id       INT,
+  customer_id    INT,
+  customer_name  VARCHAR(100),
+  customer_email VARCHAR(100),
+  customer_city  VARCHAR(50),
+  product_ids    VARCHAR(200),   -- "101,102,103" — multi-value!
+  product_names  VARCHAR(500),   -- "Laptop,Mouse,Keyboard"
+  quantities     VARCHAR(100),   -- "1,2,1"
+  unit_prices    VARCHAR(200),   -- "999.00,25.00,79.00"
+  order_total    DECIMAL(10,2),
+  order_date     DATE
+);
+
+-- Sample data:
+-- order_id=1, customer_name='Alice', product_ids='101,102', ...
+-- order_id=2, customer_name='Alice', product_ids='103', ...
+-- (Alice's email stored twice — redundancy!)</code></pre>
+          </div>
+
+          <p>This design has three types of problems:</p>
+          <ul>
+            <li><strong>Update anomaly</strong> — if Alice changes her email, you must update every row where she appears. Miss one row and you have inconsistent data.</li>
+            <li><strong>Insert anomaly</strong> — you cannot add a customer until they place an order (there's no customer-only row).</li>
+            <li><strong>Delete anomaly</strong> — if Alice's only order is deleted, all knowledge of Alice disappears from the database.</li>
+          </ul>
+
+          <h2 id="first-nf">First Normal Form (1NF)</h2>
+          <p><strong>Rule:</strong> Every column must contain atomic (indivisible) values. No repeating groups or multi-valued columns. Every row must be uniquely identifiable.</p>
+
+          <p><strong>Fix:</strong> Replace multi-value columns with separate rows; establish a primary key.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – After 1NF</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Split multi-value columns into separate rows.
+-- The PK is now composite: (order_id, product_id)
+CREATE TABLE orders_1nf (
+  order_id       INT,
+  customer_id    INT,
+  customer_name  VARCHAR(100),
+  customer_email VARCHAR(100),
+  customer_city  VARCHAR(50),
+  product_id     INT,          -- one product per row now
+  product_name   VARCHAR(100),
+  quantity       INT,
+  unit_price     DECIMAL(10,2),
+  order_date     DATE,
+  PRIMARY KEY (order_id, product_id)
+);
+-- ✅ Atomic values, unique rows, no repeating groups
+-- ❌ Still has redundancy: customer_name stored for every order line</code></pre>
+          </div>
+
+          <h2 id="second-nf">Second Normal Form (2NF)</h2>
+          <p><strong>Rule:</strong> Must be in 1NF, PLUS no <em>partial dependency</em> — every non-key column must depend on the <em>entire</em> primary key, not just part of it. (This rule only applies when the primary key is composite.)</p>
+
+          <p><strong>The problem:</strong> In <code>orders_1nf</code>, the PK is <code>(order_id, product_id)</code>. But <code>customer_name</code> depends only on <code>order_id</code> — not on the product. And <code>product_name</code> depends only on <code>product_id</code>. These are <em>partial dependencies</em>.</p>
+
+          <p><strong>Fix:</strong> Split into separate tables so each non-key column depends on the full PK of its table.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – After 2NF</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Products table — product_name depends only on product_id
+CREATE TABLE products (
+  product_id   INT PRIMARY KEY,
+  product_name VARCHAR(100),
+  unit_price   DECIMAL(10,2)
+);
+
+-- Orders table — customer info depends only on order_id
+CREATE TABLE orders (
+  order_id    INT PRIMARY KEY,
+  customer_id INT,
+  customer_name  VARCHAR(100),
+  customer_email VARCHAR(100),
+  customer_city  VARCHAR(50),
+  order_date  DATE
+);
+
+-- Order items — junction table, PK is (order_id, product_id)
+-- Both order_id and product_id are needed to identify a line item
+CREATE TABLE order_items (
+  order_id   INT,
+  product_id INT,
+  quantity   INT,
+  PRIMARY KEY (order_id, product_id),
+  FOREIGN KEY (order_id)   REFERENCES orders(order_id),
+  FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+-- ✅ No partial dependencies
+-- ❌ Still has redundancy: customer_city depends on customer, not order</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="third-nf">Third Normal Form (3NF)</h2>
+          <p><strong>Rule:</strong> Must be in 2NF, PLUS no <em>transitive dependency</em> — non-key columns must depend on the primary key only, not on other non-key columns.</p>
+
+          <p><strong>The problem:</strong> In the <code>orders</code> table, <code>customer_city</code> depends on <code>customer_id</code>, not on <code>order_id</code>. This is a transitive dependency: order_id → customer_id → customer_city.</p>
+
+          <p><strong>Fix:</strong> Move customer information to its own table.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – After 3NF</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Customers table — all customer attributes depend only on customer_id
+CREATE TABLE customers (
+  customer_id   INT PRIMARY KEY,
+  customer_name VARCHAR(100) NOT NULL,
+  email         VARCHAR(100) UNIQUE,
+  city          VARCHAR(50)
+);
+
+-- Orders table — only order-specific data; FK to customers
+CREATE TABLE orders (
+  order_id    INT PRIMARY KEY,
+  customer_id INT NOT NULL,
+  order_date  DATE NOT NULL,
+  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
+
+-- Products table
+CREATE TABLE products (
+  product_id   INT PRIMARY KEY,
+  product_name VARCHAR(100) NOT NULL,
+  unit_price   DECIMAL(10,2) NOT NULL
+);
+
+-- Order items junction table
+CREATE TABLE order_items (
+  order_id   INT,
+  product_id INT,
+  quantity   INT NOT NULL,
+  PRIMARY KEY (order_id, product_id),
+  FOREIGN KEY (order_id)   REFERENCES orders(order_id),
+  FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+-- ✅ Fully in 3NF:
+-- Each non-key column depends ONLY on the PK of its table.
+-- No redundancy. Update customer email in ONE place.</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>The normalization mantra</strong>
+              <p>"Every non-key attribute must depend on the key, the whole key, and nothing but the key." This covers 1NF (the key), 2NF (the whole key), and 3NF (nothing but the key) in a single memorable sentence.</p>
+            </div>
+          </div>
+
+          <h2 id="bcnf">Boyce-Codd Normal Form (BCNF)</h2>
+          <p>BCNF is a slightly stricter version of 3NF. It covers edge cases where a table has multiple overlapping candidate keys. The rule: every <em>determinant</em> (left side of a functional dependency) must be a candidate key.</p>
+
+          <p>BCNF violations are rare in typical application schemas. If your tables are in 3NF and you don't have unusual overlapping composite keys, you're usually also in BCNF.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – BCNF Example</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Classic BCNF violation: student-course-teacher
+-- (student_id, course_id) → teacher_id   [one teacher per course per student]
+-- teacher_id → course_id                 [each teacher teaches one course]
+-- But teacher_id is NOT a candidate key — it determines course_id,
+-- which violates BCNF.
+
+-- BCNF fix: decompose into two tables
+CREATE TABLE teacher_courses (
+  teacher_id INT PRIMARY KEY,
+  course_id  INT,
+  FOREIGN KEY (course_id) REFERENCES courses(course_id)
+);
+
+CREATE TABLE student_teachers (
+  student_id INT,
+  teacher_id INT,
+  PRIMARY KEY (student_id, teacher_id),
+  FOREIGN KEY (student_id) REFERENCES students(student_id),
+  FOREIGN KEY (teacher_id) REFERENCES teacher_courses(teacher_id)
+);</code></pre>
+          </div>
+
+          <h2 id="denormalization">When to Denormalize</h2>
+          <p><strong>Denormalization</strong> is the deliberate introduction of redundancy for performance reasons. It makes reads faster at the cost of making writes more complex (you must update duplicated data in multiple places).</p>
+
+          <p>Common scenarios where denormalization is justified:</p>
+          <ul>
+            <li><strong>Reporting and data warehouses</strong> — OLAP workloads have infrequent writes and very frequent complex aggregation reads. Denormalized "star schemas" with pre-joined fact tables are standard practice.</li>
+            <li><strong>Cached aggregate columns</strong> — storing a pre-computed <code>order_count</code> on the customers table avoids a COUNT join on every page load. A trigger or application code keeps it updated.</li>
+            <li><strong>Read performance on very large tables</strong> — when a normalized JOIN is a bottleneck even with indexes, adding redundant columns to avoid the JOIN can be necessary.</li>
+          </ul>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Denormalize as a measured decision</strong>
+              <p>Start normalized. Measure actual query performance. Denormalize only the specific bottlenecks you have identified — not as a pre-emptive strategy. Premature denormalization creates data integrity problems that are hard to fix later.</p>
+            </div>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-normal">Normalization: 1NF → 2NF → 3NF in Plain English</h2>
+          <p>Normalization organizes tables so each fact lives in exactly one place. The goal is killing <strong>update anomalies</strong> — the bugs where changing an address in one row leaves five other rows wrong.</p>
+          <table>
+            <thead><tr><th>Form</th><th>Rule</th><th>Fixes</th></tr></thead>
+            <tbody>
+              <tr><td>1NF</td><td>atomic values, no repeating groups</td><td>no <code>"phone1, phone2"</code> in one cell</td></tr>
+              <tr><td>2NF</td><td>1NF + no partial dependency on part of a composite key</td><td>split out data that depends on only half the key</td></tr>
+              <tr><td>3NF</td><td>2NF + no non-key column depends on another non-key column</td><td>move <code>city</code> that depends on <code>zip</code> to its own table</td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-sql">-- ❌ Not normalized: customer name repeated on every order
+orders(id, customer_name, customer_email, product, qty)
+
+-- ✅ 3NF: customer facts live once, referenced by id
+customers(id, name, email)
+orders(id, customer_id, product, qty)</code></pre>
+          <p><strong>The trade-off:</strong> more normalization = fewer duplicates but more joins. Read-heavy analytics systems often <em>denormalize</em> on purpose (accepting duplication) to avoid expensive joins. Normalize for correctness first, denormalize later only where measured performance demands it.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Identify a repeating group to normalize.</li>
+              <li>Apply 1NF (atomic values).</li>
+              <li>Apply 2NF (remove partial dependencies).</li>
+              <li>Apply 3NF (remove transitive dependencies).</li>
+              <li>Spot redundant duplicated data.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Take a denormalized <code>orders</code> sheet (customer name and address repeated per row) and normalize it to 3NF across <code>customers</code> and <code>orders</code> tables. Explain 1NF, 2NF, and 3NF and the trade-off between normalization and query simplicity.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Normalization organizes tables to eliminate redundancy and prevent update, insert, and delete anomalies.</li>
+              <li><strong>1NF</strong> — atomic column values, no repeating groups, every row uniquely identifiable.</li>
+              <li><strong>2NF</strong> — 1NF + no partial dependencies (non-key columns depend on the full composite PK).</li>
+              <li><strong>3NF</strong> — 2NF + no transitive dependencies (non-key columns depend only on the PK, not on other non-key columns).</li>
+              <li><strong>BCNF</strong> — 3NF + every determinant of a functional dependency is a candidate key. Covers rare edge cases.</li>
+              <li>The normalization mantra: depend on <em>the key, the whole key, and nothing but the key</em>.</li>
+              <li>Denormalize deliberately and measurably — start normalized, identify real bottlenecks, then add controlled redundancy.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is database normalization?</li>
+            <li>What problems does normalization solve?</li>
+            <li>What are 1NF, 2NF, and 3NF?</li>
+            <li>What is denormalization, and when is it used?</li>
+            <li>What is a transitive dependency?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/advanced/triggers.html" class="topic-tag sql-topic-tag">🗄️ Triggers</a>
+            <a href="/sql/advanced/views.html" class="topic-tag sql-topic-tag">🗄️ Views</a>
+            <a href="/sql/advanced/indexes.html" class="topic-tag sql-topic-tag">🗄️ Indexes</a>
+            <a href="/sql/database-concepts.html" class="topic-tag sql-topic-tag">🗄️ Database Concepts</a>
+            <a href="/sql/interview/questions.html" class="topic-tag sql-topic-tag">🗄️ Interview Questions</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Do I always need to go all the way to 3NF? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For OLTP (transactional) databases, 3NF is the standard target and the right default. In practice, most well-designed application schemas reach 3NF naturally. Going beyond 3NF to BCNF or 4NF is only necessary when you have specific structural problems (overlapping candidate keys, multi-valued dependencies) — which are rare in typical app databases.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between 2NF and 3NF? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>2NF eliminates <em>partial dependencies</em> — where a non-key column depends on only part of a composite primary key. 3NF eliminates <em>transitive dependencies</em> — where a non-key column depends on another non-key column, which in turn depends on the PK. In other words: 2NF is about the relationship between non-key columns and the PK; 3NF is about relationships between non-key columns and each other.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is a single-column primary key always in 2NF? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Partial dependencies only arise with <em>composite</em> primary keys. If your table has a single-column PK, it is automatically in 2NF (assuming it's in 1NF). You still need to check for 3NF violations (transitive dependencies), which can exist even with a single-column PK.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How does normalization affect query performance? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Normalized tables generally require more JOINs to reassemble data, which adds query complexity and can be slower on very large datasets without proper indexes. For OLTP workloads with many small transactions, normalized schemas perform well. For OLAP/reporting workloads with complex aggregations over large datasets, denormalized schemas (like star/snowflake schemas in data warehouses) often perform better. Always index your foreign key columns in normalized schemas.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/advanced/triggers.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Triggers</span>
+          </a>
+          <a href="/sql/advanced/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

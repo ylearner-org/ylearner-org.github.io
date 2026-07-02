@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resolving Git Merge Conflicts – Step-by-Step Guide | ylearner</title>
+  <meta name="description" content="Learn how to resolve Git merge conflicts step by step. Understand conflict markers, resolve them manually or with tools, and prevent conflicts in the first place.">
+  <meta name="keywords" content="git merge conflict, resolve merge conflict, git conflict markers, git mergetool, git merge --abort, merge conflict tutorial">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/git/branching/merge-conflicts.html">
+  <meta property="og:title" content="Resolving Git Merge Conflicts – Step-by-Step Guide | ylearner">
+  <meta property="og:description" content="Don't panic when you hit a merge conflict. This step-by-step guide explains conflict markers, manual resolution, merge tools, and how to prevent conflicts.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/git/branching/merge-conflicts.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Resolving Git Merge Conflicts – Step-by-Step Guide | ylearner">
+  <meta name="twitter:description" content="Don't panic when you hit a merge conflict. This step-by-step guide explains conflict markers, manual resolution, merge tools, and how to prevent conflicts.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Resolving Git Merge Conflicts","description":"Step-by-step guide to understanding and resolving Git merge conflicts, including conflict markers, manual resolution, and merge tools.","educationalLevel":"Intermediate","keywords":"git merge conflict, resolve merge conflict, git conflict markers","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <a href="/git/branching/branches-overview.html">Branching &amp; Merging</a><span class="separator">›</span>
+          <span class="current">Merge Conflicts</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌿 Branching &amp; Merging</div>
+          <h1>Resolving Git Merge Conflicts – Step-by-Step Guide</h1>
+          <p class="lesson-intro">Merge conflicts are a normal part of collaborative development — not a sign that something went terribly wrong. They happen when two branches modify the same part of the same file differently, and Git can't decide which version to keep. Once you understand the conflict markers and the resolution workflow, conflicts become quick to resolve rather than something to fear.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-causes-conflicts">What Causes Merge Conflicts?</h2>
+          <p>Git merges automatically when the two branches change <em>different</em> parts of the codebase. A conflict occurs specifically when:</p>
+          <ul>
+            <li>Two branches modify the <strong>same lines</strong> in the same file differently.</li>
+            <li>One branch modifies a file and the other branch <strong>deletes</strong> that same file.</li>
+          </ul>
+          <p>Git is excellent at merging changes to different files and even different parts of the same file. It only gets stuck when it literally cannot tell which human decision to keep.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Trigger a conflict by merging two branches that both changed the same line
+git switch main
+git merge feature/login
+# Auto-merging index.html
+# CONFLICT (content): Merge conflict in index.html
+# Automatic merge failed; fix conflicts and then commit the result.
+
+# Check which files have conflicts
+git status
+# On branch main
+# You have unmerged paths.
+#   (fix conflicts and run "git commit")
+#   (use "git merge --abort" to abort the merge)
+#
+# Unmerged paths:
+#   (use "git add &lt;file&gt;..." to mark resolution)
+#         both modified:   index.html</code></pre>
+          </div>
+
+          <h2 id="conflict-markers">Understanding Conflict Markers</h2>
+          <p>When a conflict occurs, Git edits the conflicted file to show you both versions using special markers:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-html">&lt;!-- index.html with conflict markers --&gt;
+&lt;nav class="main-nav"&gt;
+  &lt;a href="/"&gt;Home&lt;/a&gt;
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+  &lt;a href="/login"&gt;Sign In&lt;/a&gt;
+  &lt;a href="/register"&gt;Register&lt;/a&gt;
+=======
+  &lt;a href="/auth/login"&gt;Login&lt;/a&gt;
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/login
+&lt;/nav&gt;</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Marker</th><th>Meaning</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code></td>
+                  <td>Start of YOUR changes (the branch you're merging INTO — current branch)</td>
+                </tr>
+                <tr>
+                  <td><code>=======</code></td>
+                  <td>Dividing line between the two versions</td>
+                </tr>
+                <tr>
+                  <td><code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/login</code></td>
+                  <td>End of THEIR changes (the branch you're merging FROM)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Conflicts are normal — don't panic</strong>
+              <p>Every developer encounters conflicts. They look alarming the first time but become routine quickly. The markers clearly show you exactly what changed and from where. Take conflicts section by section — don't try to resolve the whole file at once if there are multiple conflicts.</p>
+            </div>
+          </div>
+
+          <h2 id="resolving-manually">Resolving Conflicts Manually</h2>
+          <p>To resolve a conflict, open the conflicted file in your editor and <strong>edit it to contain exactly what you want</strong>. Remove all three marker lines and keep the correct code (which might be one version, the other, or a combination of both).</p>
+
+          <h3>Example: resolving the conflict above</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-html">&lt;!-- After resolution: combined both versions --&gt;
+&lt;nav class="main-nav"&gt;
+  &lt;a href="/"&gt;Home&lt;/a&gt;
+  &lt;a href="/auth/login"&gt;Sign In&lt;/a&gt;
+  &lt;a href="/register"&gt;Register&lt;/a&gt;
+&lt;/nav&gt;
+&lt;!-- No conflict markers remain. The file is now valid HTML. --&gt;</code></pre>
+          </div>
+
+          <h3>Complete resolution workflow</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Step 1: See which files have conflicts
+git status
+
+# Step 2: Open each conflicted file, edit to resolve, save
+# (edit in your text editor — remove ALL &lt;&lt;&lt;&lt;&lt;&lt;&lt;, =======, &gt;&gt;&gt;&gt;&gt;&gt;&gt; markers)
+
+# Step 3: Mark each resolved file as resolved
+git add index.html
+git add src/styles.css   # if multiple files had conflicts
+
+# Step 4: Verify no more conflicts remain
+git status
+# All conflicts fixed but you are still merging.
+#   (use "git commit" to conclude merge)
+
+# Step 5: Commit to finalize the merge
+git commit
+# Editor opens with auto-generated merge commit message:
+# "Merge branch 'feature/login'"
+# Save and close to complete the merge</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Don't forget to remove ALL conflict markers</strong>
+              <p>If you accidentally commit a file that still contains <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> or <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> markers, your code will be broken and syntax errors will appear. Always double-check by searching the file for <code>&lt;&lt;&lt;&lt;</code> before running <code>git add</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="using-tools">Using Merge Tools</h2>
+          <p>Visual merge tools show both versions side by side, making it easier to choose what to keep. Most modern editors have built-in conflict resolution UIs.</p>
+
+          <h3>VS Code Merge Editor</h3>
+          <p>VS Code automatically detects conflicted files and shows a special three-panel merge editor when you open them. Buttons let you "Accept Current Change", "Accept Incoming Change", "Accept Both Changes", or manually edit the result pane.</p>
+
+          <h3>Git's built-in mergetool</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Launch the configured merge tool for all conflicted files
+git mergetool
+
+# Configure VS Code as your merge tool
+git config --global merge.tool vscode
+git config --global mergetool.vscode.cmd 'code --wait $MERGED'
+
+# Or use vimdiff (terminal-based)
+git config --global merge.tool vimdiff
+git mergetool  # opens vimdiff for each conflicted file</code></pre>
+          </div>
+
+          <h2 id="aborting-merge">Aborting a Merge</h2>
+          <p>If you started a merge and things are getting too complex, you can abort and return to the pre-merge state:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Shell</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Abort mid-merge and restore everything to before the merge
+git merge --abort
+
+# Verify you're back to the pre-merge state
+git status
+# On branch main
+# nothing to commit, working tree clean</code></pre>
+          </div>
+
+          <h2 id="prevent-conflicts">Tips to Prevent Conflicts</h2>
+          <p>You can't prevent all conflicts, but you can reduce their frequency and severity:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Practice</th><th>Why it helps</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Pull frequently</strong></td>
+                  <td>Keep your branch close to main — fewer diverged changes = fewer conflicts</td>
+                </tr>
+                <tr>
+                  <td><strong>Short-lived branches</strong></td>
+                  <td>Branches that live hours/days conflict less than ones that live weeks</td>
+                </tr>
+                <tr>
+                  <td><strong>Small, focused PRs</strong></td>
+                  <td>A PR that touches 5 files is less likely to conflict than one touching 50</td>
+                </tr>
+                <tr>
+                  <td><strong>Communicate with team</strong></td>
+                  <td>Tell teammates when you're refactoring a shared file they're also editing</td>
+                </tr>
+                <tr>
+                  <td><strong>Modular code structure</strong></td>
+                  <td>Isolate concerns into separate files — fewer people editing the same file</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="deep-conflict">Merge Conflicts: What the Markers Mean and How to Resolve</h2>
+          <p>A conflict happens when two branches change the <em>same lines</em> of the same file. Git can't decide which wins, so it pauses and marks the spot for you. Conflicts are normal — not a sign you broke anything.</p>
+          <pre><code class="language-text">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+color: blue;          ← your current branch's version
+=======
+color: green;         ← the incoming branch's version
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature-x</code></pre>
+          <h3>Resolve in three steps</h3>
+          <ol>
+            <li>Open each conflicted file. <strong>Edit the content</strong> to what it should actually be, then delete all three marker lines (<code>&lt;&lt;&lt;</code>, <code>===</code>, <code>&gt;&gt;&gt;</code>).</li>
+            <li><code>git add &lt;file&gt;</code> to mark it resolved.</li>
+            <li><code>git commit</code> to finish the merge (Git pre-fills a merge message).</li>
+          </ol>
+          <table>
+            <thead><tr><th>Command</th><th>Does</th></tr></thead>
+            <tbody>
+              <tr><td><code>git status</code></td><td>lists which files still conflict</td></tr>
+              <tr><td><code>git merge --abort</code></td><td>bail out, back to pre-merge state</td></tr>
+              <tr><td><code>git checkout --theirs &lt;file&gt;</code></td><td>take the incoming version wholesale</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Avoid them:</strong> pull/merge often and keep branches short-lived. The longer a branch drifts, the bigger the conflict when it finally merges.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create a conflict by editing the same line on two branches.</li>
+              <li>Run a merge to trigger the conflict.</li>
+              <li>Read the conflict markers (<code>&lt;&lt;&lt;</code>, <code>===</code>, <code>&gt;&gt;&gt;</code>).</li>
+              <li>Resolve the file and stage it.</li>
+              <li>Complete the merge commit.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Deliberately create a merge conflict by changing the same line on two branches, then resolve it by editing the file, removing the conflict markers, staging, and committing. Explain what the <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code>, and <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> markers mean and how to abort a merge.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Conflicts happen when <strong>two branches modify the same lines</strong> of the same file — Git can't decide which version to keep.</li>
+              <li>Git marks conflicts with <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code>, <code>=======</code>, and <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; branch-name</code> markers in the file.</li>
+              <li>To resolve: <strong>edit the file</strong> to remove markers and keep the right code → <code>git add &lt;file&gt;</code> → <code>git commit</code>.</li>
+              <li>Use <code>git merge --abort</code> to cancel the merge and return to the pre-merge state.</li>
+              <li>VS Code and <code>git mergetool</code> provide visual side-by-side conflict resolution.</li>
+              <li>Prevent conflicts by <strong>pulling frequently</strong>, keeping branches short-lived, and writing modular code.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What causes a merge conflict?</li>
+            <li>What do the conflict markers mean?</li>
+            <li>How do you resolve a merge conflict?</li>
+            <li>How do you abort an in-progress merge?</li>
+            <li>How can you reduce the frequency of merge conflicts?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/git/branching/merging.html" class="topic-tag git-topic-tag">🔀 Merging Branches</a>
+            <a href="/git/branching/rebase.html" class="topic-tag git-topic-tag">🔀 Rebase</a>
+            <a href="/git/basics/undoing-changes.html" class="topic-tag git-topic-tag">🔀 Undoing Changes</a>
+            <a href="/git/advanced/stashing.html" class="topic-tag git-topic-tag">🔀 Stashing Changes</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">How do I see all conflicted files at once? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Run <code>git status</code> — all conflicted files appear under "Unmerged paths" as "both modified". You can also run <code>git diff</code> to see all conflict markers in all files at once. In VS Code, conflicted files show with a "C" indicator in the Source Control panel and are listed under "Merge Changes".</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What if I resolve a conflict and then realize I made the wrong choice? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Before committing: just edit the file again. You haven't committed yet, so nothing is final. If you've already committed the merge: use <code>git revert -m 1 &lt;merge-commit-hash&gt;</code> to create a commit that undoes the merge, or <code>git reset --hard ORIG_HEAD</code> if you haven't pushed (Git saves the pre-merge state in ORIG_HEAD).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does the conflict show "HEAD" — which branch is that? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>HEAD in conflict markers refers to the branch you're currently on — the branch you're merging INTO. If you ran <code>git switch main</code> then <code>git merge feature/login</code>, then <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> shows the version from <code>main</code> and <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/login</code> shows the version from <code>feature/login</code>. The "incoming" change is always the branch you named in the <code>git merge</code> command.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can a merge conflict affect binary files (images, PDFs)? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, but Git can't show markers in binary files. Instead, Git will say "CONFLICT (binary): Merge conflict in logo.png" and keep one version (usually the current branch's). You then need to manually choose which version to keep: <code>git checkout --ours logo.png</code> (keep current branch's version) or <code>git checkout --theirs logo.png</code> (keep the incoming branch's version), then <code>git add logo.png</code>.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/branching/merging.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Merging Branches</span>
+          </a>
+          <a href="/git/branching/rebase.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Rebase</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

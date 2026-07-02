@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Database – SQL Project for Beginners | ylearner</title>
+  <meta name="description" content="Build a complete library management system database in SQL. Create tables for books, members, and loans, insert sample data, and write real-world queries and reports.">
+  <meta name="keywords" content="SQL project beginner, library database SQL, SQL CREATE TABLE project, library management system SQL, SQL project tutorial, books members loans SQL">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/projects/library-database.html">
+  <meta property="og:title" content="Library Database – SQL Project for Beginners | ylearner">
+  <meta property="og:description" content="Step-by-step SQL project: build a library management database with books, members, and loans tables. Includes schema design, sample data, queries, and reports.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/projects/library-database.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Library Database – SQL Project for Beginners | ylearner">
+  <meta name="twitter:description" content="Step-by-step SQL project: build a library management database with books, members, and loans tables. Includes schema design, sample data, queries, and reports.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Library Database SQL Project","description":"Build a library management database with books, members, and loans tables — a hands-on SQL project for beginners.","educationalLevel":"Beginner","keywords":"SQL project, library database, books members loans","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <span>Projects</span><span class="separator">›</span>
+          <span class="current">Library Database</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🛠️ Projects</div>
+          <h1>Library Database – SQL Project for Beginners</h1>
+          <p class="lesson-intro">In this project you'll build a complete library management system from scratch using SQL. You'll design the schema, create tables with proper constraints and foreign keys, insert realistic sample data, and write queries that answer real operational questions — available books, overdue loans, member history, and popularity reports.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 45 min</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="project-overview">Project Overview</h2>
+          <p>The library system needs to track:</p>
+          <ul>
+            <li><strong>Books</strong> — title, author, ISBN, genre, publication year, and how many copies the library owns.</li>
+            <li><strong>Members</strong> — people who have library cards, with contact details and join date.</li>
+            <li><strong>Loans</strong> — which member borrowed which book, when, and whether it was returned.</li>
+          </ul>
+
+          <h2 id="schema-design">Schema Design</h2>
+          <p>Three tables, two foreign key relationships:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Table</th><th>Primary Key</th><th>Key Columns</th><th>Foreign Keys</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>books</strong></td><td>id</td><td>title, author, isbn, genre, published_year, copies_available</td><td>—</td></tr>
+                <tr><td><strong>members</strong></td><td>id</td><td>name, email, join_date</td><td>—</td></tr>
+                <tr><td><strong>loans</strong></td><td>id</td><td>loan_date, return_date, returned</td><td>book_id → books, member_id → members</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="create-tables">Create Tables</h2>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – DDL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">CREATE TABLE books (
+  id                INT PRIMARY KEY,
+  title             VARCHAR(200)    NOT NULL,
+  author            VARCHAR(150)    NOT NULL,
+  isbn              VARCHAR(20)     UNIQUE NOT NULL,
+  genre             VARCHAR(50),
+  published_year    INT,
+  copies_available  INT             NOT NULL DEFAULT 1,
+  CHECK (copies_available >= 0)
+);
+
+CREATE TABLE members (
+  id        INT PRIMARY KEY,
+  name      VARCHAR(100)  NOT NULL,
+  email     VARCHAR(150)  UNIQUE NOT NULL,
+  join_date DATE          NOT NULL DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE loans (
+  id          INT PRIMARY KEY,
+  book_id     INT     NOT NULL,
+  member_id   INT     NOT NULL,
+  loan_date   DATE    NOT NULL DEFAULT CURRENT_DATE,
+  return_date DATE,           -- expected return date
+  returned    BOOLEAN NOT NULL DEFAULT FALSE,
+  FOREIGN KEY (book_id)   REFERENCES books(id)   ON DELETE RESTRICT,
+  FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE RESTRICT
+);
+
+-- Index the FK columns for faster JOIN performance
+CREATE INDEX idx_loans_book_id   ON loans(book_id);
+CREATE INDEX idx_loans_member_id ON loans(member_id);</code></pre>
+          </div>
+
+          <h2 id="insert-data">Insert Sample Data</h2>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL – Sample Data</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- 10 Books
+INSERT INTO books (id, title, author, isbn, genre, published_year, copies_available) VALUES
+  (1, 'The Pragmatic Programmer', 'David Thomas', '9780135957059', 'Technology',    2019, 3),
+  (2, 'Clean Code',               'Robert Martin','9780132350884', 'Technology',    2008, 2),
+  (3, 'Dune',                     'Frank Herbert', '9780441013593', 'Science Fiction',1965,4),
+  (4, 'To Kill a Mockingbird',    'Harper Lee',    '9780061935466', 'Fiction',       1960, 2),
+  (5, 'Sapiens',                  'Yuval Harari',  '9780062316097', 'Non-Fiction',   2011, 3),
+  (6, 'The Great Gatsby',         'F. Scott Fitzgerald','9780743273565','Fiction',   1925, 1),
+  (7, 'Designing Data-Intensive Applications','Martin Kleppmann','9781449373320','Technology',2017,2),
+  (8, 'Atomic Habits',            'James Clear',   '9780735211292', 'Non-Fiction',   2018, 4),
+  (9, 'Foundation',               'Isaac Asimov',  '9780553293357', 'Science Fiction',1951,2),
+  (10,'1984',                     'George Orwell', '9780451524935', 'Fiction',       1949, 3);
+
+-- 5 Members
+INSERT INTO members (id, name, email, join_date) VALUES
+  (1, 'Alice Johnson', 'alice@example.com',  '2022-01-15'),
+  (2, 'Bob Smith',     'bob@example.com',    '2022-06-20'),
+  (3, 'Carol White',   'carol@example.com',  '2023-03-10'),
+  (4, 'Dave Brown',    'dave@example.com',   '2023-07-05'),
+  (5, 'Eve Davis',     'eve@example.com',    '2024-01-22');
+
+-- 8 Loans
+INSERT INTO loans (id, book_id, member_id, loan_date, return_date, returned) VALUES
+  (1,  1, 1, '2024-11-01', '2024-11-15', TRUE),
+  (2,  3, 1, '2024-11-20', '2024-12-04', FALSE),  -- Alice still has Dune
+  (3,  5, 2, '2024-10-10', '2024-10-24', TRUE),
+  (4,  7, 2, '2024-11-15', '2024-11-29', FALSE),  -- Bob still has DDIA
+  (5,  2, 3, '2024-09-01', '2024-09-15', TRUE),
+  (6,  8, 3, '2024-11-25', '2024-12-09', FALSE),  -- Carol still has Atomic Habits
+  (7,  1, 4, '2024-11-05', '2024-11-19', TRUE),
+  (8, 10, 5, '2024-10-01', '2024-10-15', TRUE);</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="queries">Operational Queries</h2>
+
+          <h3>Find all available books (with copies remaining)</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT id, title, author, genre, copies_available
+FROM books
+WHERE copies_available > 0
+ORDER BY genre, title;</code></pre>
+          </div>
+
+          <h3>Currently borrowed books (not yet returned)</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT
+  b.title,
+  b.author,
+  m.name          AS borrowed_by,
+  l.loan_date,
+  l.return_date   AS due_date,
+  CURRENT_DATE - l.return_date AS days_overdue
+FROM loans l
+JOIN books   b ON b.id = l.book_id
+JOIN members m ON m.id = l.member_id
+WHERE l.returned = FALSE
+ORDER BY l.return_date;</code></pre>
+          </div>
+
+          <h3>Overdue loans (past return date, not yet returned)</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT
+  m.name        AS member,
+  m.email,
+  b.title,
+  l.return_date AS due_date,
+  CURRENT_DATE - l.return_date AS days_overdue
+FROM loans l
+JOIN books   b ON b.id = l.book_id
+JOIN members m ON m.id = l.member_id
+WHERE l.returned = FALSE
+  AND l.return_date < CURRENT_DATE
+ORDER BY days_overdue DESC;</code></pre>
+          </div>
+
+          <h3>Member borrow history</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT
+  m.name          AS member,
+  b.title,
+  b.genre,
+  l.loan_date,
+  l.return_date,
+  CASE WHEN l.returned THEN 'Returned' ELSE 'On Loan' END AS status
+FROM loans l
+JOIN books   b ON b.id = l.book_id
+JOIN members m ON m.id = l.member_id
+WHERE m.id = 1   -- change to the member_id you want
+ORDER BY l.loan_date DESC;</code></pre>
+          </div>
+
+          <h2 id="reports">Reports</h2>
+
+          <h3>Most popular books (by loan count)</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT
+  b.title,
+  b.author,
+  COUNT(l.id)  AS total_loans,
+  SUM(CASE WHEN l.returned = FALSE THEN 1 ELSE 0 END) AS currently_on_loan
+FROM books b
+LEFT JOIN loans l ON l.book_id = b.id
+GROUP BY b.id, b.title, b.author
+ORDER BY total_loans DESC;</code></pre>
+          </div>
+
+          <h3>Most active members (by books borrowed)</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT
+  m.name,
+  m.email,
+  COUNT(l.id)    AS total_loans,
+  MAX(l.loan_date) AS last_loan_date
+FROM members m
+LEFT JOIN loans l ON l.member_id = m.id
+GROUP BY m.id, m.name, m.email
+ORDER BY total_loans DESC;</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Design <code>books</code>, <code>members</code>, and <code>loans</code> tables.</li>
+              <li>Add keys and relationships.</li>
+              <li>Insert sample data.</li>
+              <li>Query books currently on loan.</li>
+              <li>Find overdue loans.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a small library schema (books, members, loans) with proper keys and a foreign key from loans to both books and members. Write queries for "books currently borrowed" and "members with overdue books." Explain the many-to-many relationship modeled by the loans table.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Built a 3-table library schema: <code>books</code>, <code>members</code>, <code>loans</code> with proper FK constraints.</li>
+              <li>Added CHECK constraint to prevent negative <code>copies_available</code>; indexed FK columns.</li>
+              <li>Inserted 10 books, 5 members, and 8 loan records with mixed returned/outstanding status.</li>
+              <li>Wrote queries to list available books, find currently borrowed items, and identify overdue loans.</li>
+              <li>Built reports for most popular books and most active members using LEFT JOIN + COUNT + GROUP BY.</li>
+              <li>Key SQL used: CREATE TABLE with FK + CHECK, INSERT, SELECT + JOIN + WHERE, COUNT + GROUP BY + ORDER BY.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you model a many-to-many relationship?</li>
+            <li>What is a junction/bridge table?</li>
+            <li>How would you find overdue loans?</li>
+            <li>What constraints keep a loans table consistent?</li>
+            <li>How do you prevent lending an already-borrowed book?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/projects/ecommerce-schema.html" class="topic-tag sql-topic-tag">🗄️ E-Commerce Schema</a>
+            <a href="/sql/advanced/normalization.html" class="topic-tag sql-topic-tag">🗄️ Normalization</a>
+            <a href="/sql/advanced/indexes.html" class="topic-tag sql-topic-tag">🗄️ Indexes</a>
+            <a href="/sql/interview/exercises.html" class="topic-tag sql-topic-tag">🗄️ SQL Exercises</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">How do I update copies_available when a book is loaned or returned? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>You have two options. Option A: update <code>copies_available</code> in your application code every time you INSERT into loans or UPDATE loans SET returned = TRUE. Option B: use a TRIGGER that fires AFTER INSERT on loans (decrement) and AFTER UPDATE on loans (increment when returned = TRUE). For a learning project, Option A is more explicit and easier to understand. In production, Option B enforces consistency regardless of how the data is modified.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What does ON DELETE RESTRICT do? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>ON DELETE RESTRICT</code> prevents deletion of a referenced row if child rows exist. So you cannot delete a book from the books table if that book has loan records. This protects data integrity. Alternatives: ON DELETE CASCADE (automatically delete child rows), ON DELETE SET NULL (set FK column to NULL). For this library system, RESTRICT makes sense — you don't want to accidentally delete book records that have loan history.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How would I add a feature to reserve books? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Add a <code>reservations</code> table: <code>id, book_id, member_id, reserved_at, expires_at, fulfilled</code>. When a member reserves a book, insert a row. When they collect it, INSERT into loans and mark the reservation as fulfilled. Add a query to show pending reservations per book so staff can notify members when their book is available. This is a good extension exercise.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What's a good next project after this? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The <a href="/sql/projects/ecommerce-schema.html">E-Commerce Schema project</a> is a natural next step — it introduces more tables, multi-level foreign key relationships, and more complex analytical queries. After that, the <a href="/sql/projects/analytics-queries.html">Analytics Queries project</a> covers advanced SQL patterns like cohort analysis, retention, moving averages, and funnel analysis using window functions.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/interview/quiz.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+          <a href="/sql/projects/ecommerce-schema.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">E-Commerce Schema</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

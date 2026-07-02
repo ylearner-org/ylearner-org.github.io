@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL GROUP BY – Grouping Rows for Aggregation | ylearner</title>
+  <meta name="description" content="Learn how SQL GROUP BY collapses rows with the same value into groups so aggregate functions like COUNT, SUM, and AVG compute per group. Includes multi-column grouping and rules.">
+  <meta name="keywords" content="SQL GROUP BY, GROUP BY tutorial, SQL aggregation, GROUP BY multiple columns, SQL COUNT GROUP BY, SQL AVG GROUP BY, SQL grouping rows">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/grouping/group-by.html">
+  <meta property="og:title" content="SQL GROUP BY – Grouping Rows for Aggregation | ylearner">
+  <meta property="og:description" content="Master SQL GROUP BY: collapse rows into groups and compute aggregates like COUNT, SUM, and AVG per group. Rules, examples, and NULL handling explained.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/grouping/group-by.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL GROUP BY – Grouping Rows for Aggregation | ylearner">
+  <meta name="twitter:description" content="Master SQL GROUP BY: collapse rows into groups and compute aggregates like COUNT, SUM, and AVG per group. Rules, examples, and NULL handling explained.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL GROUP BY","description":"How SQL GROUP BY collapses rows into groups and enables per-group aggregation with COUNT, SUM, AVG, and more.","educationalLevel":"Intermediate","keywords":"SQL GROUP BY, SQL aggregation, GROUP BY multiple columns","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/grouping/group-by.html">Grouping</a><span class="separator">›</span>
+          <span class="current">GROUP BY</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">📊 Grouping &amp; Aggregation</div>
+          <h1>SQL GROUP BY – Grouping Rows for Aggregation</h1>
+          <p class="lesson-intro">GROUP BY is one of the most powerful clauses in SQL. It collapses all rows that share the same value in a column into a single group, letting aggregate functions like <code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, and <code>MAX</code> compute one result per group instead of one result for the whole table.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="group-by-syntax">GROUP BY Syntax</h2>
+          <p>The GROUP BY clause comes after WHERE and before ORDER BY in a SELECT statement:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">SELECT   column1, aggregate_function(column2)
+FROM     table_name
+WHERE    condition          -- optional: filters rows BEFORE grouping
+GROUP BY column1
+ORDER BY column1;           -- optional</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Every non-aggregate column in SELECT must appear in GROUP BY</strong>
+              <p>This is the fundamental rule. If you select <code>department</code> and <code>COUNT(*)</code>, then <code>department</code> must be in the GROUP BY clause. Aggregate functions like <code>COUNT</code>, <code>SUM</code>, <code>AVG</code> are exempt — they summarise the group.</p>
+            </div>
+          </div>
+
+          <h2 id="how-grouping-works">How Grouping Works</h2>
+          <p>Think of GROUP BY as sorting the rows into buckets. Rows with the same value in the GROUP BY column are placed in the same bucket. Then each aggregate function runs once per bucket, producing one output row per group.</p>
+
+          <p>Given this <code>employees</code> table:</p>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>id</th><th>name</th><th>department</th><th>salary</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>Alice</td><td>Engineering</td><td>90000</td></tr>
+                <tr><td>2</td><td>Bob</td><td>Engineering</td><td>85000</td></tr>
+                <tr><td>3</td><td>Carol</td><td>Marketing</td><td>72000</td></tr>
+                <tr><td>4</td><td>Dave</td><td>Marketing</td><td>68000</td></tr>
+                <tr><td>5</td><td>Eve</td><td>HR</td><td>60000</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="with-aggregates">Using GROUP BY with Aggregate Functions</h2>
+          <p>Count employees and compute average salary per department:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">SELECT
+    department,
+    COUNT(*)        AS headcount,
+    AVG(salary)     AS avg_salary,
+    SUM(salary)     AS total_payroll,
+    MIN(salary)     AS lowest_salary,
+    MAX(salary)     AS highest_salary
+FROM employees
+GROUP BY department
+ORDER BY headcount DESC;</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ Result</div>
+            Engineering → headcount: 2, avg_salary: 87500, total_payroll: 175000<br>
+            Marketing   → headcount: 2, avg_salary: 70000, total_payroll: 140000<br>
+            HR          → headcount: 1, avg_salary: 60000, total_payroll: 60000
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>COUNT(*) vs COUNT(column)</strong>
+              <p><code>COUNT(*)</code> counts every row in the group including NULLs. <code>COUNT(column)</code> counts only non-NULL values in that column. Use <code>COUNT(*)</code> for headcounts and <code>COUNT(column)</code> when you want to know how many rows have a value in a specific field.</p>
+            </div>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="multiple-columns">Grouping by Multiple Columns</h2>
+          <p>You can group by more than one column. Each unique combination of the grouped columns forms its own group:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">SELECT
+    department,
+    job_title,
+    COUNT(*)    AS headcount,
+    AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department, job_title
+ORDER BY department, job_title;</code></pre>
+          </div>
+
+          <p>This groups by the combination of <code>department</code> AND <code>job_title</code>. "Engineering / Senior Engineer" and "Engineering / Junior Engineer" become separate groups even though they share the same department.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Sales totals per year and month
+SELECT
+    YEAR(order_date)  AS yr,
+    MONTH(order_date) AS mo,
+    SUM(amount)       AS monthly_sales
+FROM orders
+GROUP BY YEAR(order_date), MONTH(order_date)
+ORDER BY yr, mo;</code></pre>
+          </div>
+
+          <h2 id="group-by-rules">GROUP BY Rules</h2>
+          <p>Follow these rules to write correct GROUP BY queries:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Rule</th><th>Explanation</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>Non-aggregate = GROUP BY</strong></td>
+                  <td>Every column in SELECT that is not inside an aggregate function must appear in the GROUP BY list.</td>
+                </tr>
+                <tr>
+                  <td><strong>NULL forms its own group</strong></td>
+                  <td>All rows where the GROUP BY column is NULL are placed in a single NULL group.</td>
+                </tr>
+                <tr>
+                  <td><strong>HAVING for post-group filtering</strong></td>
+                  <td>To filter groups (e.g., only departments with more than 5 people), use HAVING, not WHERE.</td>
+                </tr>
+                <tr>
+                  <td><strong>ORDER BY can use aliases</strong></td>
+                  <td>You can ORDER BY an aggregate alias like <code>ORDER BY headcount DESC</code> even though it was defined in SELECT.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>NULL grouping behaviour</strong>
+              <p>If the GROUP BY column contains NULLs, all NULL rows are grouped together as one group. The aggregate functions compute over those NULL rows just like any other group. Keep this in mind when your data has optional columns.</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Demonstrate NULL group: employees with no department assigned
+SELECT
+    department,          -- will show NULL for unassigned employees
+    COUNT(*) AS headcount
+FROM employees
+GROUP BY department;
+-- The NULL group appears as a row where department IS NULL</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-groupby">The GROUP BY Rule Everyone Breaks Once</h2>
+          <p>The cardinal rule: <strong>every column in <code>SELECT</code> must either be inside an aggregate function or listed in <code>GROUP BY</code>.</strong> Break it and you get an error (or, in older MySQL, silently wrong data):</p>
+          <pre><code class="language-sql">-- ❌ customer_name is neither aggregated nor grouped
+SELECT customer_name, COUNT(*)
+FROM orders
+GROUP BY customer_id;
+
+-- ✅ group by what you select
+SELECT customer_name, COUNT(*)
+FROM orders
+GROUP BY customer_name;</code></pre>
+          <p>Think of <code>GROUP BY</code> as collapsing many rows into one per group. A non-grouped, non-aggregated column has many possible values for that single output row — the database can't pick one.</p>
+          <h3>WHERE vs HAVING — filter rows vs filter groups</h3>
+          <pre><code class="language-sql">SELECT region, SUM(amount) AS total
+FROM orders
+WHERE order_date &gt;= '2024-01-01'   -- filters ROWS before grouping
+GROUP BY region
+HAVING SUM(amount) &gt; 10000;         -- filters GROUPS after aggregating</code></pre>
+          <p><code>WHERE</code> can't see aggregates (it runs before grouping); <code>HAVING</code> is the only place to filter on <code>SUM</code>, <code>COUNT</code>, etc.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Group rows by one column.</li>
+              <li>Count rows per group.</li>
+              <li>Group by multiple columns.</li>
+              <li>Combine a group with an aggregate.</li>
+              <li>Order the grouped results.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>On a <code>sales</code> table, compute total and average revenue per <code>region</code> and per <code>region, product</code>. Explain the rule that every non-aggregated SELECT column must appear in GROUP BY.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>GROUP BY</strong> collapses all rows sharing the same column value into a single output row.</li>
+              <li>Aggregate functions (<code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code>) compute one result per group.</li>
+              <li>Every non-aggregate column in <code>SELECT</code> must also appear in <code>GROUP BY</code>.</li>
+              <li>You can group by <strong>multiple columns</strong> — each unique combination becomes a separate group.</li>
+              <li><strong>NULL values</strong> form their own group.</li>
+              <li>Use <strong>HAVING</strong> (not WHERE) to filter groups after aggregation.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does GROUP BY do?</li>
+            <li>Which columns can appear in SELECT alongside GROUP BY?</li>
+            <li>How does GROUP BY interact with aggregates?</li>
+            <li>What is the difference between GROUP BY and DISTINCT?</li>
+            <li>In what order do WHERE, GROUP BY, and HAVING execute?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/grouping/having-clause.html" class="topic-tag sql-topic-tag">🗄️ HAVING Clause</a>
+            <a href="/sql/grouping/window-functions.html" class="topic-tag sql-topic-tag">🗄️ Window Functions</a>
+            <a href="/sql/functions/aggregate-functions.html" class="topic-tag sql-topic-tag">🗄️ Aggregate Functions</a>
+            <a href="/sql/grouping/rollup-cube.html" class="topic-tag sql-topic-tag">🗄️ ROLLUP &amp; CUBE</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I use a WHERE clause with GROUP BY? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. WHERE filters individual rows BEFORE grouping occurs. Only rows that pass the WHERE condition are included in the groups. To filter groups themselves (after aggregation), use HAVING. The order is: FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens if I GROUP BY a column not in SELECT? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>That is perfectly valid. You can GROUP BY a column without including it in the SELECT list. The grouping still happens by that column — you just do not see it in the output. This is useful when you want to group by a technical key but only display a human-readable label.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I GROUP BY an expression or function result? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. You can GROUP BY any scalar expression: <code>GROUP BY YEAR(order_date)</code>, <code>GROUP BY UPPER(country)</code>, or <code>GROUP BY price * quantity</code>. In PostgreSQL and some other databases you can also use a SELECT alias in GROUP BY, but standard SQL requires repeating the expression.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is GROUP BY the same as ORDER BY? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. GROUP BY organises rows into groups for aggregation — it changes the number of output rows. ORDER BY just sorts the output rows without changing them. A GROUP BY query does not guarantee any particular sort order — add an explicit ORDER BY if you need sorted results.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/joins/quiz.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+          <a href="/sql/grouping/having-clause.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">HAVING Clause</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

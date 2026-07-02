@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS Event Handling – t-on Directives & Custom Events | ylearner</title>
+  <meta name="description" content="Complete guide to OWL JS event handling: t-on-click, t-on-input, t-on-keydown, inline vs method handlers, event modifiers (prevent, stop, self), custom events with trigger(), and keyboard shortcuts.">
+  <meta name="keywords" content="OWL JS event handling, OWL t-on-click, OWL custom events, OWL trigger event, OWL JS event modifiers, t-on-submit prevent, OWL keyboard events, Odoo Web Library events, owl js event listener">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/owljs/core/events.html">
+  <meta property="og:title" content="OWL JS Event Handling – t-on Directives Complete Guide | ylearner">
+  <meta property="og:description" content="t-on-click, t-on-submit, inline handlers, method handlers, event modifiers, custom events with trigger() — full OWL JS event handling tutorial.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/owljs/core/events.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS Event Handling Complete Guide | ylearner">
+  <meta name="twitter:description" content="t-on-* directives, inline vs method handlers, prevent/stop modifiers, custom events — everything about events in OWL JS.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS Event Handling",
+    "description": "Complete guide to OWL JS event handling: t-on directives, inline and method handlers, event modifiers, custom events with trigger(), and keyboard event patterns.",
+    "educationalLevel": "Beginner",
+    "keywords": "OWL JS events, t-on-click, OWL custom events, event modifiers, OWL trigger, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/core/components.html">Core Concepts</a><span class="separator">›</span>
+          <span class="current">Event Handling</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Core Concepts</div>
+          <h1>OWL JS Event Handling – t-on Directives &amp; Custom Events</h1>
+          <p class="lesson-intro">Events are how users interact with your OWL components — clicking buttons, submitting forms, typing in inputs, pressing keyboard shortcuts. OWL handles all DOM events through the <code>t-on-[eventname]</code> directive, which attaches native browser event listeners in a declarative way. Beyond DOM events, OWL components can also <strong>fire custom events</strong> with <code>this.trigger()</code>, allowing a child to communicate upward without needing a callback prop. This lesson covers everything: inline handlers, method handlers, all modifier combinations, keyboard events, and custom event patterns.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 5 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="t-on-basics">t-on-[event] Basics</h2>
+          <p>The <code>t-on-</code> prefix followed by any browser event name attaches a listener to that element. The attribute value is a JavaScript expression evaluated in the component's scope.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – common t-on examples</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Mouse events --&gt;
+&lt;button t-on-click="handleClick"&gt;Click me&lt;/button&gt;
+&lt;div t-on-mouseenter="onHover" t-on-mouseleave="onLeave"&gt;&lt;/div&gt;
+&lt;div t-on-dblclick="handleDoubleClick"&gt;&lt;/div&gt;
+
+&lt;!-- Form events --&gt;
+&lt;form t-on-submit="handleSubmit"&gt;&lt;/form&gt;
+&lt;input t-on-change="handleChange"/&gt;
+&lt;input t-on-input="handleInput"/&gt;
+&lt;input t-on-focus="handleFocus" t-on-blur="handleBlur"/&gt;
+
+&lt;!-- Keyboard events --&gt;
+&lt;input t-on-keydown="handleKeyDown"/&gt;
+&lt;input t-on-keyup="handleKeyUp"/&gt;
+
+&lt;!-- Window / document events (on an element) --&gt;
+&lt;div t-on-scroll="handleScroll"&gt;&lt;/div&gt;</code></pre>
+          </div>
+
+          <h2 id="method-handlers">Method Handlers</h2>
+          <p>The most common pattern: pass the name of a class method. OWL calls it with the native <code>Event</code> object as the first argument.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – method handlers</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class SearchBox extends Component {
+  state = useState({ query: "", results: [] });
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;input
+        t-model="state.query"
+        t-on-keydown="onKeyDown"
+        placeholder="Search…"
+      /&gt;
+      &lt;button t-on-click="search"&gt;Search&lt;/button&gt;
+    &lt;/div&gt;
+  `;
+
+  // Receives the native KeyboardEvent as argument
+  onKeyDown(ev) {
+    if (ev.key === "Enter") {
+      this.search();
+    }
+    if (ev.key === "Escape") {
+      this.state.query = "";
+    }
+  }
+
+  search() {
+    // this.state.query is available — no event arg needed here
+    console.log("Searching for:", this.state.query);
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="inline-handlers">Inline Handlers</h2>
+          <p>For simple one-liners, use an inline arrow function in the template attribute. The event object is available as <code>ev</code>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – inline handlers</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Toggle a boolean --&gt;
+&lt;button t-on-click="() =&gt; state.isOpen = !state.isOpen"&gt;Toggle&lt;/button&gt;
+
+&lt;!-- Pass data to a method (useful in loops) --&gt;
+&lt;button t-on-click="() =&gt; deleteItem(item.id)"&gt;Delete&lt;/button&gt;
+
+&lt;!-- Inline with event object --&gt;
+&lt;input t-on-keydown="(ev) =&gt; ev.key === 'Enter' &amp;&amp; submitForm()"/&gt;
+
+&lt;!-- Set state directly --&gt;
+&lt;button t-on-click="() =&gt; state.filter = 'active'"&gt;Active&lt;/button&gt;</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Inline vs method: which to use?</strong>
+              <p>Use <strong>inline</strong> for simple, obvious one-liners (toggle a flag, set a filter value). Use a <strong>method</strong> when the handler has more than one statement, needs to be tested, is used in multiple places, or involves async logic. Keep templates readable — if an inline expression requires mental parsing, move it to a named method.</p>
+            </div>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="event-modifiers">Event Modifiers</h2>
+          <p>OWL supports modifiers appended with a dot after the event name. They are applied before your handler runs:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – event modifiers</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- .prevent — calls event.preventDefault() before the handler --&gt;
+&lt;form t-on-submit.prevent="handleSubmit"&gt;&lt;/form&gt;
+&lt;a t-on-click.prevent="navigate" href="/foo"&gt;Link&lt;/a&gt;
+
+&lt;!-- .stop — calls event.stopPropagation() before the handler --&gt;
+&lt;div t-on-click="handleParentClick"&gt;
+  &lt;button t-on-click.stop="handleChildClick"&gt;Inner button&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- .self — handler only fires if the event target IS this element (not a child) --&gt;
+&lt;div class="modal-overlay" t-on-click.self="closeModal"&gt;
+  &lt;div class="modal-content"&gt;…&lt;/div&gt;  &lt;!-- clicking inside won't close --&gt;
+&lt;/div&gt;
+
+&lt;!-- Combine modifiers --&gt;
+&lt;form t-on-submit.prevent.stop="handleSubmit"&gt;&lt;/form&gt;</code></pre>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Modifier</th><th>What it does</th><th>Common use case</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>.prevent</code></td><td>Calls <code>event.preventDefault()</code></td><td>Prevent form submission page reload, prevent link navigation</td></tr>
+                <tr><td><code>.stop</code></td><td>Calls <code>event.stopPropagation()</code></td><td>Stop click from bubbling to parent overlay</td></tr>
+                <tr><td><code>.self</code></td><td>Only fires if <code>event.target === event.currentTarget</code></td><td>Modal backdrop click-to-close without closing when clicking the modal content</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="keyboard-events">Keyboard Event Patterns</h2>
+          <p>Keyboard events (keydown, keyup, keypress) give you <code>ev.key</code> (readable name like <code>"Enter"</code>, <code>"Escape"</code>, <code>"ArrowDown"</code>) and <code>ev.code</code> (physical key like <code>"Space"</code>). Always use <code>ev.key</code> for logic.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – keyboard event handling</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class CommandPalette extends Component {
+  state = useState({ isOpen: false, query: "" });
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;input
+        t-if="state.isOpen"
+        t-model="state.query"
+        t-on-keydown="handleKey"
+        placeholder="Type a command…"
+      /&gt;
+    &lt;/div&gt;
+  `;
+
+  handleKey(ev) {
+    switch (ev.key) {
+      case "Enter":
+        this.executeCommand(this.state.query);
+        break;
+
+      case "Escape":
+        this.state.isOpen = false;
+        this.state.query  = "";
+        break;
+
+      case "ArrowDown":
+        ev.preventDefault();   // prevent page scroll
+        this.selectNext();
+        break;
+
+      case "ArrowUp":
+        ev.preventDefault();
+        this.selectPrev();
+        break;
+    }
+  }
+
+  // Check modifier keys
+  handleGlobalKey(ev) {
+    // Ctrl/Cmd + K: open command palette
+    if ((ev.ctrlKey || ev.metaKey) &amp;&amp; ev.key === "k") {
+      ev.preventDefault();
+      this.state.isOpen = !this.state.isOpen;
+    }
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="custom-events">Custom Events with trigger()</h2>
+          <p>A child component can dispatch a custom event up the DOM tree using <code>this.trigger(eventName, detail)</code>. A parent component can listen to it in the template with <code>t-on-[event-name]</code>. This is an alternative to callback props for child-to-parent communication — especially useful when the child is deeply nested.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – custom event with trigger()</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// ── Child: fires a custom event ───────────────────────────────────
+class ColorPicker extends Component {
+  static template = xml`
+    &lt;div class="color-picker"&gt;
+      &lt;button t-on-click="() =&gt; pick('red')"   style="background:red"&gt;&lt;/button&gt;
+      &lt;button t-on-click="() =&gt; pick('green')" style="background:green"&gt;&lt;/button&gt;
+      &lt;button t-on-click="() =&gt; pick('blue')"  style="background:blue"&gt;&lt;/button&gt;
+    &lt;/div&gt;
+  `;
+
+  pick(color) {
+    // Dispatch a custom "color-selected" event with a detail payload
+    this.trigger("color-selected", { color });
+  }
+}
+
+// ── Parent: listens to the custom event ───────────────────────────
+class App extends Component {
+  static components = { ColorPicker };
+
+  state = useState({ selectedColor: "none" });
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;p&gt;Selected: &lt;t t-esc="state.selectedColor"/&gt;&lt;/p&gt;
+      &lt;!-- Listen with t-on-[event-name] --&gt;
+      &lt;ColorPicker t-on-color-selected="onColorSelected"/&gt;
+    &lt;/div&gt;
+  `;
+
+  onColorSelected(ev) {
+    // ev.detail contains the payload from trigger()
+    this.state.selectedColor = ev.detail.color;
+  }
+}</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>trigger() vs callback props — when to use each</strong>
+              <p><strong>Callback props</strong> are explicit and type-checkable. Use them when the parent directly uses the child and the interface should be clear. <strong>trigger()</strong> is better when: (1) the child is deeply nested and threading callback props is cumbersome, (2) multiple different parents might listen to the same event, or (3) you want to decouple the child from knowing its parent's API. In Odoo modules, <code>trigger()</code> is common because views often insert widgets without knowing all parent listeners.</p>
+            </div>
+          </div>
+
+          <h2 id="events-in-loops">Events in Loops</h2>
+          <p>When handling events inside <code>t-foreach</code>, use inline arrow functions to capture the loop variable:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML – event handlers in loops</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;ul&gt;
+  &lt;li t-foreach="state.items" t-as="item" t-key="item.id"&gt;
+
+    &lt;span t-esc="item.name"/&gt;
+
+    &lt;!-- Arrow function captures 'item' from the loop scope --&gt;
+    &lt;button t-on-click="() =&gt; deleteItem(item.id)"&gt;Delete&lt;/button&gt;
+    &lt;button t-on-click="() =&gt; editItem(item)"&gt;Edit&lt;/button&gt;
+
+    &lt;!-- Named method doesn't work without capturing: avoid this --&gt;
+    &lt;!-- &lt;button t-on-click="deleteItem"&gt;❌ no item.id passed&lt;/button&gt; --&gt;
+
+  &lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+          </div>
+
+          <h2 id="native-event-object">The Native Event Object</h2>
+          <p>OWL passes the native browser <code>Event</code> (or its subclass) to your handler as the first argument. All standard event properties are available:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – using the event object</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class FileDropZone extends Component {
+  static template = xml`
+    &lt;div
+      class="drop-zone"
+      t-on-dragover.prevent="() =&gt; {}"
+      t-on-drop.prevent="handleDrop"
+    &gt;
+      Drop files here
+    &lt;/div&gt;
+  `;
+
+  handleDrop(ev) {
+    const files = Array.from(ev.dataTransfer.files);  // native DragEvent API
+    console.log("Dropped files:", files.map(f =&gt; f.name));
+  }
+}
+
+class InputWithValidation extends Component {
+  static template = xml`
+    &lt;input
+      type="email"
+      t-on-input="validateEmail"
+      t-on-blur="validateEmail"
+    /&gt;
+  `;
+
+  validateEmail(ev) {
+    const value = ev.target.value;          // ev.target is the input element
+    this.state.isValid = value.includes("@") &amp;&amp; value.includes(".");
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="common-patterns">Common Real-World Patterns</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – common event patterns</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class UIPatterns extends Component {
+  state = useState({
+    isMenuOpen: false,
+    selected: null,
+    confirmingDelete: false,
+  });
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;!-- 1. Toggle on click --&gt;
+      &lt;button t-on-click="() =&gt; state.isMenuOpen = !state.isMenuOpen"&gt;
+        Menu
+      &lt;/button&gt;
+
+      &lt;!-- 2. Close on outside click (modal overlay) --&gt;
+      &lt;div t-if="state.isMenuOpen"
+           class="overlay"
+           t-on-click.self="() =&gt; state.isMenuOpen = false"&gt;
+        &lt;div class="menu"&gt;…&lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;!-- 3. Confirm before delete --&gt;
+      &lt;button t-if="!state.confirmingDelete"
+              t-on-click="() =&gt; state.confirmingDelete = true"&gt;
+        Delete
+      &lt;/button&gt;
+      &lt;span t-if="state.confirmingDelete"&gt;
+        Are you sure?
+        &lt;button t-on-click="confirmDelete"&gt;Yes&lt;/button&gt;
+        &lt;button t-on-click="() =&gt; state.confirmingDelete = false"&gt;No&lt;/button&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+  `;
+
+  confirmDelete() {
+    // perform delete…
+    this.state.confirmingDelete = false;
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="deep-events">Handling Events with t-on</h2>
+          <p>OWL wires DOM events in the template with the <code>t-on-</code> directive: <code>t-on-<em>eventname</em></code> points at a method on your component. No <code>addEventListener</code>, no manual cleanup — OWL attaches and removes handlers with the component.</p>
+          <pre><code class="language-javascript">static template = xml`
+    &lt;button t-on-click="onClick"&gt;Click&lt;/button&gt;
+    &lt;input t-on-input="onType"/&gt;
+    &lt;form t-on-submit.prevent="onSave"&gt;...&lt;/form&gt;`;
+
+onClick(ev) { console.log("clicked", ev); }
+onType(ev)  { this.state.text = ev.target.value; }
+onSave()    { /* .prevent already blocked page reload */ }</code></pre>
+          <table>
+            <thead><tr><th>Syntax</th><th>Does</th></tr></thead>
+            <tbody>
+              <tr><td><code>t-on-click="fn"</code></td><td>call <code>fn</code> on click</td></tr>
+              <tr><td><code>t-on-click="() =&gt; fn(id)"</code></td><td>pass an argument inline</td></tr>
+              <tr><td><code>t-on-submit.prevent</code></td><td>auto <code>preventDefault()</code></td></tr>
+              <tr><td><code>t-on-click.stop</code></td><td>auto <code>stopPropagation()</code></td></tr>
+            </tbody>
+          </table>
+          <p><strong>Child → parent communication:</strong> a child never reaches into its parent. Instead the parent passes a callback down as a prop, and the child calls it: <code>this.props.onDelete(this.props.id)</code>. Data flows down as props, notifications flow up as function calls — the same one-way pattern React uses.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a <code>TagInput</code> component that demonstrates advanced event handling:</p>
+            <ol>
+              <li>An <code>&lt;input&gt;</code> where the user types a tag name. Pressing <strong>Enter</strong> adds the tag to a list. Pressing <strong>Backspace</strong> when the input is empty removes the last tag.</li>
+              <li>Each tag has an ✕ button. Clicking it removes that specific tag (use inline arrow in the loop).</li>
+              <li>Use <code>t-on-keydown</code> with <code>ev.key</code> to handle Enter and Backspace.</li>
+              <li>Prevent form submission if the component is inside a <code>&lt;form&gt;</code> by using <code>t-on-keydown.prevent</code> only on Enter (hint: check the key first, then call preventDefault manually in the handler).</li>
+              <li>Fire a custom <code>"tags-changed"</code> event via <code>this.trigger()</code> whenever the tag list changes. In a parent <code>App</code>, listen to it and display the current tag array.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Wire up events: a button <code>t-on-click</code> calling a setup method, an input handler updating state, and a custom event bubbled to a parent. Explain OWL’s <code>t-on-</code> syntax, event modifiers, and how child-to-parent communication works (props callback vs events).</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>t-on-[eventname]</code> attaches a native browser event listener to any DOM element.</li>
+              <li>Handlers can be method names (<code>t-on-click="handleClick"</code>) or inline arrow functions (<code>t-on-click="() =&gt; state.isOpen = true"</code>).</li>
+              <li>The native <code>Event</code> object is passed as the first argument to every handler method.</li>
+              <li><strong>Modifiers</strong>: <code>.prevent</code> (preventDefault), <code>.stop</code> (stopPropagation), <code>.self</code> (target must be the element itself). Combine with dots.</li>
+              <li>In loops, use inline arrows to capture the loop variable: <code>() =&gt; deleteItem(item.id)</code>.</li>
+              <li><code>this.trigger("event-name", detail)</code> dispatches a custom DOM event that bubbles up. Parent listens with <code>t-on-event-name="handler"</code>.</li>
+              <li>Keyboard events: use <code>ev.key</code> (e.g. <code>"Enter"</code>, <code>"Escape"</code>, <code>"ArrowDown"</code>) rather than <code>ev.keyCode</code> (deprecated).</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you handle events in OWL?</li>
+            <li>What is the <code>t-on-</code> directive?</li>
+            <li>What are event modifiers?</li>
+            <li>How does a child notify its parent?</li>
+            <li>How do you pass data to an event handler?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/owljs/core/state.html" class="topic-tag owl-topic-tag">🦉 State &amp; useState</a>
+            <a href="/owljs/core/templates.html" class="topic-tag owl-topic-tag">🦉 Template Syntax</a>
+            <a href="/owljs/templates/input-binding.html" class="topic-tag owl-topic-tag">🦉 Input Binding (t-model)</a>
+            <a href="/owljs/lifecycle/setup-mounted.html" class="topic-tag owl-topic-tag">🦉 setup &amp; onMounted</a>
+            <a href="/owljs/advanced/sub-components.html" class="topic-tag owl-topic-tag">🦉 Sub-components</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why doesn't my method get the event object when I use a callback prop? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>When the parent passes <code>onSave.bind="save"</code>, the child calls <code>props.onSave(data)</code> passing its own argument — not a DOM event. The parent's <code>save</code> method receives whatever the child passes. This is by design — callback props carry business data (like form values), not raw DOM events. If you need the event itself, use <code>trigger()</code> instead, which dispatches an actual DOM CustomEvent.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I add event listeners to window or document in OWL? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, but you cannot do it with <code>t-on-*</code> since that requires a DOM element in the template. Use <code>onMounted</code> to add the listener and <code>onWillUnmount</code> to remove it: <code>window.addEventListener('keydown', this.boundHandler)</code> in <code>onMounted</code>, <code>window.removeEventListener('keydown', this.boundHandler)</code> in <code>onWillUnmount</code>. Store the bound handler as a property so you can remove the exact same reference.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between t-on-input and t-on-change? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>input</code> fires on every keystroke (immediately as the value changes). <code>change</code> fires when the element loses focus OR when a selection-type input (checkbox, radio, select) changes. Use <code>t-on-input</code> for live search or real-time validation. Use <code>t-on-change</code> for select dropdowns or when you only want to react when the user finishes typing and moves away. For most controlled inputs in OWL, <code>t-model</code> uses <code>input</code> internally.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is this.trigger() the same as the browser's CustomEvent? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — <code>this.trigger(name, detail)</code> is a thin wrapper that creates a native <code>CustomEvent</code> with <code>bubbles: true</code> and <code>composed: true</code> and dispatches it on the component's root DOM element. It bubbles normally through the DOM. The parent's <code>t-on-[name]</code> catches it when it reaches the parent's DOM element. You can also listen to it with plain <code>element.addEventListener()</code> if needed.</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/core/state.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">State &amp; useState</span>
+          </a>
+          <a href="/owljs/core/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

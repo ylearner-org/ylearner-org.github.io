@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL Services in Odoo – orm, notification, dialog, and Custom Services | ylearner</title>
+  <meta name="description" content="Master Odoo OWL services: use the orm, notification, dialog, and user services. Learn to write and register a custom service for shared functionality.">
+  <meta name="keywords" content="Odoo OWL services, orm service, notification service, dialog service, useService, custom service, Odoo 19">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/owl/owl-services.html">
+  <meta property="og:title" content="OWL Services in Odoo – orm, notification, dialog, and Custom Services">
+  <meta property="og:description" content="Master Odoo OWL services: use the orm, notification, dialog, and user services. Learn to write and register a custom service for shared functionality.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/owl/owl-services.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL Services in Odoo – orm, notification, dialog, and Custom Services | ylearner">
+  <meta name="twitter:description" content="Use Odoo OWL services: orm, notification, dialog, user. Write and register custom services.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL Services in Odoo – orm, notification, dialog, and Custom Services",
+    "description": "Master Odoo OWL services: use the orm, notification, dialog, and user services. Learn to write and register a custom service for shared functionality.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo OWL services, orm service, notification, dialog, useService, custom service",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/owl/owl-in-odoo.html">OWL in Odoo</a><span class="separator">›</span>
+          <span class="current">OWL Services</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 OWL in Odoo</div>
+          <h1>OWL Services in Odoo – orm, notification, dialog, and Custom Services</h1>
+          <p class="lesson-intro">Services are singletons in Odoo's OWL environment that provide shared functionality to all components. You inject them with <code>useService()</code>. Odoo ships dozens of built-in services; you can also write your own to encapsulate shared logic for your module.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="deep-owlservices">OWL Services: Shared Tools Any Component Can Use</h2>
+          <p>Services are long-lived singletons that provide functionality across the whole web client — talking to the server, showing notifications, opening dialogs. A component grabs one with the <code>useService</code> hook instead of re-implementing it.</p>
+          <pre><code class="language-javascript">import { useService } from "@web/core/utils/hooks";
+
+class OrderButton extends Component {
+    setup() {
+        this.orm = useService("orm");             // server calls
+        this.notification = useService("notification");
+    }
+    async confirm() {
+        await this.orm.write("sale.order", [this.props.id], { state: "done" });
+        this.notification.add("Order confirmed", { type: "success" });
+    }
+}</code></pre>
+          <table>
+            <thead><tr><th>Service</th><th>Provides</th></tr></thead>
+            <tbody>
+              <tr><td><code>orm</code></td><td>read/write/search Odoo models</td></tr>
+              <tr><td><code>notification</code></td><td>toast messages</td></tr>
+              <tr><td><code>dialog</code></td><td>modal dialogs</td></tr>
+              <tr><td><code>rpc</code></td><td>low-level server calls</td></tr>
+              <tr><td><code>action</code></td><td>trigger window actions</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Why services and not imports:</strong> a service is a single shared instance registered in the environment, so every component talks to the <em>same</em> notification queue, the same ORM session. <code>useService</code> must be called in <code>setup()</code> (it's a hook). You can register your own services for app-wide shared state or logic.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Inject a service with <code>useService</code>.</li>
+              <li>Use the <code>orm</code> service to call a model.</li>
+              <li>Use the <code>notification</code> service.</li>
+              <li>Use the <code>rpc</code> service.</li>
+              <li>Register a custom service.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Use the <code>orm</code> service inside an OWL component to read records and the <code>notification</code> service to show feedback. Explain what services are in OWL/Odoo, how <code>useService</code> provides them, and why services centralize cross-cutting concerns.</p>
+          </div>
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>How services work and the <code>useService()</code> hook</li>
+              <li>The <strong>orm</strong> service: searchRead, create, write, unlink</li>
+              <li>The <strong>notification</strong> service: success, warning, danger toasts</li>
+              <li>The <strong>dialog</strong> service: confirmation dialogs and custom dialogs</li>
+              <li>Writing and registering a custom service</li>
+            </ul>
+          </div>
+
+          <h2 id="how-services-work">How Services Work</h2>
+          <p>A service is a plain JavaScript object registered in the <code>services</code> registry. It is instantiated once when the Odoo web client boots, and the same instance is injected into every component that requests it. Services can depend on other services.</p>
+          <p>In a component, inject a service in <code>setup()</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { useService } from '@web/core/utils/hooks';
+
+setup() {
+    this.orm  = useService('orm');
+    this.notification = useService('notification');
+    this.dialog = useService('dialog');
+    this.user = useService('user');
+    this.router = useService('router');
+    this.action = useService('action');
+}</code></pre>
+          </div>
+
+          <h2 id="orm-service">orm Service</h2>
+          <p>The <code>orm</code> service is the primary way to call Odoo model methods from JavaScript:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// search + read combined
+const partners = await this.orm.searchRead(
+    'res.partner',                      // model
+    [['is_company', '=', true]],        // domain
+    ['name', 'email', 'phone'],         // fields
+    { limit: 20, order: 'name asc' },  // options
+);
+
+// search only (returns IDs)
+const ids = await this.orm.search('res.partner', [['name', 'like', 'Al']]);
+
+// read specific records
+const records = await this.orm.read('res.partner', [1, 2, 3], ['name', 'email']);
+
+// searchCount
+const total = await this.orm.searchCount('res.partner', []);
+
+// create
+const newId = await this.orm.create('library.book', {
+    name: 'Clean Code', author: 'Robert C. Martin',
+});
+
+// write
+await this.orm.write('library.book', [newId], { available: true });
+
+// unlink
+await this.orm.unlink('library.book', [newId]);
+
+// call arbitrary model method
+const result = await this.orm.call(
+    'library.book', 'check_availability', [[bookId]], {}
+);</code></pre>
+          </div>
+
+          <h2 id="notification-service">notification Service</h2>
+          <p>Show non-blocking toast messages:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Success (green)
+this.notification.add('Record saved successfully!', { type: 'success' });
+
+// Warning (yellow)
+this.notification.add('Low stock warning.', { type: 'warning' });
+
+// Danger (red)
+this.notification.add('Operation failed.', { type: 'danger' });
+
+// Info (blue, default)
+this.notification.add('Processing your request…');
+
+// With auto-dismiss duration (ms) and sticky option
+this.notification.add('Changes saved.', {
+    type: 'success',
+    sticky: false,   // auto-dismiss (default)
+});
+this.notification.add('Important notice.', {
+    type: 'warning',
+    sticky: true,    // stays until user closes
+});</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="dialog-service">dialog Service</h2>
+          <p>Show confirmation dialogs or custom dialog components:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { ConfirmationDialog } from '@web/core/confirmation_dialog/confirmation_dialog';
+
+// Simple confirmation
+this.dialog.add(ConfirmationDialog, {
+    title: 'Delete Book',
+    body: 'Are you sure you want to delete this book?',
+    confirm: async () => {
+        await this.orm.unlink('library.book', [this.bookId]);
+        this.notification.add('Book deleted.', { type: 'success' });
+    },
+    cancel: () => {/* optional cancel handler */},
+});
+
+// Custom dialog component
+import { MyCustomDialog } from './my_custom_dialog';
+
+this.dialog.add(MyCustomDialog, {
+    title: 'Custom Dialog',
+    bookId: this.bookId,
+    onSave: (result) => {
+        this.state.savedResult = result;
+    },
+});</code></pre>
+          </div>
+
+          <h2 id="custom-service">Writing a Custom Service</h2>
+          <p>Encapsulate shared logic (e.g., a book availability cache) in a custom service:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { registry } from '@web/core/registry';
+
+const bookService = {
+    dependencies: ['orm', 'notification'],
+
+    async start(env, { orm, notification }) {
+        const cache = new Map();
+
+        return {
+            async checkAvailability(bookId) {
+                if (cache.has(bookId)) {
+                    return cache.get(bookId);
+                }
+                const [book] = await orm.read(
+                    'library.book', [bookId], ['available_copies']
+                );
+                const available = book.available_copies > 0;
+                cache.set(bookId, available);
+                return available;
+            },
+
+            clearCache() {
+                cache.clear();
+            },
+        };
+    },
+};
+
+registry.category('services').add('book', bookService);</code></pre>
+          </div>
+          <p>Inject it in any component with <code>this.book = useService('book')</code>.</p>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Services are singletons — inject once in <code>setup()</code> via <code>useService()</code></li>
+              <li><code>orm</code> service covers all ORM operations: searchRead, create, write, unlink, call</li>
+              <li><code>notification.add(msg, {type})</code> for toasts; <code>dialog.add(Component, props)</code> for dialogs</li>
+              <li>Custom services are registered in <code>registry.category('services')</code> and can depend on other services</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What are services in OWL?</li>
+            <li>What does <code>useService</code> do?</li>
+            <li>What is the <code>orm</code> service used for?</li>
+            <li>How do you show a notification from a component?</li>
+            <li>How do you register a custom service?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/owl/owl-in-odoo.html" class="topic-tag odoo-topic-tag">🦉 OWL in Odoo</a>
+              <a href="/odoo/owl/owl-components.html" class="topic-tag odoo-topic-tag">🦉 OWL Components</a>
+              <a href="/odoo/owl/custom-widgets.html" class="topic-tag odoo-topic-tag">🦉 Custom Widgets</a>
+            </div>
+          </section>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What's the difference between orm.call and orm.searchRead? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>orm.searchRead(model, domain, fields, opts)</code> is a convenience wrapper for the common search+read pattern. <code>orm.call(model, method, args, kwargs)</code> calls any Python model method by name — use it for custom model methods, workflow actions, or any method not covered by the ORM convenience wrappers.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can services hold reactive state? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — use <code>reactive()</code> from <code>@odoo/owl</code> inside the service's <code>start()</code> method to create reactive data that components can observe. Components will re-render when the reactive object changes, even though the data lives in the service rather than the component's local state.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I call a Python @api.model method from JavaScript? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>orm.call(modelName, methodName, positionalArgs, keywordArgs)</code>. For example: <code>await this.orm.call('library.book', 'get_bestsellers', [], {limit: 5})</code>. The method must be decorated with <code>@api.model</code> on the Python side. Record-based methods (decorated with <code>@api.multi</code> or <code>@api.one</code>) pass record IDs as the first positional argument.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a href="/odoo/owl/owl-components.html" class="lesson-nav-link">
+        <span class="nav-label">← Prev</span>
+        <span class="nav-title">OWL Components</span>
+        </a>
+        <a href="/odoo/owl/custom-widgets.html" class="lesson-nav-link next">
+        <span class="nav-label">Next →</span>
+        <span class="nav-title">Custom Field Widgets</span>
+        </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

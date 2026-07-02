@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Forms – Validation, FormData &amp; Input Handling | ylearner</title>
+  <meta name="description" content="Master JavaScript form handling: reading input values, the submit event with preventDefault, real-time validation, HTML5 Constraint Validation API, FormData, client-side regex patterns, error display, and file inputs.">
+  <meta name="keywords" content="javascript form validation, FormData javascript, preventDefault submit, checkValidity javascript, setCustomValidity javascript, html5 constraint validation, javascript form input, file input javascript">
+  <link rel="canonical" href="https://ylearner.org/javascript/dom/forms.html">
+  <meta property="og:title" content="JavaScript Forms – Validation, FormData &amp; Input Handling | ylearner">
+  <meta property="og:description" content="Master JavaScript form handling: reading values, validation with the Constraint Validation API, FormData, and handling file inputs.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/dom/forms.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Forms – Validation, FormData &amp; Input Handling | ylearner">
+  <meta name="twitter:description" content="Master JavaScript form handling: reading values, validation with the Constraint Validation API, FormData, and handling file inputs.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/dom/dom-manipulation.html">DOM &amp; Browser</a><span class="separator">›</span>
+          <span class="current">Forms &amp; Validation</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 DOM &amp; Browser</div>
+          <h1>JavaScript Forms and Validation – Handling User Input</h1>
+          <p class="lesson-intro">Forms are the primary way users send data to web applications. JavaScript enhances forms with <em>real-time validation</em>, custom error messages, and programmatic submission — all without a page reload. Learning to intercept the <code>submit</code> event and the <strong>Constraint Validation API</strong> gives you full control over the user experience.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 21 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="accessing-form-elements">Accessing Form Elements</h2>
+          <p>There are several ways to reference a form and its inputs:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// By ID (most common)
+const form    = document.getElementById('signup-form');
+const emailEl = document.getElementById('email');
+
+// Via form.elements (named collection)
+// Works with name or id attribute
+const nameInput = form.elements['username'];
+const emailInput = form.elements['email'];
+
+// .elements also supports numeric index
+console.log(form.elements[0]); // first input in the form
+
+// Form reference from an input
+const parentForm = emailEl.form; // the &lt;form&gt; that owns this input
+
+// All inputs matching a type
+const checkboxes = form.querySelectorAll('input[type="checkbox"]');</code></pre>
+          </div>
+
+          <h2 id="reading-input-values">Reading Input Values</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Text, email, password, number, textarea — use .value
+const username = document.getElementById('username').value;
+const email    = document.getElementById('email').value.trim();
+
+// Checkbox — use .checked (boolean)
+const agreeBox = document.getElementById('agree');
+console.log(agreeBox.checked); // true | false
+
+// Radio buttons — find the checked one
+const genderInputs = document.querySelectorAll('input[name="gender"]');
+let selectedGender = '';
+genderInputs.forEach(radio =&gt; {
+  if (radio.checked) selectedGender = radio.value;
+});
+
+// Select (dropdown) — .value gives selected option's value
+const country = document.getElementById('country').value;
+// Multi-select — iterate options
+const multiSelect = document.getElementById('skills');
+const selected = Array.from(multiSelect.options)
+  .filter(opt =&gt; opt.selected)
+  .map(opt =&gt; opt.value);</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>username  → "alice"
+email     → "alice@example.com"
+checked   → true
+gender    → "female"
+country   → "US"</pre>
+          </div>
+
+          <h2 id="submit-event">The Submit Event and preventDefault</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const form = document.getElementById('login-form');
+
+form.addEventListener('submit', (e) =&gt; {
+  e.preventDefault(); // stops the browser from reloading / navigating
+
+  const email    = form.elements['email'].value.trim();
+  const password = form.elements['password'].value;
+
+  if (!email || !password) {
+    showError('All fields are required.');
+    return;
+  }
+
+  // Send data to server (AJAX / Fetch)
+  submitLogin({ email, password });
+});
+
+function showError(message) {
+  const errorEl = document.getElementById('form-error');
+  errorEl.textContent = message;
+  errorEl.style.display = 'block';
+}
+
+function submitLogin(data) {
+  fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(res =&gt; res.json()).then(handleResponse);
+}</code></pre>
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always call preventDefault first</strong>
+              <p>Call <code>e.preventDefault()</code> at the very start of your submit handler, before any validation logic. If an error is thrown before it runs, the browser will navigate away and your error handling code never executes.</p>
+            </div>
+          </div>
+
+          <h2 id="real-time-validation">Real-Time Validation with the input Event</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const emailInput = document.getElementById('email');
+const emailError = document.getElementById('email-error');
+
+// Validate as the user types
+emailInput.addEventListener('input', () =&gt; {
+  const value = emailInput.value.trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (value === '') {
+    showFieldError(emailInput, emailError, 'Email is required');
+  } else if (!emailRegex.test(value)) {
+    showFieldError(emailInput, emailError, 'Enter a valid email address');
+  } else {
+    clearFieldError(emailInput, emailError);
+  }
+});
+
+function showFieldError(input, errorEl, message) {
+  input.classList.add('invalid');
+  input.classList.remove('valid');
+  errorEl.textContent = message;
+  errorEl.style.display = 'block';
+}
+
+function clearFieldError(input, errorEl) {
+  input.classList.remove('invalid');
+  input.classList.add('valid');
+  errorEl.textContent = '';
+  errorEl.style.display = 'none';
+}</code></pre>
+          </div>
+
+          <h2 id="constraint-validation-api">HTML5 Constraint Validation API</h2>
+          <p>HTML5 added built-in validation attributes (<code>required</code>, <code>minlength</code>, <code>pattern</code>, <code>type="email"</code>, etc.). JavaScript can query their state and customise messages:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const input = document.getElementById('username');
+
+// checkValidity() — returns true if all constraints pass
+console.log(input.checkValidity()); // false if required + empty
+
+// validity object — individual flags
+const v = input.validity;
+console.log(v.valueMissing);   // true if required and empty
+console.log(v.tooShort);       // true if below minlength
+console.log(v.patternMismatch);// true if pattern attr fails
+console.log(v.typeMismatch);   // true for wrong type (email, url, etc.)
+
+// validationMessage — browser's localised error string
+console.log(input.validationMessage); // "Please fill in this field."
+
+// setCustomValidity — override with your own message
+input.setCustomValidity('Username must not contain spaces');
+// Reset to built-in validation (empty string = valid)
+input.setCustomValidity('');
+
+// form.checkValidity() — validates ALL fields
+const form = document.getElementById('signup-form');
+if (!form.checkValidity()) {
+  form.reportValidity(); // shows native tooltips
+}</code></pre>
+          </div>
+
+          <h2 id="formdata-api">FormData API</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const form = document.getElementById('profile-form');
+
+form.addEventListener('submit', (e) =&gt; {
+  e.preventDefault();
+
+  // Automatically reads ALL named inputs, including files
+  const formData = new FormData(form);
+
+  // Read individual values
+  console.log(formData.get('username'));
+  console.log(formData.get('avatar'));   // File object
+
+  // Iterate all entries
+  for (const [name, value] of formData.entries()) {
+    console.log(name, value);
+  }
+
+  // Modify programmatically
+  formData.set('timestamp', Date.now());
+  formData.delete('honeypot'); // remove spam trap field
+
+  // Send as multipart/form-data (perfect for file uploads)
+  fetch('/api/profile', {
+    method: 'POST',
+    body: formData  // DO NOT set Content-Type header — browser sets it
+  });
+
+  // Convert to plain object
+  const data = Object.fromEntries(formData.entries());
+  console.log(data);
+});</code></pre>
+          </div>
+
+          <h2 id="file-inputs">File Inputs</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const fileInput = document.getElementById('avatar');
+
+fileInput.addEventListener('change', () =&gt; {
+  const files = fileInput.files; // FileList (array-like)
+  const file  = files[0];        // first selected file
+
+  if (!file) return;
+
+  // File metadata
+  console.log(file.name);    // "photo.jpg"
+  console.log(file.size);    // bytes
+  console.log(file.type);    // "image/jpeg"
+
+  // Validate size (max 2 MB)
+  const MAX_SIZE = 2 * 1024 * 1024;
+  if (file.size &gt; MAX_SIZE) {
+    showError('File must be under 2 MB');
+    fileInput.value = ''; // clear selection
+    return;
+  }
+
+  // Preview image with FileReader
+  const reader = new FileReader();
+  reader.onload = (e) =&gt; {
+    document.getElementById('preview').src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+});</code></pre>
+          </div>
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Client-side validation is not enough</strong>
+              <p>Always validate and sanitize data on the server. JavaScript validation can be bypassed by disabling JavaScript or crafting raw HTTP requests. Treat client-side validation as a UX convenience, not a security measure.</p>
+            </div>
+          </div>
+
+          <h2 id="common-patterns">Common Validation Patterns Table</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Rule</th><th>Regex / API</th><th>Example</th></tr></thead>
+              <tbody>
+                <tr><td>Required field</td><td><code>value.trim() !== ''</code></td><td>Any non-empty input</td></tr>
+                <tr><td>Email</td><td><code>/^[^\s@]+@[^\s@]+\.[^\s@]+$/</code></td><td>user@example.com</td></tr>
+                <tr><td>Strong password</td><td><code>/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/</code></td><td>Min 8 chars, upper, lower, digit</td></tr>
+                <tr><td>Phone (US)</td><td><code>/^\+?1?\s?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/</code></td><td>(555) 123-4567</td></tr>
+                <tr><td>URL</td><td><code>type="url"</code> or URL constructor</td><td>https://example.com</td></tr>
+                <tr><td>Numeric range</td><td><code>min</code>/<code>max</code> attributes + <code>validity.rangeUnderflow</code></td><td>Age 18–120</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="deep-jsforms">Handling Forms: preventDefault and FormData</h2>
+          <p>The two essentials of form handling in JS: stop the browser's default full-page reload on submit, and read the field values. <code>FormData</code> makes reading every field trivial.</p>
+          <pre><code class="language-javascript">form.addEventListener("submit", (e) => {
+  e.preventDefault();                 // ← stop the page reload
+  const data = new FormData(form);    // grabs all named fields
+  const values = Object.fromEntries(data);   // → { email: "...", name: "..." }
+
+  if (!values.email.includes("@")) {
+    return showError("Bad email");
+  }
+  fetch("/api", { method: "POST", body: data });
+});</code></pre>
+          <p><strong>Why <code>preventDefault()</code> first:</strong> a <code>&lt;form&gt;</code> submit reloads/navigates by default — for a JS-handled form (AJAX, single-page app) that wipes your work. Calling it first keeps you in control.</p>
+          <table>
+            <thead><tr><th>Tool</th><th>Does</th></tr></thead>
+            <tbody>
+              <tr><td><code>new FormData(form)</code></td><td>collect all named inputs</td></tr>
+              <tr><td><code>form.checkValidity()</code></td><td>run built-in HTML validation</td></tr>
+              <tr><td><code>input.setCustomValidity(msg)</code></td><td>set a custom error</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Reminder:</strong> only inputs with a <code>name</code> attribute appear in <code>FormData</code> — a missing <code>name</code> is why a field "isn't submitting." And client validation is UX only; always re-validate on the server, since anyone can bypass the browser.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a registration form with real-time validation:</p>
+            <ol>
+              <li>Fields: username (3–20 chars, alphanumeric), email, password (min 8 chars, 1 uppercase, 1 digit), confirm password.</li>
+              <li>Show inline error messages as the user types using the <code>input</code> event.</li>
+              <li>The submit button should be disabled until all fields are valid.</li>
+              <li>On valid submit, log the form data as a plain object using <code>Object.fromEntries(new FormData(form))</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a multi-step form wizard with three steps (Personal Info, Account Details, Review &amp; Submit). Each step validates before advancing. Show a progress bar. On the final step, display all entered data in a review card. Use a single <code>&lt;form&gt;</code> element and manage visibility of steps with CSS classes. Submit using FormData and fetch.</p>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Access inputs via <code>getElementById</code>, <code>form.elements[name]</code>, or <code>querySelector</code>.</li>
+              <li>Read values with <code>.value</code>; checkboxes/radios use <code>.checked</code>.</li>
+              <li>Always call <code>e.preventDefault()</code> in submit handlers to prevent page reload.</li>
+              <li>Use the <code>input</code> event for live validation and <code>change</code> for on-commit validation.</li>
+              <li>The Constraint Validation API (<code>checkValidity()</code>, <code>validity</code>, <code>setCustomValidity()</code>) leverages HTML5 attributes.</li>
+              <li><code>FormData</code> automatically collects all named inputs including files.</li>
+              <li>Never rely solely on client-side validation — always validate on the server too.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>Why do we call <code>e.preventDefault()</code> on form submit?</li>
+            <li>What is the difference between the <code>input</code> event and the <code>change</code> event?</li>
+            <li>How does the Constraint Validation API differ from custom JavaScript validation?</li>
+            <li>When should you use <code>FormData</code> instead of reading values manually?</li>
+            <li>Why is client-side validation insufficient for security?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/javascript/dom/event-delegation.html" class="topic-tag">Event Delegation</a>
+            <a href="/javascript/dom/fetch-api.html" class="topic-tag">Fetch API</a>
+            <a href="/javascript/dom/events.html" class="topic-tag">JS Events</a>
+            <a href="/javascript/dom/dom-manipulation.html" class="topic-tag">DOM Manipulation</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">How do I reset a form programmatically? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Call <code>form.reset()</code> to restore all inputs to their default values (as defined in the HTML). This also triggers the <code>reset</code> event so you can clear any custom error states in a reset handler: <code>form.addEventListener('reset', clearAllErrors)</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I disable browser native validation tooltips? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Add the <code>novalidate</code> attribute to the <code>&lt;form&gt;</code> element: <code>&lt;form novalidate&gt;</code>. This disables the browser's built-in UI but the underlying Constraint Validation API (<code>checkValidity()</code>, <code>validity.*</code>) still works, letting you implement fully custom error UI while still leveraging HTML5 validation logic.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I handle multiple checkboxes with the same name in FormData? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>formData.get('interests')</code> only returns the first checked value. Use <code>formData.getAll('interests')</code> to get an array of all checked values for inputs sharing the same <code>name</code> attribute. This is the correct way to handle multi-value fields like checkbox groups and multi-select elements.</p></div>
+            </div>
+          </section>
+
+<div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/dom/event-delegation.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Event Delegation</span></a>
+          <a href="/javascript/dom/fetch-api.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Fetch API</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

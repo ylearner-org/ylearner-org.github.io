@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XML Basics – What Odoo Developers Need to Know | ylearner</title>
+  <meta name="description" content="Learn the XML syntax Odoo uses for views, data files, and QWeb templates. Covers XML rules, form/list views, actions, menus, QWeb directives, data vs demo files, and external IDs.">
+  <meta name="keywords" content="Odoo XML, Odoo views, QWeb templates, Odoo data files, Odoo XML tutorial, XML basics Odoo, Odoo form view, Odoo list view">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/xml-basics.html">
+  <meta property="og:title" content="XML Basics – What Odoo Developers Need to Know">
+  <meta property="og:description" content="Learn the XML syntax Odoo uses for views, data files, and QWeb templates — with real examples from the Odoo source.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/xml-basics.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="XML Basics for Odoo – Views, Data Files, and QWeb | ylearner">
+  <meta name="twitter:description" content="XML syntax for Odoo: views, data files, QWeb templates, external IDs, and more. Free beginner tutorial on ylearner.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "XML Basics for Odoo",
+    "description": "A complete guide to Odoo XML: syntax rules, view definitions, actions, menus, QWeb templates, data files, and external IDs.",
+    "educationalLevel": "Beginner",
+    "keywords": "Odoo XML, QWeb, views, data files, external IDs, Odoo development",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">XML Basics for Odoo</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🐍 Introduction</div>
+          <h1>XML Basics – What Odoo Developers Need to Know</h1>
+          <p class="lesson-intro">XML (eXtensible Markup Language) is the format Odoo uses to define views, menus, actions, data records, and templates. Before writing your first Odoo module, you need a solid understanding of XML syntax, structure, and rules. This page covers the XML fundamentals every Odoo developer must know — from document structure and element rules to attributes, namespaces, and special characters.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <!-- Section 1: What is XML? -->
+          <h2 id="what-is-xml">What is XML?</h2>
+          <p>XML (eXtensible Markup Language) is a format for describing and storing structured data as plain text. It was designed to be both human-readable and machine-readable. Unlike HTML, which tells a browser <em>how to display</em> data, XML describes <em>what the data means</em>.</p>
+          <p>Key points:</p>
+          <ul>
+            <li>You define your own tags — there are no predefined tags like HTML's <code>&lt;p&gt;</code> or <code>&lt;div&gt;</code></li>
+            <li>XML is self-describing: a <code>&lt;book&gt;</code> element containing <code>&lt;title&gt;</code> and <code>&lt;author&gt;</code> children makes its meaning clear without documentation</li>
+            <li>XML is the foundation of many technologies: SVG, RSS, SOAP, Office documents (.docx, .xlsx), and of course Odoo's entire configuration system</li>
+          </ul>
+          <p>Odoo uses XML for four purposes:</p>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Purpose</th><th>Example files</th></tr></thead>
+              <tbody>
+                <tr><td>View definitions</td><td><code>views/sale_order_views.xml</code></td></tr>
+                <tr><td>Data records (menus, actions, security)</td><td><code>views/menu.xml</code>, <code>security/ir.model.access.csv</code></td></tr>
+                <tr><td>QWeb templates (reports, emails, portal, website)</td><td><code>report/sale_report.xml</code></td></tr>
+                <tr><td>Module manifest dependencies (indirect)</td><td><code>__manifest__.py</code> <code>data</code> list</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># Python — structure is implicit in the code
+book = {"title": "Clean Code", "author": "Robert C. Martin", "price": 39.99}</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- XML — structure and meaning are explicit in the markup --&gt;
+&lt;book&gt;
+    &lt;title&gt;Clean Code&lt;/title&gt;
+    &lt;author&gt;Robert C. Martin&lt;/author&gt;
+    &lt;price&gt;39.99&lt;/price&gt;
+&lt;/book&gt;</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>XML errors block module loading</strong>
+              <p>Odoo will fail to load your module with a traceback if any XML file contains a syntax error. The error message names the file and line number. Get comfortable reading and writing valid XML before your first module.</p>
+            </div>
+          </div>
+
+          <!-- Section 2: XML Tree Structure -->
+          <h2 id="xml-tree">XML Tree Structure</h2>
+          <p>Every XML document is a tree. There is one root element, and every other element is a child, grandchild, or deeper descendant. This tree structure is called the <strong>document tree</strong> (or DOM tree).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;                          &lt;!-- root --&gt;
+  &lt;data&gt;                        &lt;!-- child of root --&gt;
+    &lt;record id="r1"&gt;            &lt;!-- child of data --&gt;
+      &lt;field name="name"&gt;Library&lt;/field&gt;
+      &lt;field name="active"&gt;True&lt;/field&gt;
+    &lt;/record&gt;
+    &lt;record id="r2"&gt;
+      &lt;field name="name"&gt;Books&lt;/field&gt;
+    &lt;/record&gt;
+  &lt;/data&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <p>Vocabulary:</p>
+          <ul>
+            <li><strong>Root element</strong> — the single top-level element; in Odoo XML files this is always <code>&lt;odoo&gt;</code></li>
+            <li><strong>Parent / child</strong> — direct containment relationship</li>
+            <li><strong>Ancestor / descendant</strong> — any level up or down the tree</li>
+            <li><strong>Sibling</strong> — elements that share the same parent</li>
+            <li><strong>Leaf node</strong> — element with no children (just text content)</li>
+          </ul>
+
+          <p>A real Odoo XML file with the tree labelled:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;odoo&gt;                                  &lt;!-- root --&gt;
+    &lt;data&gt;
+        &lt;record id="view_book_list" model="ir.ui.view"&gt;
+            &lt;field name="name"&gt;library.book.list&lt;/field&gt;    &lt;!-- leaf --&gt;
+            &lt;field name="model"&gt;library.book&lt;/field&gt;        &lt;!-- leaf --&gt;
+            &lt;field name="arch" type="xml"&gt;
+                &lt;list&gt;
+                    &lt;field name="name"/&gt;                    &lt;!-- self-closing leaf --&gt;
+                    &lt;field name="author_id"/&gt;
+                &lt;/list&gt;
+            &lt;/field&gt;
+        &lt;/record&gt;
+    &lt;/data&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <p>Why tree structure matters in Odoo: XPath expressions navigate this tree to find and modify specific nodes during view inheritance.</p>
+
+          <!-- Section 3: XML Syntax Rules -->
+          <h2 id="xml-syntax">XML Syntax Rules</h2>
+          <p>XML has strict, non-negotiable syntax rules. Unlike HTML browsers that silently fix broken markup, Odoo's XML parser raises a parse error and refuses to load the module if any rule is violated.</p>
+
+          <p><strong>Rule 1 — Every tag must close</strong></p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- Valid: explicit close tag --&gt;
+&lt;field name="name"&gt;Library&lt;/field&gt;
+
+&lt;!-- Valid: self-closing (for empty elements) --&gt;
+&lt;field name="name"/&gt;
+
+&lt;!-- INVALID: missing close tag — module will fail to load --&gt;
+&lt;field name="name"&gt;Library</code></pre>
+          </div>
+
+          <p><strong>Rule 2 — Tags are case-sensitive</strong></p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;Record id="x"&gt;    &lt;!-- This is a "Record" element --&gt;
+&lt;record id="x"&gt;    &lt;!-- This is a "record" element — completely different --&gt;</code></pre>
+          </div>
+          <p>Odoo always uses lowercase tag names. <code>&lt;Record&gt;</code> and <code>&lt;record&gt;</code> would be treated as two distinct element types.</p>
+
+          <p><strong>Rule 3 — Attributes must be quoted</strong></p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- Valid --&gt;
+&lt;record id="view_book" model="ir.ui.view"&gt;
+
+&lt;!-- INVALID: unquoted attribute values --&gt;
+&lt;record id=view_book model=ir.ui.view&gt;</code></pre>
+          </div>
+
+          <p><strong>Rule 4 — Exactly one root element</strong></p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- Valid: one root --&gt;
+&lt;odoo&gt;
+    &lt;data&gt;...&lt;/data&gt;
+&lt;/odoo&gt;
+
+&lt;!-- INVALID: two root elements side by side --&gt;
+&lt;odoo&gt;...&lt;/odoo&gt;
+&lt;odoo&gt;...&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <p><strong>Rule 5 — Elements must be properly nested</strong></p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- Valid: proper nesting --&gt;
+&lt;group&gt;
+    &lt;field name="name"/&gt;
+&lt;/group&gt;
+
+&lt;!-- INVALID: interleaved tags --&gt;
+&lt;group&gt;
+    &lt;field name="name"&gt;
+&lt;/group&gt;
+    &lt;/field&gt;</code></pre>
+          </div>
+
+          <p><strong>Rule 6 — The XML declaration is optional but recommended</strong></p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</code></pre>
+          </div>
+          <p>Odoo XML files include this declaration. The <code>encoding="UTF-8"</code> tells the parser that the file uses UTF-8 character encoding, which supports all Unicode characters (important for multi-language Odoo deployments).</p>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Well-formed vs Valid</strong>
+              <p>An XML document is <em>well-formed</em> if it follows all syntax rules above. It is <em>valid</em> if it also conforms to a schema (DTD or XSD) that defines which elements and attributes are allowed. Odoo XML files must be well-formed; Odoo's own internal schema (RNG files) validates the structure.</p>
+            </div>
+          </div>
+
+          <!-- Section 4: XML Elements -->
+          <h2 id="xml-elements">XML Elements</h2>
+          <p>An <strong>element</strong> is the fundamental building block of XML. An element consists of an opening tag, optional content, and a closing tag.</p>
+
+          <p><strong>Element types:</strong></p>
+          <p>1. Element with text content (most Odoo field values):</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;field name="name"&gt;Library Management&lt;/field&gt;</code></pre>
+          </div>
+
+          <p>2. Element with child elements:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="action_books" model="ir.actions.act_window"&gt;
+    &lt;field name="name"&gt;Books&lt;/field&gt;
+    &lt;field name="res_model"&gt;library.book&lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <p>3. Empty element (self-closing):</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;field name="name"/&gt;           &lt;!-- same as &lt;field name="name"&gt;&lt;/field&gt; --&gt;
+&lt;separator/&gt;
+&lt;chatter/&gt;</code></pre>
+          </div>
+
+          <p>4. Element with mixed content (text and child elements — rare in Odoo):</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;p&gt;Click &lt;a href="/contact"&gt;here&lt;/a&gt; to contact us.&lt;/p&gt;</code></pre>
+          </div>
+
+          <p><strong>Element naming rules:</strong></p>
+          <ul>
+            <li>Can contain letters, numbers, hyphens, underscores, periods</li>
+            <li>Must start with a letter or underscore — NOT a number or hyphen</li>
+            <li>Cannot contain spaces</li>
+            <li>Cannot start with "xml" (reserved)</li>
+          </ul>
+          <p>Valid Odoo element names: <code>&lt;record&gt;</code>, <code>&lt;field&gt;</code>, <code>&lt;menuitem&gt;</code>, <code>&lt;template&gt;</code>, <code>&lt;t&gt;</code>, <code>&lt;xpath&gt;</code></p>
+
+          <p><strong>Nesting and parent-child relationships</strong> in a real Odoo view:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;form&gt;                      &lt;!-- parent --&gt;
+    &lt;sheet&gt;                 &lt;!-- child of form, parent of group --&gt;
+        &lt;group&gt;             &lt;!-- child of sheet, parent of field elements --&gt;
+            &lt;field name="name"/&gt;        &lt;!-- child of group --&gt;
+            &lt;field name="partner_id"/&gt;  &lt;!-- sibling of name field --&gt;
+        &lt;/group&gt;
+    &lt;/sheet&gt;
+&lt;/form&gt;</code></pre>
+          </div>
+
+          <!-- AD BLOCK -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <!-- Section 5: XML Attributes -->
+          <h2 id="xml-attributes">XML Attributes</h2>
+          <p>An <strong>attribute</strong> provides additional information about an element. Attributes always appear in the opening tag as <code>name="value"</code> pairs.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;record id="view_book_form" model="ir.ui.view" priority="16"&gt;
+&lt;!--      attribute 1         attribute 2        attribute 3 --&gt;</code></pre>
+          </div>
+
+          <p><strong>Attribute rules:</strong></p>
+          <ul>
+            <li>Name-value pair, value always in quotes (single or double)</li>
+            <li>An element can have multiple attributes (no limit)</li>
+            <li>Each attribute name must be unique within an element</li>
+            <li>Attribute order does not matter to the XML parser</li>
+            <li>Attributes cannot contain child elements</li>
+          </ul>
+
+          <p><strong>Elements vs attributes — when to use which:</strong></p>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Use attributes for...</th><th>Use elements for...</th></tr></thead>
+              <tbody>
+                <tr><td>Metadata about the record (id, type, model)</td><td>The actual data value</td></tr>
+                <tr><td>Short identifiers and flags</td><td>Multi-line or structured content</td></tr>
+                <tr><td>Values that won't have sub-structure</td><td>Values that might need child elements</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>Odoo follows this consistently:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- id and model are ATTRIBUTES — they identify and classify the record --&gt;
+&lt;record id="view_book_form" model="ir.ui.view"&gt;
+
+    &lt;!-- name is an ATTRIBUTE on field — it names which field this is --&gt;
+    &lt;!-- The value (library.book.form) is the ELEMENT content --&gt;
+    &lt;field name="name"&gt;library.book.form&lt;/field&gt;
+
+    &lt;!-- type="xml" is an ATTRIBUTE — metadata about how to parse the content --&gt;
+    &lt;field name="arch" type="xml"&gt;
+        ...
+    &lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          </div>
+
+          <p><strong>Important Odoo attributes to recognise:</strong></p>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Element</th><th>Key attributes</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr><td><code>&lt;record&gt;</code></td><td><code>id</code>, <code>model</code></td><td>XML ID and target model</td></tr>
+                <tr><td><code>&lt;field&gt;</code></td><td><code>name</code>, <code>type</code>, <code>ref</code>, <code>eval</code></td><td>Field name; parse type; record reference; Python expression</td></tr>
+                <tr><td><code>&lt;menuitem&gt;</code></td><td><code>id</code>, <code>name</code>, <code>parent</code>, <code>action</code>, <code>sequence</code></td><td>Menu identity and hierarchy</td></tr>
+                <tr><td><code>&lt;filter&gt;</code></td><td><code>string</code>, <code>name</code>, <code>domain</code>, <code>context</code></td><td>Display label, programmatic name, domain applied</td></tr>
+                <tr><td><code>&lt;xpath&gt;</code></td><td><code>expr</code>, <code>position</code></td><td>XPath expression, insert position</td></tr>
+                <tr><td><code>&lt;button&gt;</code></td><td><code>name</code>, <code>string</code>, <code>type</code>, <code>class</code>, <code>icon</code></td><td>Method name, label, type (object/action), CSS class</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p><strong><code>eval</code> attribute</strong> — evaluates a Python expression instead of treating the value as a string:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- Without eval: stores the string "True" --&gt;
+&lt;field name="active"&gt;True&lt;/field&gt;
+
+&lt;!-- With eval: stores the Python boolean True --&gt;
+&lt;field name="active" eval="True"/&gt;
+
+&lt;!-- Useful for lists, tuples, and expressions --&gt;
+&lt;field name="groups_id" eval="[(4, ref('base.group_user'))]"/&gt;</code></pre>
+          </div>
+
+          <p><strong><code>ref</code> attribute</strong> — references another record by its XML ID:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- ref resolves the XML ID to the database integer ID at load time --&gt;
+&lt;field name="action_id" ref="action_library_book"/&gt;
+&lt;field name="parent_id" ref="base.group_user"/&gt;</code></pre>
+          </div>
+
+          <!-- Section 6: XML Namespaces -->
+          <h2 id="xml-namespaces">XML Namespaces</h2>
+          <p>An <strong>XML namespace</strong> prevents element name conflicts when combining XML from different sources. A namespace is declared with <code>xmlns</code> and is identified by a URI.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- xmlns:xsi declares the XML Schema Instance namespace --&gt;
+&lt;odoo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</code></pre>
+          </div>
+
+          <p><strong>When you will see namespaces in Odoo:</strong></p>
+          <ol>
+            <li><strong>RNG validation files</strong> — Odoo's view schema files use namespaces internally (you don't write these)</li>
+            <li><strong>CDATA with HTML</strong> — some older Odoo modules declare an HTML namespace in QWeb templates</li>
+            <li><strong>SOAP/Web services</strong> — if you integrate Odoo with SOAP APIs, response XML uses namespaces heavily</li>
+            <li><strong>Office documents</strong> — if you generate .docx/.xlsx from Odoo, the OpenXML format uses namespaces</li>
+          </ol>
+
+          <p>For day-to-day Odoo module development, you will rarely write namespaces yourself:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;odoo&gt;
+    &lt;!-- No namespace needed — Odoo's XML parser knows the expected structure --&gt;
+    &lt;record id="..." model="..."&gt;
+        &lt;field name="..."&gt;value&lt;/field&gt;
+    &lt;/record&gt;
+&lt;/odoo&gt;</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Namespaces in practice</strong>
+              <p>Namespaces are important in theory but rarely written by hand in Odoo module development. You will encounter them when reading Odoo's internal RNG schema files or integrating with SOAP web services. For now, knowing what <code>xmlns</code> means is enough.</p>
+            </div>
+          </div>
+
+          <!-- Section 7: Special Characters and Entities -->
+          <h2 id="special-characters">Special Characters and Entities</h2>
+          <p>XML reserves five characters as part of its markup syntax. If these appear in your data (not as markup), you must escape them using XML entities:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Character</th><th>Entity</th><th>Where you'll see it in Odoo</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>&lt;</code></td><td><code>&amp;lt;</code></td><td>Domain comparisons: <code>('amount', '&amp;lt;', 500)</code></td></tr>
+                <tr><td><code>&gt;</code></td><td><code>&amp;gt;</code></td><td>Greater-than in <code>invisible</code> expressions</td></tr>
+                <tr><td><code>&amp;</code></td><td><code>&amp;amp;</code></td><td>URLs with query strings, Python <code>and</code> as <code>&amp;amp;&amp;amp;</code></td></tr>
+                <tr><td><code>"</code></td><td><code>&amp;quot;</code></td><td>A quote character inside a double-quoted attribute</td></tr>
+                <tr><td><code>'</code></td><td><code>&amp;apos;</code></td><td>A quote character inside a single-quoted attribute</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>Real examples from Odoo code:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- Domain with less-than: raw &lt; would break XML parsing --&gt;
+&lt;filter string="Small Orders"
+        domain="[('amount_total', '&amp;lt;', 100)]"/&gt;
+
+&lt;!-- Invisible attribute with 'and' written as &amp;amp;&amp;amp; in older Odoo versions --&gt;
+&lt;!-- (Odoo 17+ uses Python-style expressions directly) --&gt;
+&lt;field name="delivery_date"
+       invisible="state != 'confirmed' &amp;amp;&amp;amp; type != 'delivery'"/&gt;
+
+&lt;!-- URL with query string — &amp; must be &amp;amp; --&gt;
+&lt;a t-attf-href="/shop/product/#{slug(product)}&amp;amp;pricelist=#{pricelist_id}"&gt;
+    View product
+&lt;/a&gt;</code></pre>
+          </div>
+
+          <p><strong>CDATA sections</strong> — when a block contains many special characters (like embedded code), wrapping in CDATA avoids escaping every character:</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">XML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-xml">&lt;!-- Without CDATA: every &lt; &gt; &amp; must be escaped — messy --&gt;
+&lt;field name="arch" type="xml"&gt;
+    &amp;lt;form&amp;gt;...&amp;lt;/form&amp;gt;
+&lt;/field&gt;
+
+&lt;!-- With CDATA: characters inside are treated as literal text --&gt;
+&lt;field name="code"&gt;&lt;![CDATA[
+    if order.amount_total &gt; 1000 and order.state == 'confirmed':
+        discount = order.amount_total * 0.05
+        order.write({'discount_amount': discount})
+]]&gt;&lt;/field&gt;</code></pre>
+          </div>
+          <p>CDATA syntax: <code>&lt;![CDATA[</code> ... <code>]]&gt;</code>. The only string that cannot appear inside CDATA is <code>]]&gt;</code> (the closing marker).</p>
+
+          <!-- Summary -->
+          <h2 id="deep-xmlbasics">XML in Odoo: Views, Data, and the External ID</h2>
+          <p>Odoo uses XML to define everything the user sees and much of the seed data — views, menus, actions, records. You don't need deep XML expertise, but you must understand its structure and Odoo's key concept: the <strong>external ID</strong>.</p>
+          <pre><code class="language-xml">&lt;record id="view_book_form" model="ir.ui.view"&gt;   &lt;!-- id = external ID --&gt;
+    &lt;field name="name"&gt;book.form&lt;/field&gt;
+    &lt;field name="model"&gt;library.book&lt;/field&gt;
+    &lt;field name="arch" type="xml"&gt;
+        &lt;form&gt;&lt;field name="title"/&gt;&lt;/form&gt;
+    &lt;/field&gt;
+&lt;/record&gt;</code></pre>
+          <table>
+            <thead><tr><th>Concept</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td><code>&lt;record&gt;</code></td><td>creates/updates a database record from XML</td></tr>
+              <tr><td><code>id="..."</code></td><td>external ID — a stable, unique reference</td></tr>
+              <tr><td><code>ref="..."</code></td><td>points to another record's external ID</td></tr>
+            </tbody>
+          </table>
+          <p><strong>XML rules:</strong> it's stricter than HTML — every tag must close, attributes must be quoted, and it's case-sensitive. A single malformed tag stops the whole file from loading. <strong>The external ID is the crucial idea:</strong> the <code>id</code> on a <code>&lt;record&gt;</code> (like <code>view_book_form</code>) is a stable, human-readable name Odoo maps to the record's real database id. This lets other XML reference it with <code>ref="module.view_book_form"</code> — menus point to actions, views inherit other views, records link to each other — all by external ID, so nothing breaks when database ids differ across installations. <strong>Loading:</strong> XML data files only take effect if listed in the manifest's <code>data</code> key, <em>in order</em> — a record referencing another must load after it. <strong>Views use <code>arch</code>:</strong> the actual view layout goes inside a <code>&lt;field name="arch" type="xml"&gt;</code>. Master the record/external-ID pattern and Odoo's XML stops being mysterious.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Write a well-formed XML element.</li>
+              <li>Add attributes to it.</li>
+              <li>Nest elements correctly.</li>
+              <li>Note that XML defines views, menus, and data.</li>
+              <li>Add an XML comment.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a small valid Odoo-style XML data file (an <code>&lt;odoo&gt;</code> root with a <code>&lt;record&gt;</code> that sets field values). Explain how Odoo uses XML for views, menus, and seed data, and why well-formed XML (closed tags, quoted attributes) matters.</p>
+          </div>
+
+          <div class="summary-box" id="summary">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li>XML is strict: every tag closes, attributes quoted, exactly one root, case-sensitive. Odoo refuses to load a module with invalid XML.</li>
+              <li>XML documents are <strong>trees</strong>: one root element, nested children, siblings share a parent. The tree structure is what XPath expressions navigate.</li>
+              <li>Five characters must be escaped: <code>&lt;</code> → <code>&amp;lt;</code>, <code>&gt;</code> → <code>&amp;gt;</code>, <code>&amp;</code> → <code>&amp;amp;</code>, <code>"</code> → <code>&amp;quot;</code>, <code>'</code> → <code>&amp;apos;</code>. Use CDATA for blocks containing many special characters.</li>
+              <li>Use <strong>attributes</strong> for metadata (id, type, name). Use <strong>element content</strong> for values. Odoo's <code>&lt;record id="..." model="..."&gt;</code> with <code>&lt;field name="..."&gt;value&lt;/field&gt;</code> follows this throughout.</li>
+              <li><strong>Namespaces</strong> (<code>xmlns</code>) prevent element name collisions. Rare in day-to-day Odoo module development but common in Odoo's internal RNG schema files.</li>
+              <li>The XML declaration <code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;</code> is optional but recommended — it declares UTF-8 encoding which supports all Unicode characters.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How is XML used in Odoo?</li>
+            <li>What is the root element of an Odoo XML data file?</li>
+            <li>What is a <code>&lt;record&gt;</code> in Odoo XML?</li>
+            <li>Why must XML be well-formed?</li>
+            <li>What is the difference between XML data files and view files?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/odoo/what-is-odoo.html" class="topic-tag odoo-topic-tag">🐍 What is Odoo?</a>
+            <a href="/odoo/odoo-prerequisites.html" class="topic-tag odoo-topic-tag">🐍 Prerequisites</a>
+            <a href="/odoo/postgresql-basics.html" class="topic-tag odoo-topic-tag">🐍 PostgreSQL for Odoo</a>
+            <a href="/odoo/module/basic-views.html" class="topic-tag odoo-topic-tag">🐍 Basic Views</a>
+            <a href="/odoo/module/module-structure.html" class="topic-tag odoo-topic-tag">🐍 Module Structure</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why is XML strict while HTML is lenient? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>HTML was designed for browsers that needed to display web pages even when authors made mistakes — lenient parsing was a pragmatic choice. XML was designed as a data exchange format where correctness matters: if two systems are exchanging data, an ambiguous document should fail rather than be silently misinterpreted. Odoo's XML parser (Python's lxml) follows the strict XML spec — a missing closing tag or unquoted attribute raises a ParseError and prevents the module from loading.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between an XML element and an attribute? Which should I use? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Elements are the building blocks (the tags themselves and their content). Attributes are name=value pairs inside the opening tag. In Odoo: use attributes for metadata that identifies or classifies the element — <code>id</code>, <code>model</code>, <code>name</code> on a <code>&lt;field&gt;</code>. Use element content for the actual value. A <code>&lt;field name="active"&gt;True&lt;/field&gt;</code> follows this: <code>name</code> is metadata (an attribute), <code>True</code> is the value (element content).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Do I need to understand XML namespaces to write Odoo modules? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For most module development — no. You will write Odoo XML files for years without ever declaring a namespace yourself. You need to know what <code>xmlns</code> means so you're not confused when you see it in Odoo's internal source files (RNG schemas, some SOAP integrations). The practical takeaway: if you see <code>xmlns:xsi="..."</code> in an XML file, it's declaring a namespace for schema validation — you can read past it.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">My module fails to load with "XMLSyntaxError" — where do I start? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The error message includes the filename and line number — go there first. Common causes: (1) an unescaped <code>&amp;</code> character — use <code>&amp;amp;</code>; (2) a missing closing tag — check the element opened on the previous few lines; (3) an unquoted attribute value; (4) two root elements (make sure everything is inside <code>&lt;odoo&gt;</code>). Run <code>xmllint --noout yourfile.xml</code> locally to check for syntax errors before restarting Odoo.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/odoo-prerequisites.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">Odoo Prerequisites</span>
+          </a>
+          <a href="/odoo/module/basic-views.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Basic Views</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

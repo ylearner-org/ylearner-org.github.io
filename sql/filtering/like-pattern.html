@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL LIKE – Pattern Matching with Wildcards | ylearner</title>
+  <meta name="description" content="Learn SQL LIKE pattern matching — the % and _ wildcard characters, NOT LIKE, case sensitivity differences between MySQL and PostgreSQL, and performance tips.">
+  <meta name="keywords" content="SQL LIKE, SQL pattern matching, SQL wildcard, SQL percent wildcard, SQL underscore wildcard, SQL NOT LIKE, SQL ILIKE, SQL LIKE performance">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/filtering/like-pattern.html">
+  <meta property="og:title" content="SQL LIKE – Pattern Matching with Wildcards | ylearner">
+  <meta property="og:description" content="Master SQL LIKE with % and _ wildcards. Learn NOT LIKE, case sensitivity in MySQL vs PostgreSQL, and how leading wildcards cause full table scans.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/filtering/like-pattern.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL LIKE – Pattern Matching with Wildcards | ylearner">
+  <meta name="twitter:description" content="Master SQL LIKE with % and _ wildcards. Learn NOT LIKE, case sensitivity in MySQL vs PostgreSQL, and how leading wildcards cause full table scans.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL LIKE – Pattern Matching with Wildcards","description":"Learn SQL LIKE operator with % and _ wildcards for pattern matching. Covers NOT LIKE, case sensitivity differences, and index usage performance notes.","educationalLevel":"Beginner","keywords":"SQL LIKE, SQL wildcards, SQL pattern matching, ILIKE PostgreSQL, SQL % wildcard, SQL _ wildcard","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/filtering/like-pattern.html">Filtering</a><span class="separator">›</span>
+          <span class="current">LIKE Pattern Matching</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔍 Filtering</div>
+          <h1>SQL LIKE – Pattern Matching with Wildcards</h1>
+          <p class="lesson-intro">The <code>LIKE</code> operator lets you filter string columns using pattern matching with two wildcards: <code>%</code> (zero or more characters) and <code>_</code> (exactly one character). It is the standard SQL tool for text search within column values. This lesson covers both wildcards with practical examples, case sensitivity behaviour, and a critical performance note about index usage.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="like-syntax">LIKE Syntax</h2>
+          <p>The <code>LIKE</code> operator is used in a <code>WHERE</code> clause with a pattern string. The pattern can include literal characters and two special wildcard characters.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Basic syntax
+SELECT * FROM table_name WHERE column LIKE 'pattern';
+
+-- Both wildcards
+-- %  →  zero or more characters (any characters)
+-- _  →  exactly one character (any single character)</code></pre>
+          </div>
+
+          <h2 id="percent-wildcard">% – Zero or More Characters</h2>
+          <p>The <code>%</code> wildcard matches any sequence of characters including an empty string. You can place it at the start, end, or both ends of the pattern.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Starts with 'A' (prefix search — can use index)
+SELECT * FROM customers WHERE last_name LIKE 'A%';
+-- Matches: 'Adams', 'Allen', 'Anderson', 'A'
+
+-- Ends with '@gmail.com' (suffix search)
+SELECT * FROM users WHERE email LIKE '%@gmail.com';
+-- Matches: 'alice@gmail.com', 'bob123@gmail.com'
+
+-- Contains 'john' anywhere (substring search — forces full table scan)
+SELECT * FROM users WHERE username LIKE '%john%';
+-- Matches: 'john', 'johnny', 'big_john', 'johnson'
+
+-- Starts with 'invoice_' and ends with '.pdf'
+SELECT * FROM files WHERE filename LIKE 'invoice\_%\.pdf' ESCAPE '\';
+-- Escaping % and _ when you want the literal characters
+
+-- Pattern with no wildcards behaves like = (exact match)
+SELECT * FROM products WHERE name LIKE 'Laptop';
+-- Same as: WHERE name = 'Laptop'</code></pre>
+          </div>
+
+          <h2 id="underscore-wildcard">_ – Exactly One Character</h2>
+          <p>The <code>_</code> wildcard matches exactly one character — any character. Use it when you need to match a specific pattern length or position.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Exactly 2-character country codes
+SELECT * FROM countries WHERE code LIKE '__';
+-- Matches: 'US', 'GB', 'DE' — not 'USA' or 'U'
+
+-- Phone numbers in format: 3 digits, dash, 4 digits
+SELECT * FROM contacts WHERE phone LIKE '___-____';
+-- Matches: '555-1234', '800-9999'
+
+-- SKU starting with two letters, then 4 digits
+SELECT * FROM products WHERE sku LIKE '__-____';
+-- Matches: 'AB-1234', 'XY-9876'
+
+-- Combining _ and %
+-- Names starting with any character, then 'at', then anything
+SELECT * FROM users WHERE name LIKE '_at%';
+-- Matches: 'Cathy', 'Matthew', 'Natalie' (2nd+3rd chars are 'at')</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="not-like">NOT LIKE</h2>
+          <p><code>NOT LIKE</code> returns rows where the column does <strong>not</strong> match the pattern.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Exclude test/example email addresses
+SELECT * FROM users WHERE email NOT LIKE '%@test.com';
+SELECT * FROM users WHERE email NOT LIKE '%example%';
+
+-- Exclude filenames with a certain prefix
+SELECT * FROM files WHERE filename NOT LIKE 'temp_%';
+
+-- Combined with other conditions
+SELECT * FROM users
+WHERE email NOT LIKE '%@test.com'
+  AND email NOT LIKE '%@example.com'
+  AND is_active = 1;</code></pre>
+          </div>
+
+          <h2 id="case-sensitivity">Case Sensitivity</h2>
+          <p>The case sensitivity of <code>LIKE</code> depends on the database and the column's collation.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Database</th><th>Default LIKE behaviour</th><th>Case-insensitive option</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>MySQL</td><td>Case-insensitive (default collation: utf8mb4_general_ci)</td><td>Default (no change needed); use <code>COLLATE utf8mb4_bin</code> for case-sensitive</td></tr>
+                <tr><td>PostgreSQL</td><td>Case-sensitive</td><td>Use <code>ILIKE</code> for case-insensitive matching</td></tr>
+                <tr><td>SQLite</td><td>Case-insensitive for ASCII letters only</td><td>No native ILIKE; use <code>LOWER(col) LIKE LOWER(pattern)</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- MySQL: case-insensitive by default
+SELECT * FROM users WHERE name LIKE 'alice%';
+-- Matches: 'alice', 'Alice', 'ALICE', 'AliceSmith'
+
+-- PostgreSQL: case-sensitive by default
+SELECT * FROM users WHERE name LIKE 'alice%';
+-- Matches: 'alice', 'alicesmith' — does NOT match 'Alice' or 'ALICE'
+
+-- PostgreSQL ILIKE: case-insensitive
+SELECT * FROM users WHERE name ILIKE 'alice%';
+-- Matches: 'alice', 'Alice', 'ALICE', 'AliceSmith'
+
+-- SQLite / portable: use LOWER() for consistent case-insensitive search
+SELECT * FROM users WHERE LOWER(name) LIKE 'alice%';</code></pre>
+          </div>
+
+          <h2 id="performance-note">Performance Note – Leading Wildcards and Index Usage</h2>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Leading % forces a full table scan</strong>
+              <p>When a LIKE pattern starts with <code>%</code> (e.g., <code>LIKE '%smith'</code> or <code>LIKE '%john%'</code>), the database <strong>cannot use a regular B-tree index</strong> on that column — it must scan every row. On a large table, this can be very slow. A prefix search (<code>LIKE 'smith%'</code>) CAN use an index because the leading characters are known. For full-text search within large datasets, use a dedicated full-text search feature: <code>FULLTEXT</code> indexes in MySQL, <code>tsvector</code> / <code>tsquery</code> in PostgreSQL, or an external search engine like Elasticsearch.</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Can use index on last_name (prefix search)
+SELECT * FROM customers WHERE last_name LIKE 'Smi%';
+-- Index range scan: rows starting with 'Smi'
+
+-- CANNOT use index (leading wildcard — full table scan)
+SELECT * FROM customers WHERE last_name LIKE '%smith';
+SELECT * FROM customers WHERE last_name LIKE '%mit%';
+
+-- Check with EXPLAIN (MySQL)
+EXPLAIN SELECT * FROM customers WHERE last_name LIKE 'Smi%';
+-- Look for 'range' in the type column — good
+EXPLAIN SELECT * FROM customers WHERE last_name LIKE '%smith';
+-- Look for 'ALL' in the type column — full table scan</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-like">LIKE: Pattern Matching (and the Index Killer)</h2>
+          <p><code>LIKE</code> matches text against a pattern using two wildcards: <code>%</code> (any number of characters, including none) and <code>_</code> (exactly one character).</p>
+          <table>
+            <thead><tr><th>Pattern</th><th>Matches</th></tr></thead>
+            <tbody>
+              <tr><td><code>'A%'</code></td><td>starts with A</td></tr>
+              <tr><td><code>'%son'</code></td><td>ends with "son"</td></tr>
+              <tr><td><code>'%oo%'</code></td><td>contains "oo"</td></tr>
+              <tr><td><code>'A_c'</code></td><td>A, any one char, c (3 letters)</td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-sql">SELECT * FROM users WHERE email LIKE '%@gmail.com';
+SELECT * FROM products WHERE code LIKE 'AB\_%' ESCAPE '\';  -- literal underscore</code></pre>
+          <p><strong>The performance trap:</strong> a <em>leading</em> wildcard — <code>LIKE '%son'</code> — cannot use a normal index, so it forces a full table scan. <code>LIKE 'A%'</code> (wildcard only at the end) <em>can</em> use an index. On big tables, avoid leading-<code>%</code> searches, or switch to a full-text search index for "contains" queries.</p>
+          <p><strong>Case sensitivity:</strong> <code>LIKE</code> is case-sensitive in PostgreSQL — use <code>ILIKE</code> (or <code>LOWER(col) LIKE LOWER(...)</code>) for case-insensitive matching; MySQL's default collation is often case-insensitive already. To match a literal <code>%</code> or <code>_</code>, escape it with an <code>ESCAPE</code> character.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Match a prefix with <code>LIKE 'A%'</code>.</li>
+              <li>Match a suffix with <code>LIKE '%son'</code>.</li>
+              <li>Use <code>_</code> to match a single character.</li>
+              <li>Do case-insensitive matching with <code>ILIKE</code> or <code>LOWER()</code>.</li>
+              <li>Negate with <code>NOT LIKE</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Find all customers whose email ends in '@gmail.com' and whose name starts with 'A'. Explain the <code>%</code> and <code>_</code> wildcards and how to match a literal <code>%</code> using an escape character.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>LIKE</code> pattern matches string columns using two wildcards: <code>%</code> (zero or more chars) and <code>_</code> (exactly one char).</li>
+              <li>Prefix search (<code>LIKE 'abc%'</code>) can use a B-tree index. Leading <code>%</code> (<code>LIKE '%abc'</code>) forces a full table scan.</li>
+              <li><code>NOT LIKE</code> returns rows that do not match the pattern.</li>
+              <li>MySQL is case-insensitive by default. PostgreSQL is case-sensitive — use <code>ILIKE</code> for case-insensitive matching in PostgreSQL.</li>
+              <li>For large-scale full-text search, use database full-text search features (<code>FULLTEXT</code> in MySQL, <code>tsvector</code> in PostgreSQL) instead of <code>LIKE '%term%'</code>.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does the LIKE operator do?</li>
+            <li>What do the <code>%</code> and <code>_</code> wildcards mean?</li>
+            <li>How do you do case-insensitive matching?</li>
+            <li>How do you match a literal percent sign?</li>
+            <li>What is the difference between LIKE and a regular-expression match?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/filtering/logical-operators.html" class="topic-tag sql-topic-tag">🔍 Logical Operators</a>
+            <a href="/sql/filtering/between-in.html" class="topic-tag sql-topic-tag">🔍 BETWEEN &amp; IN</a>
+            <a href="/sql/filtering/comparison-operators.html" class="topic-tag sql-topic-tag">🔍 Comparison Operators</a>
+            <a href="/sql/basics/select-statement.html" class="topic-tag sql-topic-tag">🗄️ SELECT Statement</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">How do I search for a literal % or _ character with LIKE? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use the <code>ESCAPE</code> clause to define an escape character, then prefix the literal wildcard with it. For example: <code>WHERE notes LIKE '50\% complete' ESCAPE '\'</code> — this searches for the literal string "50% complete". Any character can be the escape character — backslash and <code>!</code> are common choices. Example: <code>LIKE '100!%' ESCAPE '!'</code> finds "100%".</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between LIKE and regular expression matching? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>LIKE</code> only supports two wildcards (<code>%</code> and <code>_</code>) and is part of the SQL standard. Regular expressions (REGEXP/RLIKE in MySQL, <code>~</code> in PostgreSQL) support full regex syntax — character classes, quantifiers, anchors, alternation. Regular expressions are much more expressive but also slower and non-standard. Use <code>LIKE</code> for simple prefix/suffix/substring checks and reserve regex for complex patterns like "email validation" or "extract digits".</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Does LIKE work with NULL values? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — if a column value is NULL, <code>col LIKE '%pattern%'</code> returns UNKNOWN (not TRUE), and the row is filtered out. <code>NOT LIKE</code> also returns UNKNOWN for NULL values. This means NULL rows are excluded from both <code>LIKE</code> and <code>NOT LIKE</code> results. If you want to include NULL rows in a NOT LIKE result, add an explicit <code>OR col IS NULL</code>: <code>WHERE name NOT LIKE '%test%' OR name IS NULL</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When should I use LIKE vs = for exact matching? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For exact matches, always use <code>=</code>. A pattern with no wildcards (<code>LIKE 'exact_value'</code>) behaves the same as <code>= 'exact_value'</code> functionally, but <code>=</code> is clearer, slightly faster (no pattern parsing), and unambiguously communicates your intent to readers. Use <code>LIKE</code> only when you actually need pattern matching with <code>%</code> or <code>_</code>.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/filtering/logical-operators.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Logical Operators</span>
+          </a>
+          <a href="/sql/filtering/between-in.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">BETWEEN &amp; IN</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

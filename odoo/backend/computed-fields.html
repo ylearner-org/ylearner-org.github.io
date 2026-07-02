@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Computed Fields – @api.depends and Stored vs Non-Stored | ylearner</title>
+  <meta name="description" content="Master Odoo computed fields in Odoo 19: @api.depends decorator, store=True vs non-stored fields, inverse functions for write-back, and @api.depends_context for user-dependent values.">
+  <meta name="keywords" content="Odoo computed fields, api.depends, store=True, Odoo 19, inverse function, depends_context, computed field example, Odoo backend development">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/backend/computed-fields.html">
+  <meta property="og:title" content="Odoo Computed Fields – @api.depends and Stored vs Non-Stored">
+  <meta property="og:description" content="Master Odoo computed fields in Odoo 19: @api.depends decorator, store=True vs non-stored fields, inverse functions for write-back, and @api.depends_context for user-dependent values.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/backend/computed-fields.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Computed Fields – @api.depends and Stored vs Non-Stored | ylearner">
+  <meta name="twitter:description" content="Master Odoo computed fields in Odoo 19: @api.depends decorator, store=True vs non-stored fields, inverse functions for write-back, and @api.depends_context for user-dependent values.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Computed Fields – @api.depends and Stored vs Non-Stored",
+    "description": "Master Odoo computed fields in Odoo 19: @api.depends decorator, store=True vs non-stored fields, inverse functions for write-back, and @api.depends_context for user-dependent values.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo computed fields, api.depends, store=True, inverse function, depends_context, Odoo backend",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">Backend Development</span><span class="separator">›</span>
+          <span class="current">Computed Fields</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Backend Development</div>
+          <h1>Odoo Computed Fields – @api.depends and Stored vs Non-Stored</h1>
+          <p class="lesson-intro">Computed fields derive their value dynamically from other fields rather than being stored by users directly. They are one of the most powerful tools in Odoo backend development — letting you expose calculated data, enforce formatting, and build reactive UIs without writing view logic. This page covers everything you need to know about computed fields in Odoo 19: the <code>@api.depends</code> decorator, the <code>store</code> parameter, inverse functions for write-back, and context-dependent calculations.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="deep-storecompute">store=True or Not? The Decision That Affects Search and Speed</h2>
+          <p>A computed field can be recalculated on the fly or persisted to a database column. The choice has real consequences:</p>
+          <table>
+            <thead><tr><th></th><th>store=False (default)</th><th>store=True</th></tr></thead>
+            <tbody>
+              <tr><td>Where value lives</td><td>computed each read</td><td>saved in a DB column</td></tr>
+              <tr><td>Searchable / groupable</td><td>no (needs a <code>search=</code> method)</td><td>yes, natively</td></tr>
+              <tr><td>Best for</td><td>cheap, always-fresh values</td><td>values you filter, sort, or report on</td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-python">total = fields.Float(compute="_compute_total", store=True)
+
+@api.depends("price", "quantity")
+def _compute_total(self):
+    for rec in self:
+        rec.total = rec.price * rec.quantity</code></pre>
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Every field you read must be in <code>@api.depends</code></strong>
+              <p>The decorator tells Odoo <em>when</em> to recompute. Forget a dependency and the field goes stale — it won't update when that field changes, producing "wrong total" bugs that are painful to trace. For a stored field, always loop <code>for rec in self:</code> — <code>self</code> can be a recordset of many records.</p>
+            </div>
+          </div>
+
+<div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Add a computed field with <code>compute=</code>.</li>
+              <li>Write the compute method with <code>@api.depends</code>.</li>
+              <li>Make the computed field stored.</li>
+              <li>Add an inverse function.</li>
+              <li>Make the computed field searchable.</li>
+            </ol>
+          </div>
+
+<div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Create a computed <code>total</code> field on an order-line model that multiplies price × quantity, decorated with <code>@api.depends('price','quantity')</code>, and make it stored. Explain when to store a computed field and the role of <code>@api.depends</code>.</p>
+          </div>
+
+<div class="summary-box">
+            <h3>📋 What You Will Learn</h3>
+            <ul>
+              <li>How to declare a computed field using <code>compute=</code> and <code>@api.depends</code></li>
+              <li>The difference between stored and non-stored computed fields</li>
+              <li>How to make a computed field writable with <code>inverse=</code></li>
+              <li>Using <code>@api.depends_context</code> for values that depend on the current user or language</li>
+              <li>Common patterns and pitfalls to avoid</li>
+            </ul>
+          </div>
+
+          <!-- Section 1 -->
+          <h2 id="what-is-a-computed-field">What is a Computed Field?</h2>
+          <p>A computed field is a field whose value is calculated by a Python method rather than entered directly by the user. You declare it like any normal field, but add a <code>compute</code> parameter pointing to the name of the method that fills it.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">from odoo import models, fields, api
+
+class LibraryBook(models.Model):
+    _name = 'library.book'
+    _description = 'Library Book'
+
+    title = fields.Char(string='Title', required=True)
+    author_id = fields.Many2one('res.partner', string='Author')
+    display_name = fields.Char(
+        string='Display Name',
+        compute='_compute_display_name',   # name of the method
+    )
+
+    @api.depends('title', 'author_id.name')
+    def _compute_display_name(self):
+        for record in self:
+            if record.author_id:
+                record.display_name = f"{record.title} — {record.author_id.name}"
+            else:
+                record.display_name = record.title</code></pre>
+          </div>
+
+          <p>Key points about compute methods:</p>
+          <ul>
+            <li>The method <strong>always iterates over <code>self</code></strong> — even when only one record is involved. This is because Odoo calls compute methods on recordsets that may contain many records.</li>
+            <li>You <strong>assign</strong> to <code>record.field_name</code> inside the loop — you never return a value.</li>
+            <li>Every record in the loop must receive an assignment. If you skip a record, Odoo raises a <code>ValueError</code>.</li>
+          </ul>
+
+          <!-- Section 2 -->
+          <h2 id="api-depends-decorator">@api.depends Decorator</h2>
+          <p>The <code>@api.depends</code> decorator tells Odoo which fields this computation depends on. Whenever any of the listed fields changes, Odoo marks the computed field as dirty and recalculates it (either immediately for stored fields, or on the next read for non-stored fields).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">class LibraryLoan(models.Model):
+    _name = 'library.loan'
+    _description = 'Book Loan'
+
+    book_id = fields.Many2one('library.book', string='Book')
+    borrow_date = fields.Date(string='Borrow Date')
+    due_date = fields.Date(string='Due Date')
+    return_date = fields.Date(string='Return Date')
+
+    # Depends on two date fields — recomputes when either changes
+    @api.depends('due_date', 'return_date')
+    def _compute_days_overdue(self):
+        today = fields.Date.today()
+        for loan in self:
+            if loan.return_date:
+                # Already returned — not overdue
+                loan.days_overdue = 0
+            elif loan.due_date and loan.due_date < today:
+                loan.days_overdue = (today - loan.due_date).days
+            else:
+                loan.days_overdue = 0
+
+    days_overdue = fields.Integer(
+        string='Days Overdue',
+        compute='_compute_days_overdue',
+    )</code></pre>
+          </div>
+
+          <h3 id="dot-notation-in-depends">Dot Notation in Depends</h3>
+          <p>You can traverse relational fields using dot notation in <code>@api.depends</code>. This tells Odoo to recompute the field when the related field changes on the linked record:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">@api.depends('author_id.name', 'author_id.country_id.name')
+def _compute_author_info(self):
+    for book in self:
+        author = book.author_id
+        country = author.country_id.name or 'Unknown'
+        book.author_info = f"{author.name} ({country})" if author else ''</code></pre>
+          </div>
+
+          <p>However, use deep dot notation sparingly — each additional level adds a dependency trigger that can cause unexpected recomputations across many records.</p>
+
+          <!-- AD BLOCK -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <!-- Section 3 -->
+          <h2 id="stored-vs-non-stored">Stored vs Non-Stored Computed Fields</h2>
+          <p>The <code>store</code> parameter controls whether the computed value is persisted in the database or calculated fresh on every read.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Behaviour</th><th>Non-Stored (default)</th><th>Stored (<code>store=True</code>)</th></tr></thead>
+              <tbody>
+                <tr><td>Database column</td><td>No</td><td>Yes</td></tr>
+                <tr><td>When computed</td><td>Every time the record is read</td><td>When a dependency changes (written to DB)</td></tr>
+                <tr><td>Searchable/filterable</td><td>No (by default)</td><td>Yes — like a normal field</td></tr>
+                <tr><td>Sortable in list views</td><td>No</td><td>Yes</td></tr>
+                <tr><td>Performance</td><td>CPU cost on every read</td><td>DB disk cost, but fast reads</td></tr>
+                <tr><td>Always up-to-date</td><td>Yes</td><td>Yes (triggered by depends)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">class LibraryBook(models.Model):
+    _name = 'library.book'
+
+    title = fields.Char(string='Title')
+    author_id = fields.Many2one('res.partner', string='Author')
+
+    # Non-stored: computed on every read, not searchable
+    display_name = fields.Char(
+        string='Display Name',
+        compute='_compute_display_name',
+        # store=False is the default — no need to write it
+    )
+
+    # Stored: has a DB column, searchable, sortable
+    search_name = fields.Char(
+        string='Search Name',
+        compute='_compute_search_name',
+        store=True,         # saves to database
+        index=True,         # good idea for fields you filter on
+    )
+
+    @api.depends('title', 'author_id.name')
+    def _compute_display_name(self):
+        for book in self:
+            book.display_name = f"{book.title} by {book.author_id.name or 'Unknown'}"
+
+    @api.depends('title', 'author_id.name')
+    def _compute_search_name(self):
+        for book in self:
+            book.search_name = f"{book.title} {book.author_id.name or ''}".strip().lower()</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>When to use store=True</strong>
+              <p>Use <code>store=True</code> when you need to search or sort by the computed field, when the computation is expensive and reads are frequent, or when you need to reference the field in a domain filter on a related model. For simple display-only values that are cheap to compute, leave <code>store=False</code>.</p>
+            </div>
+          </div>
+
+          <!-- Section 4 -->
+          <h2 id="inverse-functions">Inverse Functions (write-back)</h2>
+          <p>By default, computed fields are read-only — you cannot write to them. Adding an <code>inverse</code> function makes the field writable. When the user (or code) sets a value on the computed field, Odoo calls the inverse function to translate that value back to the underlying fields.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">class LibraryLoan(models.Model):
+    _name = 'library.loan'
+
+    borrow_date = fields.Date(string='Borrow Date', default=fields.Date.today)
+    loan_duration = fields.Integer(string='Duration (days)', default=14)
+
+    # Computed from borrow_date + loan_duration
+    # Inverse allows user to set due_date directly and back-calculate duration
+    due_date = fields.Date(
+        string='Due Date',
+        compute='_compute_due_date',
+        inverse='_inverse_due_date',
+        store=True,
+    )
+
+    @api.depends('borrow_date', 'loan_duration')
+    def _compute_due_date(self):
+        from datetime import timedelta
+        for loan in self:
+            if loan.borrow_date and loan.loan_duration:
+                loan.due_date = loan.borrow_date + timedelta(days=loan.loan_duration)
+            else:
+                loan.due_date = False
+
+    def _inverse_due_date(self):
+        from datetime import timedelta
+        for loan in self:
+            if loan.due_date and loan.borrow_date:
+                delta = loan.due_date - loan.borrow_date
+                loan.loan_duration = delta.days
+            else:
+                loan.loan_duration = 0</code></pre>
+          </div>
+
+          <p>The inverse function has no decorator — it's a plain method. It receives <code>self</code> as a recordset, and reads <code>self.field_name</code> (the new value just set by the user) to update the source fields.</p>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Inverse and store=True</strong>
+              <p>When you use both <code>store=True</code> and <code>inverse</code>, be careful: if the user directly sets the stored field to a value inconsistent with the dependencies, the next time a dependency changes the compute method will overwrite what the user set. Design your inverse and compute carefully to maintain a consistent state.</p>
+            </div>
+          </div>
+
+          <!-- Section 5 -->
+          <h2 id="computed-relational-fields">Computed Relational Fields</h2>
+          <p>Computed fields can be any field type, including relational fields like Many2one, One2many, and Many2many. This is useful for building virtual relationships or aggregated collections.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">class LibraryBook(models.Model):
+    _name = 'library.book'
+
+    loan_ids = fields.One2many('library.loan', 'book_id', string='All Loans')
+
+    # Computed Many2many — active loans only
+    active_loan_ids = fields.Many2many(
+        'library.loan',
+        string='Active Loans',
+        compute='_compute_active_loans',
+    )
+
+    # Computed Integer — count of overdue loans
+    overdue_loan_count = fields.Integer(
+        string='Overdue Loans',
+        compute='_compute_active_loans',
+        store=True,
+    )
+
+    @api.depends('loan_ids', 'loan_ids.state', 'loan_ids.days_overdue')
+    def _compute_active_loans(self):
+        for book in self:
+            active = book.loan_ids.filtered(lambda l: l.state == 'active')
+            book.active_loan_ids = active
+            book.overdue_loan_count = len(active.filtered(lambda l: l.days_overdue > 0))
+
+    # Computed Many2one — last borrower
+    last_borrower_id = fields.Many2one(
+        'res.partner',
+        string='Last Borrower',
+        compute='_compute_last_borrower',
+        store=True,
+    )
+
+    @api.depends('loan_ids.borrower_id', 'loan_ids.borrow_date')
+    def _compute_last_borrower(self):
+        for book in self:
+            last_loan = book.loan_ids.sorted('borrow_date', reverse=True)[:1]
+            book.last_borrower_id = last_loan.borrower_id if last_loan else False</code></pre>
+          </div>
+
+          <h3 id="depends-context">@api.depends_context</h3>
+          <p><code>@api.depends_context</code> is used when the computed value depends on context variables rather than field values — most commonly the current user (<code>'uid'</code>) or the user's language (<code>'lang'</code>). The cache is keyed per context value.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">class LibraryBook(models.Model):
+    _name = 'library.book'
+
+    # This field is different for each user — it shows if the current user
+    # has this book in their reading list
+    is_in_my_list = fields.Boolean(
+        string='In My Reading List',
+        compute='_compute_is_in_my_list',
+    )
+
+    @api.depends_context('uid')
+    def _compute_is_in_my_list(self):
+        # self.env.uid is the current user's ID — available via context
+        my_list = self.env['library.reading.list'].search([
+            ('user_id', '=', self.env.uid),
+        ])
+        my_book_ids = my_list.mapped('book_id').ids
+        for book in self:
+            book.is_in_my_list = book.id in my_book_ids</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Never use store=True with depends_context</strong>
+              <p>Context-dependent fields cannot be stored because the value is per-user — storing one user's value would overwrite another's. Always leave <code>store=False</code> (the default) for fields that use <code>@api.depends_context</code>.</p>
+            </div>
+          </div>
+
+          <!-- Section 6 -->
+          <h2 id="common-patterns-and-pitfalls">Common Patterns and Pitfalls</h2>
+
+          <h3 id="missing-dependency">Missing Dependency — Stale Values</h3>
+          <p>If a field used in the compute method is not listed in <code>@api.depends</code>, Odoo will not recompute the field when that field changes. The value will be stale:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># WRONG — penalty_amount is used but not listed in depends
+# If penalty_per_day changes, full_cost will NOT update
+@api.depends('days_overdue')   # missing: 'penalty_per_day'
+def _compute_full_cost(self):
+    for loan in self:
+        loan.full_cost = loan.days_overdue * loan.penalty_per_day
+
+# CORRECT — both fields listed
+@api.depends('days_overdue', 'penalty_per_day')
+def _compute_full_cost(self):
+    for loan in self:
+        loan.full_cost = loan.days_overdue * loan.penalty_per_day</code></pre>
+          </div>
+
+          <h3 id="circular-dependency">Circular Dependencies</h3>
+          <p>If field A depends on field B and field B depends on field A, Odoo raises an <code>odoo.exceptions.UserError</code> at model load time. Break the cycle by introducing an intermediate field or restructuring the logic.</p>
+
+          <h3 id="always-assign">Always Assign a Value</h3>
+          <p>Every record in the loop must receive a value. Using early <code>continue</code> without assigning causes a <code>ValueError: cannot assign to the field</code> error for skipped records:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># WRONG — records without a due_date are skipped and not assigned
+def _compute_days_overdue(self):
+    today = fields.Date.today()
+    for loan in self:
+        if not loan.due_date:
+            continue       # <-- this record is never assigned!
+        loan.days_overdue = (today - loan.due_date).days
+
+# CORRECT — always assign, use a fallback for the missing-data case
+def _compute_days_overdue(self):
+    today = fields.Date.today()
+    for loan in self:
+        if not loan.due_date:
+            loan.days_overdue = 0   # explicit fallback
+        else:
+            loan.days_overdue = max(0, (today - loan.due_date).days)</code></pre>
+          </div>
+
+          <h3 id="performance-tip">Performance: Batch Your Reads</h3>
+          <p>Odoo's ORM prefetches fields automatically, but if you call external methods or search inside a compute loop, you may generate N queries for N records. Use <code>mapped()</code>, <code>filtered()</code>, and pre-fetch patterns instead:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Python</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python"># SLOW — search inside a loop → N database queries
+def _compute_loan_count(self):
+    for book in self:
+        book.loan_count = self.env['library.loan'].search_count([
+            ('book_id', '=', book.id)
+        ])
+
+# FAST — one search for all books, then distribute results
+def _compute_loan_count(self):
+    # read_group returns aggregate data in a single query
+    data = self.env['library.loan'].read_group(
+        domain=[('book_id', 'in', self.ids)],
+        fields=['book_id'],
+        groupby=['book_id'],
+    )
+    loan_map = {row['book_id'][0]: row['book_id_count'] for row in data}
+    for book in self:
+        book.loan_count = loan_map.get(book.id, 0)</code></pre>
+          </div>
+
+          <!-- Section 7 -->
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Key Points</h3>
+            <ul>
+              <li>Declare a computed field with <code>compute='_method_name'</code> on the field definition</li>
+              <li>Decorate the compute method with <code>@api.depends('field1', 'field2.subfield')</code></li>
+              <li>Always iterate over <code>self</code> and assign to every record — never skip a record</li>
+              <li><code>store=True</code> persists the value to the database, making it searchable and sortable</li>
+              <li><code>inverse='_method_name'</code> makes the field writable by translating the value back to source fields</li>
+              <li><code>@api.depends_context('uid')</code> creates per-user cached computed fields — never stored</li>
+              <li>Missing a dependency causes stale values; a circular dependency raises an error at startup</li>
+              <li>Use <code>read_group</code> and pre-fetching patterns to avoid N+1 queries in compute methods</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a computed field?</li>
+            <li>What does <code>@api.depends</code> do?</li>
+            <li>When should a computed field be stored?</li>
+            <li>What is an inverse function?</li>
+            <li>How do you make a computed field searchable?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+<div class="related-topics">
+            <a href="/odoo/module/models-fields.html" class="topic-tag odoo-topic-tag">🐍 Models &amp; Fields</a>
+            <a href="/odoo/backend/onchange-constraints.html" class="topic-tag odoo-topic-tag">🐍 Onchange &amp; Constraints</a>
+            <a href="/odoo/backend/model-inheritance.html" class="topic-tag odoo-topic-tag">🐍 Model Inheritance</a>
+            <a href="/odoo/backend/scheduled-actions.html" class="topic-tag odoo-topic-tag">🐍 Scheduled Actions</a>
+            <a href="/odoo/module/security-access.html" class="topic-tag odoo-topic-tag">🐍 Security &amp; Access Rights</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I search on a non-stored computed field? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not by default. You can add a <code>search='_search_method_name'</code> parameter to the field and define a search method that returns a domain — but it's complex and often slower than using <code>store=True</code>. For fields you plan to search or filter frequently, <code>store=True</code> is the practical choice.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Does @api.depends work across modules (on fields from other models)? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Dot notation like <code>@api.depends('partner_id.country_id.name')</code> traverses relational fields across any model. Odoo tracks the dependency chain and will recompute your field when any field in the chain changes — even if the intermediate model is defined in another module.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens to stored computed fields when I install the module on an existing database? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Odoo adds the database column but leaves it empty (NULL) for existing records. It schedules a background recomputation job that fills in values for all existing records. For large tables this can take several minutes. If you need the field populated immediately for a migration, you may need a post-init hook or a manual <code>_recompute_todo</code> call.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does my compute method run with an empty self (no records)? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>This can happen during onchange handling in new (unsaved) records where related IDs do not yet exist. Your compute method must handle the case where relational fields return empty recordsets. Always guard with <code>if record.related_field:</code> or use <code>or False</code> / <code>or 0</code> fallbacks for missing values.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/module/quiz.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">📝 Module Quiz</span>
+          </a>
+          <a href="/odoo/backend/onchange-constraints.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Onchange &amp; Constraints</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

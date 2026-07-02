@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Correlated Subqueries – Row-by-Row Subqueries | ylearner</title>
+  <meta name="description" content="Learn SQL correlated subqueries: how they reference the outer query, run once per outer row, and when to use or avoid them. Includes rewriting as JOINs.">
+  <meta name="keywords" content="SQL correlated subquery, correlated subquery tutorial, SQL row-by-row subquery, correlated subquery vs JOIN, SQL performance subquery">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/subqueries/correlated-subqueries.html">
+  <meta property="og:title" content="SQL Correlated Subqueries – Row-by-Row Subqueries | ylearner">
+  <meta property="og:description" content="Understand SQL correlated subqueries: they reference the outer query and execute once per row. Learn when they are necessary and when to rewrite as JOINs.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/subqueries/correlated-subqueries.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL Correlated Subqueries – Row-by-Row Subqueries | ylearner">
+  <meta name="twitter:description" content="Understand SQL correlated subqueries: they reference the outer query and execute once per row. Learn when they are necessary and when to rewrite as JOINs.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Correlated Subqueries","description":"Correlated subqueries reference the outer query and execute once per outer row. Covers how they work, performance implications, and rewriting as JOINs.","educationalLevel":"Advanced","keywords":"SQL correlated subquery, row-by-row subquery, correlated vs JOIN","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/subqueries/correlated-subqueries.html">Subqueries</a><span class="separator">›</span>
+          <span class="current">Correlated Subqueries</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🪆 Subqueries</div>
+          <h1>SQL Correlated Subqueries – Row-by-Row Subqueries</h1>
+          <p class="lesson-intro">A correlated subquery is a subquery that references a column from the outer query. Because it depends on the outer row, it is re-evaluated once for every row the outer query processes. This makes correlated subqueries powerful but potentially slow on large tables.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-correlated">What Is a Correlated Subquery?</h2>
+          <p>In a regular (non-correlated) subquery, the inner query is independent and runs once. In a correlated subquery, the inner query references a column from the outer query, so it must run once for each row processed by the outer query.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Feature</th><th>Regular Subquery</th><th>Correlated Subquery</th></tr></thead>
+              <tbody>
+                <tr><td>References outer query?</td><td>No</td><td>Yes</td></tr>
+                <tr><td>Runs how many times?</td><td>Once</td><td>Once per outer row</td></tr>
+                <tr><td>Can be cached?</td><td>Yes (run once)</td><td>No (changes per row)</td></tr>
+                <tr><td>Performance</td><td>Usually fast</td><td>Potentially slow (O(N) executions)</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="how-it-works">How It Works</h2>
+          <p>The outer query passes the current row's values into the inner query. The inner query uses those values, returns a result, and the outer query decides whether to include that row:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Find employees earning more than their department average
+SELECT e.name, e.department, e.salary
+FROM employees e
+WHERE e.salary > (
+    SELECT AVG(e2.salary)
+    FROM employees e2
+    WHERE e2.department = e.department   -- e.department comes from the outer query
+);
+-- For each row in the outer query, the inner query computes AVG for THAT department</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Spot a correlated subquery</strong>
+              <p>Look for a column reference in the inner query that uses an alias defined in the outer FROM clause (e.g., <code>e.department</code> where <code>e</code> is the outer table alias). If the inner query has no reference to the outer query, it is a regular subquery.</p>
+            </div>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="vs-regular">Correlated vs Regular Subquery</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Regular subquery: inner query runs ONCE, returns the overall average
+SELECT name, salary
+FROM employees
+WHERE salary > (SELECT AVG(salary) FROM employees);
+
+-- Correlated subquery: inner query runs ONCE PER ROW, returns dept-specific average
+SELECT name, department, salary
+FROM employees e
+WHERE salary > (SELECT AVG(salary) FROM employees e2 WHERE e2.department = e.department);</code></pre>
+          </div>
+
+          <h2 id="example">More Correlated Subquery Examples</h2>
+          <p>Find the most recent order for each customer:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">SELECT o.customer_id, o.order_date, o.amount
+FROM orders o
+WHERE o.order_date = (
+    SELECT MAX(o2.order_date)
+    FROM orders o2
+    WHERE o2.customer_id = o.customer_id   -- correlated reference
+);</code></pre>
+          </div>
+
+          <p>Find products that have never been ordered:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">SELECT p.name, p.category
+FROM products p
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM order_items oi
+    WHERE oi.product_id = p.id    -- correlated reference
+);</code></pre>
+          </div>
+
+          <h2 id="performance">Performance Considerations</h2>
+          <p>Correlated subqueries execute once per outer row. For a table with 100,000 rows, that is 100,000 subquery executions. Most can be rewritten as JOINs for better performance:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Correlated subquery (potentially slow for large tables)
+SELECT e.name, e.department, e.salary
+FROM employees e
+WHERE e.salary > (
+    SELECT AVG(e2.salary) FROM employees e2 WHERE e2.department = e.department
+);
+
+-- Equivalent JOIN with derived table (faster)
+SELECT e.name, e.department, e.salary
+FROM employees e
+JOIN (
+    SELECT department, AVG(salary) AS dept_avg
+    FROM employees
+    GROUP BY department
+) dept_stats ON e.department = dept_stats.department
+WHERE e.salary > dept_stats.dept_avg;</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>When to keep correlated subqueries</strong>
+              <p>Some correlated subqueries cannot be trivially rewritten as JOINs — particularly those using EXISTS/NOT EXISTS for semi-join or anti-join semantics. Modern query optimisers (PostgreSQL, SQL Server, MySQL 8) often convert correlated subqueries to joins internally. Always EXPLAIN/profile your query on real data.</p>
+            </div>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-correlated">Correlated Subqueries: One That Runs Per Row</h2>
+          <p>A <em>regular</em> subquery runs once, independently. A <strong>correlated</strong> subquery references a column from the outer query, so it re-evaluates <em>for every outer row</em> — like a loop. Powerful, but potentially slow.</p>
+          <pre><code class="language-sql">-- each employee vs their OWN department's average — inner query
+-- depends on the outer row's e1.dept, so it re-runs per employee
+SELECT e1.name, e1.salary
+FROM employees e1
+WHERE e1.salary > (
+    SELECT AVG(e2.salary)
+    FROM employees e2
+    WHERE e2.dept = e1.dept        -- ← correlation: references e1
+);</code></pre>
+          <table>
+            <thead><tr><th></th><th>Regular subquery</th><th>Correlated</th></tr></thead>
+            <tbody>
+              <tr><td>References outer row?</td><td>no</td><td>yes</td></tr>
+              <tr><td>Runs</td><td>once</td><td>per outer row</td></tr>
+              <tr><td>Best for</td><td>a fixed value/list</td><td>row-by-row comparison</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Performance:</strong> because it repeats per row, a correlated subquery over a big table can be expensive. Two common rewrites are faster: a <strong>window function</strong> (<code>AVG(salary) OVER (PARTITION BY dept)</code>) computes the per-group value in one pass, or a <strong>JOIN to an aggregated subquery</strong>. Reach for correlation when it reads clearest (especially with <code>EXISTS</code>), but know the window-function alternative when speed matters.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Write a correlated subquery that references the outer row.</li>
+              <li>Find rows above their group’s average.</li>
+              <li>Compare correlated vs non-correlated subqueries.</li>
+              <li>Use EXISTS with correlation.</li>
+              <li>Observe that it executes per outer row.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>For each employee, find those earning more than the average salary in <em>their own</em> department using a correlated subquery. Explain how a correlated subquery re-runs per outer row and its performance trade-offs vs a window function.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A <strong>correlated subquery</strong> references a column from the outer query — making it dependent on each outer row.</li>
+              <li>It re-executes once per outer row, which can be slow on large datasets.</li>
+              <li>Classic use: find rows where a value compares against a <strong>per-group aggregate</strong> (e.g., salary vs department average).</li>
+              <li>Most correlated subqueries can be rewritten as <strong>JOINs with derived tables</strong> for better performance.</li>
+              <li>EXISTS-based correlated subqueries are often the best way to express semi-join or anti-join logic.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a correlated subquery?</li>
+            <li>How does it differ from a regular subquery?</li>
+            <li>Why can correlated subqueries be slow?</li>
+            <li>How does EXISTS use correlation?</li>
+            <li>How might a window function replace a correlated subquery?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/subqueries/subqueries-intro.html" class="topic-tag sql-topic-tag">🗄️ Subqueries Intro</a>
+            <a href="/sql/subqueries/exists-in.html" class="topic-tag sql-topic-tag">🗄️ EXISTS &amp; IN</a>
+            <a href="/sql/subqueries/cte-with.html" class="topic-tag sql-topic-tag">🗄️ CTEs (WITH)</a>
+            <a href="/sql/joins/inner-join.html" class="topic-tag sql-topic-tag">🗄️ INNER JOIN</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can a correlated subquery appear in the SELECT clause? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. A correlated scalar subquery in SELECT computes a value for each row: <code>SELECT name, (SELECT COUNT(*) FROM orders o WHERE o.customer_id = c.id) AS order_count FROM customers c</code>. This is often called a "correlated column subquery." It is convenient but slow for large tables — a LEFT JOIN with GROUP BY is usually faster.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I know if my subquery is correlated or not? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Check whether the inner query references any alias or column from the outer FROM clause. If you can run the inner query independently (without the outer query's context) and get a meaningful result, it is a regular subquery. If it references outer columns and would fail or produce no result standalone, it is correlated.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Do all database engines optimise correlated subqueries? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Major databases (PostgreSQL, MySQL 8, SQL Server, Oracle) apply "subquery unnesting" to convert many correlated subqueries into more efficient join plans automatically. However, this is not guaranteed for all query patterns. Always check the EXPLAIN plan to see whether the optimiser actually avoided a nested loop execution.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/subqueries/subqueries-intro.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Subqueries Intro</span>
+          </a>
+          <a href="/sql/subqueries/exists-in.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">EXISTS &amp; IN</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

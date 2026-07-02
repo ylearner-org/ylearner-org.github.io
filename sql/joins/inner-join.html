@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL INNER JOIN – Matching Rows from Two Tables | ylearner</title>
+  <meta name="description" content="Learn SQL INNER JOIN: syntax, how it works, multiple joins, join conditions, and filtering. INNER JOIN returns only rows that match in both tables.">
+  <meta name="keywords" content="SQL INNER JOIN, SQL JOIN syntax, multiple joins SQL, JOIN ON vs WHERE, SQL join tutorial">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/joins/inner-join.html">
+  <meta property="og:title" content="SQL INNER JOIN – Matching Rows from Two Tables | ylearner">
+  <meta property="og:description" content="Learn SQL INNER JOIN: syntax, how it works, chaining multiple joins, and the difference between ON and WHERE for filtering.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/joins/inner-join.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL INNER JOIN – Matching Rows from Two Tables | ylearner">
+  <meta name="twitter:description" content="Learn SQL INNER JOIN: syntax, how it works, chaining multiple joins, and the difference between ON and WHERE for filtering.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL INNER JOIN","description":"Learn SQL INNER JOIN — how it returns only matching rows from both tables, how to chain multiple joins, and when to use ON vs WHERE for filtering.","educationalLevel":"Beginner","keywords":"SQL INNER JOIN, JOIN syntax, multiple joins, ON vs WHERE","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/joins/joins-overview.html">Joins</a><span class="separator">›</span>
+          <span class="current">INNER JOIN</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔗 Joins</div>
+          <h1>SQL INNER JOIN – Matching Rows from Two Tables</h1>
+          <p class="lesson-intro">INNER JOIN is the most common join in SQL. It returns only the rows where the join condition is satisfied in <em>both</em> tables — rows with no match on either side are excluded from the result. If you write <code>JOIN</code> without a qualifier, it means INNER JOIN.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="inner-join-syntax">INNER JOIN Syntax</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT columns
+FROM table_a
+INNER JOIN table_b ON table_a.column = table_b.column;
+
+-- Shorthand: JOIN alone defaults to INNER JOIN
+SELECT columns
+FROM table_a
+JOIN table_b ON table_a.column = table_b.column;</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Always use table aliases</strong>
+              <p>Assign short aliases (<code>e</code> for employees, <code>d</code> for departments) and prefix every column reference with the alias. This avoids ambiguous column errors and makes multi-table queries much easier to read.</p>
+            </div>
+          </div>
+
+          <h2 id="how-it-works">How INNER JOIN Works</h2>
+          <p>The database pairs every row from the left table with every row from the right table that satisfies the ON condition. Rows without a match are discarded. Using the sample tables from the overview:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT e.id, e.name, d.dept_name
+FROM employees e
+INNER JOIN departments d ON e.dept_id = d.id;
+
+-- Result:
+-- id | name  | dept_name
+--  1 | Alice | Marketing
+--  2 | Bob   | Engineering
+--  3 | Carol | Engineering
+--  4 | Dave  | HR
+
+-- Eve (dept_id = NULL) is EXCLUDED — no matching department
+-- Finance department (no employees) is EXCLUDED</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Select all columns with prefix to avoid ambiguity
+SELECT
+  e.id        AS employee_id,
+  e.name      AS employee_name,
+  e.salary,
+  d.id        AS dept_id,
+  d.dept_name
+FROM employees e
+INNER JOIN departments d ON e.dept_id = d.id
+ORDER BY e.name;</code></pre>
+          </div>
+
+          <h2 id="multiple-joins">Chaining Multiple Joins</h2>
+          <p>You can chain as many JOINs as needed. Each JOIN adds another table to the result. The order matters for readability but not for correctness (the optimizer handles it).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Three-table join: employees → departments → locations
+SELECT
+  e.name         AS employee,
+  d.dept_name    AS department,
+  l.city         AS office_city
+FROM employees e
+INNER JOIN departments d  ON e.dept_id  = d.id
+INNER JOIN locations   l  ON d.location_id = l.id
+ORDER BY e.name;
+
+-- Four-table join: orders → customers → products → categories
+SELECT
+  o.order_id,
+  c.name          AS customer,
+  p.product_name,
+  cat.category_name,
+  o.quantity,
+  o.quantity * p.price AS line_total
+FROM orders o
+INNER JOIN customers c   ON o.customer_id  = c.id
+INNER JOIN products  p   ON o.product_id   = p.id
+INNER JOIN categories cat ON p.category_id = cat.id
+WHERE o.order_date >= '2026-01-01'
+ORDER BY o.order_date DESC;</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="join-conditions">Join Conditions</h2>
+          <p>The ON clause can contain any valid condition — not just equality. You can join on ranges, multiple columns, or function results (though non-equality joins can be slow without proper indexing).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Equality join (most common)
+JOIN departments d ON e.dept_id = d.id
+
+-- Multi-column join: match on composite key
+JOIN order_details od ON o.order_id = od.order_id
+                     AND o.store_id  = od.store_id
+
+-- Non-equi join: find salary grades that apply to each employee
+SELECT e.name, e.salary, g.grade_name
+FROM employees e
+INNER JOIN salary_grades g
+        ON e.salary BETWEEN g.min_salary AND g.max_salary;
+
+-- USING shorthand when column names match in both tables
+SELECT e.name, d.dept_name
+FROM employees e
+INNER JOIN departments d USING (dept_id);
+-- Equivalent to: ON e.dept_id = d.dept_id</code></pre>
+          </div>
+
+          <h2 id="filtering">Filtering with WHERE vs ON</h2>
+          <p>For INNER JOIN, filtering in ON and in WHERE produces the same result. However, the conventional rule is: put the <em>join condition</em> in ON, and put the <em>row filter</em> in WHERE. For LEFT JOIN (covered next), the distinction is critical.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Recommended: join condition in ON, filter in WHERE
+SELECT e.name, d.dept_name
+FROM employees e
+INNER JOIN departments d ON e.dept_id = d.id
+WHERE d.dept_name = 'Engineering';
+
+-- Also works but less clear: filter moved into ON
+SELECT e.name, d.dept_name
+FROM employees e
+INNER JOIN departments d ON e.dept_id = d.id
+                        AND d.dept_name = 'Engineering';
+
+-- Combine aggregation with INNER JOIN
+SELECT
+  d.dept_name,
+  COUNT(e.id)          AS employee_count,
+  ROUND(AVG(e.salary), 2) AS avg_salary
+FROM departments d
+INNER JOIN employees e ON e.dept_id = d.id
+GROUP BY d.dept_name
+ORDER BY avg_salary DESC;</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-joinnull">INNER vs LEFT, and the WHERE-clause Trap That Silently Breaks LEFT JOINs</h2>
+          <p><code>INNER JOIN</code> keeps only rows that match on both sides. <code>LEFT JOIN</code> keeps <em>all</em> left rows, filling unmatched right columns with <code>NULL</code>. Choosing wrong quietly drops data.</p>
+          <pre><code class="language-sql">-- All customers, even those who never ordered
+SELECT c.name, o.id
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id;</code></pre>
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>A condition in <code>WHERE</code> turns your LEFT JOIN back into an INNER JOIN</strong>
+              <p>Filtering a right-table column in <code>WHERE</code> removes the <code>NULL</code> rows you were trying to keep:</p>
+              <pre><code class="language-sql">-- ❌ drops customers with no orders (NULL fails the WHERE test)
+... LEFT JOIN orders o ON o.customer_id = c.id
+    WHERE o.status = 'shipped';
+
+-- ✅ put the condition in the ON clause instead
+... LEFT JOIN orders o
+      ON o.customer_id = c.id AND o.status = 'shipped';</code></pre>
+            </div>
+          </div>
+          <p>To find "customers with no orders," LEFT JOIN and then check for the NULL explicitly: <code>WHERE o.id IS NULL</code>. That's the standard anti-join pattern.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Join two tables with INNER JOIN.</li>
+              <li>Join on a foreign key.</li>
+              <li>Add a WHERE filter after the join.</li>
+              <li>Join three tables together.</li>
+              <li>Alias the tables in the join.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Join <code>orders</code>, <code>customers</code>, and <code>products</code> to produce a report of each order’s customer name and product name. Explain why INNER JOIN drops rows that have no match on either side.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>INNER JOIN</strong> — Returns only rows with a matching value in both tables.</li>
+              <li><strong>Unmatched rows are excluded</strong> — Eve (no dept) and Finance (no employees) do not appear.</li>
+              <li><strong>JOIN = INNER JOIN</strong> — The keyword alone defaults to INNER JOIN.</li>
+              <li><strong>Use aliases</strong> — Always prefix column references with table aliases in multi-table queries.</li>
+              <li><strong>Chain multiple JOINs</strong> — Add one INNER JOIN per additional table.</li>
+              <li><strong>Multi-column joins</strong> — Use AND in ON to match composite keys.</li>
+              <li><strong>ON for join condition, WHERE for row filter</strong> — Keeps intent clear, matters for outer joins.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does INNER JOIN return?</li>
+            <li>What happens to unmatched rows in an INNER JOIN?</li>
+            <li>How do you join more than two tables?</li>
+            <li>What is the difference between INNER JOIN and a comma join with WHERE?</li>
+            <li>Does join order affect INNER JOIN results?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/joins/joins-overview.html" class="topic-tag sql-topic-tag">🗄️ Joins Overview</a>
+            <a href="/sql/joins/left-right-join.html" class="topic-tag sql-topic-tag">🗄️ LEFT & RIGHT JOIN</a>
+            <a href="/sql/joins/full-outer-join.html" class="topic-tag sql-topic-tag">🗄️ FULL OUTER JOIN</a>
+            <a href="/sql/functions/aggregate-functions.html" class="topic-tag sql-topic-tag">🗄️ Aggregate Functions</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does INNER JOIN order matter (which table is on which side)?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For INNER JOIN, the result is the same regardless of table order — the join is commutative. The query optimizer may reorder tables anyway based on statistics. Conventionally, you write the "main" table first and the "lookup" table second (e.g. employees INNER JOIN departments). For outer joins (LEFT/RIGHT), order absolutely matters.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens if there are duplicate matches?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>If multiple rows in the right table match a single row from the left table, you get multiple result rows (a fan-out). For example: one order with three order items produces three rows when you join orders to order_items. This is expected and correct. Watch for it when aggregating — SUM() on the orders table after joining to items will double-count. Use subqueries or GROUP BY carefully to avoid this.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I join on a NULL value?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>You cannot match on NULL with the standard ON condition because <code>NULL = NULL</code> is UNKNOWN, not TRUE. If you need to treat NULLs as equal, use: <code>ON (e.dept_id = d.id OR (e.dept_id IS NULL AND d.id IS NULL))</code>. In practice, NULL foreign keys mean "no relationship" and you would use LEFT JOIN rather than trying to match NULLs.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use INNER JOIN with a subquery?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — any table reference in a JOIN can be a subquery (also called a derived table): <code>INNER JOIN (SELECT dept_id, AVG(salary) AS avg_sal FROM employees GROUP BY dept_id) AS dept_avg ON e.dept_id = dept_avg.dept_id</code>. In modern SQL, a CTE (<code>WITH dept_avg AS (...)</code>) is usually more readable for this pattern.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/joins/joins-overview.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Joins Overview</span>
+          </a>
+          <a href="/sql/joins/left-right-join.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">LEFT & RIGHT JOIN</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

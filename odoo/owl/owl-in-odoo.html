@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL in Odoo – Using the Web Library in Backend and POS | ylearner</title>
+  <meta name="description" content="Learn how Odoo uses OWL (Odoo Web Library) in the backend, POS, and website: the asset bundling system, registries, services, and the boot process.">
+  <meta name="keywords" content="OWL in Odoo, Odoo Web Library backend, OWL services, OWL registry, asset bundle, Odoo 19 frontend">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/owl/owl-in-odoo.html">
+  <meta property="og:title" content="OWL in Odoo – Using the Web Library in Backend and POS">
+  <meta property="og:description" content="Learn how Odoo uses OWL in the backend, POS, and website: asset bundling, registries, services, and the boot process.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/owl/owl-in-odoo.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL in Odoo – Using the Web Library in Backend and POS | ylearner">
+  <meta name="twitter:description" content="How Odoo uses OWL in backend, POS, website: asset bundles, registries, services, boot process.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL in Odoo – Using the Web Library in Backend and POS",
+    "description": "Learn how Odoo uses OWL in the backend, POS, and website: asset bundling, registries, services, and the boot process.",
+    "educationalLevel": "Intermediate",
+    "keywords": "OWL in Odoo, Odoo Web Library, asset bundle, registry, services, boot process",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">OWL in Odoo</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 OWL in Odoo</div>
+          <h1>OWL in Odoo – Using the Web Library in Backend and POS</h1>
+          <p class="lesson-intro">OWL (Odoo Web Library) is Odoo's own frontend framework, used for the backend UI (<code>/web</code>), the Point of Sale, and increasingly for the website editor. Understanding how Odoo loads, organizes, and boots OWL code is key to writing reliable frontend customizations.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="deep-owlinodoo">OWL in Odoo: The Modern Web Client</h2>
+          <p>OWL is Odoo's own React-like JavaScript framework, and since Odoo 15+ it powers the entire web client. When you need custom interactivity beyond what XML views offer, you write OWL components.</p>
+          <pre><code class="language-javascript">import { Component, useState } from "@odoo/owl";
+import { registry } from "@web/core/registry";
+
+class MyWidget extends Component {
+    static template = "my_module.MyWidget";   // an XML QWeb template
+    setup() {
+        this.state = useState({ count: 0 });
+        this.orm = useService("orm");          // talk to the server
+    }
+}
+registry.category("actions").add("my_widget", MyWidget);   // make it usable</code></pre>
+          <table>
+            <thead><tr><th>Piece</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td>Component</td><td>class + QWeb template</td></tr>
+              <tr><td><code>setup()</code></td><td>state, hooks, services</td></tr>
+              <tr><td>services (<code>orm</code>, <code>notification</code>)</td><td>shared functionality</td></tr>
+              <tr><td>registry</td><td>where components/widgets are registered</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Where OWL fits:</strong> most Odoo screens are declared in XML (form/list/kanban views) and need no JavaScript. You reach for OWL when you need <em>custom</em> interactivity — a bespoke dashboard, a special field widget, a client action with its own UI. <strong>The registry is central to Odoo's OWL:</strong> you don't just render components anywhere — you <em>register</em> them (as fields, actions, or components) so Odoo's web client knows how to use them, e.g. a custom field widget you can then reference in a view with <code>widget="my_widget"</code>. <strong>Services connect OWL to Odoo:</strong> <code>useService("orm")</code> lets a component read/write models, <code>notification</code> shows toasts, <code>action</code> triggers window actions — the bridge between your frontend and the Python backend. <strong>Templates are QWeb XML</strong> (the same templating used for reports), referenced by name. <strong>Prerequisite:</strong> comfort with modern JavaScript and component thinking (state, props, one-way data flow) — OWL concepts mirror React/Vue, so that knowledge transfers directly.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Note that OWL is Odoo’s frontend framework.</li>
+              <li>Identify a component <code>.js</code> file.</li>
+              <li>Register a component.</li>
+              <li>Note the assets bundle.</li>
+              <li>Reload assets after a change.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Explain OWL’s role as Odoo’s modern JavaScript framework (replacing the old widget system): how components are registered and loaded via asset bundles, and how it compares conceptually to React/Vue (components, reactive state, templates).</p>
+          </div>
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>Where OWL is used in Odoo (backend, POS, website editor)</li>
+              <li>How asset bundles work and how to add your files</li>
+              <li>The <code>@odoo-module</code> directive and ES module system</li>
+              <li>The service and registry pattern</li>
+              <li>How the Odoo web client boots</li>
+            </ul>
+          </div>
+
+          <h2 id="where-owl-is-used">Where OWL is Used in Odoo</h2>
+          <table>
+            <thead><tr><th>Area</th><th>OWL usage</th><th>Main asset bundle</th></tr></thead>
+            <tbody>
+              <tr><td>Backend (/web)</td><td>All views, dialogs, widgets, action manager</td><td>web.assets_backend</td></tr>
+              <tr><td>Point of Sale</td><td>Full POS app — screens, components, popups</td><td>point_of_sale.assets</td></tr>
+              <tr><td>Website editor</td><td>Editor toolbar, snippet options, overlay</td><td>website.assets_wysiwyg</td></tr>
+              <tr><td>Frontend (public pages)</td><td>Minimal — some widgets (chat, form)</td><td>web.assets_frontend</td></tr>
+            </tbody>
+          </table>
+          <p>Backend and POS customizations go into different bundles. Never put backend code in the POS bundle or vice versa — they boot separately and have different registries.</p>
+
+          <h2 id="asset-bundles">Asset Bundles</h2>
+          <p>Asset bundles are named collections of JS, CSS, and XML files. Declare files in your module's <code>__manifest__.py</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">'assets': {
+    # Backend customizations
+    'web.assets_backend': [
+        'my_module/static/src/js/my_widget.js',
+        'my_module/static/src/xml/my_widget.xml',
+        'my_module/static/src/scss/my_widget.scss',
+    ],
+    # POS customizations
+    'point_of_sale.assets': [
+        'my_module/static/src/pos/my_pos_component.js',
+        'my_module/static/src/pos/my_pos_component.xml',
+    ],
+    # Public website
+    'web.assets_frontend': [
+        'my_module/static/src/js/website_widget.js',
+    ],
+}</code></pre>
+          </div>
+          <p>Odoo builds bundles at startup (or from cache). In development mode (<code>?debug=assets</code>), bundles are rebuilt on every request.</p>
+
+          <h2 id="odoo-module">@odoo-module Directive</h2>
+          <p>Every JS file in an Odoo asset bundle must start with <code>/** @odoo-module **/</code>. This marks the file as an ES module in Odoo's module system and enables imports from other Odoo modules:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+
+// Import from Odoo core
+import { Component, useState, onMounted } from '@odoo/owl';
+import { registry } from '@web/core/registry';
+import { useService } from '@web/core/utils/hooks';
+
+// Import from another module in the same bundle
+import { MyHelperClass } from 'my_module/static/src/js/helpers';
+
+export class MyComponent extends Component {
+    static template = 'my_module.MyComponent';
+
+    setup() {
+        this.orm = useService('orm');
+        this.state = useState({ count: 0 });
+    }
+}</code></pre>
+          </div>
+          <p>The path in imports like <code>'@web/core/registry'</code> resolves to the module exported from <code>web/static/src/core/registry.js</code> in the Odoo source.</p>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="registry-system">The Registry System</h2>
+          <p>Registries are the primary mechanism for extending Odoo's UI without patching. A registry is a key→value store where you register components, services, or views under a string key:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { registry } from '@web/core/registry';
+import { MyFieldWidget } from './my_field_widget';
+
+// Register a custom field widget
+registry.category('fields').add('my_widget', {
+    component: MyFieldWidget,
+    displayName: 'My Custom Widget',
+    supportedTypes: ['char', 'text'],
+});
+
+// Use it in a view XML: widget="my_widget"</code></pre>
+          </div>
+          <p>Common registry categories:</p>
+          <table>
+            <thead><tr><th>Category</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td>fields</td><td>Field widgets for form/list views</td></tr>
+              <tr><td>views</td><td>View types (form, list, kanban, etc.)</td></tr>
+              <tr><td>services</td><td>Singleton services injected into components</td></tr>
+              <tr><td>actions</td><td>Client-side action handlers</td></tr>
+              <tr><td>systray</td><td>Items in the top-right system tray</td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="services">Services</h2>
+          <p>Services are singletons that provide shared functionality to all components. Access them via <code>useService()</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { Component } from '@odoo/owl';
+import { useService } from '@web/core/utils/hooks';
+
+export class MyComponent extends Component {
+    static template = 'my_module.MyComponent';
+
+    setup() {
+        this.orm = useService('orm');         // ORM calls
+        this.notification = useService('notification');  // Toast messages
+        this.dialog = useService('dialog');   // Dialog popups
+        this.router = useService('router');   // URL routing
+        this.user = useService('user');       // Current user info
+    }
+
+    async loadData() {
+        const records = await this.orm.searchRead(
+            'res.partner',
+            [['is_company', '=', true]],
+            ['name', 'email'],
+            { limit: 10 },
+        );
+        this.notification.add('Loaded!', { type: 'success' });
+    }
+}</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Backend, POS, and website editor use separate OWL asset bundles — add files to the correct bundle</li>
+              <li>Every JS file needs <code>/** @odoo-module **/</code> at the top</li>
+              <li>Use registries to add field widgets, views, services, and systray items without patching</li>
+              <li>Access shared functionality (ORM, notifications, dialogs) through services via <code>useService()</code></li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is OWL?</li>
+            <li>Why did Odoo build OWL?</li>
+            <li>How does OWL compare to React or Vue?</li>
+            <li>How are OWL components loaded in Odoo?</li>
+            <li>What is an assets bundle?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/owl/owl-components.html" class="topic-tag odoo-topic-tag">🦉 OWL Components</a>
+              <a href="/odoo/owl/owl-services.html" class="topic-tag odoo-topic-tag">🦉 OWL Services</a>
+              <a href="/odoo/owl/custom-widgets.html" class="topic-tag odoo-topic-tag">🦉 Custom Widgets</a>
+              <a href="/odoo/pos/pos-architecture.html" class="topic-tag odoo-topic-tag">🖥️ POS Architecture</a>
+            </div>
+          </section>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What's the difference between a registry and a patch? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A registry registers a new entry under a key — it adds to the system. A patch modifies an existing component or class in-place. Use registries for adding new field widgets, services, and actions. Use patches for extending existing POS components or altering behavior of a specific existing component.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I debug OWL components in the browser? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Open DevTools and use the OWL Devtools browser extension (available for Chrome/Firefox). It shows the component tree, component state, props, and environment. In development mode (<code>?debug=1</code>), Odoo also adds extra error messages and disables caching.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use external npm packages in Odoo OWL code? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not directly via npm — Odoo's asset system doesn't use npm. You can include a pre-bundled JavaScript library by adding the file to your module's <code>static/lib/</code> folder and registering it in the manifest. Alternatively, load it from a CDN via a <code>&lt;script&gt;</code> tag in a QWeb template, though this adds a network dependency.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a href="/odoo/pos/quiz.html" class="lesson-nav-link">
+        <span class="nav-label">← Prev</span>
+        <span class="nav-title">📝 POS Quiz</span>
+        </a>
+        <a href="/odoo/owl/owl-components.html" class="lesson-nav-link next">
+        <span class="nav-label">Next →</span>
+        <span class="nav-title">OWL Components in Odoo</span>
+        </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

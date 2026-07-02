@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Comments – Single-line, Multi-line &amp; JSDoc | ylearner</title>
+  <meta name="description" content="Learn JavaScript comments: single-line //, multi-line /* */, JSDoc /** */ with @param and @returns, good vs bad commenting practices, TODO conventions, ESLint disable comments, and code organization tips.">
+  <meta name="keywords" content="javascript comments, jsdoc javascript, javascript single line comment, javascript multi-line comment, javascript todo comment, jsdoc @param @returns, eslint disable comment, javascript documentation">
+  <link rel="canonical" href="https://ylearner.org/javascript/beginner/comments.html">
+  <meta property="og:title" content="JavaScript Comments – Single-line, Multi-line &amp; JSDoc | ylearner">
+  <meta property="og:description" content="Learn JavaScript comments: single-line, multi-line, JSDoc documentation, good vs bad practices, TODO conventions, and ESLint disable comments.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/beginner/comments.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Comments – Single-line, Multi-line &amp; JSDoc | ylearner">
+  <meta name="twitter:description" content="Learn JavaScript comments: single-line, multi-line, JSDoc documentation, good vs bad practices, TODO conventions, and ESLint disable comments.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/beginner/setting-up.html">Beginner</a><span class="separator">›</span>
+          <span class="current">Comments</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌱 Beginner</div>
+          <h1>JavaScript Comments – Writing Clean, Documented Code</h1>
+          <p class="lesson-intro">Comments are text in your source code that JavaScript completely ignores — they exist only for humans. Good comments make code maintainable, understandable to teammates, and easier to revisit months later. Bad comments clutter code and become misleading when they fall out of sync with the code. This lesson covers single-line, multi-line, and JSDoc comments, along with the principles that separate genuinely helpful comments from noise.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="single-line">Single-Line Comments</h2>
+          <p>A single-line comment starts with <code>//</code> and extends to the end of the line. Everything after <code>//</code> on that line is ignored by JavaScript.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// This is a standalone comment explaining the next line
+const TAX_RATE = 0.08;   // 8% sales tax — required by state law
+
+// Calculate the final price including tax
+function addTax(price) {
+  return price * (1 + TAX_RATE);
+}
+
+// Single-line comments are ideal for:
+// - Brief explanations
+// - Annotating specific values or magic numbers
+// - Quick notes during development</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>Comment WHY, Not WHAT</strong><p>The code already shows <em>what</em> is happening. Comments should explain <em>why</em> — the reason for a decision, a non-obvious constraint, a business rule, or a workaround for a known issue. <code>// increment i</code> above <code>i++</code> is useless. <code>// start at 1 to skip the header row</code> is valuable.</p></div>
+          </div>
+
+          <h2 id="multi-line">Multi-Line Comments</h2>
+          <p>Multi-line comments start with <code>/*</code> and end with <code>*/</code>. Everything between these delimiters is a comment, regardless of how many lines it spans.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/*
+  This function validates a UK postcode format.
+  Valid examples: "SW1A 1AA", "EC2R 8AH", "W1A 0AX"
+
+  Note: This is a simplified regex — it does NOT guarantee
+  the postcode actually exists in Royal Mail's database.
+  Use a postcode lookup API for verified addresses.
+*/
+function isValidUKPostcode(postcode) {
+  const regex = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
+  return regex.test(postcode.trim());
+}
+
+/* Quick inline multi-line comment */
+const MAX = /* the theoretical max before overflow */ 2147483647;</code></pre>
+          </div>
+
+          <h2 id="commenting-out">Commenting Out Code for Debugging</h2>
+          <p>A common technique is temporarily commenting out code to isolate bugs or test alternatives. Most editors support <kbd>Ctrl + /</kbd> (or <kbd>Cmd + /</kbd>) to toggle line comments.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function processOrder(order) {
+  // validateOrder(order);   // Temporarily disabled while debugging
+  const total = calculateTotal(order.items);
+
+  /*
+  // Old discount logic — keeping for reference
+  if (order.coupon) {
+    total = total * 0.9;
+  }
+  */
+
+  // New discount logic
+  if (order.coupon && isValidCoupon(order.coupon)) {
+    return total * getCouponDiscount(order.coupon);
+  }
+
+  return total;
+}</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content"><strong>Don't Leave Commented-Out Code in Production</strong><p>Commented-out code clutters your codebase, confuses other developers, and often represents dead code that should be deleted. If you need to keep old logic, use version control (git) — you can always retrieve deleted code from git history. Remove commented-out code before committing.</p></div>
+          </div>
+
+          <!-- place ad-in-content after 2nd or 3rd h2 -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="jsdoc">JSDoc Comments</h2>
+          <p>JSDoc is a standardized comment format that documents functions, parameters, return values, and types. It uses <code>/** */</code> (double asterisk) and special <code>@</code> tags. IDEs like VS Code read JSDoc to provide intellisense, type hints, and hover documentation.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/**
+ * Calculates the area of a rectangle.
+ *
+ * @param {number} width - The width of the rectangle in pixels.
+ * @param {number} height - The height of the rectangle in pixels.
+ * @returns {number} The area in square pixels.
+ * @throws {Error} If width or height is negative.
+ *
+ * @example
+ * const area = rectangleArea(10, 5);
+ * console.log(area); // 50
+ */
+function rectangleArea(width, height) {
+  if (width < 0 || height < 0) {
+    throw new Error("Width and height must be non-negative.");
+  }
+  return width * height;
+}
+
+/**
+ * Represents a user in the system.
+ * @typedef {Object} User
+ * @property {string} id - Unique user identifier.
+ * @property {string} name - Display name.
+ * @property {string} email - Email address.
+ * @property {boolean} isAdmin - Whether the user has admin privileges.
+ */
+
+/**
+ * Fetches a user by their ID.
+ * @param {string} userId - The user's unique identifier.
+ * @returns {Promise&lt;User|null&gt;} The user object, or null if not found.
+ */
+async function getUserById(userId) {
+  // implementation...
+}</code></pre>
+          </div>
+
+          <table>
+            <thead>
+              <tr><th>JSDoc Tag</th><th>Purpose</th><th>Example</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>@param</code></td><td>Documents a parameter</td><td><code>@param {string} name - User's name</code></td></tr>
+              <tr><td><code>@returns</code></td><td>Documents return value</td><td><code>@returns {number} The sum</code></td></tr>
+              <tr><td><code>@throws</code></td><td>Documents thrown errors</td><td><code>@throws {TypeError} If invalid input</code></td></tr>
+              <tr><td><code>@example</code></td><td>Usage example</td><td><code>@example myFn(1, 2) // 3</code></td></tr>
+              <tr><td><code>@typedef</code></td><td>Defines a custom type</td><td><code>@typedef {Object} Config</code></td></tr>
+              <tr><td><code>@deprecated</code></td><td>Marks outdated API</td><td><code>@deprecated Use newFn() instead</code></td></tr>
+              <tr><td><code>@see</code></td><td>Links to related docs</td><td><code>@see https://mdn.io/...</code></td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="good-vs-bad">Good vs Bad Comments</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// ❌ BAD COMMENTS — These explain WHAT the code does (already obvious)
+// Declare a variable called count and set it to 0
+let count = 0;
+
+// Add 1 to count
+count++;
+
+// Return the user's name
+return user.name;
+
+// ✅ GOOD COMMENTS — These explain WHY (not obvious from code)
+// Start counting from 0; the display will add 1 for 1-based numbering
+let count = 0;
+
+// Increment on each failed attempt; lockout triggers at MAX_ATTEMPTS
+count++;
+
+// Return the display name — falls back to email prefix if name isn't set
+return user.name || user.email.split("@")[0];
+
+// ✅ GOOD: Explain a non-obvious business rule
+// Per GDPR Article 17, we must not log the user's IP address
+const requestLog = { timestamp, endpoint };  // IP deliberately excluded
+
+// ✅ GOOD: Explain a workaround
+// Array.from() instead of spread operator due to IE11 transpilation bug (see #GH-412)
+const items = Array.from(nodeList);</code></pre>
+          </div>
+
+          <h2 id="todo-comments">TODO and FIXME Comments</h2>
+          <p>It's a universal convention to use <code>TODO:</code> and <code>FIXME:</code> prefixes in comments to mark work that needs to be done. Many IDEs and linters can find and list these automatically.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// TODO: Add input validation before this goes to production
+function saveUser(data) {
+  db.insert(data);
+}
+
+// FIXME: This breaks when the user list is empty — returns undefined
+function getFirstUser(users) {
+  return users[0].name;
+}
+
+// HACK: Temporary fix for the timezone offset bug — remove after Q3 backend update
+const adjustedDate = new Date(timestamp - 3600000);
+
+// NOTE: This algorithm is O(n²) — acceptable for now with small datasets,
+//       but needs to be replaced with a hash map approach for scale
+function findDuplicate(arr) {
+  for (let i = 0; i &lt; arr.length; i++) {
+    for (let j = i + 1; j &lt; arr.length; j++) {
+      if (arr[i] === arr[j]) return arr[i];
+    }
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="eslint-comments">ESLint Disable Comments</h2>
+          <p>When ESLint flags a rule violation you intentionally need to break, you can disable the rule for a specific line. This is an escape hatch — use it sparingly and always explain why.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Disable a rule for one line (add explanation!)
+const result = eval(expression); // eslint-disable-line no-eval -- sandboxed input, validated upstream
+
+// Disable for the next line
+// eslint-disable-next-line no-console
+console.log("Debug output:", data);
+
+// Disable for a block
+/* eslint-disable no-magic-numbers */
+const RETRIES = 3;
+const TIMEOUT = 5000;
+const MAX_SIZE = 1048576;
+/* eslint-enable no-magic-numbers */
+
+// Disable for the entire file (rarely justified — use at the top)
+/* eslint-disable no-unused-vars */</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content"><strong>Comments and Code Organization</strong><p>Use comments to group related code blocks in a file: <code>// === UTILITY FUNCTIONS ===</code>, <code>// === API CALLS ===</code>, <code>// === EVENT HANDLERS ===</code>. In larger codebases these sections should be split into separate files/modules, but section headers help readability in smaller files.</p></div>
+          </div>
+
+          <h2 id="deep-jscomments">Comments: And Why They Vanish in Production</h2>
+          <p>JavaScript ignores <code>//</code> to end of line and <code>/* ... */</code> across lines. Good comments explain the <em>why</em> a line can't — a workaround, a business rule, a gotcha — not the obvious "what."</p>
+          <pre><code class="language-javascript">i++;                    // ❌ "increment i" — redundant
+timeout = 3000;         // ✅ payment gateway drops connections after 3s
+
+/* JSDoc: tooling reads this for autocomplete + type hints */
+/** @param {number} price @returns {number} price with tax */
+function withTax(price) { return price * 1.1; }</code></pre>
+          <table>
+            <thead><tr><th>Syntax</th><th>Use</th></tr></thead>
+            <tbody>
+              <tr><td><code>// line</code></td><td>quick notes</td></tr>
+              <tr><td><code>/* block */</code></td><td>multi-line</td></tr>
+              <tr><td><code>/** JSDoc */</code></td><td>documented functions (IDE reads it)</td></tr>
+            </tbody>
+          </table>
+          <p><strong>A JS-specific reality:</strong> production build tools (minifiers/bundlers like esbuild, Terser) <em>strip all comments</em> from shipped code — so comments never reach or slow down the user; they're purely for developers. That means you can comment generously in source without a runtime cost. <strong>JSDoc</strong> is special: those <code>/** */</code> blocks are parsed by editors and TypeScript to provide type checking and autocomplete even in plain JS — a cheap way to get many TypeScript benefits. Delete commented-out code (git remembers it) and avoid comments that will silently drift out of date as the code changes.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Write a function <code>calculateShipping(weight, distance)</code> with a full JSDoc comment including <code>@param</code>, <code>@returns</code>, <code>@example</code>, and a description of the pricing formula.</li>
+              <li>Review a function you've written in a previous exercise and identify any comments that explain <em>what</em> the code does. Rewrite them to explain <em>why</em> instead.</li>
+              <li>Add a <code>TODO:</code> comment to a function that needs input validation, describing exactly what needs to be added.</li>
+              <li>Deliberately trigger an ESLint warning (if ESLint is set up), then use an inline disable comment with an explanation.</li>
+              <li>Write a multi-line <code>/* */</code> comment explaining a complex algorithm or business rule in a function of your choice.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Take the following undocumented utility file and add proper JSDoc comments to every function. Include parameter types, return types, a brief description, and at least one <code>@example</code> per function. Also identify which comments already present are "bad" (explain what) and which are "good" (explain why):</p>
+            <pre style="background:#1a1a2e;color:#e0e0e0;padding:1rem;border-radius:4px;overflow-x:auto;font-size:0.85em"><code>function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+function debounce(fn, delay) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+function groupBy(arr, key) {
+  return arr.reduce((acc, item) => {
+    (acc[item[key]] = acc[item[key]] || []).push(item);
+    return acc;
+  }, {});
+}</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Single-line comments use <code>//</code>; multi-line use <code>/* */</code>.</li>
+              <li>JSDoc comments use <code>/** */</code> with <code>@param</code>, <code>@returns</code>, <code>@throws</code>, <code>@example</code> tags for documenting functions.</li>
+              <li>Comment WHY, not WHAT — the code shows what happens; comments explain the reasoning.</li>
+              <li>Use <code>TODO:</code>, <code>FIXME:</code>, <code>HACK:</code>, <code>NOTE:</code> prefixes for actionable comments.</li>
+              <li>Don't commit commented-out code — use git history instead.</li>
+              <li>ESLint disable comments are a last resort; always include an explanation of why.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between single-line and multi-line comments in JavaScript?</li>
+            <li>What is JSDoc and why is it useful?</li>
+            <li>What makes a comment "good" vs "bad"?</li>
+            <li>When would you use a TODO comment vs just fixing the problem?</li>
+            <li>What is the <code>@param</code> JSDoc tag used for?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/javascript/beginner/user-input.html" class="topic-tag">⚡ User Input</a>
+            <a href="/javascript/beginner/variables.html" class="topic-tag">⚡ Variables</a>
+            <a href="/javascript/beginner/hello-world.html" class="topic-tag">⚡ Hello World</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Do comments affect JavaScript performance? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In modern JavaScript, comments have effectively zero runtime performance impact. Build tools (like Webpack, Vite, or esbuild) automatically strip comments from production bundles. The only minor concern is file download size in unbuilt code, but minifiers handle this. Write as many comments as help maintainability — don't skip them for performance reasons.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I write JSDoc for every function? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not necessarily. Simple, self-explanatory functions with clear names and descriptive parameter names often don't need JSDoc: <code>function double(n) { return n * 2; }</code> is clear enough. JSDoc adds the most value for: public APIs, complex algorithms, functions with non-obvious parameter expectations, functions that throw, and any code others will need to use without reading the implementation.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is TypeScript and how does it relate to JSDoc? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>TypeScript is JavaScript with static type syntax built in. JSDoc's type annotations (<code>{string}</code>, <code>{number}</code>, <code>{Promise&lt;User&gt;}</code>) serve a similar purpose but through comments rather than syntax. VS Code actually uses JSDoc type comments to provide TypeScript-like type checking in plain JavaScript files when you add <code>// @ts-check</code> at the top. Many teams use JSDoc as a lighter alternative to TypeScript.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I nest multi-line comments? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. JavaScript doesn't support nested block comments. <code>/* outer /* inner */ still outer */</code> — the comment ends at the first <code>*/</code>, so <code>still outer */</code> becomes invalid code. If you need to comment out a block that already contains multi-line comments, convert them to single-line comments first, or use your editor's "comment out" feature which handles this automatically.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I automatically generate documentation from JSDoc comments? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use the <strong>JSDoc</strong> tool (<code>npm install -g jsdoc</code>). Running <code>jsdoc src/</code> generates an HTML documentation site from your JSDoc comments. Other popular alternatives are <strong>TypeDoc</strong> (for TypeScript), <strong>ESDoc</strong>, and <strong>documentation.js</strong>. These tools create professional API documentation sites automatically from your code comments.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/beginner/user-input.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">JavaScript User Input</span>
+          </a>
+          <a href="/javascript/beginner/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+        </nav>
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

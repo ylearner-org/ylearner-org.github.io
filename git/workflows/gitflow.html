@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git Flow – A Branching Strategy for Release Management | ylearner</title>
+  <meta name="description" content="Learn Git Flow: the branching model for teams with scheduled releases. Covers main, develop, feature, release, and hotfix branches with practical commands.">
+  <meta name="keywords" content="git flow, gitflow branching strategy, git flow feature branch, git flow release, git flow hotfix, git branching model, git flow vs trunk based">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/git/workflows/gitflow.html">
+  <meta property="og:title" content="Git Flow – A Branching Strategy for Release Management | ylearner">
+  <meta property="og:description" content="Learn Git Flow: the branching model with main, develop, feature, release, and hotfix branches designed for teams with scheduled release cycles.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/git/workflows/gitflow.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Git Flow – A Branching Strategy for Release Management | ylearner">
+  <meta name="twitter:description" content="Learn Git Flow: the branching model with main, develop, feature, release, and hotfix branches designed for teams with scheduled release cycles.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Git Flow – A Branching Strategy for Release Management","description":"Learn Git Flow: the branching model for teams with scheduled releases using main, develop, feature, release, and hotfix branches.","educationalLevel":"Intermediate","keywords":"git flow, branching strategy, gitflow model","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <span>Workflows</span><span class="separator">›</span>
+          <span class="current">Git Flow</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔀 Workflows</div>
+          <h1>Git Flow – A Branching Strategy for Release Management</h1>
+          <p class="lesson-intro">Git Flow is a branching model designed for projects that have scheduled, versioned releases. Created by Vincent Driessen, it defines a strict branching structure with specific roles for each branch type. Teams that ship software in discrete versions — desktop apps, mobile apps, enterprise software, npm packages — often benefit from Git Flow's disciplined approach to separating work-in-progress from stable releases.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-gitflow">What Is Git Flow?</h2>
+          <p>Git Flow defines two permanent (long-lived) branches and three types of temporary (short-lived) branches. Each type has a specific purpose and specific rules about where it branches from and merges to.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Branch type</th><th>Lifespan</th><th>Purpose</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>main</code></td><td>Permanent</td><td>Production-ready code only. Every commit is a release.</td></tr>
+                <tr><td><code>develop</code></td><td>Permanent</td><td>Integration branch. Next release is built here.</td></tr>
+                <tr><td><code>feature/*</code></td><td>Temporary</td><td>New features. Branches from develop, merges to develop.</td></tr>
+                <tr><td><code>release/*</code></td><td>Temporary</td><td>Release preparation. Branches from develop, merges to main + develop.</td></tr>
+                <tr><td><code>hotfix/*</code></td><td>Temporary</td><td>Urgent production fixes. Branches from main, merges to main + develop.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="main-branches">The Two Permanent Branches</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Initialize Git Flow in a new or existing repo
+git switch -c main
+git switch -c develop
+
+# Or using the git-flow CLI tool
+git flow init
+# Accepts defaults: main=main, develop=develop,
+# feature prefix=feature/, release prefix=release/,
+# hotfix prefix=hotfix/</code></pre>
+          </div>
+
+          <p><strong>main</strong> always contains production-ready code. It should be deployable at any time. Every merge to <code>main</code> is tagged with a version number.</p>
+          <p><strong>develop</strong> is the integration branch where completed features accumulate before the next release. It's the base for all feature branches.</p>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="feature-branches">Feature Branches</h2>
+          <p>Each new feature gets its own branch. Feature branches branch from <code>develop</code> and merge back to <code>develop</code> when the feature is complete.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Start a feature (manual approach)
+git switch develop
+git pull origin develop
+git switch -c feature/user-authentication
+
+# ... develop the feature, make commits ...
+
+# Merge back to develop when complete
+git switch develop
+git merge --no-ff feature/user-authentication
+git push origin develop
+git branch -d feature/user-authentication
+
+# Using git-flow CLI
+git flow feature start user-authentication
+# ... work ...
+git flow feature finish user-authentication
+# (automatically merges to develop, deletes feature branch)</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Use --no-ff (no fast-forward) for feature merges</strong>
+              <p>The <code>--no-ff</code> flag forces Git to create a merge commit even when a fast-forward is possible. This preserves the historical evidence that a feature branch existed and groups all the feature's commits together — making it easy to revert an entire feature if needed.</p>
+            </div>
+          </div>
+
+          <h2 id="release-branches">Release Branches</h2>
+          <p>When <code>develop</code> has accumulated enough features for a release, a release branch is created. Only bug fixes, documentation, and release preparation go in here — no new features.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Create a release branch from develop
+git switch develop
+git switch -c release/1.2.0
+
+# Bump version numbers, update CHANGELOG, fix last-minute bugs
+# No new features allowed here
+
+# When release is ready: merge to BOTH main AND develop
+git switch main
+git merge --no-ff release/1.2.0
+git tag -a v1.2.0 -m "Release v1.2.0"
+
+git switch develop
+git merge --no-ff release/1.2.0
+
+git branch -d release/1.2.0
+
+# Push everything
+git push origin main develop --follow-tags</code></pre>
+          </div>
+
+          <h2 id="hotfix-branches">Hotfix Branches</h2>
+          <p>When a critical bug is found in production, a hotfix branch is created directly from <code>main</code> — you can't wait for the next planned release cycle.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Create hotfix branch directly from main
+git switch main
+git switch -c hotfix/1.1.1
+
+# Fix the bug, bump the patch version
+
+# Merge to BOTH main AND develop (or current release branch)
+git switch main
+git merge --no-ff hotfix/1.1.1
+git tag -a v1.1.1 -m "Hotfix v1.1.1 – fix critical auth bypass"
+
+git switch develop
+git merge --no-ff hotfix/1.1.1
+
+git branch -d hotfix/1.1.1
+git push origin main develop --follow-tags</code></pre>
+          </div>
+
+          <h2 id="when-to-use">When to Use (and Not Use) Git Flow</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Git Flow works well for</th><th>Git Flow is overkill for</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Apps with versioned releases (v1.0, v2.0)</td><td>Continuous deployment (deploy many times/day)</td></tr>
+                <tr><td>Supporting multiple versions simultaneously</td><td>Small teams (1–3 developers)</td></tr>
+                <tr><td>Mobile apps, desktop software, npm packages</td><td>Web apps with one production environment</td></tr>
+                <tr><td>Long release cycles (weeks/months)</td><td>Startups moving fast with frequent deploys</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Git Flow's original author now recommends against it for web projects</strong>
+              <p>Vincent Driessen added a note to his original 2010 blog post: if your team is delivering software continuously (not versioned releases), the simpler Feature Branch Workflow or trunk-based development is a better fit. Git Flow was designed for software that cannot be easily rolled back or that needs to support multiple versions simultaneously.</p>
+            </div>
+          </div>
+
+          <h2 id="deep-gitflow">Git Flow vs Trunk-Based: Which Branching Model?</h2>
+          <p>A branching model is a team's agreement on how branches map to work. <strong>Git Flow</strong> is the heavyweight classic; <strong>trunk-based</strong> is the lightweight modern default. Knowing both — and when each fits — is the real lesson.</p>
+          <table>
+            <thead><tr><th>Git Flow branch</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>main</code></td><td>production, tagged releases only</td></tr>
+              <tr><td><code>develop</code></td><td>integration of finished features</td></tr>
+              <tr><td><code>feature/*</code></td><td>one per feature, off develop</td></tr>
+              <tr><td><code>release/*</code></td><td>stabilize a version before ship</td></tr>
+              <tr><td><code>hotfix/*</code></td><td>urgent prod fix, off main</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Git Flow</strong> suits versioned/released software (desktop apps, libraries) where multiple versions live in parallel — but the many long-lived branches cause painful merges and slow integration.</p>
+          <p><strong>Trunk-based development</strong> (what most web teams and CI/CD shops use now): short-lived feature branches merge into <code>main</code> within a day or two, behind feature flags if needed. Fewer branches, tiny merges, continuous deployment. <strong>Rule of thumb:</strong> shipping continuously to one production environment → trunk-based; maintaining several released versions → Git Flow. The biggest mistake is long-lived branches either way — they're where merge pain is born.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Identify Gitflow’s branches (main, develop, feature, release, hotfix).</li>
+              <li>Branch a feature off develop.</li>
+              <li>Create a release branch.</li>
+              <li>Create a hotfix off main.</li>
+              <li>Merge a release into main and develop.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Outline the Gitflow model: the roles of <code>main</code>, <code>develop</code>, <code>feature/*</code>, <code>release/*</code>, and <code>hotfix/*</code> branches and how changes flow between them. Explain when Gitflow suits a project and why many teams now prefer simpler trunk-based or feature-branch flows.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Git Flow</strong> uses two permanent branches: <code>main</code> (production) and <code>develop</code> (integration).</li>
+              <li><strong>Feature branches</strong>: branch from <code>develop</code>, merge back to <code>develop</code> via <code>--no-ff</code>.</li>
+              <li><strong>Release branches</strong>: branch from <code>develop</code>, merge to <strong>both</strong> <code>main</code> and <code>develop</code>, then tag on <code>main</code>.</li>
+              <li><strong>Hotfix branches</strong>: branch from <code>main</code>, merge to <strong>both</strong> <code>main</code> and <code>develop</code>, then tag.</li>
+              <li>Every merge to <code>main</code> gets an annotated version tag.</li>
+              <li>Best for: projects with discrete versioned releases, multiple supported versions.</li>
+              <li>Avoid for: continuous deployment, small teams, frequently deployed web apps.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is Gitflow?</li>
+            <li>What branches does Gitflow define?</li>
+            <li>What is the difference between a release and a hotfix branch?</li>
+            <li>When is Gitflow a good fit?</li>
+            <li>Why do some teams avoid Gitflow?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/git/workflows/feature-branch-workflow.html" class="topic-tag git-topic-tag">🔀 Feature Branch Workflow</a>
+            <a href="/git/advanced/tags-releases.html" class="topic-tag git-topic-tag">⚙️ Tags &amp; Releases</a>
+            <a href="/git/branching/merging.html" class="topic-tag git-topic-tag">🔀 Merging</a>
+            <a href="/git/projects/team-workflow.html" class="topic-tag git-topic-tag">🛠️ Team Workflow Project</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Do I need the git-flow CLI tool to use Git Flow? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. The <code>git flow</code> CLI tool is a convenience wrapper that automates the branch creation, merging, and deletion steps. Everything it does can be done with standard Git commands. The tool is helpful for reducing mistakes (e.g., forgetting to merge a hotfix back to develop), but many teams use Git Flow conventions with plain Git commands and rely on PR/code review processes on GitHub/GitLab to enforce the rules.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens to the develop branch after a release? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>After a release is merged to both <code>main</code> and <code>develop</code>, development continues on the <code>develop</code> branch for the next release. The <code>develop</code> branch is never deleted — it's permanent. Immediately after a release merge, <code>develop</code> should be identical to <code>main</code>, and then it starts accumulating new feature merges for the next release cycle.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How does Git Flow handle breaking changes or backwards-incompatible features? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Breaking changes are handled through semantic versioning. When a release includes breaking changes, increment the MAJOR version (e.g., <code>v1.5.0</code> → <code>v2.0.0</code>). Teams often create a separate long-lived maintenance branch (e.g., <code>support/1.x</code>) to continue supporting the previous major version with security patches while the new major version is developed on <code>develop</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is GitHub Flow the same as Git Flow? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — they're quite different. <strong>GitHub Flow</strong> is a much simpler model: there's only one long-lived branch (<code>main</code>), and all work happens in feature branches that are merged directly to <code>main</code> via pull requests. It's designed for continuous deployment. <strong>Git Flow</strong> has the full structure with <code>develop</code>, feature, release, and hotfix branches for versioned release management. GitHub Flow is simpler and more appropriate for most web projects; Git Flow is more structured and suited for software with versioned releases.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/advanced/quiz.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+          <a href="/git/workflows/feature-branch-workflow.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Feature Branch Workflow</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

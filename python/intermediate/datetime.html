@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python datetime Module – Dates, Times, Timedeltas & Formatting | ylearner</title>
+  <meta name="description" content="Master Python datetime: creating date/time objects, formatting with strftime, parsing with strptime, timedelta arithmetic, timezones, and real-world date operations.">
+  <meta name="keywords" content="python datetime, python date, python time, python strftime, python strptime, python timedelta, python date format">
+  <link rel="canonical" href="https://ylearner.org/python/intermediate/datetime.html">
+  <meta property="og:title" content="Python datetime Module – Dates, Times, Timedeltas & Formatting">
+  <meta property="og:description" content="Master Python datetime: creating date/time objects, formatting with strftime, parsing with strptime, timedelta arithmetic, timezones, and real-world date operations.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/intermediate/datetime.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python datetime Module – Dates, Times, Timedeltas & Formatting">
+  <meta name="twitter:description" content="Master Python datetime: creating date/time objects, formatting with strftime, parsing with strptime, timedelta arithmetic, timezones, and real-world date operations.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python datetime – Working with Dates and Times","description":"Master Python datetime: creating date/time objects, formatting with strftime, parsing with strptime, timedelta arithmetic, timezones, and real-world date operations.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/intermediate/modules.html">Intermediate</a><span class="separator">›</span><span class="current">Date & Time</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Intermediate</div>
+          <h1>Python datetime – Working with Dates and Times</h1>
+          <p class="lesson-intro">Python's <code>datetime</code> module provides classes for manipulating dates and times. It is essential for applications involving scheduling, logging, age calculation, deadline tracking, or any time-based logic.</p>
+          <div class="lesson-meta"><span>⏱️ 22 min read</span><span>🎯 Intermediate</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="basics">Basic datetime Objects</h2>
+          <p>The <code>datetime</code> module provides: <code>date</code> (year/month/day), <code>time</code> (hour/min/sec), <code>datetime</code> (both combined), and <code>timedelta</code> (duration).</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from datetime import date, time, datetime, timedelta
+
+# Current date and time
+today = date.today()
+now = datetime.now()
+
+print(today)          # 2024-06-03
+print(now)            # 2024-06-03 14:30:15.123456
+print(now.year)       # 2024
+print(now.month)      # 6
+print(now.day)        # 3
+print(now.hour)       # 14</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>2024-06-03
+2024-06-03 14:30:15.123456
+2024
+6
+3
+14</div>
+
+          <h2 id="create">Creating Specific Dates and Times</h2>
+          <p>Create datetime objects for specific points in time.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from datetime import datetime, date
+
+# Specific date
+birthday = date(1990, 7, 15)
+print(birthday)  # 1990-07-15
+
+# Specific datetime
+event = datetime(2024, 12, 25, 18, 30, 0)
+print(event)     # 2024-12-25 18:30:00
+
+# From ISO string
+d = datetime.fromisoformat("2024-06-15T09:00:00")
+print(d)</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>1990-07-15
+2024-12-25 18:30:00
+2024-06-15 09:00:00</div>
+
+          <h2 id="format">Formatting Dates – strftime()</h2>
+          <p>Convert datetime to a string with custom format using <code>strftime()</code>.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from datetime import datetime
+
+now = datetime.now()
+
+print(now.strftime("%Y-%m-%d"))            # 2024-06-03
+print(now.strftime("%d/%m/%Y"))            # 03/06/2024
+print(now.strftime("%B %d, %Y"))           # June 03, 2024
+print(now.strftime("%I:%M %p"))            # 02:30 PM
+print(now.strftime("%A, %B %d, %Y"))       # Monday, June 03, 2024</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>2024-06-03
+03/06/2024
+June 03, 2024
+02:30 PM
+Monday, June 03, 2024</div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="parse">Parsing Date Strings – strptime()</h2>
+          <p>Convert a string into a datetime object.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from datetime import datetime
+
+# Parse date from string
+date_str = "25 December 2024"
+dt = datetime.strptime(date_str, "%d %B %Y")
+print(dt)           # 2024-12-25 00:00:00
+
+# Another format
+dt2 = datetime.strptime("2024-06-15 14:30", "%Y-%m-%d %H:%M")
+print(dt2)</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>2024-12-25 00:00:00
+2024-06-15 14:30:00</div>
+
+          <h2 id="timedelta">Date Arithmetic with timedelta</h2>
+          <p><code>timedelta</code> represents a duration. Add or subtract it from dates.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from datetime import datetime, timedelta
+
+now = datetime.now()
+
+# Add/subtract time
+tomorrow = now + timedelta(days=1)
+last_week = now - timedelta(weeks=1)
+in_90_days = now + timedelta(days=90)
+
+print(f"Tomorrow: {tomorrow.date()}")
+print(f"Last week: {last_week.date()}")
+print(f"In 90 days: {in_90_days.date()}")
+
+# Difference between dates
+birthday = datetime(1990, 7, 15)
+age_days = (now - birthday).days
+print(f"Days alive: {age_days}")</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Tomorrow: 2024-06-04
+Last week: 2024-05-27
+In 90 days: 2024-09-01
+Days alive: 12376</div>
+
+          <h2 id="deep-datetime">datetime: Naive vs Aware, and Why It Bites</h2>
+          <p>The single biggest datetime bug: mixing <strong>naive</strong> datetimes (no timezone) with <strong>aware</strong> ones (timezone attached). Compare or subtract one of each and Python raises <code>TypeError</code>. Worse, a naive time silently assumes "local," which breaks across servers and DST.</p>
+          <pre><code class="language-python">from datetime import datetime, timezone, timedelta
+
+naive = datetime.now()                       # ⚠️ no tz — ambiguous
+aware = datetime.now(timezone.utc)           # ✅ explicit UTC
+
+# arithmetic with timedelta
+deadline = aware + timedelta(days=7, hours=12)
+delta = deadline - aware                      # a timedelta</code></pre>
+          <table>
+            <thead><tr><th>Method</th><th>Does</th></tr></thead>
+            <tbody>
+              <tr><td><code>strftime(fmt)</code></td><td>datetime → string (format it)</td></tr>
+              <tr><td><code>strptime(s, fmt)</code></td><td>string → datetime (parse it)</td></tr>
+              <tr><td><code>.isoformat()</code></td><td>standard <code>2026-07-02T10:00:00+00:00</code></td></tr>
+            </tbody>
+          </table>
+          <p><strong>Best practice:</strong> store and compute in <strong>UTC</strong> (aware), convert to local time only for display. Use <code>datetime.now(timezone.utc)</code>, never bare <code>utcnow()</code> (which returns a naive value — a classic footgun). Remember the strf/strp direction: <code>strftime</code> = <em>format</em> (out), <code>strptime</code> = <em>parse</em> (in).</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Work with dates and times:</p>
+            <ol>
+              <li>Get the current date and time with <code>datetime.now()</code> and print individual parts (year, month, day).</li>
+              <li>Create a specific date and format it with <code>strftime("%Y-%m-%d")</code>.</li>
+              <li>Parse the string <code>"2025-01-15"</code> back into a datetime with <code>strptime</code>.</li>
+              <li>Add 30 days to today using <code>timedelta</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a small “days until” tool: given a future date string, parse it, compute how many days remain from today using <code>timedelta</code>, and print a friendly countdown. Then compute someone’s exact age in years from their birth date. Bonus: handle timezone-aware datetimes with <code>datetime.now(timezone.utc)</code> and explain naive vs aware datetimes.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>The <code>datetime</code> module provides <code>date</code>, <code>time</code>, <code>datetime</code>, and <code>timedelta</code> classes.</li>
+              <li><code>datetime.now()</code> returns the current date and time.</li>
+              <li><code>strftime()</code> formats a datetime into a string; <code>strptime()</code> parses a string into a datetime.</li>
+              <li><code>timedelta</code> represents a duration and enables date arithmetic.</li>
+              <li>A naive datetime has no timezone; an aware datetime includes one.</li>
+              <li>Use the <code>timezone</code> class (or <code>zoneinfo</code>) for timezone-aware values.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Date and Time</h2>
+          <ul class="interview-list">
+            <li>What modules does Python provide for working with dates and times?</li>
+            <li>What is the difference between <code>strftime</code> and <code>strptime</code>?</li>
+            <li>What is a <code>timedelta</code> and what is it used for?</li>
+            <li>What is the difference between a naive and an aware datetime?</li>
+            <li>How do you get the current date and time?</li>
+            <li>How do you format a datetime into a custom string?</li>
+            <li>How do you handle time zones in Python?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/intermediate/file-handling.html" class="topic-tag">📁 File Handling</a>
+            <a href="/python/beginner/strings.html" class="topic-tag">📝 Strings</a>
+            <a href="/python/intermediate/csv.html" class="topic-tag">📊 CSV Files</a>
+            <a href="/python/real-world/logging.html" class="topic-tag">📝 Logging</a>
+            <a href="/python/beginner/numbers.html" class="topic-tag">🔢 Numbers</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>strftime</code> and <code>strptime</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>strftime</code> (“string from time”) formats a datetime object into a string. <code>strptime</code> (“string parse time”) does the reverse — it parses a string into a datetime using a format pattern.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between naive and aware datetimes? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A naive datetime carries no timezone information, so it is ambiguous about which part of the world it refers to. An aware datetime includes a timezone (tzinfo), making it unambiguous. Use aware datetimes for anything spanning time zones.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I add or subtract time from a date? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>timedelta</code>: <code>tomorrow = datetime.now() + timedelta(days=1)</code>. Subtracting two datetimes also yields a <code>timedelta</code> you can inspect with <code>.days</code> and <code>.seconds</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Which timezone library should I use? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Since Python 3.9, the standard-library <code>zoneinfo</code> module provides IANA time zones (e.g. <code>ZoneInfo("America/New_York")</code>). Before that, the third-party <code>pytz</code> package was common.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/intermediate/packages.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Packages</span></a>
+          <a href="/python/intermediate/json.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">JSON</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

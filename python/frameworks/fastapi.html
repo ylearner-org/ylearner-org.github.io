@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FastAPI Tutorial – Build REST APIs with Python & Pydantic | ylearner | ylearner</title>
+  <meta name="description" content="Learn FastAPI: installation, path operations, Pydantic models, request validation, dependency injection, automatic OpenAPI docs, and deploying a FastAPI application.">
+  <meta name="keywords" content="fastapi tutorial, fastapi python, python REST API, fastapi getting started, fastapi pydantic, python API framework">
+  <link rel="canonical" href="https://ylearner.org/python/frameworks/fastapi.html">
+  <meta property="og:title" content="FastAPI Tutorial – Build REST APIs with Python & Pydantic | ylearner">
+  <meta property="og:description" content="Learn FastAPI: installation, path operations, Pydantic models, request validation, dependency injection, automatic OpenAPI docs, and deploying a FastAPI application.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/frameworks/fastapi.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="FastAPI Tutorial – Build REST APIs with Python & Pydantic | ylearner">
+  <meta name="twitter:description" content="Learn FastAPI: installation, path operations, Pydantic models, request validation, dependency injection, automatic OpenAPI docs, and deploying a FastAPI application.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"FastAPI Tutorial – Modern Python REST API Framework","description":"Learn FastAPI: installation, path operations, Pydantic models, request validation, dependency injection, automatic OpenAPI docs, and deploying a FastAPI application.","educationalLevel":"Advanced","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/frameworks/flask.html">Frameworks</a><span class="separator">›</span><span class="current">FastAPI</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚡ Frameworks</div>
+          <h1>FastAPI Tutorial – Modern Python REST API Framework</h1>
+          <p class="lesson-intro">FastAPI is the fastest growing Python web framework — high performance (comparable to Node.js and Go), automatic data validation with Pydantic, auto-generated OpenAPI (Swagger) documentation, and async support built-in. It is the top choice for building modern REST APIs in Python.</p>
+          <div class="lesson-meta"><span>⏱️ 30 min read</span><span>🎯 Advanced</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="setup">Installation and First App</h2>
+          <p>Install FastAPI and uvicorn (ASGI server) and run your first API in minutes.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python"># pip install fastapi uvicorn
+
+# main.py
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def root():
+    return {"message": "Hello from FastAPI!"}
+
+@app.get("/items/{item_id}")
+def get_item(item_id: int, q: str | None = None):
+    return {"item_id": item_id, "query": q}
+
+# Run:
+# uvicorn main:app --reload
+# Visit: http://127.0.0.1:8000/docs  ← Auto Swagger UI!</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>{"message": "Hello from FastAPI!"}
+{"item_id": 42, "query": null}</div>
+
+          <h2 id="pydantic">Pydantic Models – Request/Response Validation</h2>
+          <p>Use Pydantic models to define and validate request bodies automatically.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from fastapi import FastAPI
+from pydantic import BaseModel, EmailStr
+from typing import Optional
+
+app = FastAPI()
+
+class User(BaseModel):
+    name: str
+    email: str
+    age: int
+    bio: Optional[str] = None
+
+@app.post("/users/", response_model=User)
+def create_user(user: User):
+    # user is already validated and typed
+    return user
+
+# FastAPI auto-validates: wrong type = 422 error
+# POST /users/ with {"name":"Alice","email":"a@b.com","age":30}</code></pre></div>
+          <div class="output-block"><div class="output-label">▶ Output</div>{"name":"Alice","email":"a@b.com","age":30,"bio":null}</div>
+
+          <h2 id="dependencies">Dependency Injection</h2>
+          <p>FastAPI's dependency injection system handles auth, DB connections, and shared logic.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from fastapi import FastAPI, Depends, HTTPException
+from fastapi.security import HTTPBearer
+
+app = FastAPI()
+security = HTTPBearer()
+
+def get_current_user(token = Depends(security)):
+    if token.credentials != "secret-token":
+        raise HTTPException(status_code=401, detail="Invalid")
+    return {"user": "alice"}
+
+@app.get("/protected")
+def protected_route(user = Depends(get_current_user)):
+    return {"message": f"Welcome {user['user']}"}</code></pre></div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="async">Async Support</h2>
+          <p>FastAPI supports both sync and async endpoints natively.</p>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import asyncio
+from fastapi import FastAPI
+import httpx
+
+app = FastAPI()
+
+@app.get("/async-data")
+async def get_data():
+    async with httpx.AsyncClient() as client:
+        response = await client.get("https://api.github.com")
+    return response.json()</code></pre></div>
+          <div class="callout callout-tip"><span class="callout-icon">💡</span><div class="callout-content"><strong>Tip</strong><p>Use async functions for I/O-bound operations (database queries, HTTP calls). FastAPI handles the event loop automatically.</p></div></div>
+
+          <h2 id="deep-fastapi">FastAPI: Modern APIs With Automatic Validation and Docs</h2>
+          <p>FastAPI is a modern framework built for APIs. Its standout trick: it uses Python <strong>type hints</strong> to automatically validate requests, serialize responses, <em>and</em> generate interactive API documentation — features you'd hand-code elsewhere.</p>
+          <pre><code class="language-python">from fastapi import FastAPI
+from pydantic import BaseModel
+app = FastAPI()
+
+class Item(BaseModel):          # the type hints ARE the validation
+    name: str
+    price: float
+
+@app.post("/items")
+async def create(item: Item):   # FastAPI validates the JSON against Item
+    return {"total": item.price * 1.1}</code></pre>
+          <table>
+            <thead><tr><th>From type hints, you get</th></tr></thead>
+            <tbody>
+              <tr><td>request validation (bad JSON → automatic 422 error)</td></tr>
+              <tr><td>response serialization</td></tr>
+              <tr><td>interactive docs at <code>/docs</code> (Swagger UI)</td></tr>
+              <tr><td>editor autocomplete on request data</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Why it took off:</strong> declare a <code>pydantic</code> model with typed fields, and FastAPI enforces it — send malformed data and the client gets a clear 422 error, no manual checking. Those same models generate <strong>live, browsable API docs</strong> automatically, so your documentation can never drift from the code. <strong>Async-native:</strong> built on ASGI, it handles <code>async def</code> endpoints for high-concurrency I/O (many simultaneous requests) out of the box. Choose FastAPI for new JSON APIs and microservices where validation, docs, and performance matter; it pairs the speed of Node-style async with Python's ecosystem.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a FastAPI service:</p>
+            <ol>
+              <li>Create an app and a <code>GET /</code> route returning a JSON message.</li>
+              <li>Add a path parameter route like <code>GET /items/{item_id}</code> with a type hint.</li>
+              <li>Define a Pydantic model and accept it in a <code>POST</code> route.</li>
+              <li>Run with <code>uvicorn</code> and open the auto-generated docs at <code>/docs</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a small CRUD API for “tasks” using FastAPI and an in-memory list: routes to create (with a Pydantic model for validation), list, retrieve by id, and delete tasks. Return proper status codes and raise <code>HTTPException</code> for missing ids. Add a dependency that simulates an API-key check on protected routes. Bonus: make one route <code>async</code> and explain when async helps here.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>FastAPI is a modern, high-performance Python web framework for building APIs.</li>
+              <li>It uses standard type hints to validate, serialize, and document requests and responses.</li>
+              <li>Pydantic models define request/response schemas and validate data automatically.</li>
+              <li>Dependency injection cleanly shares logic like auth and database sessions across routes.</li>
+              <li>Interactive Swagger/ReDoc docs are generated automatically from your code.</li>
+              <li>It supports async natively, making it well suited to high-concurrency I/O workloads.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on FastAPI</h2>
+          <ul class="interview-list">
+            <li>What is FastAPI and what is it known for?</li>
+            <li>How does FastAPI use Python type hints?</li>
+            <li>What is Pydantic and how does FastAPI use it?</li>
+            <li>What is dependency injection in FastAPI?</li>
+            <li>How does FastAPI generate interactive API documentation automatically?</li>
+            <li>When should a route be <code>async</code> in FastAPI?</li>
+            <li>How does FastAPI compare to Flask and Django REST Framework?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/frameworks/flask.html" class="topic-tag">🍷 Flask</a>
+            <a href="/python/frameworks/django.html" class="topic-tag">🎯 Django</a>
+            <a href="/python/advanced/async.html" class="topic-tag">⚡ Async</a>
+            <a href="/python/real-world/rest-api.html" class="topic-tag">🔗 REST APIs</a>
+            <a href="/python/advanced/type-hinting.html" class="topic-tag">🏷️ Type Hinting</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why is FastAPI considered fast? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It is built on Starlette and the ASGI standard with full async support, so it handles many concurrent I/O-bound requests efficiently. Combined with Pydantic’s compiled validation, its performance rivals Node.js and Go for typical API workloads.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What role does Pydantic play? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Pydantic models declare the expected shape of request and response data using type hints. FastAPI uses them to validate incoming JSON, convert types, produce clear errors, and document the schema automatically.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is dependency injection in FastAPI? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It is a system for declaring reusable pieces of logic (database sessions, authentication, settings) as functions that FastAPI supplies to your routes automatically via <code>Depends()</code>, keeping routes clean and testable.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When should I make a route <code>async</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>async def</code> when the route awaits I/O — async database drivers, external HTTP calls — so the server can handle other requests during the wait. For purely CPU-bound or simple synchronous work, a normal <code>def</code> route is fine.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/frameworks/django.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Django</span></a>
+          <a href="/python/frameworks/quiz.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">📝 Section Quiz</span></a>
+        </nav>
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

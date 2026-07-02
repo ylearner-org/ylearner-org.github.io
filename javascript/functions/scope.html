@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Scope – Global, Local, Block &amp; Lexical Scope | ylearner</title>
+  <meta name="description" content="Understand JavaScript scope: global scope, function scope, block scope with let/const, scope chain, variable shadowing, lexical scope, and how to avoid global pollution.">
+  <meta name="keywords" content="javascript scope, global scope, function scope, block scope, lexical scope, scope chain, variable shadowing, var let const scope, IIFE scope isolation">
+  <link rel="canonical" href="https://ylearner.org/javascript/functions/scope.html">
+  <meta property="og:title" content="JavaScript Scope – Global, Local, Block &amp; Lexical Scope | ylearner">
+  <meta property="og:description" content="Understand JavaScript scope: global scope, function scope, block scope with let/const, scope chain, variable shadowing, lexical scope, and how to avoid global pollution.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/functions/scope.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Scope – Global, Local, Block &amp; Lexical Scope | ylearner">
+  <meta name="twitter:description" content="Understand JavaScript scope: global scope, function scope, block scope with let/const, scope chain, variable shadowing, lexical scope, and how to avoid global pollution.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/functions/function-basics.html">Functions</a><span class="separator">›</span>
+          <span class="current">Scope</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Functions</div>
+          <h1>JavaScript Scope – Global, Function, Block, and Lexical Scope</h1>
+          <p class="lesson-intro">Scope determines where a variable is visible and accessible in your code. Understanding scope is essential for writing bug-free JavaScript — it explains why some variables are accessible and others throw ReferenceErrors, and why the same variable name can mean different things in different places.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="global-scope">Global Scope</h2>
+          <p>Variables declared outside any function or block live in the <strong>global scope</strong>. In a browser, globals are properties of the <code>window</code> object.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Global variable — accessible anywhere in the file
+const appName = "ylearner";
+let userCount = 0;
+
+function incrementUsers() {
+  userCount++; // Accesses and modifies global variable
+}
+
+incrementUsers();
+incrementUsers();
+console.log(userCount); // 2
+console.log(appName);   // ylearner</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>2
+ylearner</div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Avoid Global Scope Pollution</strong>
+              <p>Every global variable can be accidentally overwritten by any other script or library. Keep globals minimal. In modules (<code>type="module"</code>), variables are module-scoped by default, not global.</p>
+            </div>
+          </div>
+
+          <h2 id="function-scope">Function (Local) Scope</h2>
+          <p>Variables declared inside a function are scoped to that function — invisible outside it.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function calculateTax(price) {
+  const taxRate = 0.15; // Local — only visible inside calculateTax
+  const tax = price * taxRate;
+  return tax;
+}
+
+console.log(calculateTax(100)); // 15
+
+try {
+  console.log(taxRate); // ReferenceError!
+} catch (e) {
+  console.log("Error: taxRate is not accessible outside the function.");
+}
+
+// Each function call gets its own scope
+function counter() {
+  let count = 0; // Fresh for each call
+  count++;
+  return count;
+}
+console.log(counter()); // 1
+console.log(counter()); // 1 — fresh count each time</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>15
+Error: taxRate is not accessible outside the function.
+1
+1</div>
+
+          <h2 id="block-scope">Block Scope (let and const)</h2>
+          <p><code>let</code> and <code>const</code> are <strong>block-scoped</strong> — they live only inside the <code>{}</code> block where they are declared.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Block scope with if statement
+if (true) {
+  let blockVar = "I'm in the if block";
+  const blockConst = "Me too";
+  console.log(blockVar);   // Works
+}
+// blockVar is gone here
+try {
+  console.log(blockVar);
+} catch (e) {
+  console.log("blockVar not accessible outside block");
+}
+
+// Block scope with for loops
+for (let i = 0; i < 3; i++) {
+  const msg = `iteration ${i}`;
+  console.log(msg);
+}
+// i and msg are not accessible here</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>I'm in the if block
+blockVar not accessible outside block
+iteration 0
+iteration 1
+iteration 2</div>
+
+          <h2 id="var-function-scope-gotcha">var and Function Scope Gotcha</h2>
+          <p><code>var</code> ignores block scope — it is function-scoped. This leads to surprising behavior with loops and conditionals.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// var leaks out of blocks
+if (true) {
+  var leaked = "I escaped the if block!";
+}
+console.log(leaked); // "I escaped the if block!"
+
+// var in a for loop leaks into the function scope
+for (var j = 0; j < 3; j++) { /* ... */ }
+console.log(j); // 3 — j is still accessible!
+
+// let is properly block-scoped
+for (let k = 0; k < 3; k++) { /* ... */ }
+try {
+  console.log(k); // ReferenceError
+} catch (e) {
+  console.log("k not accessible outside loop");
+}</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>I escaped the if block!
+3
+k not accessible outside loop</div>
+
+          <h2 id="scope-chain">Scope Chain</h2>
+          <p>When JavaScript looks up a variable, it starts in the current scope and moves outward through parent scopes until it finds the variable or reaches the global scope.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const globalVar = "global";
+
+function outer() {
+  const outerVar = "outer";
+
+  function inner() {
+    const innerVar = "inner";
+
+    // Inner can access all parent scopes
+    console.log(innerVar);  // "inner"   — own scope
+    console.log(outerVar);  // "outer"   — parent scope
+    console.log(globalVar); // "global"  — global scope
+  }
+
+  inner();
+
+  // Outer cannot access inner's scope
+  try {
+    console.log(innerVar);
+  } catch (e) {
+    console.log("innerVar not accessible in outer");
+  }
+}
+
+outer();</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>inner
+outer
+global
+innerVar not accessible in outer</div>
+
+          <h2 id="lexical-scope">Lexical Scope</h2>
+          <p><strong>Lexical scope</strong> means that scope is determined by where a function is <em>written</em> in the source code, not where it is called from. JavaScript is lexically scoped.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const lang = "JavaScript";
+
+function getLanguage() {
+  return lang; // Reads 'lang' from where getLanguage is defined (global)
+}
+
+function demo() {
+  const lang = "Python"; // Local shadowing variable
+  console.log(getLanguage()); // "JavaScript" — NOT "Python"!
+  // getLanguage sees the scope where it was defined, not where it's called
+}
+
+demo();</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>JavaScript</div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Lexical vs Dynamic Scope</strong>
+              <p>Some older languages use dynamic scope — a function sees the variables of its <em>caller</em>. JavaScript (like most modern languages) uses lexical scope — a function sees the variables of its <em>definition site</em>. This is why closures work.</p>
+            </div>
+          </div>
+
+          <h2 id="variable-shadowing">Variable Shadowing</h2>
+          <p>A variable in an inner scope with the same name as an outer one <strong>shadows</strong> the outer variable within that scope.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const x = 10; // Outer x
+
+function example() {
+  const x = 20; // Shadows outer x inside this function
+  console.log(x); // 20 — inner x
+}
+
+example();
+console.log(x); // 10 — outer x unchanged
+
+// Block-level shadowing
+let count = 0;
+if (true) {
+  let count = 100; // Shadows outer count in this block
+  console.log(count); // 100
+}
+console.log(count); // 0 — outer count unchanged</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>20
+10
+100
+0</div>
+
+          <h2 id="scope-in-loops">Scope in Loops – The Classic var Bug</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Bug: var creates one shared variable for all iterations
+const funcsVar = [];
+for (var i = 0; i < 3; i++) {
+  funcsVar.push(() => i);
+}
+console.log(funcsVar[0]()); // 3 — not 0!
+console.log(funcsVar[1]()); // 3
+console.log(funcsVar[2]()); // 3
+
+// Fix: let creates a new binding per iteration
+const funcsLet = [];
+for (let j = 0; j < 3; j++) {
+  funcsLet.push(() => j);
+}
+console.log(funcsLet[0]()); // 0
+console.log(funcsLet[1]()); // 1
+console.log(funcsLet[2]()); // 2</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>3
+3
+3
+0
+1
+2</div>
+
+          <h2 id="iife-scope-isolation">IIFE for Scope Isolation</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Before ES modules, IIFEs isolated library code
+const MyLibrary = (function() {
+  // Private variables — not accessible outside
+  let privateCounter = 0;
+  const privateConfig = { version: "1.0" };
+
+  function increment() {
+    privateCounter++;
+  }
+
+  // Public API
+  return {
+    getCount: () => privateCounter,
+    bump: () => { increment(); return MyLibrary; },
+    version: privateConfig.version
+  };
+})();
+
+MyLibrary.bump().bump().bump();
+console.log(MyLibrary.getCount()); // 3
+console.log(MyLibrary.version);    // 1.0</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>3
+1.0</div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="deep-jsscope">Scope, Hoisting, and Closures</h2>
+          <p>Scope decides where a variable is visible. The key modern shift: <code>var</code> is <strong>function-scoped</strong>, while <code>let</code>/<code>const</code> are <strong>block-scoped</strong> (limited to the nearest <code>{ }</code>). This one difference fixes a whole category of loop bugs.</p>
+          <pre><code class="language-javascript">// var leaks out of the block
+for (var i = 0; i < 3; i++) {}
+console.log(i);   // 3 — var escaped the loop
+
+// let stays inside
+for (let j = 0; j < 3; j++) {}
+console.log(j);   // ReferenceError — block-scoped</code></pre>
+          <h3>Closures: functions remember their birthplace</h3>
+          <p>A closure is a function that keeps access to variables from the scope where it was <em>defined</em>, even after that scope has returned:</p>
+          <pre><code class="language-javascript">function counter() {
+  let count = 0;                 // "private" — survives via closure
+  return () => ++count;
+}
+const c = counter();
+c(); c();   // 1, 2 — count persists between calls</code></pre>
+          <p><strong>Hoisting:</strong> <code>var</code> and function declarations are moved to the top of their scope (var initialized to <code>undefined</code>); <code>let</code>/<code>const</code> are hoisted but stay in the "temporal dead zone" until declared, so using them early throws. The classic loop-closure bug (all callbacks logging the final <code>i</code>) simply disappears when you use <code>let</code>.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Without running the code, predict the output of each <code>console.log</code> and explain why:</p>
+            <div class="code-block">
+              <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+              <pre><code class="language-javascript">var a = 1;
+let b = 2;
+
+function test() {
+  var a = 10;
+  if (true) {
+    var a = 20;  // var — function scoped
+    let b = 30;  // let — block scoped
+    console.log(a); // A
+    console.log(b); // B
+  }
+  console.log(a); // C
+  console.log(b); // D
+}
+test();
+console.log(a); // E
+console.log(b); // F</code></pre>
+            </div>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a <code>createNamespace(name)</code> function using an IIFE that returns an object with <code>set(key, value)</code>, <code>get(key)</code>, and <code>list()</code> methods. The internal storage must be private (not accessible from outside). Create two separate namespaces and show they don't interfere with each other.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Global scope: accessible everywhere — minimize globals to avoid collisions.</li>
+              <li>Function scope: <code>var</code> and function parameters — only visible inside the function.</li>
+              <li>Block scope: <code>let</code>/<code>const</code> — restricted to the <code>{}</code> block they're declared in.</li>
+              <li>Scope chain: inner scopes can read outer variables; outer cannot read inner.</li>
+              <li>Lexical scope: where a function is defined — not called — determines its variable access.</li>
+              <li>Variable shadowing: same name in inner scope hides the outer one.</li>
+              <li>Always prefer <code>let</code>/<code>const</code> over <code>var</code> to avoid scope leaks.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between function scope and block scope?</li>
+            <li>Why does <code>var</code> cause problems in for loops with closures? How does <code>let</code> fix it?</li>
+            <li>Explain the scope chain with an example of nested functions.</li>
+            <li>What is lexical scope? How does it differ from dynamic scope?</li>
+            <li>What is variable shadowing and when can it cause bugs?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/javascript/functions/closures.html" class="topic-tag">Closures</a>
+            <a href="/javascript/functions/arrow-functions.html" class="topic-tag">Arrow Functions</a>
+            <a href="/javascript/functions/function-basics.html" class="topic-tag">Function Basics</a>
+            <a href="/javascript/beginner/variables.html" class="topic-tag">Variables</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the Temporal Dead Zone (TDZ)?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The TDZ is the period from when a <code>let</code> or <code>const</code> binding is created (hoisted) to when it is initialized. Accessing the variable during TDZ throws a <code>ReferenceError</code>. This is why <code>let</code>/<code>const</code> can't be used before their declaration line, unlike <code>var</code> (which initializes to <code>undefined</code>).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is module scope?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>JavaScript modules (<code>&lt;script type="module"&gt;</code> or ESM files) have their own scope. Variables declared at the top of a module are module-scoped — they don't become global even without <code>let</code>/<code>const</code>/<code>var</code>. This eliminates the global pollution problem.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can two functions have variables with the same name?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, completely fine. Each function has its own scope. <code>function a() { const x = 1; }</code> and <code>function b() { const x = 2; }</code> have independent <code>x</code> variables that never conflict.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/functions/arrow-functions.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Arrow Functions</span></a>
+          <a href="/javascript/functions/closures.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Closures</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

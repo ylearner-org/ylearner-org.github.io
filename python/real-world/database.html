@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Database – SQLite, PostgreSQL & SQLAlchemy Tutorial | ylearner</title>
+  <meta name="description" content="Python database programming: SQLite with sqlite3, PostgreSQL with psycopg2, and ORM with SQLAlchemy. CRUD operations and best practices.">
+  <meta name="keywords" content="python database, python sqlite, python postgresql, python sqlalchemy, python orm, python sql tutorial">
+  <link rel="canonical" href="https://ylearner.org/python/real-world/database.html">
+  <meta property="og:title" content="Python Database – SQLite, PostgreSQL & SQLAlchemy Tutorial | ylearner">
+  <meta property="og:description" content="Python database programming: SQLite with sqlite3, PostgreSQL with psycopg2, and ORM with SQLAlchemy. CRUD operations and best practices.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/real-world/database.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Database – SQLite, PostgreSQL & SQLAlchemy Tutorial | ylearner">
+  <meta name="twitter:description" content="Python database programming: SQLite with sqlite3, PostgreSQL with psycopg2, and ORM with SQLAlchemy. CRUD operations and best practices.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Database Programming","description":"Python database with SQLite, SQLAlchemy ORM, and PostgreSQL for CRUD operations.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/real-world/api-development.html">Real-World Python</a><span class="separator">›</span><span class="current">Database</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🗄️ Real-World</div>
+          <h1>Python Database Programming – SQLite & SQLAlchemy</h1>
+          <p class="lesson-intro">Python works with virtually every database. The built-in <code>sqlite3</code> module requires zero setup; SQLAlchemy provides an ORM for larger projects.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Real-World</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="sqlite">SQLite – Zero Setup</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import sqlite3
+
+conn = sqlite3.connect("myapp.db")
+conn.row_factory = sqlite3.Row
+cursor = conn.cursor()
+
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL
+    )
+''')
+
+cursor.execute("INSERT INTO users (name, email) VALUES (?, ?)", ("Alice", "alice@example.com"))
+conn.commit()
+
+cursor.execute("SELECT * FROM users WHERE name = ?", ("Alice",))
+user = cursor.fetchone()
+print(dict(user))
+conn.close()</code></pre></div>
+          <h2 id="context">Context Manager Pattern</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from contextlib import contextmanager
+
+@contextmanager
+def get_db(path="myapp.db"):
+    conn = sqlite3.connect(path)
+    conn.row_factory = sqlite3.Row
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+with get_db() as db:
+    db.execute("INSERT INTO users (name, email) VALUES (?, ?)", ("Bob", "bob@example.com"))
+    users = db.execute("SELECT * FROM users").fetchall()</code></pre></div>
+          <h2 id="sqlalchemy">SQLAlchemy ORM</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import DeclarativeBase, Session
+
+engine = create_engine("sqlite:///myapp.db")
+
+class Base(DeclarativeBase):
+    pass
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+
+Base.metadata.create_all(engine)
+
+with Session(engine) as session:
+    user = User(name="Charlie", email="charlie@example.com")
+    session.add(user)
+    session.commit()
+    all_users = session.query(User).all()
+    charlie = session.query(User).filter_by(name="Charlie").first()
+    charlie.email = "new@example.com"
+    session.commit()</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> Use sqlite3 for small apps. Switch to SQLAlchemy + PostgreSQL for concurrent writes or production scale.</div>
+          <h2 id="deep-database">Databases From Python: Parameterize or Get Hacked</h2>
+          <p>Python talks to databases through a standard API (DB-API 2.0), so <code>sqlite3</code>, <code>psycopg</code> (Postgres), and others share the same connect/cursor/execute pattern. The single most important rule lives here: <strong>never build SQL with string formatting.</strong></p>
+          <pre><code class="language-python">import sqlite3
+conn = sqlite3.connect("app.db")
+cur = conn.cursor()
+
+# ❌ SQL INJECTION — a malicious name can drop your tables
+cur.execute(f"SELECT * FROM users WHERE name = '{name}'")
+
+# ✅ parameterized — the driver safely escapes the value
+cur.execute("SELECT * FROM users WHERE name = ?", (name,))
+rows = cur.fetchall()
+conn.commit()          # writes aren't saved until you commit
+conn.close()</code></pre>
+          <table>
+            <thead><tr><th>Step</th><th>Call</th></tr></thead>
+            <tbody>
+              <tr><td>connect</td><td><code>connect(...)</code></td></tr>
+              <tr><td>run query</td><td><code>cursor.execute(sql, params)</code></td></tr>
+              <tr><td>read</td><td><code>fetchone()</code> / <code>fetchall()</code></td></tr>
+              <tr><td>save writes</td><td><code>commit()</code></td></tr>
+            </tbody>
+          </table>
+          <p><strong>SQL injection — the classic vulnerability:</strong> if you interpolate user input into a query string, an attacker can inject SQL (e.g. <code>' OR '1'='1</code>) to read or destroy data. <em>Always</em> pass values as parameters (the <code>?</code> or <code>%s</code> placeholders) and let the driver escape them. <strong>Other essentials:</strong> writes need an explicit <code>commit()</code> (or wrap in a transaction and roll back on error); close connections (or use a <code>with</code> block / connection pool). For larger apps, an ORM like <strong>SQLAlchemy</strong> gives you Python objects instead of raw SQL — and parameterizes automatically.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Work with a database:</p>
+            <ol>
+              <li>Use the built-in <code>sqlite3</code> module to create a table and insert a few rows.</li>
+              <li>Query the rows back with a parameterized <code>SELECT</code>.</li>
+              <li>Wrap the connection in a context manager so it commits/closes properly.</li>
+              <li>Define the same table as a SQLAlchemy ORM model and add a record through it.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a small contacts database with SQLite: create the schema, then implement create, read, update, and delete operations using parameterized queries to prevent SQL injection. Use a context manager for connection handling and add basic error handling for constraint violations. Bonus: re-implement the same CRUD with the SQLAlchemy ORM and compare the developer experience.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>SQLite is a zero-setup, file-based database built into Python via the <code>sqlite3</code> module.</li>
+              <li>Always use parameterized queries (<code>?</code> placeholders) — never string formatting — to prevent SQL injection.</li>
+              <li>A transaction groups operations; <code>commit</code> saves them, <code>rollback</code> undoes them.</li>
+              <li>Context managers ensure connections are committed and closed even on errors.</li>
+              <li>An ORM like SQLAlchemy maps tables to Python classes, trading some control for productivity.</li>
+              <li>Server databases (PostgreSQL, MySQL) suit concurrent, large-scale applications.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Databases</h2>
+          <ul class="interview-list">
+            <li>What is the difference between SQLite and a server database like PostgreSQL?</li>
+            <li>Why must you use parameterized queries instead of string formatting?</li>
+            <li>What is SQL injection and how do you prevent it?</li>
+            <li>What is an ORM and what are its trade-offs?</li>
+            <li>What is the difference between <code>commit</code> and <code>rollback</code>?</li>
+            <li>Why is connection handling a good fit for context managers?</li>
+            <li>What is a database transaction?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/real-world/api-development.html" class="topic-tag">🌐 API Development</a>
+            <a href="/python/advanced/context-managers.html" class="topic-tag">🔁 Context Managers</a>
+            <a href="/python/frameworks/django.html" class="topic-tag">🎯 Django</a>
+            <a href="/python/oop/classes.html" class="topic-tag">🏛️ Classes</a>
+            <a href="/python/intermediate/exception-handling.html" class="topic-tag">⚠️ Exception Handling</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why must I use parameterized queries? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Building SQL by concatenating user input lets attackers inject malicious SQL (SQL injection). Parameterized queries send values separately from the query text, so input is treated as data, never executable SQL — and it also handles quoting and types correctly.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">When should I use an ORM versus raw SQL? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>An ORM like SQLAlchemy boosts productivity, maps rows to objects, and reduces boilerplate — great for typical application logic. Raw SQL gives maximum control and performance for complex queries. Many projects mix both.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is a transaction? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A transaction is a group of database operations that succeed or fail together. You <code>commit</code> to make them permanent or <code>rollback</code> to discard them, which keeps data consistent if something goes wrong mid-way.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is SQLite suitable for production? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, for many use cases — embedded apps, small-to-medium websites, prototypes, and local tools. For high write concurrency or distributed access, a server database like PostgreSQL is a better fit.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/real-world/automation.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Automation</span>
+          </a>
+          <a href="/python/real-world/rest-api.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">REST APIs</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

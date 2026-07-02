@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Automation – Automate Tasks with Python Scripts | ylearner</title>
+  <meta name="description" content="Learn Python automation: file operations, task scheduling, sending emails, Excel manipulation, and browser automation.">
+  <meta name="keywords" content="python automation, automate tasks python, python file automation, python schedule, python send email, python openpyxl">
+  <link rel="canonical" href="https://ylearner.org/python/real-world/automation.html">
+  <meta property="og:title" content="Python Automation – Automate Tasks with Python Scripts | ylearner">
+  <meta property="og:description" content="Learn Python automation: file operations, task scheduling, sending emails, Excel manipulation, and browser automation.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/real-world/automation.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Automation – Automate Tasks with Python Scripts | ylearner">
+  <meta name="twitter:description" content="Learn Python automation: file operations, task scheduling, sending emails, Excel manipulation, and browser automation.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Automation","description":"Automate tasks with Python: file operations, scheduling, emails, and Excel manipulation.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/real-world/api-development.html">Real-World Python</a><span class="separator">›</span><span class="current">Automation</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🤖 Real-World</div>
+          <h1>Python Automation – Automate Repetitive Tasks</h1>
+          <p class="lesson-intro">Python excels at automation. From renaming thousands of files to sending daily reports, Python scripts eliminate hours of manual work.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Real-World</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="files">File Automation with pathlib</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from pathlib import Path
+import shutil
+
+downloads = Path.home() / "Downloads"
+categories = {
+    ".pdf": "Documents",
+    ".jpg": "Images", ".jpeg": "Images", ".png": "Images",
+    ".mp4": "Videos",
+    ".zip": "Archives",
+}
+
+for file in downloads.iterdir():
+    if file.is_file() and file.suffix.lower() in categories:
+        dest_dir = downloads / categories[file.suffix.lower()]
+        dest_dir.mkdir(exist_ok=True)
+        shutil.move(str(file), dest_dir / file.name)
+        print(f"Moved {file.name}")</code></pre></div>
+          <h2 id="schedule">Scheduling Tasks</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import schedule
+import time
+
+def daily_report():
+    print("Generating report...")
+
+schedule.every().day.at("09:00").do(daily_report)
+schedule.every().hour.do(lambda: print("Heartbeat"))
+
+while True:
+    schedule.run_pending()
+    time.sleep(60)</code></pre></div>
+          <h2 id="email">Sending Emails</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+def send_email(to, subject, body, smtp_pass):
+    msg = MIMEMultipart()
+    msg["From"] = "you@gmail.com"
+    msg["To"] = to
+    msg["Subject"] = subject
+    msg.attach(MIMEText(body, "html"))
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login("you@gmail.com", smtp_pass)
+        server.sendmail("you@gmail.com", to, msg.as_string())</code></pre></div>
+          <h2 id="excel">Excel with openpyxl</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import openpyxl
+from openpyxl.styles import Font, PatternFill
+
+wb = openpyxl.Workbook()
+ws = wb.active
+ws.title = "Report"
+
+headers = ["Product", "Units", "Revenue"]
+for col, h in enumerate(headers, 1):
+    cell = ws.cell(row=1, column=col, value=h)
+    cell.font = Font(bold=True)
+
+data = [("Widget A", 150, 7500), ("Widget B", 230, 11500)]
+for row_idx, row_data in enumerate(data, 2):
+    for col_idx, value in enumerate(row_data, 1):
+        ws.cell(row=row_idx, column=col_idx, value=value)
+
+wb.save("report.xlsx")</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> Store credentials in a .env file and load with python-dotenv — never hardcode passwords in scripts.</div>
+          <h2 id="deep-automation">Automation: Let Python Do the Boring Work</h2>
+          <p>Automation is one of Python's most practical uses — replacing repetitive manual tasks (renaming files, sending reports, cleaning data) with a script you run once and reuse forever. The standard-library tools cover most needs.</p>
+          <table>
+            <thead><tr><th>Task</th><th>Module</th></tr></thead>
+            <tbody>
+              <tr><td>files &amp; folders</td><td><code>pathlib</code>, <code>shutil</code></td></tr>
+              <tr><td>run other programs</td><td><code>subprocess</code></td></tr>
+              <tr><td>scheduling</td><td>OS cron / Task Scheduler</td></tr>
+              <tr><td>web/API tasks</td><td><code>requests</code></td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-python">from pathlib import Path
+
+# rename every .txt in a folder to .md
+for file in Path("notes").glob("*.txt"):
+    file.rename(file.with_suffix(".md"))</code></pre>
+          <p><strong>Use <code>pathlib</code>, not string paths:</strong> <code>Path("a") / "b" / "c.txt"</code> builds paths that work on every OS, with methods like <code>.glob()</code>, <code>.exists()</code>, and <code>.rename()</code> — far cleaner than fragile <code>os.path.join</code> string juggling. <strong>Golden rule of destructive automation:</strong> a script that renames, moves, or deletes files can wreck data fast — <em>test on a copy first</em>, print what it <em>would</em> do (a dry run) before actually doing it, and back up. <strong>Scheduling:</strong> to run a script automatically (nightly cleanup, hourly report), register it with your OS scheduler (cron on Linux/macOS, Task Scheduler on Windows) rather than leaving a Python loop running. Use <code>subprocess.run([...], check=True)</code> to invoke other command-line tools safely.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Automate routine tasks:</p>
+            <ol>
+              <li>Use <code>pathlib</code> to list every <code>.txt</code> file in a folder.</li>
+              <li>Rename or move files into subfolders based on their extension.</li>
+              <li>Schedule a function to run every few seconds with the <code>schedule</code> library (or a loop with <code>time.sleep</code>).</li>
+              <li>Write a script that appends a timestamped line to a log file each run.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a “downloads organizer” that scans a folder and moves files into category subfolders (Images, Documents, Archives, Other) based on their extension, creating folders as needed and avoiding name collisions. Make it safe to run repeatedly. Bonus: schedule it to run periodically and email yourself a summary of how many files were moved.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Python excels at automating repetitive file, data, and communication tasks.</li>
+              <li><code>pathlib</code> offers a clean, object-oriented API for filesystem work.</li>
+              <li>Schedule recurring jobs with the <code>schedule</code> library, a loop, or OS tools like cron.</li>
+              <li>Libraries like <code>openpyxl</code> (Excel) and <code>smtplib</code> (email) extend automation reach.</li>
+              <li>Make scripts idempotent and add logging so reruns are safe and observable.</li>
+              <li>Wrap risky steps in error handling so failures are reported, not hidden.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Automation</h2>
+          <ul class="interview-list">
+            <li>What kinds of tasks are good candidates for automation with Python?</li>
+            <li>Why is <code>pathlib</code> preferred over <code>os.path</code> for file work?</li>
+            <li>How do you schedule recurring tasks in Python?</li>
+            <li>What libraries help automate Excel or email?</li>
+            <li>How do you make an automation script safe to run repeatedly (idempotent)?</li>
+            <li>How do you handle errors so an automation does not silently fail?</li>
+            <li>What is the difference between scheduling in-process and using cron / Task Scheduler?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/intermediate/file-handling.html" class="topic-tag">📁 File Handling</a>
+            <a href="/python/real-world/logging.html" class="topic-tag">📝 Logging</a>
+            <a href="/python/real-world/web-scraping.html" class="topic-tag">🕸️ Web Scraping</a>
+            <a href="/python/intermediate/datetime.html" class="topic-tag">📅 Date & Time</a>
+            <a href="/python/intermediate/exception-handling.html" class="topic-tag">⚠️ Exception Handling</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why use <code>pathlib</code> instead of <code>os.path</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>pathlib</code> represents paths as objects with intuitive methods and the <code>/</code> operator for joining (<code>folder / "file.txt"</code>). It is more readable and less error-prone than string-based <code>os.path</code> functions.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I run a script automatically on a schedule? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For simple cases use the <code>schedule</code> library or a <code>while</code> loop with <code>time.sleep</code>. For reliable, system-level scheduling, use cron on Linux/macOS or Task Scheduler on Windows to run the script at set times.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I make an automation safe to re-run? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Design it to be idempotent: check whether an action is already done before doing it (e.g. skip files already moved), avoid overwriting data unintentionally, and log each action so you can audit what happened.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can Python automate Excel and email? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Use <code>openpyxl</code> or pandas for Excel files, and <code>smtplib</code> with <code>email</code> for sending mail. For richer Office automation there are libraries like <code>xlsxwriter</code> and provider-specific email APIs.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/real-world/web-scraping.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Web Scraping</span>
+          </a>
+          <a href="/python/real-world/database.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Database Programming</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

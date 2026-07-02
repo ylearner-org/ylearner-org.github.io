@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Memory Game – Build a Card Flip Memory Game | ylearner</title>
+  <meta name="description" content="Build a complete JavaScript memory card matching game with Fisher-Yates shuffle, flip animations, move counter, timer, win detection, and restart. Full working code included.">
+  <meta name="keywords" content="JavaScript memory game, card flip game JavaScript, Fisher-Yates shuffle JavaScript, JavaScript game project, DOM game JavaScript">
+  <link rel="canonical" href="https://ylearner.org/javascript/projects/memory-game.html">
+  <meta property="og:title" content="JavaScript Memory Game – Build a Card Flip Memory Game | ylearner">
+  <meta property="og:description" content="Build a complete JavaScript memory card matching game with Fisher-Yates shuffle, flip animations, move counter, timer, win detection, and restart. Full working code included.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/projects/memory-game.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Memory Game – Build a Card Flip Memory Game | ylearner">
+  <meta name="twitter:description" content="Build a complete JavaScript memory card matching game with Fisher-Yates shuffle, flip animations, move counter, timer, win detection, and restart. Full working code included.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/projects/calculator.html">Projects</a><span class="separator">›</span>
+          <span class="current">Memory Game</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🛠️ Projects</div>
+          <h1>JavaScript Memory Game – Build a Card Matching Game</h1>
+          <p class="lesson-intro">Build a complete memory card game with 16 cards (8 pairs), Fisher-Yates shuffle, CSS flip animations, match detection, move counter, timer, win screen, and restart. This project combines closures for game state, setTimeout for the flip-back delay, and CSS 3D transforms for smooth card animations.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 35 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="game-design">Game Design Overview</h2>
+          <p>The memory game presents 16 face-down cards. The player flips two cards per turn. If they match, they stay revealed. If not, they flip back after a brief delay. The game ends when all 8 pairs are matched.</p>
+
+          <table>
+            <thead><tr><th>Game Element</th><th>Implementation</th></tr></thead>
+            <tbody>
+              <tr><td>16 cards (8 pairs)</td><td>Array of 8 symbols duplicated and shuffled</td></tr>
+              <tr><td>Card flip animation</td><td>CSS 3D transform (rotateY 180°)</td></tr>
+              <tr><td>Shuffle</td><td>Fisher-Yates in-place algorithm</td></tr>
+              <tr><td>Match detection</td><td>Compare <code>data-symbol</code> of two flipped cards</td></tr>
+              <tr><td>Flip-back delay</td><td><code>setTimeout</code> 1000ms for unmatched pair</td></tr>
+              <tr><td>Win detection</td><td>Check if <code>matchedCount === 8</code></td></tr>
+              <tr><td>Move counter</td><td>Increment on every pair attempt</td></tr>
+              <tr><td>Timer</td><td><code>setInterval</code> each second</td></tr>
+              <tr><td>Lock mechanism</td><td>Boolean flag prevents 3rd card flip during check</td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="fisher-yates">Fisher-Yates Shuffle Explained</h2>
+          <p>The Fisher-Yates (also called Knuth) shuffle produces an unbiased permutation — every arrangement is equally likely. It works by iterating from the end of the array and swapping each element with a randomly chosen element from 0 to the current index.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Fisher-Yates Shuffle — O(n) time, O(1) extra space
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1)); // random index 0..i
+    [arr[i], arr[j]] = [arr[j], arr[i]];            // ES6 swap
+  }
+  return arr;
+}
+
+// Example:
+const deck = ["🦁","🦁","🐯","🐯","🦊","🦊","🐻","🐻"];
+console.log(shuffle(deck));
+// ["🐻","🦊","🦁","🐯","🦁","🐻","🦊","🐯"] (order varies)
+
+// Why not arr.sort(() => Math.random() - 0.5)?
+// That approach is biased — some permutations appear more
+// often than others due to how sort algorithms work.
+// Fisher-Yates guarantees uniform randomness.</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <strong>Common Mistake:</strong> Never use <code>array.sort(() => Math.random() - 0.5)</code> to shuffle. It produces biased results because comparison-based sorts call the comparator multiple times per element, giving some permutations a higher probability. Fisher-Yates is always the correct answer in interviews.
+          </div>
+
+          <h2 id="html-structure">HTML Structure</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/* memory.html
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Memory Game&lt;/title&gt;
+  &lt;link rel="stylesheet" href="memory-style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="game-container"&gt;
+    &lt;header class="game-header"&gt;
+      &lt;h1&gt;Memory Game&lt;/h1&gt;
+      &lt;div class="game-stats"&gt;
+        &lt;div class="stat"&gt;&lt;span&gt;Moves&lt;/span&gt;&lt;span id="moves"&gt;0&lt;/span&gt;&lt;/div&gt;
+        &lt;div class="stat"&gt;&lt;span&gt;Time&lt;/span&gt;&lt;span id="timer"&gt;0:00&lt;/span&gt;&lt;/div&gt;
+        &lt;div class="stat"&gt;&lt;span&gt;Pairs&lt;/span&gt;&lt;span id="pairs"&gt;0 / 8&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;button id="restart-btn"&gt;Restart&lt;/button&gt;
+    &lt;/header&gt;
+
+    &lt;div class="card-grid" id="card-grid"&gt;&lt;/div&gt;
+
+    &lt;!-- Win overlay --&gt;
+    &lt;div id="win-overlay" class="win-overlay hidden"&gt;
+      &lt;div class="win-box"&gt;
+        &lt;h2&gt;You Won! 🎉&lt;/h2&gt;
+        &lt;p id="win-message"&gt;&lt;/p&gt;
+        &lt;button id="play-again-btn"&gt;Play Again&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;script src="memory-script.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+*/</code></pre>
+          </div>
+
+          <h2 id="game-logic">Complete Game Logic</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// memory-script.js — Complete Memory Game
+
+// 8 unique symbols → duplicated to make 16 cards
+const SYMBOLS = ["🦁","🐯","🦊","🐻","🐼","🦋","🌸","⭐"];
+
+// ---------- Game State (closure pattern) ----------
+let flippedCards  = [];   // max 2 elements
+let matchedCount  = 0;
+let moves         = 0;
+let isLocked      = false; // prevent flipping 3rd card during check
+let timerInterval = null;
+let seconds       = 0;
+
+// ---------- Fisher-Yates Shuffle ----------
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ---------- Create Deck ----------
+function createDeck() {
+  // Duplicate each symbol and assign a unique ID to each card
+  return shuffle([...SYMBOLS, ...SYMBOLS].map((symbol, i) => ({
+    id: i,
+    symbol
+  })));
+}
+
+// ---------- Render Board ----------
+function renderBoard(deck) {
+  const grid = document.getElementById("card-grid");
+  grid.innerHTML = deck.map(card => `
+    &lt;div class="card" data-id="${card.id}" data-symbol="${card.symbol}"&gt;
+      &lt;div class="card-inner"&gt;
+        &lt;div class="card-front"&gt;?&lt;/div&gt;
+        &lt;div class="card-back"&gt;${card.symbol}&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  `).join("");
+}
+
+// ---------- Update Stats Display ----------
+function updateStats() {
+  document.getElementById("moves").textContent = moves;
+  document.getElementById("pairs").textContent = `${matchedCount} / 8`;
+}
+
+// ---------- Timer ----------
+function startTimer() {
+  stopTimer();
+  seconds = 0;
+  timerInterval = setInterval(() => {
+    seconds++;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    document.getElementById("timer").textContent =
+      `${m}:${s.toString().padStart(2, "0")}`;
+  }, 1000);
+}
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+}
+
+// ---------- Card Flip ----------
+function flipCard(card) {
+  if (isLocked) return;                        // locked during check
+  if (card.classList.contains("flipped")) return; // already flipped
+  if (card.classList.contains("matched")) return; // already matched
+
+  card.classList.add("flipped");
+  flippedCards.push(card);
+
+  if (flippedCards.length === 2) {
+    moves++;
+    updateStats();
+    checkMatch();
+  }
+}
+
+// ---------- Match Check ----------
+function checkMatch() {
+  const [a, b] = flippedCards;
+  const isMatch = a.dataset.symbol === b.dataset.symbol;
+
+  if (isMatch) {
+    a.classList.add("matched");
+    b.classList.add("matched");
+    matchedCount++;
+    updateStats();
+    flippedCards = [];
+    if (matchedCount === SYMBOLS.length) {
+      setTimeout(showWin, 400);
+    }
+  } else {
+    isLocked = true; // lock board while unmatched cards are showing
+    setTimeout(() => {
+      a.classList.remove("flipped");
+      b.classList.remove("flipped");
+      flippedCards = [];
+      isLocked = false; // unlock after flip-back
+    }, 1000);
+  }
+}
+
+// ---------- Win Screen ----------
+function showWin() {
+  stopTimer();
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  const overlay = document.getElementById("win-overlay");
+  document.getElementById("win-message").textContent =
+    `Completed in ${moves} moves and ${m}:${s.toString().padStart(2,"0")} minutes!`;
+  overlay.classList.remove("hidden");
+}
+
+// ---------- Start / Restart ----------
+function startGame() {
+  // Reset state
+  flippedCards  = [];
+  matchedCount  = 0;
+  moves         = 0;
+  isLocked      = false;
+
+  document.getElementById("win-overlay").classList.add("hidden");
+  updateStats();
+
+  const deck = createDeck();
+  renderBoard(deck);
+
+  // Attach click listeners after board is rendered
+  document.querySelectorAll(".card").forEach(card => {
+    card.addEventListener("click", () => flipCard(card));
+  });
+
+  startTimer();
+}
+
+// ---------- Event Listeners ----------
+document.getElementById("restart-btn").addEventListener("click", startGame);
+document.getElementById("play-again-btn").addEventListener("click", startGame);
+
+// ---------- Initialize ----------
+startGame();</code></pre>
+          </div>
+
+          <div class="output-block"><strong>Game Flow:</strong> Board renders with 16 face-down cards. Timer starts. Player clicks two cards — if symbols match they stay flipped and glow green. If not, they flip back after 1 second. Board locks during the 1-second delay to prevent cheating. After all 8 pairs match, the win overlay shows moves and time.</div>
+
+          <h2 id="css-flip-animation">CSS Flip Animation</h2>
+          <p>The 3D card flip effect uses CSS <code>perspective</code>, <code>transform-style: preserve-3d</code>, and <code>rotateY</code> transforms. The front and back faces are absolutely positioned on top of each other — one starts rotated 180° so only one face is visible at a time.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/* memory-style.css — Key flip animation styles
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+.card {
+  aspect-ratio: 1;
+  perspective: 500px; /* 3D perspective for the flip */
+  cursor: pointer;
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease;
+  border-radius: 12px;
+}
+
+/* Flip when .flipped class is added */
+.card.flipped .card-inner,
+.card.matched .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  backface-visibility: hidden; /* hide the reverse side */
+  font-size: 36px;
+}
+
+.card-front {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.card-back {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  transform: rotateY(180deg); /* starts facing away */
+}
+
+.card.matched .card-inner {
+  animation: matchPulse 0.4s ease;
+}
+@keyframes matchPulse {
+  0%   { transform: rotateY(180deg) scale(1); }
+  50%  { transform: rotateY(180deg) scale(1.1); }
+  100% { transform: rotateY(180deg) scale(1); }
+}
+.card.matched .card-back {
+  background: #d1fae5;
+  border-color: #10b981;
+}
+*/</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <strong>backface-visibility: hidden</strong> is the critical CSS property that makes the flip illusion work. Without it, you'd see a mirrored version of each face bleeding through during the rotation. Both faces are stacked on top of each other; <code>backface-visibility: hidden</code> ensures only the face currently pointing toward the viewer is visible.
+          </div>
+
+          <div class="callout callout-info">
+            <strong>Concepts Practiced:</strong> Arrays (shuffle, duplicating symbols), closures (game state variables), setTimeout for async delays, setInterval for the timer, CSS 3D transforms, event handling, and game state management with a lock mechanism.
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="game-state">Game State Management</h2>
+          <p>All game state lives at the top of the script as module-level variables captured by event handlers as closures. This is a clean functional approach that avoids global namespace pollution while keeping the state accessible to all game functions.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// State machine perspective:
+// idle → flip-first-card → flip-second-card → checking-match
+//                                                    ↓ (match)    → idle (matched++)
+//                                                    ↓ (no match) → locked → flip-back → idle
+
+// The isLocked boolean represents the "locked" state
+// flippedCards.length represents position in the flip sequence
+
+// Alternative: class-based game state (cleaner for larger games)
+class MemoryGame {
+  #deck = [];
+  #flipped = [];
+  #matched = 0;
+  #moves = 0;
+  #locked = false;
+
+  constructor(symbols) {
+    this.#deck = this.#shuffle([...symbols, ...symbols]);
+  }
+
+  #shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  get deck()    { return [...this.#deck]; }
+  get moves()   { return this.#moves; }
+  get matched() { return this.#matched; }
+  get isWon()   { return this.#matched === this.#deck.length / 2; }
+
+  flip(symbolIndex) {
+    if (this.#locked || this.#flipped.length === 2) return null;
+    this.#flipped.push(symbolIndex);
+    if (this.#flipped.length === 2) {
+      this.#moves++;
+      const isMatch = this.#deck[this.#flipped[0]] === this.#deck[this.#flipped[1]];
+      if (isMatch) this.#matched++;
+      return isMatch;
+    }
+    return null;
+  }
+
+  resetFlipped() { this.#flipped = []; this.#locked = false; }
+  lock()         { this.#locked = true; }
+}</code></pre>
+          </div>
+
+          <h2 id="enhancements">Enhancements</h2>
+
+          <div class="exercise-box">
+            <h3>Extend the Memory Game</h3>
+            <ul>
+              <li><strong>Difficulty levels</strong> — Easy (4×3, 6 pairs), Medium (4×4, 8 pairs), Hard (5×4, 10 pairs)</li>
+              <li><strong>High score board</strong> — localStorage leaderboard with best times per difficulty</li>
+              <li><strong>Sound effects</strong> — use the Web Audio API to play a tone on match and a buzz on miss</li>
+              <li><strong>Custom emoji sets</strong> — let the user choose from Animals, Food, Flags, etc.</li>
+              <li><strong>Accessibility</strong> — add aria-pressed for flipped state and keyboard navigation (Tab + Enter to flip)</li>
+            </ul>
+          </div>
+
+          <div class="challenge-box">
+            <h3>Keyboard Accessibility Challenge</h3>
+            <p>Make the game fully playable with keyboard only:</p>
+            <pre style="background:#1e1e2e;color:#cdd6f4;padding:12px;border-radius:8px;font-size:13px;overflow:auto;"><code>// 1. Add tabindex="0" to all cards
+// 2. Listen for keydown Enter/Space
+document.querySelectorAll(".card").forEach(card => {
+  card.setAttribute("tabindex", "0");
+  card.setAttribute("role", "button");
+  card.setAttribute("aria-label", "Memory card");
+  card.addEventListener("keydown", e => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      flipCard(card);
+    }
+  });
+  // Update aria-pressed when flipped
+  const observer = new MutationObserver(() => {
+    card.setAttribute("aria-pressed", card.classList.contains("flipped").toString());
+  });
+  observer.observe(card, { attributes: true, attributeFilter: ["class"] });
+});</code></pre>
+          </div>
+
+          <h2 id="concepts-practiced">Concepts Practiced</h2>
+          <table>
+            <thead><tr><th>Concept</th><th>Where Used</th></tr></thead>
+            <tbody>
+              <tr><td>Arrays</td><td>Deck creation, shuffle, flippedCards tracking</td></tr>
+              <tr><td>Fisher-Yates Shuffle</td><td><code>shuffle()</code> for unbiased randomization</td></tr>
+              <tr><td>Closures</td><td>Game state variables captured by event handlers</td></tr>
+              <tr><td>setTimeout</td><td>1-second delay before flipping back unmatched cards</td></tr>
+              <tr><td>setInterval</td><td>Timer counting elapsed seconds</td></tr>
+              <tr><td>CSS 3D Transforms</td><td>Card flip animation with perspective</td></tr>
+              <tr><td>DOM Generation</td><td>Card grid built from data with template literals</td></tr>
+              <tr><td>Lock Mechanism</td><td>isLocked flag prevents invalid state transitions</td></tr>
+            </tbody>
+          </table>
+
+          <div class="summary-box">
+            <h3>Summary</h3>
+            <ul>
+              <li>Fisher-Yates shuffle: the correct, unbiased way to randomize arrays in JavaScript</li>
+              <li>Lock mechanism: essential for sequential async game state — prevents invalid flips during setTimeout delay</li>
+              <li>CSS 3D flip: perspective + transform-style: preserve-3d + backface-visibility: hidden</li>
+              <li>Game state: closures capture all state variables (flippedCards, matchedCount, moves) for event handlers</li>
+              <li>Timer: setInterval increments seconds; stopTimer clears interval on win or restart</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>Fisher-Yates shuffle is one of the most commonly asked algorithm questions — know it cold</li>
+            <li>The lock flag demonstrates understanding of async state management — a very mature programming concept</li>
+            <li>CSS flip animations without JavaScript show CSS mastery alongside JavaScript skills</li>
+            <li>This project is a strong portfolio piece — it combines algorithms, animations, state management, and game logic</li>
+            <li>The class-based alternative shows you can architect code for scale, not just for one small feature</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <h3>Related Topics</h3>
+            <ul>
+              <li><a href="/javascript/projects/expense-tracker.html">Expense Tracker Project</a></li>
+              <li><a href="/javascript/projects/quiz-app.html">Quiz App Project</a></li>
+              <li><a href="/javascript/interview/coding-challenges.html">Coding Challenges</a></li>
+              <li><a href="/javascript/interview/questions.html">Interview Questions</a></li>
+            </ul>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why is isLocked needed? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Without the lock, if a user clicks a third card before the 1-second flip-back timeout fires, the game state becomes corrupted — three cards could be in the flippedCards array. The lock ensures only two cards can be "in play" at any time.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why duplicate symbols before shuffling instead of generating pairs on the fly? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Creating the full deck array first (<code>[...symbols, ...symbols]</code>) then shuffling it is cleaner and more explicit. It makes the data structure easy to inspect and debug. You could generate pairs on the fly, but it adds complexity without benefit.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why use CSS for the flip animation instead of JavaScript? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>CSS animations run off the main thread (on the compositor), making them smooth even under JavaScript load. Using <code>transition: transform 0.5s</code> and toggling a class is much more performant than manually animating with <code>requestAnimationFrame</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I add sound effects without a library? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use the Web Audio API: <code>const ctx = new AudioContext()</code>, create an oscillator, set frequency and type, connect to destination, and call <code>start()</code>/<code>stop()</code>. For match: a pleasant chord. For miss: a short low buzz. No audio files required.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How would I save a high score? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>On win, compare the current time against the stored best time in localStorage. If better, update the record. Display the best time on the win screen and game header.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/projects/expense-tracker.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Expense Tracker</span>
+          </a>
+          <a href="/javascript/projects/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

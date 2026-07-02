@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS State & useState – Reactive State Management | ylearner</title>
+  <meta name="description" content="Master OWL JS reactive state with useState: how Proxy-based reactivity works, nested state, arrays in state, multiple state objects, useState vs useRef, and real-world patterns for Odoo developers.">
+  <meta name="keywords" content="OWL JS useState, OWL reactive state, OWL JS state management, useState OWL tutorial, OWL Proxy reactivity, OWL nested state, OWL state arrays, Odoo Web Library state, owl js useRef vs useState">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/owljs/core/state.html">
+  <meta property="og:title" content="OWL JS State & useState – Reactive State Explained | ylearner">
+  <meta property="og:description" content="How useState works in OWL JS: Proxy reactivity, direct mutation, nested state, array updates, multiple state objects, and useState vs useRef.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/owljs/core/state.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS useState Complete Guide | ylearner">
+  <meta name="twitter:description" content="useState in OWL JS: Proxy reactivity, direct mutation patterns, nested state, arrays, and real-world examples.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS State and useState",
+    "description": "Complete guide to reactive state management in OWL JS using useState: Proxy-based reactivity, direct mutation, nested state, array updates, and real-world patterns.",
+    "educationalLevel": "Beginner",
+    "keywords": "OWL JS useState, reactive state, Proxy reactivity, OWL state management, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/core/components.html">Core Concepts</a><span class="separator">›</span>
+          <span class="current">State &amp; useState</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Core Concepts</div>
+          <h1>OWL JS State &amp; useState – Reactive State Management</h1>
+          <p class="lesson-intro">State is the data that belongs to a component and can change over time in response to user actions or async operations. When state changes, OWL automatically re-renders the component. The <code>useState()</code> hook is the primary way to create reactive state in OWL — it wraps your state object in a JavaScript <strong>Proxy</strong> that intercepts every mutation and schedules a re-render. This lesson explains how <code>useState</code> works under the hood, covers every mutation pattern (especially for nested objects and arrays), and shows common real-world state patterns.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 4 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="usestate-basics">useState Basics</h2>
+          <p>Call <code>useState()</code> with an initial value and assign the result to a class field. The returned object is a reactive Proxy — every property read and write on it is tracked by OWL.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – useState basic usage</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml, useState } from "@odoo/owl";
+
+class Counter extends Component {
+  // Initialize reactive state
+  state = useState({
+    count: 0,
+    label: "Clicks",
+  });
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;p&gt;&lt;t t-esc="state.label"/&gt;: &lt;t t-esc="state.count"/&gt;&lt;/p&gt;
+      &lt;button t-on-click="increment"&gt;+1&lt;/button&gt;
+      &lt;button t-on-click="reset"&gt;Reset&lt;/button&gt;
+    &lt;/div&gt;
+  `;
+
+  increment() {
+    this.state.count++;          // direct mutation — triggers re-render
+  }
+
+  reset() {
+    this.state.count = 0;        // assignment — triggers re-render
+    this.state.label = "Clicks"; // multiple mutations still trigger one re-render
+  }
+}</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Multiple mutations = one re-render</strong>
+              <p>OWL batches mutations within the same synchronous call. If your method changes five state properties in a row, OWL schedules exactly one re-render (via a microtask queue), not five separate renders. This makes mutation-heavy code efficient.</p>
+            </div>
+          </div>
+
+          <h2 id="how-reactivity-works">How Proxy-Based Reactivity Works</h2>
+          <p><code>useState(obj)</code> returns a JavaScript <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy" target="_blank" rel="noopener">Proxy</a> wrapping <code>obj</code>. Every property access (get) and mutation (set, delete, array mutation) on the proxy is intercepted:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – what Proxy does internally</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Simplified illustration — not the actual OWL source
+function useState(initialValue) {
+  return new Proxy(initialValue, {
+    set(target, key, value) {
+      target[key] = value;
+      scheduleRerender();   // notify OWL to re-render the component
+      return true;
+    },
+    // get, deleteProperty, etc. are also trapped
+  });
+}
+
+// In your component:
+this.state.count = 5;  // triggers the 'set' trap → schedules re-render</code></pre>
+          </div>
+
+          <p>The Proxy is <strong>deep</strong> — nested objects and arrays inside the state are also wrapped when accessed. This means you can mutate deeply nested properties and OWL will detect them.</p>
+
+          <h2 id="mutation-patterns">Mutation Patterns</h2>
+
+          <h3 id="primitives">Primitives</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – primitive mutations</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// All of these trigger re-renders:
+this.state.count++;              // increment
+this.state.count = 0;            // assignment
+this.state.isLoading = true;     // boolean
+this.state.message = "Hello";    // string
+delete this.state.errorMsg;      // delete a property</code></pre>
+          </div>
+
+          <h3 id="objects">Nested Objects</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – nested object mutations</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">state = useState({
+  user: {
+    name: "Alice",
+    address: {
+      city: "London",
+      country: "UK",
+    },
+  },
+});
+
+// Direct nested mutation — works because the proxy is deep
+this.state.user.name = "Bob";                   // ✅ triggers re-render
+this.state.user.address.city = "Manchester";    // ✅ nested deep mutation
+this.state.user.address = { city: "Paris", country: "FR" }; // ✅ replace whole object
+
+// Replace entire user object
+this.state.user = { name: "Carol", address: { city: "NYC", country: "US" } }; // ✅</code></pre>
+          </div>
+
+          <h3 id="arrays">Arrays in State</h3>
+          <p>The OWL Proxy intercepts all array mutation methods. Use them directly — do not replace the array with a new one unless you need to.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – array mutations</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">state = useState({
+  todos: [
+    { id: 1, text: "Learn OWL", done: false },
+    { id: 2, text: "Build app", done: false },
+  ],
+});
+
+// ✅ All these methods are intercepted and trigger re-renders:
+this.state.todos.push({ id: 3, text: "Deploy", done: false });
+this.state.todos.pop();
+this.state.todos.splice(1, 1);             // remove item at index 1
+this.state.todos.splice(1, 0, newItem);    // insert at index 1
+this.state.todos.sort((a, b) => a.id - b.id);
+this.state.todos.reverse();
+this.state.todos[0].done = true;           // mutate a property of an item
+
+// ❌ These do NOT trigger re-renders (non-mutating):
+// const newTodos = this.state.todos.filter(t => !t.done);
+// — creates a new array, the original state.todos is unchanged
+// If you want to replace the array:
+this.state.todos = this.state.todos.filter(t => !t.done); // ✅ assignment triggers re-render</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>filter/map/reduce do not mutate</strong>
+              <p><code>array.filter()</code>, <code>array.map()</code>, and <code>array.reduce()</code> return new arrays without mutating the original. They do not trigger a re-render. If you use them to compute a new list, assign the result back: <code>this.state.items = this.state.items.filter(...)</code>. Or use a getter to compute derived views (e.g. <code>get filteredItems()</code>) — getters re-run on each render, so they always reflect current state.</p>
+            </div>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="multiple-state-objects">Multiple State Objects</h2>
+          <p>One component can have multiple <code>useState</code> objects. This is useful for separating concerns — form state, UI state, and data state can live independently.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – multiple state objects</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class UserForm extends Component {
+  // Separate concerns into distinct state objects
+  formData = useState({
+    name:  "",
+    email: "",
+    role:  "viewer",
+  });
+
+  ui = useState({
+    isSubmitting: false,
+    showSuccess:  false,
+    errorMessage: null,
+  });
+
+  async submitForm() {
+    this.ui.isSubmitting = true;
+    this.ui.errorMessage = null;
+
+    try {
+      await saveUser(this.formData);
+      this.ui.showSuccess = true;
+    } catch (err) {
+      this.ui.errorMessage = err.message;
+    } finally {
+      this.ui.isSubmitting = false;
+    }
+  }
+
+  static template = xml`
+    &lt;form t-on-submit.prevent="submitForm"&gt;
+      &lt;input t-model="formData.name" placeholder="Name"/&gt;
+      &lt;input t-model="formData.email" placeholder="Email"/&gt;
+      &lt;button t-att-disabled="ui.isSubmitting"&gt;
+        &lt;t t-if="ui.isSubmitting"&gt;Saving…&lt;/t&gt;
+        &lt;t t-else=""&gt;Save&lt;/t&gt;
+      &lt;/button&gt;
+      &lt;p t-if="ui.showSuccess" class="success"&gt;Saved!&lt;/p&gt;
+      &lt;p t-if="ui.errorMessage" class="error" t-esc="ui.errorMessage"/&gt;
+    &lt;/form&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <h2 id="computed-getters">Computed Values with Getters</h2>
+          <p>JavaScript getters on the component class act as computed properties. They are called fresh on every render and automatically use the latest state, without any extra setup.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – getters as computed values</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class ShoppingCart extends Component {
+  state = useState({
+    items: [
+      { id: 1, name: "OWL Course",  price: 49.99, qty: 1 },
+      { id: 2, name: "React Course", price: 39.99, qty: 2 },
+    ],
+  });
+
+  // Computed — re-evaluated every render (reflects latest state)
+  get itemCount() {
+    return this.state.items.reduce((sum, item) => sum + item.qty, 0);
+  }
+
+  get subtotal() {
+    return this.state.items.reduce((sum, item) => sum + item.price * item.qty, 0);
+  }
+
+  get formattedTotal() {
+    return `$${this.subtotal.toFixed(2)}`;
+  }
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;p&gt;Items: &lt;t t-esc="itemCount"/&gt;&lt;/p&gt;
+      &lt;p&gt;Total: &lt;t t-esc="formattedTotal"/&gt;&lt;/p&gt;
+    &lt;/div&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <h2 id="usestate-vs-useref">useState vs useRef</h2>
+          <p>OWL also provides <code>useRef()</code> for accessing DOM elements or storing mutable values that should <strong>not</strong> trigger re-renders. Choose the right one for your use case:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Feature</th><th><code>useState</code></th><th><code>useRef</code></th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Triggers re-render on change</td><td>✅ Yes — always</td><td>❌ No — never</td></tr>
+                <tr><td>Accessed in template</td><td>✅ Yes (<code>state.x</code>)</td><td>❌ No (DOM ref only)</td></tr>
+                <tr><td>Stores DOM element reference</td><td>❌ Not the intent</td><td>✅ Primary use case</td></tr>
+                <tr><td>Stores a mutable counter/timer ID</td><td>⚠️ Causes unnecessary renders</td><td>✅ Ideal (ref.el = timerId)</td></tr>
+                <tr><td>Must render when value changes</td><td>✅ Use useState</td><td>❌ Use useState instead</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – useRef for non-reactive values</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml, useState, useRef, onMounted, onWillUnmount } from "@odoo/owl";
+
+class Timer extends Component {
+  state = useState({ elapsed: 0 });
+
+  // useRef holds the timer ID — changing it must NOT cause a re-render
+  timerRef = useRef("timer");  // or just a plain property: this._timerId = null;
+
+  onMounted() {
+    this._timerId = setInterval(() => {
+      this.state.elapsed++;  // useState — triggers re-render every second
+    }, 1000);
+  }
+
+  onWillUnmount() {
+    clearInterval(this._timerId);  // cleanup — stored as plain property, not state
+  }
+
+  static template = xml`
+    &lt;p&gt;Elapsed: &lt;t t-esc="state.elapsed"/&gt;s&lt;/p&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <h2 id="state-in-odoo">State Patterns in Odoo Components</h2>
+          <p>In real Odoo module components, you often need to handle loading states, paginated data, and server errors. Here is a typical pattern:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – Odoo component with async state loading</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { Component, xml, useState, onWillStart } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
+
+class PartnerList extends Component {
+  static template = xml`
+    &lt;div&gt;
+      &lt;t t-if="state.isLoading"&gt;&lt;span&gt;Loading…&lt;/span&gt;&lt;/t&gt;
+      &lt;t t-elif="state.error"&gt;
+        &lt;p class="text-danger" t-esc="state.error"/&gt;
+      &lt;/t&gt;
+      &lt;t t-else=""&gt;
+        &lt;ul&gt;
+          &lt;li t-foreach="state.partners" t-as="p" t-key="p.id" t-esc="p.name"/&gt;
+        &lt;/ul&gt;
+      &lt;/t&gt;
+    &lt;/div&gt;
+  `;
+
+  state = useState({
+    partners:  [],
+    isLoading: true,
+    error:     null,
+  });
+
+  setup() {
+    this.rpc = useService("rpc");
+
+    onWillStart(async () =&gt; {
+      try {
+        const result = await this.rpc("/web/dataset/call_kw", {
+          model:  "res.partner",
+          method: "search_read",
+          args:   [[["is_company", "=", true]]],
+          kwargs: { fields: ["id", "name"], limit: 20 },
+        });
+        this.state.partners  = result;
+        this.state.isLoading = false;
+      } catch (err) {
+        this.state.error     = "Failed to load partners.";
+        this.state.isLoading = false;
+      }
+    });
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="deep-reactivity">What Triggers a Re-render (and What Silently Doesn't)</h2>
+          <p><code>useState</code> returns a <strong>reactive proxy</strong>. OWL watches which properties you read during render, and re-renders when any of them change. The key rule: <em>mutate the reactive object directly</em> — you don't call a setter like in React.</p>
+          <pre><code class="language-javascript">setup() {
+  this.state = useState({ count: 0, todos: [] });
+}
+increment() {
+  this.state.count++;          // ✅ reactive → re-renders
+}</code></pre>
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Changes OWL can't see</strong>
+              <p>Reassigning a plain local variable does nothing to the UI — only the reactive <code>state</code> object is tracked. And a property that didn't exist when the proxy was created isn't reactive; initialize your shape up front:</p>
+              <pre><code class="language-javascript">// ❌ added later — not reactive
+this.state.newField = 1;
+// ✅ declare it in the initial object
+this.state = useState({ count: 0, newField: 0 });</code></pre>
+            </div>
+          </div>
+          <h3>Arrays: mutate, and the render re-reads</h3>
+          <p>Pushing to a reactive array works because OWL tracks access to the array during render:</p>
+          <pre><code class="language-javascript">addTodo(text) {
+  this.state.todos.push({ text, done: false });   // re-renders the list
+}</code></pre>
+          <p>Give list items a stable <code>t-key</code> so OWL updates only the changed rows instead of rebuilding the whole list.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a <code>KanbanBoard</code> component that demonstrates all the state patterns from this lesson:</p>
+            <ol>
+              <li>State: three columns (<code>todo</code>, <code>in-progress</code>, <code>done</code>), each an array of <code>{ id, title }</code> cards. Include at least 2 pre-loaded cards per column.</li>
+              <li>Add a "Move Right" button on each card that <code>splice</code>s it out of the current column and <code>push</code>es it into the next column.</li>
+              <li>Add a "Delete" button on each card that <code>splice</code>s it out entirely.</li>
+              <li>Add a getter <code>totalCards</code> that counts all cards across all columns. Display it in a header.</li>
+              <li>Separate state: put the cards in one <code>useState</code> object and a <code>ui</code> state in another that tracks which column is "highlighted" when hovered (use <code>t-on-mouseenter</code> / <code>t-on-mouseleave</code>).</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a component with reactive state via <code>useState</code> that updates the UI when mutated (e.g. a counter). Explain how OWL’s reactivity tracks property access and re-renders only affected components.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>useState(obj)</code> returns a deep Proxy that schedules a component re-render on any mutation.</li>
+              <li>Assign the result to a class field: <code>state = useState({ ... })</code>. Access with <code>this.state.x</code> in methods, <code>state.x</code> in templates.</li>
+              <li>All mutations are direct: <code>this.state.count++</code>, <code>this.state.items.push(x)</code>, <code>this.state.user.name = "Bob"</code>.</li>
+              <li>Array mutation methods (<code>push</code>, <code>splice</code>, <code>sort</code>) are intercepted. Non-mutating methods (<code>filter</code>, <code>map</code>) are not — assign the result back to trigger a re-render.</li>
+              <li>Multiple <code>useState</code> objects per component are fine — use them to separate concerns.</li>
+              <li>Use JS getters for computed/derived values. They re-run on each render automatically.</li>
+              <li>Use <code>useRef</code> (or a plain property) for values that must not trigger re-renders (timer IDs, abort controllers, etc.).</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is <code>useState</code>?</li>
+            <li>How does OWL reactivity work?</li>
+            <li>When does a component re-render?</li>
+            <li>Is state mutation direct or immutable in OWL?</li>
+            <li>What is the difference between props and state?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/owljs/core/components.html" class="topic-tag owl-topic-tag">🦉 Components</a>
+            <a href="/owljs/core/events.html" class="topic-tag owl-topic-tag">🦉 Event Handling</a>
+            <a href="/owljs/lifecycle/setup-mounted.html" class="topic-tag owl-topic-tag">🦉 setup &amp; onMounted</a>
+            <a href="/owljs/templates/list-rendering.html" class="topic-tag owl-topic-tag">🦉 List Rendering</a>
+            <a href="/owljs/advanced/hooks.html" class="topic-tag owl-topic-tag">🦉 Custom Hooks</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Do I need to call a render function after mutating state? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — never. OWL detects every mutation on a <code>useState</code> object automatically (via the Proxy) and schedules a re-render for you. Calling <code>this.render()</code> manually is almost always a mistake and can cause double-renders. The only exception is a very unusual case where you bypass the Proxy, which you should never do in normal code.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens if I assign a new object to state instead of mutating? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Assigning a new object to a property of the reactive proxy is fine and triggers a re-render: <code>this.state.user = { name: "New" }</code> works. The new object is then wrapped by the Proxy when accessed again. However, replacing the entire <code>state</code> itself (<code>this.state = { ... }</code>) would replace the Proxy with a plain object — mutations on the new object would not be detected. Always mutate through the Proxy reference returned by <code>useState</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can useState be called inside a method instead of as a class field? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Only inside <code>setup()</code> — hooks in OWL (like <code>useState</code>) must be called during the <code>setup</code> lifecycle phase, which runs synchronously when the component is constructed. Calling <code>useState</code> inside an event handler or an async method will throw. The most common pattern is to declare it as a class field (<code>state = useState({...})</code>), which is equivalent to calling it in the constructor. If you use <code>setup()</code>, call it there.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does Object.assign / spread not trigger a re-render? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>Object.assign(this.state, { count: 5 })</code> actually works — it assigns to properties on the Proxy, which intercepts the sets. However, <code>const s = { ...this.state }; s.count = 5; this.state = s;</code> would not, because you replaced the Proxy with a plain object. A spread produces a new plain object; if you spread into a new object and assign it back to the reactive proxy property, the inner object is no longer reactive. Stick to direct property mutations for clarity.</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/core/props.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Props</span>
+          </a>
+          <a href="/owljs/core/events.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Event Handling</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

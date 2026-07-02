@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Variables (Custom Properties) – Complete Guide | ylearner</title>
+  <meta name="description" content="Master CSS custom properties (variables): declaring with --var-name, using var(), scope, fallback values, theming, and updating variables with JavaScript. Free tutorial.">
+  <meta name="keywords" content="CSS variables, CSS custom properties, var() CSS, CSS theming, CSS dark mode variables, CSS --var-name, CSS variable fallback, CSS variables JavaScript">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/csslessons/advanced/variables.html">
+  <meta property="og:title" content="CSS Variables (Custom Properties) – Complete Guide | ylearner">
+  <meta property="og:description" content="Learn CSS custom properties from scratch — declare, use, scope, fallback values, theming, and JS updates.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/csslessons/advanced/variables.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CSS Variables Complete Guide | ylearner">
+  <meta name="twitter:description" content="CSS custom properties (--var-name), var(), scope, fallbacks, theming — complete tutorial with examples.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "CSS Variables (Custom Properties)",
+    "description": "Complete guide to CSS custom properties — declaring variables, using var(), local vs global scope, fallback values, theming patterns, and JavaScript integration.",
+    "educationalLevel": "Intermediate",
+    "keywords": "CSS variables, CSS custom properties, var(), CSS theming, CSS dark mode",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/csslessons/what-is-css.html">CSS</a><span class="separator">›</span>
+          <a href="/csslessons/advanced/variables.html">Advanced CSS</a><span class="separator">›</span>
+          <span class="current">CSS Variables</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Advanced CSS</div>
+          <h1>CSS Variables – Custom Properties Explained</h1>
+          <p class="lesson-intro">CSS custom properties, commonly called CSS variables, let you store values in named containers and reuse them throughout your stylesheet. Defined once at the top, used everywhere — and when you change the variable, every element using it updates automatically. They unlock powerful patterns like runtime theming, dark mode, and component-level design tokens, all without JavaScript build tools.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 18 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 1 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="declaring">Declaring CSS Variables</h2>
+          <p>Custom property names must start with two dashes (<code>--</code>). They are case-sensitive. Declare them inside any CSS rule; the declaration is scoped to that selector.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Declaring variables</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Global variables — declared on :root, available everywhere */
+:root {
+  --primary-color: #1572B6;
+  --secondary-color: #e44d26;
+  --font-size-base: 16px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 32px;
+  --border-radius: 6px;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Local variable — scoped to .card and its children */
+.card {
+  --card-padding: 24px;
+  padding: var(--card-padding);
+}
+</code></pre>
+          </div>
+
+          <h2 id="using">Using Variables with var()</h2>
+          <p>Read a variable anywhere in a property value using <code>var(--name)</code>. The variable resolves to its declared value at computed time.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Using var()</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">button {
+  background: var(--primary-color);
+  color: #fff;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  font-size: var(--font-size-base);
+}
+
+h1 {
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-lg);
+}
+
+a {
+  color: var(--secondary-color);
+}
+</code></pre>
+          </div>
+
+          <h2 id="fallback">Fallback Values</h2>
+          <p><code>var()</code> accepts an optional second argument — a fallback used when the variable is not defined. Fallbacks can themselves contain <code>var()</code> calls.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Fallback values</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* var(--name, fallback) */
+.btn {
+  color: var(--btn-color, #fff);          /* uses #fff if --btn-color not set */
+  padding: var(--btn-padding, 10px 20px); /* multi-value fallback */
+}
+
+/* Chained fallbacks */
+h2 {
+  font-size: var(--heading-lg, var(--font-size-base, 16px));
+  /* tries --heading-lg, then --font-size-base, then 16px */
+}
+</code></pre>
+          </div>
+
+          <h2 id="scope">Scope and Inheritance</h2>
+          <p>CSS variables follow the same cascade and inheritance rules as other properties. A child element can access any variable declared on an ancestor — including <code>:root</code>. Redeclaring a variable in a nested selector overrides it locally without affecting the rest of the document.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Scope</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">:root {
+  --color: #1572B6;   /* global default */
+}
+
+.card {
+  --color: #e44d26;   /* override locally for .card and children */
+  background: var(--color);   /* #e44d26 */
+}
+
+.card .title {
+  color: var(--color);   /* still #e44d26 — inherits from .card */
+}
+
+h1 {
+  color: var(--color);   /* #1572B6 — uses :root value */
+}
+</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="theming">Theming with CSS Variables</h2>
+          <p>The most powerful use of custom properties is runtime theming. Define all design tokens on <code>:root</code>, then override them under a theme class or media query. No extra stylesheet download needed.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Dark mode theming</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Light theme — default */
+:root {
+  --bg: #ffffff;
+  --text: #1a1a1a;
+  --surface: #f5f5f5;
+  --primary: #1572B6;
+  --border: #e0e0e0;
+}
+
+/* Dark theme — toggled via class or prefers-color-scheme */
+[data-theme="dark"],
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121212;
+    --text: #f1f1f1;
+    --surface: #1e1e1e;
+    --primary: #4fc3f7;
+    --border: #333333;
+  }
+}
+
+/* Components just use the tokens — no change needed */
+body       { background: var(--bg); color: var(--text); }
+.card      { background: var(--surface); border: 1px solid var(--border); }
+a, .btn    { color: var(--primary); }
+</code></pre>
+          </div>
+
+          <h2 id="javascript">Updating Variables with JavaScript</h2>
+          <p>JavaScript can read and write CSS custom properties at runtime, enabling dynamic theming or user-controlled styles without rewriting CSS classes.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JS – Updating CSS variables</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const root = document.documentElement;  // or any element
+
+// Read a variable
+const primary = getComputedStyle(root).getPropertyValue('--primary-color').trim();
+console.log(primary); // e.g. "#1572B6"
+
+// Set a variable
+root.style.setProperty('--primary-color', '#e44d26');
+
+// Remove / revert to stylesheet value
+root.style.removeProperty('--primary-color');
+
+// Practical: theme switcher
+document.querySelector('#themeToggle').addEventListener('click', () => {
+  const current = root.getAttribute('data-theme');
+  root.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+});
+
+// Practical: user-controlled font size slider
+document.querySelector('#fontSlider').addEventListener('input', (e) => {
+  root.style.setProperty('--font-size-base', e.target.value + 'px');
+});
+</code></pre>
+          </div>
+
+          <h2 id="design-tokens">Design Tokens Pattern</h2>
+          <p>Large projects organize CSS variables as design tokens — a single source of truth for every visual value: spacing, color, typography, shadow, radius. Components reference tokens rather than raw values, making global restyling a one-line change.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Design token system</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">:root {
+  /* Primitive tokens */
+  --color-blue-500: #1572B6;
+  --color-blue-600: #0f5fa0;
+  --color-red-500:  #e44d26;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-4: 16px;
+  --space-8: 32px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-full: 9999px;
+
+  /* Semantic tokens — reference primitives */
+  --color-primary:        var(--color-blue-500);
+  --color-primary-hover:  var(--color-blue-600);
+  --color-danger:         var(--color-red-500);
+  --spacing-component:    var(--space-4);
+  --border-radius-button: var(--radius-sm);
+}
+
+/* Now components use semantic tokens — easy to retheme */
+.btn-primary {
+  background: var(--color-primary);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--border-radius-button);
+}
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+}
+</code></pre>
+          </div>
+
+          <h2 id="deep-cssvars">CSS Custom Properties: Variables That Live in the Browser</h2>
+          <p>Custom properties (<code>--name</code>) are real variables that <em>cascade and inherit</em> like any CSS value — and unlike Sass variables, they exist at runtime, so JavaScript and media queries can change them live.</p>
+          <pre><code class="language-css">:root {                     /* define globally on the root */
+  --brand: #0066ff;
+  --gap: 16px;
+}
+.btn { background: var(--brand); padding: var(--gap); }
+.btn:hover { background: var(--brand-dark, #004); }  /* fallback if unset */</code></pre>
+          <h3>The runtime superpower</h3>
+          <pre><code class="language-css">/* Theme switch by overriding one scope — no duplicated rules */
+.dark { --brand: #4488ff; --bg: #111; }</code></pre>
+          <pre><code class="language-javascript">// change a variable from JS — everything using it updates
+el.style.setProperty("--brand", "tomato");</code></pre>
+          <table>
+            <thead><tr><th></th><th>CSS custom property</th><th>Sass <code>$var</code></th></tr></thead>
+            <tbody>
+              <tr><td>Exists at</td><td>runtime (in the browser)</td><td>compile time only</td></tr>
+              <tr><td>Cascades/inherits</td><td>yes</td><td>no</td></tr>
+              <tr><td>JS can change</td><td>yes</td><td>no</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Note the scope:</strong> a custom property is inherited by descendants, so redefining <code>--brand</code> on a container re-themes just that subtree. This is how modern dark-mode and theming work without shipping two stylesheets.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Define a variable on <code>:root</code>.</li>
+              <li>Use it with <code>var()</code>.</li>
+              <li>Provide a fallback value in <code>var()</code>.</li>
+              <li>Override a variable in a nested scope.</li>
+              <li>Change a variable on <code>:hover</code> or with JavaScript.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a theme system with custom properties: define color/spacing variables on <code>:root</code>, use them throughout, then add a <code>.dark-theme</code> class that overrides the variables to switch the whole palette. Explain how custom properties differ from Sass variables (runtime vs compile-time).</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Declare with <code>--name: value;</code> inside any selector. Use <code>:root</code> for global variables.</li>
+              <li>Read with <code>var(--name)</code> in any property value.</li>
+              <li><code>var(--name, fallback)</code> — second argument is the fallback when variable is undefined.</li>
+              <li>Variables are scoped to their selector and inherited by children. Redeclare in a nested scope to override locally.</li>
+              <li>Dark mode theming: define tokens on <code>:root</code>, override under <code>[data-theme="dark"]</code> or <code>prefers-color-scheme: dark</code>.</li>
+              <li>JavaScript: <code>getPropertyValue()</code> to read, <code>setProperty()</code> to write, <code>removeProperty()</code> to revert.</li>
+              <li>Design tokens pattern: primitive tokens → semantic tokens → component styles. One change, global effect.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What are CSS custom properties (variables)?</li>
+            <li>How do you declare and use a CSS variable?</li>
+            <li>What is the difference between CSS variables and Sass variables?</li>
+            <li>How do variable scope and inheritance work?</li>
+            <li>How can JavaScript read or change a CSS variable?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/csslessons/effects/transitions.html" class="topic-tag css-topic-tag">🎨 CSS Transitions</a>
+            <a href="/csslessons/advanced/pseudo-classes.html" class="topic-tag css-topic-tag">🔧 CSS Pseudo-classes</a>
+            <a href="/csslessons/advanced/specificity.html" class="topic-tag css-topic-tag">🔧 CSS Specificity</a>
+            <a href="/csslessons/advanced/best-practices.html" class="topic-tag css-topic-tag">🔧 CSS Best Practices</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between CSS variables and preprocessor variables (Sass/Less)? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Sass/Less variables are compile-time — they are resolved once during the build step and replaced with their values in the output CSS. The browser never sees the variable names. CSS custom properties are runtime — the browser keeps the variable names and their values, resolves them during rendering, and you can change them with JavaScript or media queries without re-compiling anything. CSS variables also cascade and inherit like normal properties; Sass variables do not.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use CSS variables inside calc()? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — <code>calc(var(--spacing-md) * 2)</code> works perfectly. The variable is substituted first, then <code>calc()</code> evaluates. This is extremely useful for spacing systems: declare a base unit like <code>--space: 8px</code> and compute all spacing from it: <code>padding: calc(var(--space) * 2)</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Are CSS variables supported in all browsers? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — CSS custom properties have been supported in all major browsers since 2016 (Chrome 49, Firefox 31, Safari 9.1, Edge 15). Global support is above 96% as of 2026. The only holdout was Internet Explorer, which is now end-of-life. You can use CSS variables without any polyfill in modern production projects.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can a CSS variable reference another CSS variable? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — <code>--semantic: var(--primitive);</code> creates a chain. The browser resolves variable references lazily, so a variable can reference another variable declared later in the same rule or declared on the same element via a different rule. Circular references (A references B, B references A) produce an invalid value and the property falls back to its initial value.</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/csslessons/effects/quiz.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+          <a href="/csslessons/advanced/pseudo-classes.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">CSS Pseudo-classes</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

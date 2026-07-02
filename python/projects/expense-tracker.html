@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Expense Tracker – Budget Tracking Project | ylearner</title>
+  <meta name="description" content="Build a Python expense tracker with categories, monthly summaries, budget alerts, and CSV export. Data persistence with JSON.">
+  <meta name="keywords" content="python expense tracker project, python budget app, python finance project, python csv project">
+  <link rel="canonical" href="https://ylearner.org/python/projects/expense-tracker.html">
+  <meta property="og:title" content="Python Expense Tracker – Budget Tracking Project | ylearner">
+  <meta property="og:description" content="Build a Python expense tracker with categories, monthly summaries, budget alerts, and CSV export. Data persistence with JSON.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/projects/expense-tracker.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Expense Tracker – Budget Tracking Project | ylearner">
+  <meta name="twitter:description" content="Build a Python expense tracker with categories, monthly summaries, budget alerts, and CSV export. Data persistence with JSON.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python Expense Tracker Project","description":"Python expense tracker with categories, budget alerts, monthly summaries, and CSV export.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/projects/calculator.html">Projects</a><span class="separator">›</span><span class="current">Expense Tracker</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">💰 Projects</div>
+          <h1>Python Expense Tracker</h1>
+          <p class="lesson-intro">Track income and expenses by category, view monthly summaries, set budget limits, and export reports to CSV.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Projects</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="code">Complete Implementation</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import csv, json
+from datetime import datetime
+from pathlib import Path
+from collections import defaultdict
+
+DATA_FILE = Path("expenses.json")
+
+class ExpenseTracker:
+    def __init__(self):
+        self.expenses, self.budgets = [], {}
+        if DATA_FILE.exists():
+            data = json.loads(DATA_FILE.read_text())
+            self.expenses = data.get("expenses", [])
+            self.budgets = data.get("budgets", {})
+
+    def save(self):
+        DATA_FILE.write_text(json.dumps({"expenses": self.expenses, "budgets": self.budgets}, indent=2))
+
+    def add(self, amount, category, description, date=""):
+        self.expenses.append({
+            "id": len(self.expenses) + 1,
+            "amount": amount, "category": category,
+            "description": description,
+            "date": date or datetime.now().strftime("%Y-%m-%d"),
+        })
+        self.save()
+
+    def monthly_summary(self, year, month):
+        totals = defaultdict(float)
+        for e in self.expenses:
+            y, m, _ = e["date"].split("-")
+            if int(y) == year and int(m) == month:
+                totals[e["category"]] += e["amount"]
+        return dict(totals)
+
+    def check_budget(self, year, month):
+        summary = self.monthly_summary(year, month)
+        return [
+            f"OVER BUDGET {cat}: spent ${spent:.2f} / limit ${self.budgets[cat]:.2f}"
+            for cat, spent in summary.items()
+            if cat in self.budgets and spent > self.budgets[cat]
+        ]
+
+    def export_csv(self, filepath):
+        with open(filepath, "w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=["id","date","category","amount","description"])
+            writer.writeheader()
+            writer.writerows(self.expenses)
+
+# Demo
+t = ExpenseTracker()
+t.add(45.50, "Food", "Grocery")
+t.add(120.00, "Housing", "Electricity")
+t.budgets["Food"] = 300.00
+
+now = datetime.now()
+for cat, total in t.monthly_summary(now.year, now.month).items():
+    print(f"{cat}: ${total:.2f}")
+for alert in t.check_budget(now.year, now.month):
+    print(alert)
+t.export_csv("expenses.csv")</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> Add a matplotlib bar chart of monthly spending per category — turns this into a data visualization project too.</div>
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Improve the expense tracker:</p>
+            <ol>
+              <li>Add categories to each expense and total spending per category.</li>
+              <li>Persist expenses to a CSV or JSON file so they survive restarts.</li>
+              <li>Add a command to show the highest single expense.</li>
+              <li>Validate that amounts are positive numbers.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Extend the tracker into a small personal-finance tool: store expenses with date, category, and amount in a database (SQLite), add monthly summaries and a simple budget check that warns when a category exceeds its limit, and export a report. Bonus: visualize spending by category with a Matplotlib bar chart.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>This project builds an expense tracker that records and summarizes spending.</li>
+              <li>Each expense holds an amount and metadata such as category and date.</li>
+              <li>Data is persisted to a file or database so it survives restarts.</li>
+              <li>Input validation keeps amounts sensible and positive.</li>
+              <li>Aggregation (totals per category, monthly summaries) turns raw data into insight.</li>
+              <li>It can grow with budgets, reports, and charts.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Building an Expense Tracker</h2>
+          <ul class="interview-list">
+            <li>How would you model an expense record in Python?</li>
+            <li>How do you persist data between program runs?</li>
+            <li>What is a good data structure for grouping expenses by category?</li>
+            <li>How do you validate financial input safely?</li>
+            <li>How would you generate a monthly summary report?</li>
+            <li>Why might you use the <code>decimal</code> module for money?</li>
+            <li>How would you add data visualization?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/data-structures/dictionaries.html" class="topic-tag">🗂️ Dictionaries</a>
+            <a href="/python/intermediate/csv.html" class="topic-tag">📊 CSV Files</a>
+            <a href="/python/real-world/database.html" class="topic-tag">🗄️ Databases</a>
+            <a href="/python/data-science/matplotlib.html" class="topic-tag">📈 Matplotlib</a>
+            <a href="/python/intermediate/datetime.html" class="topic-tag">📅 Date & Time</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Should I store money as a float? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>For accurate financial calculations, prefer the <code>decimal.Decimal</code> type, which avoids the binary rounding errors of floats. Floats are fine for casual learning but can produce cent-level discrepancies in real money math.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I make expenses persist between runs? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Write them to storage — a CSV or JSON file for simplicity, or a SQLite database for structured queries. On startup, load the existing data back into memory before accepting new entries.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I total spending by category? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Group the expenses by their category key — a dictionary mapping category to a running total, or pandas’ <code>groupby</code> if you load the data into a DataFrame.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How can I visualize the spending? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Aggregate totals per category, then plot them with Matplotlib (a bar or pie chart) or Seaborn. Keeping the data layer separate makes adding visualization straightforward.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/projects/todo-app.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Todo App</span>
+          </a>
+          <a href="/python/projects/weather-app.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Weather App</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

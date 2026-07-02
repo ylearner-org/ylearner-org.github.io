@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Website Forms – Contact and Custom Forms | ylearner</title>
+  <meta name="description" content="Build forms on the Odoo website: the built-in website_form widget, SPAM protection, custom POST controllers, file uploads, and confirmation redirects.">
+  <meta name="keywords" content="Odoo website forms, website_form, contact form, Odoo form POST, SPAM protection, website form controller, Odoo 19">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/website/website-forms.html">
+  <meta property="og:title" content="Odoo Website Forms – Contact and Custom Forms">
+  <meta property="og:description" content="Build forms on the Odoo website: the built-in website_form widget, SPAM protection, custom POST controllers, file uploads, and confirmation redirects.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/website/website-forms.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Website Forms – Contact and Custom Forms | ylearner">
+  <meta name="twitter:description" content="Build website forms in Odoo with SPAM protection, POST controllers, and file uploads.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Website Forms – Contact and Custom Forms",
+    "description": "Build forms on the Odoo website: the built-in website_form widget, SPAM protection, custom POST controllers, file uploads, and confirmation redirects.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo website forms, website_form, SPAM protection, POST controller, file upload",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/website/website-overview.html">Website Development</a><span class="separator">›</span>
+          <span class="current">Website Forms</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">💻 Website Development</div>
+          <h1>Odoo Website Forms – Contact and Custom Forms</h1>
+          <p class="lesson-intro">Website forms let visitors submit data from public pages — contact requests, lead generation, event registrations, or custom enquiries. Odoo provides a built-in <code>website_form</code> JavaScript widget for simple cases, and the full POST controller pattern for custom logic.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="deep-webforms">Website Forms: Turning Visitor Input Into Records</h2>
+          <p>Odoo's website builder lets you drop a form on a page that <strong>creates a record</strong> on submit — a contact request, a job application, a lead. It posts to a built-in generic endpoint that maps fields to a model.</p>
+          <pre><code class="language-html">&lt;form action="/website/form/" method="post" data-model_name="crm.lead"&gt;
+  &lt;input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/&gt;
+  &lt;input type="text"  name="contact_name"  required="1"/&gt;
+  &lt;input type="email" name="email_from"    required="1"/&gt;
+  &lt;textarea name="description"&gt;&lt;/textarea&gt;
+  &lt;button type="submit"&gt;Send&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+          <p>The <code>data-model_name</code> tells Odoo which model to create; each input's <code>name</code> must match a field on that model. The <code>/website/form/</code> controller validates and creates the record.</p>
+          <table>
+            <thead><tr><th>Concern</th><th>Handling</th></tr></thead>
+            <tbody>
+              <tr><td>CSRF</td><td>include the <code>csrf_token</code> — required, blocks forged posts</td></tr>
+              <tr><td>Allowed fields</td><td>a model's <code>_website_form_fields</code> whitelist limits what can be set</td></tr>
+              <tr><td>Spam</td><td>add a honeypot/captcha for public forms</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Security matters here because the form is public.</strong> Odoo only lets website forms write to fields a model explicitly whitelists (via <code>_website_form_fields</code> / the <code>website_form</code> access), so a visitor can't set arbitrary fields like <code>user_id</code> or prices by injecting hidden inputs. Always keep the CSRF token, validate/whitelist server-side, and add anti-spam (captcha) on any public-facing form. For custom target models, you must opt the model and its safe fields into website forms explicitly.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Add a form snippet to a page.</li>
+              <li>Map form fields to a model.</li>
+              <li>Handle the submission.</li>
+              <li>Add a success message.</li>
+              <li>Add spam protection (concept).</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a public contact/lead form on a website page that creates a record in a backend model on submit, with validation and a thank-you message. Explain how the Website Form snippet maps fields to a model and how submissions are stored.</p>
+          </div>
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>The built-in <code>website_form</code> widget and when to use it</li>
+              <li>Writing a custom POST controller for website form submissions</li>
+              <li>CSRF and SPAM protection on public forms</li>
+              <li>Handling file uploads and confirmation redirects</li>
+            </ul>
+          </div>
+
+          <h2 id="website-form-widget">The website_form Widget</h2>
+          <p>For standard forms that create records (leads, job applications, contact messages), the <code>website_form</code> JavaScript widget handles submission, validation, and SPAM protection automatically. Enable it by adding <code>data-model-name</code> to your form tag:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (QWeb)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;form id="contact_form"
+      class="s_website_form"
+      action="/website_form/"
+      method="post"
+      data-model-name="crm.lead"
+      data-success-page="/contactus-thank-you"&gt;
+
+  &lt;input type="hidden" name="csrf_token"
+         t-att-value="request.csrf_token()"/&gt;
+
+  &lt;div class="form-group"&gt;
+    &lt;label for="contact_name"&gt;Name&lt;/label&gt;
+    &lt;input type="text" class="form-control"
+           name="contact_name" required="required"/&gt;
+  &lt;/div&gt;
+
+  &lt;div class="form-group"&gt;
+    &lt;label for="email_from"&gt;Email&lt;/label&gt;
+    &lt;input type="email" class="form-control"
+           name="email_from" required="required"/&gt;
+  &lt;/div&gt;
+
+  &lt;div class="form-group"&gt;
+    &lt;label for="description"&gt;Message&lt;/label&gt;
+    &lt;textarea class="form-control" name="description" rows="5"/&gt;
+  &lt;/div&gt;
+
+  &lt;button type="submit" class="btn btn-primary"&gt;Send&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+          </div>
+          <p>The <code>website_form</code> widget posts to <code>/website_form/{model_name}</code> and creates a record using the form field names as model field names. The model must allow website form creation — configure this in Website → Configuration → Form Allowed Models.</p>
+
+          <h2 id="custom-post-controller">Custom POST Controller</h2>
+          <p>For custom logic (multi-step forms, complex validation, multiple model writes), write your own controller:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo import http
+from odoo.http import request
+
+class LibraryWebsite(http.Controller):
+
+    @http.route('/books/request', type='http',
+                auth='public', website=True, methods=['GET', 'POST'])
+    def book_request_form(self, **kw):
+        if request.httprequest.method == 'POST':
+            return self._handle_book_request(kw)
+
+        books = request.env['library.book'].sudo().search([
+            ('website_published', '=', True)
+        ])
+        return request.render('my_module.book_request_form', {
+            'books': books, 'errors': {}, 'values': {},
+        })
+
+    def _handle_book_request(self, values):
+        errors = {}
+        name = (values.get('visitor_name') or '').strip()
+        email = (values.get('visitor_email') or '').strip()
+        book_id = int(values.get('book_id') or 0)
+
+        if not name:
+            errors['visitor_name'] = 'Name is required.'
+        if not email or '@' not in email:
+            errors['visitor_email'] = 'Valid email required.'
+        if not book_id:
+            errors['book_id'] = 'Please select a book.'
+
+        if errors:
+            books = request.env['library.book'].sudo().search([
+                ('website_published', '=', True)
+            ])
+            return request.render('my_module.book_request_form', {
+                'books': books, 'errors': errors, 'values': values,
+            })
+
+        request.env['library.book.request'].sudo().create({
+            'visitor_name': name,
+            'visitor_email': email,
+            'book_id': book_id,
+        })
+        return request.redirect('/books/request/thank-you')</code></pre>
+          </div>
+
+          <h2 id="csrf-protection">CSRF Protection on Public Forms</h2>
+          <p>All POST forms must include the CSRF token. For public (unauthenticated) pages, the token is still required:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (QWeb)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;form method="post" action="/books/request"&gt;
+  &lt;input type="hidden" name="csrf_token"
+         t-att-value="request.csrf_token()"/&gt;
+  ...
+&lt;/form&gt;</code></pre>
+          </div>
+          <p>Without the CSRF token, Odoo returns HTTP 403. The token is tied to the visitor's session, which Odoo creates automatically even for anonymous visitors.</p>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="spam-protection">SPAM Protection</h2>
+          <p>Public forms are targets for bot spam. Odoo's <code>website_form</code> widget adds a honeypot field automatically. For custom forms, implement your own protection:</p>
+          <ul>
+            <li><strong>Honeypot field</strong> — an invisible input; if filled in, it's a bot:</li>
+          </ul>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (QWeb)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;!-- Hidden from real users via CSS, filled by bots --&gt;
+&lt;input type="text" name="website_url"
+       style="display:none" tabindex="-1" autocomplete="off"/&gt;</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># In controller: reject if honeypot filled
+if values.get('website_url'):
+    return request.redirect('/books/request')  # silently ignore bots</code></pre>
+          </div>
+
+          <h2 id="file-uploads">File Uploads</h2>
+          <p>For file uploads, add <code>enctype="multipart/form-data"</code> to the form and access files in the controller:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">import base64
+
+attachment = request.httprequest.files.get('document')
+if attachment and attachment.filename:
+    data = attachment.read()
+    # Validate size (max 5 MB)
+    if len(data) > 5 * 1024 * 1024:
+        errors['document'] = 'File must be under 5 MB.'
+    else:
+        request.env['ir.attachment'].sudo().create({
+            'name': attachment.filename,
+            'datas': base64.b64encode(data),
+            'res_model': 'library.book.request',
+            'res_id': book_request.id,
+        })</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Use the <code>website_form</code> widget for simple record-creation forms — it handles SPAM and validation automatically</li>
+              <li>For custom logic, write a GET/POST controller with manual validation and a POST/Redirect/GET pattern</li>
+              <li>Always include <code>csrf_token</code> in every POST form</li>
+              <li>Validate file type and size before creating <code>ir.attachment</code> records</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you add a form to an Odoo website?</li>
+            <li>How are form fields mapped to a model?</li>
+            <li>How is a submission stored?</li>
+            <li>How do you validate website form input?</li>
+            <li>How do you protect a public form from spam?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/website/website-controllers.html" class="topic-tag odoo-topic-tag">💻 Website Controllers</a>
+              <a href="/odoo/website/qweb-templates.html" class="topic-tag odoo-topic-tag">💻 QWeb Templates</a>
+              <a href="/odoo/portal/portal-forms.html" class="topic-tag odoo-topic-tag">🌐 Portal Forms</a>
+              <a href="/odoo/website/snippets.html" class="topic-tag odoo-topic-tag">💻 Website Snippets</a>
+            </div>
+          </section>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">When should I use website_form vs a custom POST controller? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use <code>website_form</code> when you're creating a single record (lead, contact message, job application) and standard field mapping is sufficient. Use a custom controller when you need multi-model writes, complex validation, file uploads alongside record creation, or conditional logic based on submitted values.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I show a thank-you page after form submission? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Redirect to a dedicated thank-you URL after successful processing: <code>return request.redirect('/my-form/thank-you')</code>. Create a simple controller and template for that URL. This also prevents duplicate submissions on browser refresh (POST/Redirect/GET pattern).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use reCAPTCHA with Odoo website forms? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — the <code>google_recaptcha</code> module integrates reCAPTCHA v3 with the <code>website_form</code> widget. Configure the site key in Website → Configuration → Settings. For custom forms, call <code>request.env['ir.recaptcha']._verify_recaptcha_token(token)</code> in your controller.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a href="/odoo/website/qweb-templates.html" class="lesson-nav-link">
+        <span class="nav-label">← Prev</span>
+        <span class="nav-title">QWeb Templates</span>
+        </a>
+        <a href="/odoo/website/snippets.html" class="lesson-nav-link next">
+        <span class="nav-label">Next →</span>
+        <span class="nav-title">Website Snippets</span>
+        </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

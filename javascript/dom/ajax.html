@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript AJAX – XMLHttpRequest, Fetch &amp; Axios | ylearner</title>
+  <meta name="description" content="Learn JavaScript AJAX: what it is, XMLHttpRequest GET and POST, parsing JSON responses, modern Fetch approach, Axios library intro, CORS policy, real-world use cases, and XHR vs fetch comparison.">
+  <meta name="keywords" content="javascript ajax, XMLHttpRequest javascript, ajax fetch, axios javascript, ajax json, readyState javascript, onreadystatechange, CORS ajax, ajax form submit">
+  <link rel="canonical" href="https://ylearner.org/javascript/dom/ajax.html">
+  <meta property="og:title" content="JavaScript AJAX – XMLHttpRequest, Fetch &amp; Axios | ylearner">
+  <meta property="og:description" content="Learn JavaScript AJAX: XMLHttpRequest, modern Fetch, Axios, CORS, and real-world use cases for loading data without page reload.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/dom/ajax.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript AJAX – XMLHttpRequest, Fetch &amp; Axios | ylearner">
+  <meta name="twitter:description" content="Learn JavaScript AJAX: XMLHttpRequest, modern Fetch, Axios, CORS, and real-world use cases for loading data without page reload.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/dom/dom-manipulation.html">DOM &amp; Browser</a><span class="separator">›</span>
+          <span class="current">AJAX</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 DOM &amp; Browser</div>
+          <h1>JavaScript AJAX – Asynchronous Data Loading</h1>
+          <p class="lesson-intro"><strong>AJAX</strong> (Asynchronous JavaScript And XML) is a technique for exchanging data with a server in the background without reloading the page. It transformed the web from static documents to dynamic applications. Today AJAX is implemented with the Fetch API, but understanding the original <code>XMLHttpRequest</code> is still valuable for legacy codebases and interviews.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 19 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-ajax">What Is AJAX?</h2>
+          <p>AJAX is not a language or library — it is a <em>technique</em> combining:</p>
+          <ul>
+            <li><strong>JavaScript</strong> — orchestrates the request and handles the response</li>
+            <li><strong>XMLHttpRequest or Fetch API</strong> — sends the HTTP request</li>
+            <li><strong>JSON (or XML)</strong> — the data format exchanged (JSON dominates today)</li>
+            <li><strong>DOM manipulation</strong> — updates the page with the response data</li>
+          </ul>
+          <p>Classic use cases include live search suggestions, infinite scroll, form submission without reload, and real-time dashboards.</p>
+
+          <h2 id="xmlhttprequest">XMLHttpRequest (XHR)</h2>
+          <p>XHR was the only AJAX mechanism for over a decade. Understanding it explains why Fetch was created:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// XHR GET request
+const xhr = new XMLHttpRequest();
+
+// 1. Configure: method, URL, async (always true in modern code)
+xhr.open('GET', 'https://jsonplaceholder.typicode.com/posts/1', true);
+
+// 2. Set response type
+xhr.responseType = 'json'; // auto-parse JSON
+
+// 3. Attach event handlers
+xhr.onreadystatechange = function() {
+  // readyState: 0=UNSENT, 1=OPENED, 2=HEADERS_RECEIVED, 3=LOADING, 4=DONE
+  if (xhr.readyState === XMLHttpRequest.DONE) {
+    if (xhr.status >= 200 &amp;&amp; xhr.status &lt; 300) {
+      console.log('Response:', xhr.response);
+    } else {
+      console.error('Error:', xhr.status, xhr.statusText);
+    }
+  }
+};
+
+xhr.onerror = () =&gt; console.error('Network error');
+
+// 4. Send the request
+xhr.send();</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+            <pre>Response: { userId: 1, id: 1, title: "sunt aut facere repellat...", body: "..." }</pre>
+          </div>
+
+          <h2 id="xhr-post">XHR POST Request</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function xhrPost(url, data, callback) {
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', url, true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.responseType = 'json';
+
+  xhr.onload = function() {
+    if (xhr.status &gt;= 200 &amp;&amp; xhr.status &lt; 300) {
+      callback(null, xhr.response);
+    } else {
+      callback(new Error(`HTTP ${xhr.status}`), null);
+    }
+  };
+
+  xhr.onerror = () =&gt; callback(new Error('Network error'), null);
+
+  xhr.send(JSON.stringify(data));
+}
+
+// Usage
+xhrPost(
+  'https://jsonplaceholder.typicode.com/posts',
+  { title: 'AJAX Post', body: 'Posted via XHR', userId: 1 },
+  (err, data) =&gt; {
+    if (err) { console.error(err); return; }
+    console.log('Created:', data);
+  }
+);</code></pre>
+          </div>
+
+          <h2 id="readystate-and-status">readyState and Status Codes</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Value</th><th>Constant</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr><td colspan="3"><strong>readyState</strong></td></tr>
+                <tr><td>0</td><td>UNSENT</td><td><code>open()</code> not called yet</td></tr>
+                <tr><td>1</td><td>OPENED</td><td><code>open()</code> called</td></tr>
+                <tr><td>2</td><td>HEADERS_RECEIVED</td><td><code>send()</code> called; headers received</td></tr>
+                <tr><td>3</td><td>LOADING</td><td>Response body downloading</td></tr>
+                <tr><td>4</td><td>DONE</td><td>Operation complete</td></tr>
+                <tr><td colspan="3"><strong>Common HTTP Status Codes</strong></td></tr>
+                <tr><td>200</td><td>OK</td><td>Success</td></tr>
+                <tr><td>201</td><td>Created</td><td>Resource created (POST)</td></tr>
+                <tr><td>204</td><td>No Content</td><td>Success, no body (DELETE)</td></tr>
+                <tr><td>400</td><td>Bad Request</td><td>Invalid request data</td></tr>
+                <tr><td>401</td><td>Unauthorized</td><td>Authentication required</td></tr>
+                <tr><td>404</td><td>Not Found</td><td>Resource does not exist</td></tr>
+                <tr><td>500</td><td>Internal Server Error</td><td>Server-side bug</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="ajax-with-fetch">Modern AJAX with Fetch</h2>
+          <p>Fetch achieves the same goals with far less boilerplate:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Live search using Fetch
+const searchInput = document.getElementById('search');
+const resultsList = document.getElementById('results');
+
+let debounceTimer;
+
+searchInput.addEventListener('input', () =&gt; {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(async () =&gt; {
+    const query = searchInput.value.trim();
+    if (!query) { resultsList.innerHTML = ''; return; }
+
+    try {
+      resultsList.innerHTML = '&lt;li&gt;Loading...&lt;/li&gt;';
+      const res  = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      resultsList.innerHTML = data.length
+        ? data.map(item =&gt; `&lt;li&gt;${item.name}&lt;/li&gt;`).join('')
+        : '&lt;li&gt;No results found&lt;/li&gt;';
+
+    } catch (err) {
+      resultsList.innerHTML = `&lt;li class="error"&gt;Error: ${err.message}&lt;/li&gt;`;
+    }
+  }, 300); // 300 ms debounce
+});</code></pre>
+          </div>
+
+          <h2 id="axios-intro">Axios – A Popular AJAX Library</h2>
+          <p>Axios is a third-party library that wraps XHR/Fetch with extra features: automatic JSON parsing, interceptors, request cancellation, and better error handling out of the box:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Include via CDN: &lt;script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"&gt;&lt;/script&gt;
+// Or install: npm install axios
+
+// GET — Axios auto-parses JSON
+async function getUsers() {
+  try {
+    const { data } = await axios.get('https://jsonplaceholder.typicode.com/users');
+    console.log(data); // already parsed array
+  } catch (error) {
+    // Axios DOES reject on HTTP errors (unlike native fetch)
+    console.error(error.response.status, error.message);
+  }
+}
+
+// POST
+async function createUser(userData) {
+  const { data } = await axios.post('/api/users', userData, {
+    headers: { Authorization: 'Bearer my-token' }
+  });
+  return data;
+}
+
+// Axios instance with base URL and default headers
+const api = axios.create({
+  baseURL: 'https://api.example.com',
+  timeout: 10000,
+  headers: { 'X-API-Key': 'abc123' }
+});
+
+// Use the instance
+const { data: profile } = await api.get('/profile');</code></pre>
+          </div>
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>When to use Axios vs Fetch</strong>
+              <p>Use the native <strong>Fetch API</strong> for new projects to avoid extra dependencies — it handles 95% of use cases. Choose <strong>Axios</strong> when you need: request/response interceptors, progress events for file uploads, automatic HTTP error rejection, or when supporting environments where fetch isn't available natively.</p>
+            </div>
+          </div>
+
+          <h2 id="cors-explained">CORS Policy Explained</h2>
+          <p>Browsers enforce the <strong>Same-Origin Policy</strong>: a page at <code>https://myapp.com</code> cannot freely request <code>https://api.other.com</code> unless that server explicitly allows it via CORS headers.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// This will be BLOCKED by the browser if api.other.com doesn't allow it
+fetch('https://api.other.com/data')
+  .catch(err =&gt; console.error(err)); // TypeError: Failed to fetch
+
+// The server must respond with:
+// Access-Control-Allow-Origin: https://myapp.com
+// (or * for any origin)
+
+// Preflight: for POST/PUT with custom headers, browser sends an OPTIONS
+// request first to check permissions — Fetch handles this automatically.
+
+// Workarounds (when you can't control the server):
+// 1. A proxy server on YOUR domain that forwards requests
+// 2. JSONP (legacy, only for GET, avoid in new code)
+
+// Example: proxy pattern
+const PROXY = 'https://myapp.com/proxy?url=';
+fetch(PROXY + encodeURIComponent('https://api.other.com/data'))
+  .then(r =&gt; r.json())
+  .then(data =&gt; console.log(data));</code></pre>
+          </div>
+
+          <h2 id="deep-ajax">AJAX: Updating the Page Without a Reload</h2>
+          <p>AJAX (Asynchronous JavaScript And XML) is the technique of fetching data from a server in the background and updating part of the page — no full reload. It's what makes modern web apps feel instant. The old <code>XMLHttpRequest</code> has been replaced by the cleaner <code>fetch</code>.</p>
+          <pre><code class="language-javascript">// modern AJAX = fetch + async/await
+async function loadUser(id) {
+  try {
+    const res = await fetch(`/api/users/${id}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);  // fetch won't throw on 404
+    const user = await res.json();
+    document.querySelector("#name").textContent = user.name;  // update just this
+  } catch (err) {
+    showError(err);
+  }
+}</code></pre>
+          <table>
+            <thead><tr><th>Old</th><th>Modern</th></tr></thead>
+            <tbody>
+              <tr><td><code>XMLHttpRequest</code></td><td><code>fetch()</code> (promise-based)</td></tr>
+              <tr><td>callbacks</td><td><code>async/await</code></td></tr>
+              <tr><td>XML</td><td>JSON (despite the name)</td></tr>
+            </tbody>
+          </table>
+          <p><strong>The concept that matters:</strong> instead of the browser requesting a whole new HTML page, JavaScript quietly asks the server for <em>data</em> (usually JSON now, despite AJAX's "X" for XML), then surgically updates the DOM — so only the changed part re-renders. That's the difference between a jarring page refresh and a smooth single-page app. <strong>The fetch gotcha to remember:</strong> <code>fetch</code> only rejects on network failure, not on HTTP error status — a 404 or 500 still "succeeds," so you must check <code>res.ok</code> yourself. <strong>Always handle errors</strong> (network drops, server errors) with <code>try/catch</code> and show the user feedback; a silent failed request looks like a frozen app.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build an infinite-scroll post list:</p>
+            <ol>
+              <li>On page load, fetch the first 10 posts from <code>https://jsonplaceholder.typicode.com/posts?_start=0&amp;_limit=10</code>.</li>
+              <li>Render each post as a card.</li>
+              <li>When the user scrolls near the bottom of the page (use a <code>scroll</code> listener on <code>window</code> and compare <code>scrollY + innerHeight</code> to <code>document.body.scrollHeight</code>), fetch the next 10 posts.</li>
+              <li>Show a loading spinner while fetching; stop when all 100 posts are loaded.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a GitHub user lookup tool using the public GitHub API (<code>https://api.github.com/users/{username}</code>). Features: text input + search button, display avatar, name, bio, followers, public repos; below that, load the user's top 5 repos by stars from <code>/users/{username}/repos?sort=stars&amp;per_page=5</code>. Handle 404 (user not found) and rate limit (403) errors with appropriate messages. Use XHR for the user lookup and Fetch for the repos — deliberately mixing both for practice.</p>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>AJAX is a technique for loading data asynchronously without page reloads.</li>
+              <li>XHR uses <code>open()</code>, <code>send()</code>, and <code>onreadystatechange</code>; check <code>readyState === 4</code> and <code>status</code>.</li>
+              <li>Modern AJAX uses the Fetch API with Promises and <code>async/await</code>.</li>
+              <li>Axios provides a cleaner API, auto JSON parsing, and HTTP error rejection.</li>
+              <li>CORS is enforced by the browser; the server must send <code>Access-Control-Allow-Origin</code> headers.</li>
+              <li>Debounce AJAX calls in search inputs to avoid excessive requests.</li>
+              <li>JSONP is a legacy workaround — avoid in new code; use a proxy instead.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does AJAX stand for and what problem does it solve?</li>
+            <li>What are the readyState values in XHR and what does each mean?</li>
+            <li>How does Axios differ from the native Fetch API?</li>
+            <li>What is a CORS preflight request?</li>
+            <li>How would you debounce an AJAX search request?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/javascript/dom/fetch-api.html" class="topic-tag">Fetch API</a>
+            <a href="/javascript/dom/web-storage.html" class="topic-tag">Web Storage</a>
+            <a href="/javascript/advanced/promises.html" class="topic-tag">Promises</a>
+            <a href="/javascript/advanced/async-await.html" class="topic-tag">Async/Await</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Is AJAX still relevant with modern frameworks? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Absolutely. React, Vue, and Angular all need to fetch data from APIs — they just abstract the Fetch or Axios calls into hooks or services. Understanding AJAX fundamentals makes you far more effective when debugging network issues, writing custom data-fetching logic, or working without a framework.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is JSONP and why should I avoid it? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>JSONP (JSON with Padding) is a legacy hack that injects a <code>&lt;script&gt;</code> tag pointing to a cross-origin URL. The server wraps the JSON in a callback function call, bypassing CORS. It only works for GET requests, is vulnerable to XSS if the server is compromised, and is completely superseded by CORS and proxy patterns. Don't use it in new code.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I show upload progress with Fetch? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The Fetch API does not natively expose upload progress events. For upload progress, use <code>XMLHttpRequest</code> with <code>xhr.upload.addEventListener('progress', handler)</code>, or use the Axios library which wraps XHR and exposes an <code>onUploadProgress</code> callback. The Streams API (via <code>fetch</code> request body as a <code>ReadableStream</code>) can provide some progress info but is experimental in most environments.</p></div>
+            </div>
+          </section>
+
+<div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/dom/fetch-api.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Fetch API</span></a>
+          <a href="/javascript/dom/web-storage.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Web Storage</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

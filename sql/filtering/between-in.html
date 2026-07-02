@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL BETWEEN &amp; IN – Range and List Filtering | ylearner</title>
+  <meta name="description" content="Learn SQL BETWEEN and IN operators for range and list filtering. Covers NOT BETWEEN, date ranges, NOT IN with NULL gotcha, and IN vs OR performance.">
+  <meta name="keywords" content="SQL BETWEEN, SQL IN operator, SQL NOT BETWEEN, SQL NOT IN, SQL range filter, SQL list filter, SQL IN vs OR, SQL IN with NULL">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/filtering/between-in.html">
+  <meta property="og:title" content="SQL BETWEEN &amp; IN – Range and List Filtering | ylearner">
+  <meta property="og:description" content="Master SQL BETWEEN for inclusive ranges and IN for list membership. Learn the NOT IN NULL gotcha and when to use IN vs chained OR.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/filtering/between-in.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL BETWEEN &amp; IN – Range and List Filtering | ylearner">
+  <meta name="twitter:description" content="Master SQL BETWEEN for inclusive ranges and IN for list membership. Learn the NOT IN NULL gotcha and when to use IN vs chained OR.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL BETWEEN & IN – Range and List Filtering","description":"Learn SQL BETWEEN for inclusive numeric and date ranges, and IN for list membership tests. Covers NOT BETWEEN, NOT IN NULL gotcha, and performance comparison with OR.","educationalLevel":"Beginner","keywords":"SQL BETWEEN, SQL IN, NOT BETWEEN, NOT IN, SQL range filter, SQL list filter","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/filtering/between-in.html">Filtering</a><span class="separator">›</span>
+          <span class="current">BETWEEN &amp; IN</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔍 Filtering</div>
+          <h1>SQL BETWEEN &amp; IN – Range and List Filtering</h1>
+          <p class="lesson-intro"><code>BETWEEN</code> and <code>IN</code> are shorthand operators that make SQL queries more readable and concise. <code>BETWEEN low AND high</code> filters a range of values (both ends inclusive), while <code>IN (val1, val2, ...)</code> checks for membership in a list. Both come with important gotchas — <code>BETWEEN</code>'s inclusive boundary behaviour and <code>NOT IN</code>'s NULL trap — covered in detail here.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 12 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="between-syntax">BETWEEN – Inclusive Range Filtering</h2>
+          <p><code>BETWEEN low AND high</code> returns rows where the column value is greater than or equal to <code>low</code> AND less than or equal to <code>high</code>. <strong>Both endpoints are included.</strong></p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Numeric range (inclusive both ends)
+SELECT * FROM products WHERE price BETWEEN 10 AND 50;
+-- Equivalent to: WHERE price >= 10 AND price <= 50
+-- Includes products priced exactly 10 or exactly 50
+
+-- Age range
+SELECT * FROM employees WHERE age BETWEEN 25 AND 40;
+
+-- BETWEEN with integer ID ranges
+SELECT * FROM orders WHERE id BETWEEN 1000 AND 2000;</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>BETWEEN is always inclusive on both ends</strong>
+              <p><code>BETWEEN 10 AND 50</code> is exactly equivalent to <code>&gt;= 10 AND &lt;= 50</code>. The value 10 is included, and the value 50 is included. This is different from half-open ranges common in programming (<code>[start, end)</code>). Keep this in mind especially with date ranges — see the next section.</p>
+            </div>
+          </div>
+
+          <h2 id="between-dates">BETWEEN with Dates</h2>
+          <p>Date BETWEEN is common, but you must be careful about timestamp precision at the end of the range.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- DATE columns: clean and safe
+SELECT * FROM events
+WHERE event_date BETWEEN '2026-01-01' AND '2026-12-31';
+-- Includes Jan 1 through Dec 31 — both dates included
+
+-- DATETIME / TIMESTAMP: be careful — '2026-12-31' means '2026-12-31 00:00:00'
+-- This MISSES orders placed on Dec 31 after midnight!
+SELECT * FROM orders
+WHERE created_at BETWEEN '2026-01-01' AND '2026-12-31';  -- BUG
+
+-- CORRECT: use the last moment of the day, or use >= and <
+SELECT * FROM orders
+WHERE created_at BETWEEN '2026-01-01 00:00:00' AND '2026-12-31 23:59:59';
+
+-- Even better: use >= and < (avoids microsecond precision issues)
+SELECT * FROM orders
+WHERE created_at >= '2026-01-01' AND created_at < '2027-01-01';</code></pre>
+          </div>
+
+          <h2 id="not-between">NOT BETWEEN</h2>
+          <p><code>NOT BETWEEN</code> returns rows where the value falls outside the specified range.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Products NOT in the 10–50 price range
+SELECT * FROM products WHERE price NOT BETWEEN 10 AND 50;
+-- Equivalent to: WHERE price < 10 OR price > 50
+
+-- Employees outside the mid-career age range
+SELECT * FROM employees WHERE age NOT BETWEEN 30 AND 50;
+
+-- Orders outside a date range
+SELECT * FROM orders
+WHERE created_at NOT BETWEEN '2026-01-01' AND '2026-06-30';</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="in-syntax">IN – List Membership Testing</h2>
+          <p><code>IN</code> checks whether a value matches any item in a list. It is much cleaner than chaining multiple <code>OR</code> conditions when testing one column against several values.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- IN with strings
+SELECT * FROM users WHERE country IN ('US', 'CA', 'GB', 'AU');
+-- Equivalent (but messier): WHERE country = 'US' OR country = 'CA' OR ...
+
+-- IN with numbers
+SELECT * FROM products WHERE category_id IN (1, 3, 5, 7);
+
+-- IN with subquery (find orders for active users)
+SELECT * FROM orders
+WHERE user_id IN (SELECT id FROM users WHERE is_active = 1);
+
+-- NOT IN with a clean list
+SELECT * FROM employees WHERE department NOT IN ('Temp', 'Contract');</code></pre>
+          </div>
+
+          <h2 id="not-in-nulls">NOT IN and the NULL Gotcha</h2>
+          <p>This is one of the most dangerous SQL traps: <strong>if a NULL exists anywhere in an IN list (or subquery), NOT IN returns no rows at all.</strong></p>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>NOT IN returns no rows if the list contains NULL</strong>
+              <p>The logic behind this: <code>x NOT IN (1, 2, NULL)</code> expands to <code>x &lt;&gt; 1 AND x &lt;&gt; 2 AND x &lt;&gt; NULL</code>. But <code>x &lt;&gt; NULL</code> always evaluates to UNKNOWN. TRUE AND UNKNOWN = UNKNOWN. So no row can ever satisfy the condition — the result is always empty when NULL is in the list.</p>
+            </div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- DANGER: if the subquery returns any NULL manager_id, this returns NOTHING
+SELECT * FROM employees
+WHERE manager_id NOT IN (SELECT manager_id FROM managers);
+-- If managers.manager_id has even one NULL row → empty result set!
+
+-- SAFE: use NOT EXISTS instead
+SELECT * FROM employees e
+WHERE NOT EXISTS (
+  SELECT 1 FROM managers m
+  WHERE m.manager_id = e.manager_id
+);
+
+-- Or: exclude NULLs explicitly from the subquery
+SELECT * FROM employees
+WHERE manager_id NOT IN (
+  SELECT manager_id FROM managers WHERE manager_id IS NOT NULL
+);
+
+-- IN itself is safe with NULLs in the list (just doesn't match them):
+SELECT * FROM users WHERE country IN ('US', NULL);
+-- Returns rows where country = 'US'. The NULL in the list is harmless for IN.
+-- (But the row where country IS NULL is NOT returned.)</code></pre>
+          </div>
+
+          <h2 id="in-vs-or">IN vs OR – When to Use Each</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Aspect</th><th>IN</th><th>Chained OR</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Readability</td><td>Cleaner for 3+ values</td><td>Gets verbose quickly</td></tr>
+                <tr><td>Performance</td><td>Optimized well, often faster for long lists</td><td>Equivalent for short lists; optimizer may handle differently</td></tr>
+                <tr><td>Subquery support</td><td>Yes — <code>IN (SELECT ...)</code></td><td>No</td></tr>
+                <tr><td>NULL handling</td><td>NOT IN with NULLs is dangerous (see above)</td><td>Explicit, no hidden NULL traps</td></tr>
+                <tr><td>Multiple columns</td><td>Yes — <code>IN ((col1, col2) IN (...))</code></td><td>Need explicit AND/OR combinations</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Use IN: clean and intention-clear
+SELECT * FROM orders
+WHERE status IN ('pending', 'processing', 'shipped');
+
+-- The chained OR equivalent (harder to read for 3+ values)
+SELECT * FROM orders
+WHERE status = 'pending' OR status = 'processing' OR status = 'shipped';
+
+-- IN with a subquery preview (advanced — covered in the subqueries section)
+SELECT * FROM customers
+WHERE id IN (
+  SELECT DISTINCT customer_id
+  FROM orders
+  WHERE total > 1000
+);</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-betweenin">BETWEEN and IN: Ranges and Lists, Concisely</h2>
+          <p><code>BETWEEN</code> matches a value in a range; <code>IN</code> matches any value in a list. Both are shorthand that make <code>WHERE</code> clauses far cleaner than chained <code>OR</code>s.</p>
+          <pre><code class="language-sql">-- these pairs are equivalent
+WHERE price BETWEEN 10 AND 50
+WHERE price &gt;= 10 AND price &lt;= 50          -- BETWEEN is INCLUSIVE
+
+WHERE status IN ('paid', 'shipped')
+WHERE status = 'paid' OR status = 'shipped'
+
+WHERE status NOT IN ('cancelled', 'refunded')  -- negate a list</code></pre>
+          <table>
+            <thead><tr><th>Operator</th><th>Matches</th></tr></thead>
+            <tbody>
+              <tr><td><code>BETWEEN a AND b</code></td><td>a ≤ x ≤ b (inclusive both ends)</td></tr>
+              <tr><td><code>IN (...)</code></td><td>any listed value</td></tr>
+              <tr><td><code>IN (SELECT ...)</code></td><td>values from a subquery</td></tr>
+            </tbody>
+          </table>
+          <p><strong>BETWEEN is inclusive</strong> on both ends — <code>BETWEEN 10 AND 50</code> includes 10 and 50. This bites with dates: <code>BETWEEN '2026-01-01' AND '2026-01-31'</code> may <em>miss</em> rows on Jan 31 if they have a time component (a timestamp of <code>2026-01-31 14:00</code> is after midnight), so for timestamps prefer <code>&gt;= start AND &lt; next_day</code>. <strong>IN with a subquery</strong> is powerful — <code>WHERE id IN (SELECT customer_id FROM orders)</code> — but beware the <code>NOT IN</code> NULL trap: if the subquery returns any NULL, <code>NOT IN</code> returns no rows at all. Use <code>NOT EXISTS</code> when the column can be NULL. Both operators are cleaner and often faster than long <code>OR</code> chains.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Filter a range with <code>BETWEEN</code>.</li>
+              <li>Match a list with <code>IN</code>.</li>
+              <li>Exclude a list with <code>NOT IN</code>.</li>
+              <li>Use <code>BETWEEN</code> on dates.</li>
+              <li>Compare <code>BETWEEN</code> to <code>&gt;=</code> AND <code>&lt;=</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Query orders placed <code>BETWEEN</code> two dates and from a country <code>IN</code> a given list. Explain that BETWEEN is inclusive and the gotcha of <code>NOT IN</code> when the list contains NULL values.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>BETWEEN low AND high</code> is inclusive on both ends. Equivalent to <code>&gt;= low AND &lt;= high</code>.</li>
+              <li>For DATETIME ranges, use <code>&gt;= start AND &lt; next_day</code> to avoid missing the last day's data.</li>
+              <li><code>NOT BETWEEN</code> returns values outside the range (equivalent to <code>&lt; low OR &gt; high</code>).</li>
+              <li><code>IN (val1, val2, ...)</code> is cleaner than chained <code>OR</code> for same-column checks and supports subqueries.</li>
+              <li><strong>NOT IN NULL trap:</strong> if the list or subquery contains any NULL, <code>NOT IN</code> returns zero rows. Use <code>NOT EXISTS</code> or filter NULLs out of the subquery.</li>
+              <li><code>IN</code> is generally faster than <code>OR</code> for long lists and cleaner to read.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does the BETWEEN operator do?</li>
+            <li>Is BETWEEN inclusive or exclusive?</li>
+            <li>What does the IN operator do?</li>
+            <li>What is the danger of NOT IN with NULLs?</li>
+            <li>How does IN compare to multiple OR conditions?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/filtering/like-pattern.html" class="topic-tag sql-topic-tag">🔍 LIKE Pattern Matching</a>
+            <a href="/sql/filtering/logical-operators.html" class="topic-tag sql-topic-tag">🔍 Logical Operators</a>
+            <a href="/sql/filtering/comparison-operators.html" class="topic-tag sql-topic-tag">🔍 Comparison Operators</a>
+            <a href="/sql/functions/string-functions.html" class="topic-tag sql-topic-tag">🗄️ String Functions</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Is BETWEEN inclusive or exclusive of the endpoint values? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Always inclusive on both ends. <code>BETWEEN 10 AND 50</code> is exactly <code>&gt;= 10 AND &lt;= 50</code> — values of exactly 10 and exactly 50 are included. This is consistently defined in the SQL standard and applies in MySQL, PostgreSQL, SQLite, and SQL Server. It is a common source of off-by-one errors, especially with date ranges where the timestamp midnight on the end date can exclude records from that day.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use BETWEEN with strings? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — <code>BETWEEN</code> works with any data type that supports ordering, including strings. <code>WHERE last_name BETWEEN 'A' AND 'M'</code> returns names that sort alphabetically between 'A' and 'M', inclusive. However, string BETWEEN behaves based on the column's collation and can be case-sensitive. In practice, numeric and date ranges are the most common use cases because the results are predictable. String BETWEEN is occasionally useful for searching within a known alphabetical segment.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How large can an IN list be? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>There is no SQL standard limit, but databases have practical limits. MySQL's limit is controlled by <code>max_allowed_packet</code> and query length — thousands of values are fine. PostgreSQL also handles large IN lists well but recommends using a temporary table or subquery for very large lists (1000+ values). In practice, if your IN list comes from another table, using a JOIN or a subquery (<code>IN (SELECT ...)</code>) is more efficient and maintainable than a hardcoded list of thousands of IDs.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does NOT IN return no rows when the subquery has a NULL? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Because <code>NOT IN</code> is syntactic sugar for a series of <code>&lt;&gt;</code> comparisons joined by AND. When one of the values in the list is NULL, one of those comparisons becomes <code>col &lt;&gt; NULL</code>, which evaluates to UNKNOWN. And TRUE AND UNKNOWN = UNKNOWN, which fails the WHERE filter. So no row can return TRUE — every row evaluates to UNKNOWN or FALSE. The safe alternatives are: (1) <code>NOT EXISTS</code> with a correlated subquery, which handles NULLs correctly; or (2) add <code>WHERE col IS NOT NULL</code> inside the subquery to exclude NULLs from the list before NOT IN evaluates them.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/filtering/like-pattern.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">LIKE Pattern Matching</span>
+          </a>
+          <a href="/sql/filtering/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

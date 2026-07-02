@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS Refs – t-ref and useRef for DOM Access | ylearner</title>
+  <meta name="description" content="Complete guide to OWL JS t-ref and useRef: how to access DOM elements directly, when refs are available, multiple refs, component refs, and real-world patterns for focus management, measurement, and third-party integration.">
+  <meta name="keywords" content="OWL JS t-ref, OWL useRef, OWL DOM access, OWL ref component, OWL JS refs tutorial, OWL t-ref example, Odoo Web Library refs, OWL focus management, OWL useRef el">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/owljs/templates/refs.html">
+  <meta property="og:title" content="OWL JS Refs – t-ref and useRef DOM Access | ylearner">
+  <meta property="og:description" content="t-ref and useRef in OWL JS: accessing DOM elements, timing, multiple refs, component refs, focus, measurement, third-party library integration.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/owljs/templates/refs.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS t-ref and useRef Complete Guide | ylearner">
+  <meta name="twitter:description" content="t-ref and useRef for DOM access in OWL JS — timing, multiple refs, component refs, and real-world patterns.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS Refs (t-ref and useRef)",
+    "description": "Complete guide to OWL JS refs: t-ref directive and useRef hook for direct DOM access, timing semantics, multiple refs, component refs, and patterns for focus management, DOM measurement, and third-party libraries.",
+    "educationalLevel": "Intermediate",
+    "keywords": "OWL JS t-ref, useRef, DOM access, refs, focus management, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/templates/conditional.html">Dynamic Templates</a><span class="separator">›</span>
+          <span class="current">Refs (t-ref)</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Dynamic Templates</div>
+          <h1>OWL JS Refs – t-ref and useRef for Direct DOM Access</h1>
+          <p class="lesson-intro">OWL's declarative data flow handles 95% of UI work — but sometimes you need a direct reference to a real DOM element: to call <code>.focus()</code>, measure dimensions with <code>getBoundingClientRect()</code>, initialize a third-party library, or imperatively scroll to a position. OWL provides two pieces for this: <code>t-ref</code> marks an element in the template, and <code>useRef()</code> creates the ref object that OWL fills with the real DOM element after mounting. This lesson covers everything about refs: timing, multiple refs, conditional refs, and every real-world use case.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 16 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 5 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="useref-basics">Setting Up a Ref</h2>
+          <p>Two steps: call <code>useRef("name")</code> in the component and add <code>t-ref="name"</code> to the element in the template. The string name connects them.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – useRef + t-ref</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml, useRef, onMounted } from "@odoo/owl";
+
+class AutoFocus extends Component {
+  static template = xml`
+    &lt;div&gt;
+      &lt;!-- Step 2: mark the element with t-ref --&gt;
+      &lt;input t-ref="searchInput" type="text" placeholder="Search…"/&gt;
+      &lt;button t-on-click="focusSearch"&gt;Focus Search&lt;/button&gt;
+    &lt;/div&gt;
+  `;
+
+  // Step 1: create the ref — name must match t-ref value
+  searchInput = useRef("searchInput");
+
+  setup() {
+    onMounted(() =&gt; {
+      // .el is the real DOM element — available after mount
+      this.searchInput.el?.focus();
+    });
+  }
+
+  focusSearch() {
+    this.searchInput.el?.focus();
+  }
+}</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Always use optional chaining: .el?.</strong>
+              <p><code>myRef.el</code> is <code>null</code> before the component mounts and after it unmounts. Using <code>this.myRef.el?.focus()</code> (optional chaining) safely no-ops when the element is not yet available, instead of throwing <code>Cannot read properties of null</code>. Make this a habit.</p>
+            </div>
+          </div>
+
+          <h2 id="ref-timing">Ref Availability Timing</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Lifecycle Point</th><th>ref.el value</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>During <code>setup()</code></td><td><code>null</code> — not yet rendered</td></tr>
+                <tr><td>During <code>onWillStart()</code></td><td><code>null</code> — not yet rendered</td></tr>
+                <tr><td>During <code>onMounted()</code></td><td>✅ Real DOM element</td></tr>
+                <tr><td>In event handlers (after mount)</td><td>✅ Real DOM element</td></tr>
+                <tr><td>During <code>onWillPatch()</code> / <code>onPatched()</code></td><td>✅ Real DOM element</td></tr>
+                <tr><td>During <code>onWillUnmount()</code></td><td>✅ Real DOM element (last chance)</td></tr>
+                <tr><td>After component destroyed</td><td><code>null</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="multiple-refs">Multiple Refs</h2>
+          <p>Create as many refs as you need — one <code>useRef()</code> call per element:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – multiple refs</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class RichEditor extends Component {
+  static template = xml`
+    &lt;div class="editor"&gt;
+      &lt;div t-ref="toolbar" class="toolbar"&gt;
+        &lt;button t-on-click="bold"&gt;B&lt;/button&gt;
+        &lt;button t-on-click="italic"&gt;I&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div t-ref="editable" class="content" contenteditable="true"&gt;&lt;/div&gt;
+      &lt;div t-ref="statusBar" class="status-bar"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  `;
+
+  toolbar   = useRef("toolbar");
+  editable  = useRef("editable");
+  statusBar = useRef("statusBar");
+
+  setup() {
+    onMounted(() =&gt; {
+      this.editable.el?.focus();
+
+      // Measure toolbar height to set editor padding
+      const toolbarH = this.toolbar.el?.getBoundingClientRect().height || 0;
+      if (this.editable.el) {
+        this.editable.el.style.paddingTop = toolbarH + "px";
+      }
+    });
+  }
+
+  bold()   { document.execCommand("bold"); }
+  italic() { document.execCommand("italic"); }
+}</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="conditional-refs">Refs on Conditional Elements</h2>
+          <p>If the element with <code>t-ref</code> is inside a <code>t-if</code>, the ref is only set when the element is in the DOM. When the condition becomes false and the element is removed, <code>ref.el</code> returns to <code>null</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML + JavaScript – conditional ref</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class SearchPanel extends Component {
+  state = useState({ isOpen: false });
+
+  inputRef = useRef("searchInput");
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;button t-on-click="openPanel"&gt;Open Search&lt;/button&gt;
+
+      &lt;!-- Ref only valid when panel is open --&gt;
+      &lt;div t-if="state.isOpen" class="search-panel"&gt;
+        &lt;input t-ref="searchInput" type="search"/&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  `;
+
+  openPanel() {
+    this.state.isOpen = true;
+    // Can't focus here — DOM doesn't exist yet (state mutation is async micro-task)
+    // Use onPatched instead:
+  }
+
+  setup() {
+    let _wasOpen = false;
+    onPatched(() =&gt; {
+      if (this.state.isOpen &amp;&amp; !_wasOpen) {
+        // Panel just became visible — focus the input
+        this.inputRef.el?.focus();
+      }
+      _wasOpen = this.state.isOpen;
+    });
+  }
+}</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Focus after conditional render: use onPatched</strong>
+              <p>When you set state to show an element and immediately try to focus its ref, the DOM has not updated yet — the focus call runs before OWL patches the DOM. Use <code>onPatched</code> to detect when the element just appeared and focus it there. Alternatively, use <code>await Promise.resolve()</code> to defer to the next microtask after OWL's render — but <code>onPatched</code> is the idiomatic OWL approach.</p>
+            </div>
+          </div>
+
+          <h2 id="dynamic-ref-names">Dynamic Ref Names</h2>
+          <p>Ref names can be dynamic expressions in <code>t-ref</code> — useful in loops:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML + JavaScript – dynamic ref in a loop</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">class TabPanel extends Component {
+  static template = xml`
+    &lt;div&gt;
+      &lt;!-- Dynamic ref name per tab --&gt;
+      &lt;div
+        t-foreach="props.tabs"
+        t-as="tab"
+        t-key="tab.id"
+        t-att-ref="'tab-' + tab.id"
+        class="tab-panel"
+        t-att-class="{ active: state.activeId === tab.id }"
+      &gt;
+        &lt;t t-esc="tab.content"/&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  `;
+
+  state = useState({ activeId: null });
+
+  // Access a specific tab's DOM element
+  scrollToTab(id) {
+    // Dynamic refs accessed via this.refs (not useRef)
+    const el = this.refs["tab-" + id];
+    el?.scrollIntoView({ behavior: "smooth" });
+  }
+}</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Dynamic refs use this.refs, not useRef()</strong>
+              <p>When <code>t-ref</code> uses a dynamic expression (<code>t-att-ref</code>), the element is stored in <code>this.refs["refName"]</code> — an object of all current refs on the component. Static refs created with <code>useRef("name")</code> are also accessible in <code>this.refs.name</code>, but the idiomatic way is through the ref object returned by <code>useRef()</code>.</p>
+            </div>
+          </div>
+
+          <h2 id="common-patterns">Common Ref Patterns</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – real-world ref patterns</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// 1. Measure element dimensions after render
+class AdaptiveLayout extends Component {
+  containerRef = useRef("container");
+  state = useState({ columns: 1 });
+
+  setup() {
+    onMounted(() =&gt; this.updateColumns());
+    onPatched(() =&gt; this.updateColumns());
+  }
+
+  updateColumns() {
+    const width = this.containerRef.el?.getBoundingClientRect().width || 0;
+    this.state.columns = width &gt; 900 ? 3 : width &gt; 600 ? 2 : 1;
+  }
+}
+
+// 2. Programmatic scroll
+class ChatList extends Component {
+  listRef = useRef("list");
+
+  scrollToBottom() {
+    const el = this.listRef.el;
+    if (el) el.scrollTop = el.scrollHeight;
+  }
+
+  scrollToItem(id) {
+    const item = this.listRef.el?.querySelector(`[data-id="${id}"]`);
+    item?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+}
+
+// 3. Read input value imperatively (as alternative to t-model)
+class FileUpload extends Component {
+  fileInput = useRef("fileInput");
+
+  getSelectedFiles() {
+    return Array.from(this.fileInput.el?.files || []);
+  }
+
+  clearInput() {
+    if (this.fileInput.el) this.fileInput.el.value = "";
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="deep-refs">Refs: Reaching a Real DOM Element When You Must</h2>
+          <p>Most of the time you let OWL update the DOM. But sometimes you need the actual element — to focus an input, measure size, or hand it to a chart library. That's what <code>t-ref</code> + the <code>useRef</code> hook are for.</p>
+          <pre><code class="language-javascript">import { Component, useRef, onMounted, xml } from "@odoo/owl";
+
+class SearchBox extends Component {
+    static template = xml`&lt;input t-ref="search" placeholder="Search…"/&gt;`;
+    setup() {
+        this.searchInput = useRef("search");   // name matches t-ref
+        onMounted(() => {
+            this.searchInput.el.focus();       // .el = the real DOM node
+        });
+    }
+}</code></pre>
+          <p><strong>The timing rule:</strong> <code>ref.el</code> is <code>null</code> until the element is actually in the DOM. So you access it in <code>onMounted</code> (or later), never in <code>setup()</code> or <code>onWillStart</code> — the DOM doesn't exist yet there. Reading <code>.el</code> too early is the most common ref bug.</p>
+          <table>
+            <thead><tr><th>Do with a ref</th><th>Don't</th></tr></thead>
+            <tbody>
+              <tr><td>focus, scroll, measure, media playback</td><td>read/write data (use state)</td></tr>
+              <tr><td>integrate a 3rd-party DOM library</td><td>manually change what OWL renders</td></tr>
+            </tbody>
+          </table>
+          <p>Refs are an <em>escape hatch</em> for imperative DOM work. For anything that affects what's displayed, change <code>state</code> and let OWL re-render — fighting the framework by mutating DOM directly leads to inconsistencies.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a <code>ContentEditableEditor</code> component using refs for direct DOM control:</p>
+            <ol>
+              <li>Render a <code>&lt;div contenteditable="true" t-ref="editor"&gt;</code>.</li>
+              <li>In <code>onMounted</code>, focus the editor.</li>
+              <li>Add a "Bold" button that calls <code>document.execCommand("bold")</code>. Refocus the editor after the command.</li>
+              <li>Add a "Clear" button that sets <code>this.editorRef.el.innerHTML = ""</code> and refocuses.</li>
+              <li>Add a character counter: listen to the <code>input</code> event on the editor div (use <code>t-on-input</code>), read <code>event.target.innerText.length</code>, and update <code>state.charCount</code>.</li>
+              <li>Add a "Get Content" button that reads <code>this.editorRef.el?.innerHTML</code> and logs it. Show the raw HTML below the editor in a <code>&lt;pre&gt;</code> tag using <code>t-esc</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Use <code>useRef</code> + <code>t-ref</code> to grab a DOM element and focus it when the component mounts. Explain when to reach for a ref (direct DOM access) versus reactive state, and why ref access should happen after mount.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Two steps: <code>myRef = useRef("name")</code> in the class + <code>t-ref="name"</code> on the element in the template.</li>
+              <li>Access the DOM element via <code>this.myRef.el</code>. Always use optional chaining (<code>?.el</code>) — it is <code>null</code> before mount and after unmount.</li>
+              <li>Ref is available from <code>onMounted</code> through <code>onWillUnmount</code>. Before that: <code>null</code>. After: <code>null</code>.</li>
+              <li>For conditional elements (<code>t-if</code>), the ref is <code>null</code> when the element is not in the DOM.</li>
+              <li>To focus an element that just appeared via <code>t-if</code>, use <code>onPatched</code> — not an immediate focus after setting state.</li>
+              <li>Dynamic ref names (from loops) use <code>t-att-ref</code> and are accessed via <code>this.refs["name"]</code>.</li>
+              <li>Use refs only when you need direct DOM access — for everything else (text, classes, attributes), use the reactive template system.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a ref in OWL?</li>
+            <li>How do you create and attach a ref?</li>
+            <li>When is a ref available (which lifecycle)?</li>
+            <li>When should you use a ref instead of state?</li>
+            <li>How do you focus an input with a ref?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/owljs/templates/dynamic-attrs.html" class="topic-tag owl-topic-tag">🦉 Dynamic Attributes</a>
+            <a href="/owljs/lifecycle/setup-mounted.html" class="topic-tag owl-topic-tag">🦉 setup &amp; onMounted</a>
+            <a href="/owljs/lifecycle/patch-hooks.html" class="topic-tag owl-topic-tag">🦉 willPatch &amp; patched</a>
+            <a href="/owljs/advanced/hooks.html" class="topic-tag owl-topic-tag">🦉 Custom Hooks</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I put t-ref on a component tag to get the component instance? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — <code>t-ref</code> on a component tag gives you the component instance (not a DOM element). <code>this.myRef.comp</code> is the child component instance; <code>this.myRef.el</code> is its root DOM element. However, accessing child component internals from a parent is an anti-pattern — it breaks encapsulation. Prefer props and callback props for communication. Use component refs only for legitimate imperative use cases like calling a child's <code>scrollToTop()</code> method.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why is my ref null when I try to use it in an event handler? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>If you use <code>t-ref</code> on an element inside a <code>t-if</code>, the element is only in the DOM when the condition is true. If the condition is false when the handler runs, <code>ref.el</code> is <code>null</code>. Check the condition first: <code>if (!this.myRef.el) return;</code>. Also verify the ref name in <code>useRef("name")</code> exactly matches the <code>t-ref="name"</code> string — they are case-sensitive.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is useRef the same as useState? When should I use each? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>They serve different purposes. <code>useState</code> holds reactive data that the template renders — mutations trigger re-renders. <code>useRef</code> holds a mutable reference that does <em>not</em> trigger re-renders — OWL sets its <code>.el</code> property when the DOM element appears or disappears. Use <code>useState</code> for data that affects what the template shows. Use <code>useRef</code> when you need to imperatively access a DOM element. Storing a DOM element in <code>useState</code> would cause unnecessary re-renders every time the element is set; that is why they are separate.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use querySelector on this.el instead of useRef? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — <code>this.el.querySelector(".my-input")</code> is an alternative to <code>useRef</code> when you do not want to add a <code>t-ref</code> attribute. However, <code>useRef</code> is preferred because it is more explicit (names the intention), more stable (does not depend on CSS class names that might change), and more efficient (OWL fills it directly rather than requiring a DOM traversal). Reserve <code>querySelector</code> for cases where you cannot modify the template (e.g., content inserted by a third-party library).</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/templates/dynamic-attrs.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Dynamic Attributes (t-att)</span>
+          </a>
+          <a href="/owljs/templates/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

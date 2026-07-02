@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Scope Explained – LEGB Rule, global, nonlocal | ylearner | ylearner</title>
+  <meta name="description" content="Understand Python scope: local, enclosing, global, and built-in (LEGB rule). Learn the global and nonlocal keywords, closures, and common scope mistakes.">
+  <meta name="keywords" content="python scope, python local global scope, python LEGB, python global keyword, python nonlocal, python variable scope">
+  <link rel="canonical" href="https://ylearner.org/python/functions/scope.html">
+  <meta property="og:title" content="Python Scope Explained – LEGB Rule, global, nonlocal | ylearner">
+  <meta property="og:description" content="Understand Python scope: local, enclosing, global, and built-in (LEGB rule). Learn the global and nonlocal keywords, closures, and common scope mistakes.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/functions/scope.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python Scope Explained – LEGB Rule, global, nonlocal | ylearner">
+  <meta name="twitter:description" content="Understand Python scope: local, enclosing, global, and built-in (LEGB rule). Learn the global and nonlocal keywords, closures, and common scope mistakes.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Python Scope – Local, Global, Enclosing, and Built-in (LEGB Rule)","description":"Understand Python scope: local, enclosing, global, and built-in (LEGB rule). Learn the global and nonlocal keywords, closures, and common scope mistakes.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <!-- Adsense Header -->
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/python/functions/function-basics.html">Functions</a><span class="separator">›</span>
+          <span class="current">Scope</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Functions</div>
+          <h1>Python Scope – Local, Global, Enclosing, and Built-in (LEGB Rule)</h1>
+          <p class="lesson-intro">Scope determines where a variable is visible and accessible in your code. Python follows the LEGB rule to look up variable names: Local → Enclosing → Global → Built-in. Misunderstanding scope causes some of the most confusing bugs in Python.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="legb">The LEGB Rule</h2>
+          <p>When Python encounters a variable name, it searches in this order: <strong>L</strong>ocal (inside the current function), <strong>E</strong>nclosing (outer function in nested functions), <strong>G</strong>lobal (module-level), <strong>B</strong>uilt-in (Python's built-in names like len, print, range).</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">x = "global"     # G - global scope
+
+def outer():
+    x = "enclosing"  # E - enclosing scope
+    def inner():
+        x = "local"  # L - local scope
+        print(x)     # Finds "local" first
+    inner()
+    print(x)         # Finds "enclosing"
+
+outer()
+print(x)             # Finds "global"</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+local
+enclosing
+global
+          </div>
+
+          <h2 id="global">The global Keyword</h2>
+          <p>To modify a global variable inside a function, declare it with the global keyword.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">count = 0  # Global
+
+def increment():
+    global count   # Tell Python to use the global count
+    count += 1
+
+increment()
+increment()
+increment()
+print(count)  # 3 - global was modified</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+3
+          </div>
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>Tip</strong><p>Using global is generally discouraged. Prefer passing values as arguments and returning them instead.</p></div>
+          </div>
+
+          <!-- Adsense In Content -->
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="nonlocal">The nonlocal Keyword (Closures)</h2>
+          <p>In nested functions, nonlocal refers to the enclosing function's variable (not global).</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">def make_counter():
+    count = 0
+    def counter():
+        nonlocal count   # Refers to outer function's count
+        count += 1
+        return count
+    return counter
+
+my_counter = make_counter()
+print(my_counter())  # 1
+print(my_counter())  # 2
+print(my_counter())  # 3</code></pre>
+          </div>
+          <div class="output-block">
+            <div class="output-label">▶ Output</div>
+1
+2
+3
+          </div>
+
+          <h2 id="builtin">Built-in Scope</h2>
+          <p>Built-in scope contains Python's built-in functions and constants. Be careful not to shadow them with your own variable names.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python"># ❌ Don't shadow built-ins!
+list = [1, 2, 3]   # Overwrites the built-in list!
+print = "hi"       # Overwrites print! Now you can't print!
+
+# ✅ Use descriptive names
+my_list = [1, 2, 3]
+message = "hi"
+print(message)     # Works fine</code></pre>
+          </div>
+
+          <h2 id="deep-pyscope">The LEGB Rule: Where Python Looks Up a Name</h2>
+          <p>When you use a variable, Python searches four scopes in order — <strong>L</strong>ocal, <strong>E</strong>nclosing, <strong>G</strong>lobal, <strong>B</strong>uilt-in — and uses the first match. Understanding LEGB explains most "why is this variable that value?" confusion.</p>
+          <pre><code class="language-python">x = "global"
+def outer():
+    x = "enclosing"
+    def inner():
+        print(x)     # finds "enclosing" (E) before "global" (G)
+    inner()</code></pre>
+          <h3>Assigning needs global / nonlocal</h3>
+          <p>Reading an outer variable is automatic; <em>rebinding</em> one is not. Assign to a name inside a function and Python treats it as local unless you declare otherwise:</p>
+          <pre><code class="language-python">count = 0
+def bump():
+    global count      # without this, "count += 1" raises UnboundLocalError
+    count += 1
+
+def make_counter():
+    n = 0
+    def inc():
+        nonlocal n    # rebind the enclosing n, not create a new local
+        n += 1; return n
+    return inc</code></pre>
+          <p><strong>Common trap:</strong> <code>count += 1</code> without <code>global</code> fails because the <code>+=</code> makes <code>count</code> a local, then reads it before assignment. Prefer returning values over mutating globals — globals make code hard to test and reason about.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Explore variable scope:</p>
+            <ol>
+              <li>Define a variable inside a function and confirm it is not visible outside.</li>
+              <li>Read a global variable from inside a function (no keyword needed).</li>
+              <li>Use the <code>global</code> keyword to modify a module-level variable from a function.</li>
+              <li>Create a closure with an inner function and use <code>nonlocal</code> to update an enclosing variable.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a counter factory: a function <code>make_counter()</code> that returns an inner function which, each time it is called, increments and returns a count. Use <code>nonlocal</code> so the inner function updates the enclosing variable. Create two independent counters and show they don’t interfere. Then write a small example that demonstrates the full LEGB lookup order with a name defined at several levels.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Scope determines where a name is visible; Python resolves names using the LEGB rule.</li>
+              <li>LEGB = Local → Enclosing → Global → Built-in, searched in that order.</li>
+              <li>Assigning to a name inside a function creates a new local unless declared <code>global</code> or <code>nonlocal</code>.</li>
+              <li><code>global</code> lets a function rebind a module-level variable.</li>
+              <li><code>nonlocal</code> lets a nested function rebind a variable in the enclosing (but non-global) scope.</li>
+              <li>A closure is an inner function that remembers variables from its enclosing scope.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Scope</h2>
+          <ul class="interview-list">
+            <li>What is variable scope in Python?</li>
+            <li>What is the LEGB rule?</li>
+            <li>What does the <code>global</code> keyword do?</li>
+            <li>What does the <code>nonlocal</code> keyword do and how does it differ from <code>global</code>?</li>
+            <li>What is a closure?</li>
+            <li>Why can you read a global variable in a function but not assign to it without <code>global</code>?</li>
+            <li>What is the built-in scope?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/functions/function-basics.html" class="topic-tag">⚙️ Function Basics</a>
+            <a href="/python/functions/parameters.html" class="topic-tag">🎛️ Parameters</a>
+            <a href="/python/advanced/decorators.html" class="topic-tag">🎁 Decorators</a>
+            <a href="/python/beginner/variables.html" class="topic-tag">📦 Variables</a>
+            <a href="/python/advanced/generators.html" class="topic-tag">🔁 Generators</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What does the LEGB rule mean? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>It is the order Python searches for a name: Local (inside the current function), Enclosing (any outer functions), Global (module level), and Built-in (Python’s own names like <code>len</code>). The first match wins.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between <code>global</code> and <code>nonlocal</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>global</code> binds a name to the module-level scope, letting a function modify a top-level variable. <code>nonlocal</code> binds to the nearest enclosing function scope, used in closures to modify a variable in an outer (but not global) function.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why can I read a global but not change it without <code>global</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Reading falls back through LEGB and finds the global. But assigning to a name inside a function makes Python treat it as a new local for the whole function, shadowing the global — unless you declare <code>global</code> first.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is a closure? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A closure is a nested function that captures and remembers variables from its enclosing scope even after that outer function has finished. It is the basis for decorators and factory functions like a counter generator.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/functions/lambda.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Lambda Functions</span>
+          </a>
+          <a href="/python/functions/recursion.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Recursion</span>
+          </a>
+        </nav>
+
+        <!-- Adsense Footer -->
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <!-- Adsense Sidebar -->
+      <!-- Adsense Sidebar -->
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

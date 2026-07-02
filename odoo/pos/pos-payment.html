@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo POS Payment Integration – Custom Payment Methods | ylearner</title>
+  <meta name="description" content="Integrate custom payment methods in Odoo POS: pos.payment.method, the PaymentInterface JS class, terminal communication, and split payments.">
+  <meta name="keywords" content="Odoo POS payment, pos.payment.method, PaymentInterface, payment terminal, split payment, Odoo 19 POS payment">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/pos/pos-payment.html">
+  <meta property="og:title" content="Odoo POS Payment Integration – Custom Payment Methods">
+  <meta property="og:description" content="Integrate custom payment methods in Odoo POS: pos.payment.method, the PaymentInterface JS class, terminal communication, and split payments.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/pos/pos-payment.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo POS Payment Integration – Custom Payment Methods | ylearner">
+  <meta name="twitter:description" content="Integrate custom payment in Odoo POS: pos.payment.method, PaymentInterface, terminal communication, split payment.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo POS Payment Integration – Custom Payment Methods",
+    "description": "Integrate custom payment methods in Odoo POS: pos.payment.method, the PaymentInterface JS class, terminal communication, and split payments.",
+    "educationalLevel": "Advanced",
+    "keywords": "Odoo POS payment, pos.payment.method, PaymentInterface, payment terminal, split payment",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/pos/pos-architecture.html">POS Development</a><span class="separator">›</span>
+          <span class="current">POS Payment Integration</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🖥️ POS Development</div>
+          <h1>Odoo POS Payment Integration – Custom Payment Methods</h1>
+          <p class="lesson-intro">Odoo POS supports cash and card payments out of the box. To integrate a custom payment terminal (e.g., a gift card system, a loyalty wallet, or a third-party payment provider), you implement a <code>PaymentInterface</code> subclass in JavaScript and back it with a <code>pos.payment.method</code> record in Python.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="deep-pospayment">POS Payments: Methods, Terminals, and Reconciliation</h2>
+          <p>Payment is where POS meets money and accounting, so correctness matters. The POS supports multiple <strong>payment methods</strong> (cash, card, custom), can integrate hardware <strong>terminals</strong>, and must reconcile cleanly with Odoo's accounting.</p>
+          <table>
+            <thead><tr><th>Concept</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td>Payment method</td><td>cash, bank card, gift card, custom</td></tr>
+              <tr><td>Payment terminal</td><td>hardware integration (Stripe, Adyen, etc.)</td></tr>
+              <tr><td>Journal</td><td>the accounting journal each method posts to</td></tr>
+              <tr><td>Session closing</td><td>reconciles cash + card totals at end of shift</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Payment methods are configured, then coded if custom:</strong> standard methods (cash, card) are set up in POS configuration and tied to accounting <em>journals</em> so every payment posts to the right account. A <em>custom</em> payment method (a new terminal, a loyalty/voucher scheme) means extending the POS JavaScript payment logic to handle its flow — authorize, confirm, handle failure/timeout, and record the amount. <strong>Terminal integration adds async complexity:</strong> a card terminal call is asynchronous and can be declined, cancelled, or time out — the POS code must handle each outcome gracefully so the cashier isn't stuck and the order state stays correct. <strong>Reconciliation is the accounting side:</strong> when a POS <em>session</em> (a cashier's shift) closes, Odoo tallies expected cash and card totals against what was collected; discrepancies are flagged. This is why payment amounts and methods must be recorded precisely — errors surface as unbalanced sessions. <strong>For developers:</strong> respect that payments are financial data — validate amounts, handle the async terminal states, ensure the payment ties to the right journal, and test the full close-session flow. Payment bugs aren't cosmetic; they affect the books.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Add a payment method to POS.</li>
+              <li>Configure a payment terminal (concept).</li>
+              <li>Handle a payment in JS.</li>
+              <li>Validate an order.</li>
+              <li>Handle the change due.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Configure POS payment methods and walk through the payment flow: selecting a method, tendering an amount, computing change, and validating the order. Explain how custom payment methods integrate and where payment logic lives in the POS.</p>
+          </div>
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>How <code>pos.payment.method</code> works</li>
+              <li>The <code>PaymentInterface</code> JavaScript class</li>
+              <li>Sending and receiving payment terminal messages</li>
+              <li>Handling payment success, failure, and cancellation</li>
+              <li>Split payment across multiple methods</li>
+            </ul>
+          </div>
+
+          <h2 id="pos-payment-method">pos.payment.method</h2>
+          <p><code>pos.payment.method</code> is the database model for a payment method. Each method is linked to a journal (bank or cash) in accounting. Fields relevant to custom integrations:</p>
+          <ul>
+            <li><code>name</code> — displayed on the PaymentScreen button</li>
+            <li><code>journal_id</code> — linked accounting journal</li>
+            <li><code>use_payment_terminal</code> — selection field; your module registers its terminal type here</li>
+            <li><code>pos_config_ids</code> — which POS configs this method is available on</li>
+          </ul>
+          <p>Register your terminal type by extending the <code>use_payment_terminal</code> selection field:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo import models, fields
+
+class PosPaymentMethod(models.Model):
+    _inherit = 'pos.payment.method'
+
+    def _get_payment_terminal_selection(self):
+        return super()._get_payment_terminal_selection() + [
+            ('my_terminal', 'My Custom Terminal'),
+        ]</code></pre>
+          </div>
+
+          <h2 id="payment-interface">PaymentInterface – JavaScript Class</h2>
+          <p>Every payment terminal integration requires a JavaScript class that extends <code>PaymentInterface</code>. Register it so Odoo POS loads it when the payment method's <code>use_payment_terminal</code> matches your key:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/** @odoo-module **/
+import { PaymentInterface } from '@point_of_sale/app/payment/payment_interface';
+import { register_payment_method } from '@point_of_sale/app/store/pos_store';
+
+export class PaymentMyTerminal extends PaymentInterface {
+
+    /**
+     * Called when the cashier clicks "Send" on the payment screen.
+     * Start the terminal transaction here.
+     */
+    async sendPaymentRequest(cid) {
+        const paymentLine = this.pos.get_order().get_paymentline(cid);
+        const amount = paymentLine.get_amount();
+
+        // Call Python method on the server to initiate the terminal
+        const result = await this.env.services.orm.call(
+            'pos.payment.method',
+            'initiate_terminal_payment',
+            [this.payment_method.id, amount],
+        );
+
+        if (result.success) {
+            paymentLine.set_payment_status('waitingCard');
+            return true;  // waiting for terminal callback
+        }
+        paymentLine.set_payment_status('retry');
+        return false;
+    }
+
+    /**
+     * Called when the cashier clicks "Cancel" during payment.
+     */
+    async sendPaymentCancel(order, cid) {
+        await this.env.services.orm.call(
+            'pos.payment.method',
+            'cancel_terminal_payment',
+            [this.payment_method.id],
+        );
+        return true;
+    }
+}
+
+register_payment_method('my_terminal', PaymentMyTerminal);</code></pre>
+          </div>
+
+          <h2 id="terminal-polling">Polling for Terminal Response</h2>
+          <p>Payment terminals are asynchronous — the cashier sends a request and waits for a response. Poll the server for the terminal status:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">export class PaymentMyTerminal extends PaymentInterface {
+
+    async sendPaymentRequest(cid) {
+        const paymentLine = this.pos.get_order().get_paymentline(cid);
+        paymentLine.set_payment_status('waitingCard');
+
+        // Poll every 2 seconds for terminal result
+        this._pollingInterval = setInterval(async () => {
+            const status = await this.env.services.orm.call(
+                'pos.payment.method',
+                'get_terminal_status',
+                [this.payment_method.id],
+            );
+
+            if (status.state === 'approved') {
+                clearInterval(this._pollingInterval);
+                paymentLine.set_payment_status('done');
+                paymentLine.transaction_id = status.transaction_id;
+                this.pos.get_order().validate_order();
+            } else if (status.state === 'declined') {
+                clearInterval(this._pollingInterval);
+                paymentLine.set_payment_status('retry');
+            }
+        }, 2000);
+
+        return true;
+    }
+}</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="split-payments">Split Payments</h2>
+          <p>Odoo POS supports split payments natively — a customer can pay part in cash and part by card. The PaymentScreen shows multiple payment lines when the cashier adds multiple payment methods. No special code is needed; Odoo's <code>validate_order()</code> handles posting multiple payment lines to accounting.</p>
+          <p>Each payment line generates a separate <code>pos.payment</code> record and a corresponding journal entry. Your integration only needs to handle the payment lines assigned to your terminal.</p>
+          <p>To access the order's payment lines in JavaScript:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const order = this.pos.get_order();
+const paymentLines = order.get_paymentlines();
+const myLines = paymentLines.filter(
+    line => line.payment_method.use_payment_terminal === 'my_terminal'
+);
+const totalMyTerminal = myLines.reduce(
+    (sum, line) => sum + line.get_amount(), 0
+);</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Register your terminal type by extending <code>_get_payment_terminal_selection()</code> on <code>pos.payment.method</code></li>
+              <li>Implement <code>sendPaymentRequest()</code> and <code>sendPaymentCancel()</code> in your <code>PaymentInterface</code> subclass</li>
+              <li>Register the class with <code>register_payment_method('your_key', YourClass)</code></li>
+              <li>Split payments are handled automatically — no extra code needed</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do payment methods work in POS?</li>
+            <li>How is change calculated?</li>
+            <li>How do you add a custom payment method?</li>
+            <li>What is a payment terminal integration?</li>
+            <li>Where does POS store payment lines?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/pos/pos-architecture.html" class="topic-tag odoo-topic-tag">🖥️ POS Architecture</a>
+              <a href="/odoo/pos/pos-models.html" class="topic-tag odoo-topic-tag">🖥️ POS Models</a>
+              <a href="/odoo/pos/pos-ui-components.html" class="topic-tag odoo-topic-tag">🖥️ POS UI Components</a>
+              <a href="/odoo/pos/pos-receipts.html" class="topic-tag odoo-topic-tag">🖥️ POS Receipts</a>
+            </div>
+          </section>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does Odoo have built-in support for card payment terminals? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — Odoo has built-in integrations for Adyen, Stripe Terminal, and Ingenico via separate modules (<code>pos_adyen</code>, <code>pos_stripe</code>, etc.). These follow the same <code>PaymentInterface</code> pattern. If your terminal isn't supported natively, implement a custom integration using the pattern shown here.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I handle a terminal timeout? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Set a maximum polling duration. If the terminal doesn't respond within (e.g.) 60 seconds, clear the interval, call <code>sendPaymentCancel()</code> to abort the terminal transaction, and set the payment line status to <code>'retry'</code>. Always provide a way for the cashier to retry or cancel.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Where is pos.payment stored in accounting? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>When the session is closed, Odoo creates a bank/cash statement for each payment method with a journal. Each <code>pos.payment</code> becomes a line on the statement. Reconciliation against the journal's account happens when the session closes and calls <code>action_pos_session_closing_control()</code>.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+        <a href="/odoo/pos/pos-ui-components.html" class="lesson-nav-link">
+        <span class="nav-label">← Prev</span>
+        <span class="nav-title">POS UI Components</span>
+        </a>
+        <a href="/odoo/pos/pos-receipts.html" class="lesson-nav-link next">
+        <span class="nav-label">Next →</span>
+        <span class="nav-title">POS Receipts</span>
+        </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

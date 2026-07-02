@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL LEFT & RIGHT JOIN – Keeping Unmatched Rows | ylearner</title>
+  <meta name="description" content="Learn SQL LEFT JOIN and RIGHT JOIN: syntax, how NULLs appear for unmatched rows, LEFT vs RIGHT comparison, and the anti-join pattern to find unmatched records.">
+  <meta name="keywords" content="SQL LEFT JOIN, SQL RIGHT JOIN, LEFT JOIN NULL, anti-join SQL, unmatched rows SQL, SQL outer join tutorial">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/joins/left-right-join.html">
+  <meta property="og:title" content="SQL LEFT & RIGHT JOIN – Keeping Unmatched Rows | ylearner">
+  <meta property="og:description" content="Learn SQL LEFT JOIN and RIGHT JOIN, how NULLs appear for unmatched rows, and the anti-join pattern to find records with no match.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/joins/left-right-join.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL LEFT & RIGHT JOIN – Keeping Unmatched Rows | ylearner">
+  <meta name="twitter:description" content="Learn SQL LEFT JOIN and RIGHT JOIN, how NULLs appear for unmatched rows, and the anti-join pattern to find records with no match.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL LEFT and RIGHT JOIN","description":"Learn SQL LEFT JOIN and RIGHT JOIN: all rows from one table plus matched rows from the other, with NULLs for unmatched. Includes anti-join pattern.","educationalLevel":"Beginner","keywords":"SQL LEFT JOIN, RIGHT JOIN, outer join, anti-join, NULL in join","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/joins/joins-overview.html">Joins</a><span class="separator">›</span>
+          <span class="current">LEFT & RIGHT JOIN</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔗 Joins</div>
+          <h1>SQL LEFT &amp; RIGHT JOIN – Keeping Unmatched Rows</h1>
+          <p class="lesson-intro">Unlike INNER JOIN which discards non-matching rows, LEFT JOIN keeps <em>all</em> rows from the left table and fills in NULL for any right-table columns where no match exists. RIGHT JOIN is the mirror image. Mastering LEFT JOIN unlocks a powerful pattern — the anti-join — for finding records with no related data.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="left-join-syntax">LEFT JOIN Syntax</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">SELECT columns
+FROM left_table
+LEFT JOIN right_table ON left_table.col = right_table.col;
+
+-- LEFT OUTER JOIN is identical — OUTER keyword is optional
+SELECT columns
+FROM left_table
+LEFT OUTER JOIN right_table ON left_table.col = right_table.col;</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Include ALL employees, even those without a department
+SELECT e.id, e.name, d.dept_name
+FROM employees e
+LEFT JOIN departments d ON e.dept_id = d.id;
+
+-- Result:
+-- id | name  | dept_name
+--  1 | Alice | Marketing
+--  2 | Bob   | Engineering
+--  3 | Carol | Engineering
+--  4 | Dave  | HR
+--  5 | Eve   | NULL          ← Eve kept; no matching department
+
+-- Finance is still excluded (it is on the RIGHT side with no match)
+-- Finance would appear with LEFT JOIN if departments is the LEFT table</code></pre>
+          </div>
+
+          <h2 id="null-in-left-join">NULLs in LEFT JOIN Results</h2>
+          <p>When a left-table row has no match in the right table, all right-table columns in the result are NULL. You can test these NULLs to identify unmatched rows.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Show employees with their department name (or 'No Department')
+SELECT
+  e.name,
+  COALESCE(d.dept_name, 'No Department') AS department
+FROM employees e
+LEFT JOIN departments d ON e.dept_id = d.id;
+
+-- Count employees per department, including departments with 0 employees
+-- NOTE: swap the table order so departments is on the LEFT
+SELECT
+  d.dept_name,
+  COUNT(e.id) AS employee_count  -- COUNT(e.id) counts non-NULL — gives 0 for empty depts
+FROM departments d
+LEFT JOIN employees e ON e.dept_id = d.id
+GROUP BY d.dept_name
+ORDER BY employee_count DESC;</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Use COUNT(column), not COUNT(*), with LEFT JOIN</strong>
+              <p>When counting with a LEFT JOIN, use <code>COUNT(right_table.id)</code> not <code>COUNT(*)</code>. COUNT(*) counts all result rows including the NULL-filled ones, inflating the count. COUNT(column) only counts non-NULL values, correctly giving 0 for groups with no matches.</p>
+            </div>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="right-join">RIGHT JOIN</h2>
+          <p>RIGHT JOIN is the mirror of LEFT JOIN — it keeps all rows from the <em>right</em> table and fills NULLs for unmatched left-table columns.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- RIGHT JOIN: keep all departments, even those with no employees
+SELECT e.name, d.dept_name
+FROM employees e
+RIGHT JOIN departments d ON e.dept_id = d.id;
+
+-- Result:
+-- name  | dept_name
+-- Alice | Marketing
+-- Bob   | Engineering
+-- Carol | Engineering
+-- Dave  | HR
+-- NULL  | Finance      ← Finance kept; no matching employee
+
+-- Eve is excluded (she has no department — unmatched on LEFT side)
+
+-- Equivalent LEFT JOIN (swap table order — same result)
+SELECT e.name, d.dept_name
+FROM departments d
+LEFT JOIN employees e ON e.dept_id = d.id;</code></pre>
+          </div>
+
+          <h2 id="left-vs-right">LEFT vs RIGHT: Which to Use?</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th></th><th>LEFT JOIN</th><th>RIGHT JOIN</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>All rows from</strong></td><td>Left (first) table</td><td>Right (second) table</td></tr>
+                <tr><td><strong>NULLs for</strong></td><td>Unmatched right columns</td><td>Unmatched left columns</td></tr>
+                <tr><td><strong>Rewrite as</strong></td><td>—</td><td>LEFT JOIN with tables swapped</td></tr>
+                <tr><td><strong>Preferred?</strong></td><td>Yes — use this by default</td><td>Avoid — swap tables and use LEFT</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Stick to LEFT JOIN</strong>
+              <p>Every RIGHT JOIN can be rewritten as a LEFT JOIN by swapping the table order. Most SQL developers use exclusively LEFT JOIN to keep queries consistent and easier to reason about. Mixing LEFT and RIGHT in the same query is a common source of confusion.</p>
+            </div>
+          </div>
+
+          <h2 id="find-unmatched">Finding Unmatched Rows (Anti-Join)</h2>
+          <p>The anti-join pattern finds rows in one table that have no corresponding row in another. Use LEFT JOIN and filter where the right-table key IS NULL.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Find employees with no department assigned
+SELECT e.id, e.name
+FROM employees e
+LEFT JOIN departments d ON e.dept_id = d.id
+WHERE d.id IS NULL;
+-- Returns: Eve (id=5, dept_id=NULL)
+
+-- Find departments with no employees
+SELECT d.id, d.dept_name
+FROM departments d
+LEFT JOIN employees e ON e.dept_id = d.id
+WHERE e.id IS NULL;
+-- Returns: Finance (id=4)
+
+-- Find customers who have never placed an order
+SELECT c.id, c.name, c.email
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+WHERE o.id IS NULL;
+
+-- Find products that have never been ordered
+SELECT p.id, p.product_name
+FROM products p
+LEFT JOIN order_items oi ON oi.product_id = p.id
+WHERE oi.id IS NULL;</code></pre>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-leftjoin">LEFT JOIN: Keep Every Row on One Side</h2>
+          <p>An <code>INNER JOIN</code> returns only rows that match on both sides. A <code>LEFT JOIN</code> keeps <em>every</em> row from the left table and fills <code>NULL</code> where the right side has no match. That <code>NULL</code> is the whole point — it's how you find what's missing.</p>
+          <pre><code class="language-sql">-- Every customer, even those with zero orders
+SELECT c.name, o.id AS order_id
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id;
+-- customers with no orders show order_id = NULL</code></pre>
+          <h3>The "find orphans" pattern</h3>
+          <pre><code class="language-sql">-- Customers who have NEVER ordered
+SELECT c.name
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+WHERE o.id IS NULL;   -- keep only the unmatched rows</code></pre>
+          <table>
+            <thead><tr><th>Join</th><th>Keeps</th></tr></thead>
+            <tbody>
+              <tr><td><code>INNER</code></td><td>only matching rows on both sides</td></tr>
+              <tr><td><code>LEFT</code></td><td>all left rows + matches (NULL when none)</td></tr>
+              <tr><td><code>RIGHT</code></td><td>all right rows + matches</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Gotcha:</strong> put a right-table condition in <code>WHERE</code> (e.g. <code>WHERE o.status='paid'</code>) and you silently turn the LEFT JOIN back into an INNER JOIN, because <code>NULL = 'paid'</code> is false. Put such conditions in the <code>ON</code> clause instead.</p>
+          <p><code>RIGHT JOIN</code> is just LEFT JOIN with the tables flipped — most people pick one direction (LEFT) and stick to it for readability.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Write a LEFT JOIN that keeps all left rows.</li>
+              <li>Find left rows with no match (NULL on the right).</li>
+              <li>Convert a LEFT JOIN to a RIGHT JOIN.</li>
+              <li>Count matched vs unmatched rows.</li>
+              <li>Filter for unmatched rows only.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>List all customers and their order counts, including customers with zero orders, using a LEFT JOIN. Then find customers who never ordered with <code>WHERE orders.id IS NULL</code>. Explain LEFT vs RIGHT and why RIGHT is rarely needed.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>LEFT JOIN</strong> — All rows from the left table. NULLs for right-table columns when no match.</li>
+              <li><strong>RIGHT JOIN</strong> — All rows from the right table. Equivalent to swapping tables and using LEFT JOIN.</li>
+              <li><strong>Prefer LEFT JOIN</strong> — More readable and consistent. Avoid mixing LEFT and RIGHT in one query.</li>
+              <li><strong>COALESCE</strong> — Use to replace NULLs in output: <code>COALESCE(d.dept_name, 'Unassigned')</code>.</li>
+              <li><strong>COUNT(right_col)</strong> — Use column count, not COUNT(*), to avoid inflated counts with LEFT JOIN.</li>
+              <li><strong>Anti-join pattern</strong> — LEFT JOIN + WHERE right_table.id IS NULL finds unmatched rows efficiently.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does a LEFT JOIN return?</li>
+            <li>What is the difference between LEFT and RIGHT JOIN?</li>
+            <li>How do you find rows with no match using a LEFT JOIN?</li>
+            <li>Why is RIGHT JOIN used less often?</li>
+            <li>What values appear for unmatched columns?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/joins/inner-join.html" class="topic-tag sql-topic-tag">🗄️ INNER JOIN</a>
+            <a href="/sql/joins/full-outer-join.html" class="topic-tag sql-topic-tag">🗄️ FULL OUTER JOIN</a>
+            <a href="/sql/functions/null-functions.html" class="topic-tag sql-topic-tag">🗄️ NULL Handling</a>
+            <a href="/sql/joins/joins-overview.html" class="topic-tag sql-topic-tag">🗄️ Joins Overview</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">If I add a WHERE clause to a LEFT JOIN, can it become an INNER JOIN?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — this is a very common mistake. If you write <code>LEFT JOIN departments d ON e.dept_id = d.id WHERE d.dept_name = 'Engineering'</code>, the WHERE filters out NULL rows (where d.dept_name is NULL), effectively converting the LEFT JOIN to an INNER JOIN. To keep unmatched rows while filtering the right table, move the condition into the ON clause: <code>LEFT JOIN departments d ON e.dept_id = d.id AND d.dept_name = 'Engineering'</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I LEFT JOIN to more than one table?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. Chain multiple LEFT JOINs: each one keeps all rows from the result so far and adds NULLs for unmatched rows in the next table. Be careful to apply each join to the correct table and check that WHERE clauses on right-table columns do not accidentally eliminate the NULL rows you want to keep.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is NOT IN or NOT EXISTS better than the anti-join pattern?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>All three can find unmatched rows, but each has trade-offs. LEFT JOIN + IS NULL is often the most performant and index-friendly. NOT IN has a dangerous NULL trap (if the subquery contains a NULL, NOT IN returns no rows). NOT EXISTS is semantically clean and handles NULLs correctly, but is slower on some databases. For production code, LEFT JOIN + IS NULL or NOT EXISTS are the safest choices.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does COUNT(*) give wrong results with LEFT JOIN?<span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>When a department has no employees, the LEFT JOIN adds one NULL-filled row for that department. COUNT(*) counts that row, giving 1 instead of 0. COUNT(e.id) only counts non-NULL values in the employee id column, correctly returning 0 for departments with no employees. Always use COUNT(right_table_column) when counting matches in a LEFT JOIN.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/joins/inner-join.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">INNER JOIN</span>
+          </a>
+          <a href="/sql/joins/full-outer-join.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">FULL OUTER JOIN</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

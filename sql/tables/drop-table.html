@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DROP TABLE – Deleting Tables in SQL | ylearner</title>
+  <meta name="description" content="Learn the SQL DROP TABLE statement — remove tables permanently, use IF EXISTS safely, and understand the difference between DROP, TRUNCATE, and DELETE.">
+  <meta name="keywords" content="SQL DROP TABLE, SQL TRUNCATE, SQL DELETE vs TRUNCATE, DROP TABLE IF EXISTS, SQL CASCADE, remove table SQL">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/tables/drop-table.html">
+  <meta property="og:title" content="DROP TABLE – Deleting Tables in SQL | ylearner">
+  <meta property="og:description" content="Understand DROP TABLE, IF EXISTS, CASCADE, and the important differences between DROP, TRUNCATE, and DELETE in SQL.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/tables/drop-table.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DROP TABLE – Deleting Tables in SQL | ylearner">
+  <meta name="twitter:description" content="Understand DROP TABLE, IF EXISTS, CASCADE, and the important differences between DROP, TRUNCATE, and DELETE in SQL.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"DROP TABLE – Deleting Tables in SQL","description":"Learn SQL DROP TABLE — how to delete tables permanently, use IF EXISTS, understand CASCADE, and compare DROP vs TRUNCATE vs DELETE.","educationalLevel":"Beginner","keywords":"DROP TABLE, TRUNCATE, DELETE, DROP TABLE IF EXISTS, SQL CASCADE","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/tables/drop-table.html">Tables &amp; Schema</a><span class="separator">›</span>
+          <span class="current">DROP TABLE</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🏗️ Tables &amp; Schema</div>
+          <h1>DROP TABLE – Deleting Tables in SQL</h1>
+          <p class="lesson-intro"><code>DROP TABLE</code> permanently removes a table and all its data from the database. It is a destructive, mostly irreversible DDL command — which is exactly why understanding it thoroughly matters. This lesson covers the full <code>DROP TABLE</code> syntax, the <code>IF EXISTS</code> safety clause, <code>CASCADE</code> for dependent objects, and a detailed comparison of <code>DROP</code>, <code>TRUNCATE</code>, and <code>DELETE</code>.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 10 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="drop-syntax">DROP TABLE Syntax</h2>
+          <p><code>DROP TABLE</code> takes a table name (or comma-separated list of names in MySQL) and removes the table definition, all its rows, all its indexes, and all its triggers.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Drop a single table
+DROP TABLE table_name;
+
+-- Drop multiple tables at once (MySQL / PostgreSQL)
+DROP TABLE table_one, table_two, table_three;
+
+-- Examples
+DROP TABLE temp_import_data;
+DROP TABLE old_sessions;</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>DROP TABLE removes the table AND all its data permanently</strong>
+              <p>There is no built-in undo. The table definition (schema) is gone, and all rows are gone. In MySQL's InnoDB, <code>DROP TABLE</code> causes an implicit commit — it cannot be rolled back even if you are inside a transaction. In PostgreSQL, DDL is transactional and <em>can</em> be rolled back within a transaction block. Always verify you have a recent backup before running <code>DROP TABLE</code> in production.</p>
+            </div>
+          </div>
+
+          <h2 id="if-exists">IF EXISTS</h2>
+          <p>Attempting to drop a table that does not exist throws an error. The <code>IF EXISTS</code> clause prevents that error — the statement becomes a silent no-op if the table is missing. This is essential in migration and setup scripts.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Without IF EXISTS — errors if table does not exist
+DROP TABLE old_logs;   -- ERROR: Table 'old_logs' doesn't exist
+
+-- With IF EXISTS — safe to run even if table is absent
+DROP TABLE IF EXISTS old_logs;   -- no error, no warning (or a note in MySQL)
+
+-- Useful in setup/teardown scripts:
+DROP TABLE IF EXISTS test_users;
+DROP TABLE IF EXISTS test_orders;
+CREATE TABLE test_users ( ... );
+CREATE TABLE test_orders ( ... );</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="truncate-vs-drop">TRUNCATE vs DROP</h2>
+          <p>When you only want to empty a table (delete all rows) but keep the table structure, use <code>TRUNCATE</code> instead of <code>DROP</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- TRUNCATE: removes all rows, keeps the table structure
+TRUNCATE TABLE logs;
+-- After TRUNCATE, logs still exists — it is just empty.
+-- Auto-increment counters are reset to 1 (MySQL).
+
+-- DROP: removes the table entirely
+DROP TABLE logs;
+-- After DROP, logs does not exist at all.
+-- You would need CREATE TABLE to recreate it.</code></pre>
+          </div>
+
+          <h2 id="delete-vs-truncate">DELETE vs TRUNCATE</h2>
+          <p><code>DELETE</code>, <code>TRUNCATE</code>, and <code>DROP</code> all remove data, but in very different ways:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Feature</th><th>DELETE</th><th>TRUNCATE</th><th>DROP</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Removes rows</td><td>Yes (filtered or all)</td><td>Yes (all rows)</td><td>Yes (all rows)</td></tr>
+                <tr><td>Removes table structure</td><td>No</td><td>No</td><td>Yes</td></tr>
+                <tr><td>WHERE clause</td><td>Yes</td><td>No</td><td>No</td></tr>
+                <tr><td>Logged (row-level)</td><td>Yes — each row logged</td><td>Minimal logging</td><td>DDL log only</td></tr>
+                <tr><td>Rollback possible</td><td>Yes (in a transaction)</td><td>PostgreSQL: yes; MySQL: no</td><td>PostgreSQL: yes; MySQL: no</td></tr>
+                <tr><td>Resets AUTO_INCREMENT</td><td>No</td><td>Yes (MySQL)</td><td>N/A (table gone)</td></tr>
+                <tr><td>Speed on large tables</td><td>Slow</td><td>Very fast</td><td>Fast</td></tr>
+                <tr><td>Fires DELETE triggers</td><td>Yes</td><td>No</td><td>No</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- DELETE: remove specific rows (can be rolled back)
+DELETE FROM logs WHERE created_at < '2025-01-01';
+
+-- DELETE all rows (slow on large tables, but rollback-safe)
+DELETE FROM logs;
+
+-- TRUNCATE: fast removal of all rows, reset auto-increment
+TRUNCATE TABLE logs;
+
+-- TRUNCATE with IF EXISTS (PostgreSQL supports this)
+TRUNCATE TABLE IF EXISTS logs;</code></pre>
+          </div>
+
+          <h2 id="cascade">CASCADE</h2>
+          <p>If other database objects depend on the table you want to drop — for example, views that query it or foreign keys that reference it — you may need <code>CASCADE</code> to force the drop and automatically remove those dependent objects too.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- PostgreSQL: DROP TABLE with CASCADE drops dependent views and FKs
+DROP TABLE users CASCADE;
+-- This also drops any views that reference users, and removes
+-- foreign key constraints in other tables that point to users.
+
+-- PostgreSQL: RESTRICT (default) — refuses to drop if dependents exist
+DROP TABLE users RESTRICT;   -- error if anything depends on users
+
+-- MySQL handles FK differently — disable FK checks first if needed:
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE users;
+SET FOREIGN_KEY_CHECKS = 1;
+-- Note: this does NOT drop the FK constraints in child tables —
+-- you must clean those up manually.</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>CASCADE is powerful — review all dependent objects before using it</strong>
+              <p>In PostgreSQL, <code>CASCADE</code> will silently drop views, foreign key constraints, and other objects that depend on your table. Before running <code>DROP TABLE ... CASCADE</code> in production, query <code>pg_depend</code> or use <code>\d+ tablename</code> in psql to see all dependents. Dropping an unexpectedly shared base table with CASCADE can break unrelated parts of your application.</p>
+            </div>
+          </div>
+
+          <h2 id="danger-callout">Production Safety Checklist</h2>
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Before running DROP TABLE in production</strong>
+              <ol>
+                <li><strong>Verify you have a recent backup</strong> — and confirm it can be restored.</li>
+                <li><strong>Double-check the table name</strong> — a typo can drop the wrong table.</li>
+                <li><strong>Check for dependent objects</strong> — views, foreign keys, application queries.</li>
+                <li><strong>Run in a transaction if your database supports DDL transactions</strong> (PostgreSQL) — allows rollback if something looks wrong.</li>
+                <li><strong>Test on a staging environment first</strong> using a production data snapshot.</li>
+                <li><strong>Consider soft-delete first</strong> — rename the table (e.g., <code>RENAME TABLE users TO users_deprecated_20260608</code>) and keep it for a few days before dropping permanently.</li>
+              </ol>
+            </div>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-drop">DROP TABLE: Permanent, and Different From DELETE</h2>
+          <p><code>DROP TABLE</code> removes the entire table — its data <em>and</em> its structure — permanently. It's easy to confuse with <code>DELETE</code> and <code>TRUNCATE</code>, but they operate at very different levels.</p>
+          <table>
+            <thead><tr><th>Command</th><th>Removes</th><th>Table still exists?</th></tr></thead>
+            <tbody>
+              <tr><td><code>DELETE</code></td><td>some/all rows (with WHERE)</td><td>yes</td></tr>
+              <tr><td><code>TRUNCATE</code></td><td>all rows, fast</td><td>yes (empty)</td></tr>
+              <tr><td><code>DROP TABLE</code></td><td>rows + structure + indexes</td><td><strong>no — gone</strong></td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-sql">DROP TABLE IF EXISTS old_logs;          -- IF EXISTS avoids an error if absent
+DROP TABLE orders;                       -- ❌ fails if other tables' FKs point here
+DROP TABLE orders CASCADE;               -- also drops dependent objects (dangerous)</code></pre>
+          <p><strong>The hierarchy of destruction:</strong> <code>DELETE</code> removes rows (you can scope it with <code>WHERE</code>), <code>TRUNCATE</code> empties the table fast but keeps it, and <code>DROP</code> deletes the table itself — columns, indexes, constraints, everything. After a <code>DROP</code>, the table simply doesn't exist. <strong>Foreign keys protect you:</strong> dropping a table that other tables reference fails by default — a good safety net. Adding <code>CASCADE</code> forces it through by also dropping the dependent objects, which can wipe out far more than you intended, so use it deliberately. <strong>Safety habits:</strong> use <code>DROP TABLE IF EXISTS</code> in scripts to avoid errors when re-running; double-check you're on the right database/schema (dropping the production table by mistake is catastrophic and usually unrecoverable without a backup); and always have a backup before structural changes. In production, do drops through reviewed migrations, never ad-hoc on a live connection.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Drop a table with DROP TABLE.</li>
+              <li>Use <code>IF EXISTS</code> to avoid errors.</li>
+              <li>Compare DROP, TRUNCATE, and DELETE.</li>
+              <li>Drop a table that has a foreign-key dependency.</li>
+              <li>Confirm the table is gone.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Safely drop a temporary table using <code>DROP TABLE IF EXISTS</code>, and explain the difference between DROP (removes structure), TRUNCATE (empties data), and DELETE (removes rows). Note what happens to dependent foreign keys.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>DROP TABLE</code> removes the table structure and <strong>all its data</strong> permanently.</li>
+              <li><code>IF EXISTS</code> prevents errors in scripts when the table may or may not exist.</li>
+              <li><strong>TRUNCATE</strong> empties a table (keeps structure), is much faster than <code>DELETE</code> on large tables, and resets auto-increment. Not rollback-safe in MySQL.</li>
+              <li><strong>DELETE</strong> removes rows (all or filtered), is fully logged and rollback-safe, fires triggers, but is slow on large tables.</li>
+              <li><strong>CASCADE</strong> (PostgreSQL) forces a drop even when dependent views or FKs exist — review dependents before using it.</li>
+              <li>Always verify a working backup before running <code>DROP TABLE</code> in production. Consider renaming the table first as a safety net.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What does DROP TABLE do?</li>
+            <li>What is the difference between DROP, TRUNCATE, and DELETE?</li>
+            <li>What does IF EXISTS do?</li>
+            <li>Can you drop a table referenced by a foreign key?</li>
+            <li>Is DROP TABLE reversible?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/tables/alter-table.html" class="topic-tag sql-topic-tag">🗄️ ALTER TABLE</a>
+            <a href="/sql/tables/create-table.html" class="topic-tag sql-topic-tag">🗄️ CREATE TABLE</a>
+            <a href="/sql/tables/constraints.html" class="topic-tag sql-topic-tag">🗄️ Constraints</a>
+            <a href="/sql/dml/delete.html" class="topic-tag sql-topic-tag">🗄️ DELETE Statement</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I recover data after DROP TABLE? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In general, no — not without a backup. In MySQL/InnoDB, <code>DROP TABLE</code> is not transactional (it causes an implicit commit), so there is no rollback. Some InnoDB recovery tools (like MySQL Enterprise Backup or third-party tools) can sometimes recover dropped tables from InnoDB data files if you act quickly before the space is reused — but this is complex, not guaranteed, and should never be relied on. In PostgreSQL, if you are inside an explicit <code>BEGIN</code> transaction block, you can <code>ROLLBACK</code> a <code>DROP TABLE</code> before committing. The best safety net is always a recent, tested backup.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between DROP TABLE and DROP DATABASE? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>DROP TABLE</code> removes a single table (and its data) from the database. <code>DROP DATABASE</code> removes the entire database — every table, view, stored procedure, and all their data in one command. <code>DROP DATABASE</code> is even more destructive. Always use <code>IF EXISTS</code> with both commands in scripts, and exercise extreme caution in production.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why does TRUNCATE reset the auto-increment counter but DELETE does not? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>TRUNCATE</code> is a DDL operation — it deallocates and re-initialises the table's data pages, which includes resetting the auto-increment sequence to 1 (in MySQL). <code>DELETE</code> is a DML operation that removes rows one at a time through the transaction log; the auto-increment counter is a table-level setting and is not touched by <code>DELETE</code>. If you need to reset the counter after a <code>DELETE</code>, use <code>ALTER TABLE t AUTO_INCREMENT = 1;</code> in MySQL or <code>ALTER SEQUENCE t_id_seq RESTART WITH 1;</code> in PostgreSQL.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I drop a table that has foreign key constraints pointing to it? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>By default, no — most databases will refuse with an error like "Cannot drop table 'users' referenced by a foreign key constraint." You have three options: (1) Drop the child table first, then the parent. (2) Drop the foreign key constraint in the child table first with <code>ALTER TABLE orders DROP FOREIGN KEY fk_orders_user;</code>, then drop the parent table. (3) Use <code>CASCADE</code> in PostgreSQL which automatically drops the FK constraints. In MySQL, you can temporarily disable FK checks with <code>SET FOREIGN_KEY_CHECKS = 0;</code> — but remember to re-enable them and clean up orphaned FK definitions afterward.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/tables/alter-table.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">ALTER TABLE</span>
+          </a>
+          <a href="/sql/tables/constraints.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Constraints</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

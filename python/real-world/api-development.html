@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python API Development – Build REST APIs with FastAPI & Flask | ylearner</title>
+  <meta name="description" content="Learn to build REST APIs in Python using FastAPI and Flask. Covers routing, request/response models, authentication, and deployment.">
+  <meta name="keywords" content="python api development, python rest api, python fastapi tutorial, python flask api, build api python">
+  <link rel="canonical" href="https://ylearner.org/python/real-world/api-development.html">
+  <meta property="og:title" content="Python API Development – Build REST APIs with FastAPI & Flask | ylearner">
+  <meta property="og:description" content="Learn to build REST APIs in Python using FastAPI and Flask. Covers routing, request/response models, authentication, and deployment.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/real-world/api-development.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python API Development – Build REST APIs with FastAPI & Flask | ylearner">
+  <meta name="twitter:description" content="Learn to build REST APIs in Python using FastAPI and Flask. Covers routing, request/response models, authentication, and deployment.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python API Development","description":"Build REST APIs in Python using FastAPI and Flask with routing, authentication, and deployment.","educationalLevel":"Intermediate","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/real-world/web-scraping.html">Real-World Python</a><span class="separator">›</span><span class="current">API Development</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 Real-World</div>
+          <h1>Python API Development – Build REST APIs</h1>
+          <p class="lesson-intro">APIs are the backbone of modern web services. Python offers FastAPI for high performance and Flask for simplicity to build production-ready REST APIs quickly.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Real-World</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="fastapi">FastAPI – Quick Start</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Item(BaseModel):
+    name: str
+    price: float
+    in_stock: bool = True
+
+items_db = {}
+
+@app.get("/items/{item_id}")
+def get_item(item_id: int):
+    if item_id not in items_db:
+        return {"error": "Not found"}
+    return items_db[item_id]
+
+@app.post("/items/{item_id}")
+def create_item(item_id: int, item: Item):
+    items_db[item_id] = item
+    return {"message": "Created", "item": item}
+
+@app.put("/items/{item_id}")
+def update_item(item_id: int, item: Item):
+    items_db[item_id] = item
+    return {"message": "Updated"}
+
+@app.delete("/items/{item_id}")
+def delete_item(item_id: int):
+    items_db.pop(item_id, None)
+    return {"message": "Deleted"}</code></pre></div>
+          <h2 id="run">Running the API</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Bash</span><button class="copy-btn">Copy</button></div><pre><code class="language-bash">pip install fastapi uvicorn
+uvicorn main:app --reload
+# Visit http://localhost:8000/docs for Swagger UI</code></pre></div>
+          <h2 id="flask">Flask Alternative</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+items = {}
+
+@app.route("/items/&lt;int:item_id&gt;", methods=["GET"])
+def get_item(item_id):
+    return jsonify(items.get(item_id, {"error": "Not found"}))
+
+@app.route("/items/&lt;int:item_id&gt;", methods=["POST"])
+def create_item(item_id):
+    data = request.get_json()
+    items[item_id] = data
+    return jsonify({"message": "Created"}), 201
+
+if __name__ == "__main__":
+    app.run(debug=True)</code></pre></div>
+          <h2 id="auth">Token Authentication</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+import secrets
+
+security = HTTPBearer()
+API_KEY = "secret-token-123"
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    if not secrets.compare_digest(credentials.credentials, API_KEY):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+    return credentials.credentials
+
+@app.get("/secure", dependencies=[Depends(verify_token)])
+def secure_endpoint():
+    return {"data": "Protected resource"}</code></pre></div>
+          <h2 id="validation">Pydantic Validation</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">from pydantic import BaseModel, validator, Field
+
+class UserCreate(BaseModel):
+    username: str = Field(..., min_length=3, max_length=50)
+    email: str
+    age: int = Field(..., ge=0, le=150)
+
+    @validator("email")
+    def validate_email(cls, v):
+        if "@" not in v:
+            raise ValueError("Invalid email")
+        return v.lower()
+
+@app.post("/users/")
+def create_user(user: UserCreate):
+    return {"created": user.dict()}</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> Use FastAPI for new projects — auto-generated Swagger docs at /docs, async support, and Pydantic validation built-in.</div>
+          <h2 id="deep-apidev">Building an API: Resources, Methods, Status Codes</h2>
+          <p>An API lets programs talk to your app over HTTP. A well-designed REST API models <strong>resources</strong> (nouns) as URLs and uses HTTP <strong>methods</strong> (verbs) for actions — a predictable convention clients already understand.</p>
+          <table>
+            <thead><tr><th>Method</th><th>Action</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td>GET</td><td>read</td><td><code>GET /users/5</code></td></tr>
+              <tr><td>POST</td><td>create</td><td><code>POST /users</code></td></tr>
+              <tr><td>PUT/PATCH</td><td>update</td><td><code>PATCH /users/5</code></td></tr>
+              <tr><td>DELETE</td><td>remove</td><td><code>DELETE /users/5</code></td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-python">@app.post("/users")
+def create_user(user: User):
+    saved = db.save(user)
+    return saved, 201        # 201 Created — the RIGHT status for a new resource</code></pre>
+          <p><strong>Status codes carry meaning</strong> — use them correctly: <code>200</code> OK, <code>201</code> Created, <code>400</code> bad request (client's fault), <code>401/403</code> auth, <code>404</code> not found, <code>500</code> server error. Returning <code>200</code> for everything (with an error buried in the body) forces clients to guess. <strong>Design principles:</strong> use nouns for URLs (<code>/users</code>, not <code>/getUsers</code>) and let the method express the verb; make GET <em>safe</em> (no side effects) and PUT/DELETE <em>idempotent</em> (repeating them changes nothing further); version your API (<code>/v1/</code>) so you can evolve without breaking clients. <strong>Security:</strong> validate every input, authenticate protected endpoints, and never trust the client.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a small API:</p>
+            <ol>
+              <li>Create a FastAPI app with a <code>GET /health</code> route returning <code>{"status": "ok"}</code>.</li>
+              <li>Add a <code>POST /items</code> route that accepts a Pydantic model and echoes it back.</li>
+              <li>Protect a route with a simple token check that returns 401 on failure.</li>
+              <li>Run it with uvicorn and test it via the <code>/docs</code> page.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Develop a small “notes” API with create, list, and get-by-id endpoints, using Pydantic models for validation and proper HTTP status codes (201 on create, 404 when missing). Add token authentication so write operations require a valid header, and return clear JSON error bodies. Bonus: write a couple of automated tests for the endpoints using <code>TestClient</code>.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>An API exposes functionality over HTTP using clear endpoints and predictable responses.</li>
+              <li>Use the right HTTP methods (GET, POST, PUT, PATCH, DELETE) for each operation.</li>
+              <li>Return meaningful status codes: 200/201 for success, 400/401/404 for client errors, 500 for server errors.</li>
+              <li>Validate request bodies (e.g. with Pydantic) to reject bad data early.</li>
+              <li>Protect endpoints with authentication such as tokens or API keys.</li>
+              <li>Auto-generated docs (Swagger/ReDoc in FastAPI) keep the API self-describing.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on API Development</h2>
+          <ul class="interview-list">
+            <li>What is an API and what makes a good API design?</li>
+            <li>What are common HTTP methods and what does each represent?</li>
+            <li>What HTTP status codes should an API return for success and errors?</li>
+            <li>How do you validate incoming request data?</li>
+            <li>How do you secure an API endpoint?</li>
+            <li>What is the difference between authentication and authorization?</li>
+            <li>How do you document an API?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/frameworks/fastapi.html" class="topic-tag">⚡ FastAPI</a>
+            <a href="/python/frameworks/flask.html" class="topic-tag">🍷 Flask</a>
+            <a href="/python/real-world/rest-api.html" class="topic-tag">🔗 REST APIs</a>
+            <a href="/python/intermediate/json.html" class="topic-tag">📄 JSON</a>
+            <a href="/python/real-world/database.html" class="topic-tag">🗄️ Databases</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between authentication and authorization? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Authentication verifies who you are (e.g. checking a token or password). Authorization decides what you are allowed to do (e.g. whether you can delete a resource). An API typically does both.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Which status code should I return when creating a resource? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Return <code>201 Created</code> for a successful creation, ideally with the new resource in the body and a <code>Location</code> header. Use <code>200 OK</code> for ordinary successful reads and updates.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I validate incoming data? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Define a schema — with Pydantic in FastAPI, for example — so the framework automatically checks types and required fields, converts values, and returns a clear error response when data is invalid.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I build my API with Flask, FastAPI, or Django? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>FastAPI is excellent for modern, async, well-documented APIs. Flask suits small or highly custom services. Django REST Framework fits when you already use Django and want a full-featured, batteries-included toolkit.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/advanced/quiz.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+          <a href="/python/real-world/web-scraping.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Web Scraping</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

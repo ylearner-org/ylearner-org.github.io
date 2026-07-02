@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python To-Do App – Task Manager with JSON Storage | ylearner</title>
+  <meta name="description" content="Build a Python to-do app with add, complete, delete, priority levels, and JSON file persistence. Full CLI project with dataclasses.">
+  <meta name="keywords" content="python todo app project, python task manager, python beginner project, python json storage">
+  <link rel="canonical" href="https://ylearner.org/python/projects/todo-app.html">
+  <meta property="og:title" content="Python To-Do App – Task Manager with JSON Storage | ylearner">
+  <meta property="og:description" content="Build a Python to-do app with add, complete, delete, priority levels, and JSON file persistence. Full CLI project with dataclasses.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/python/projects/todo-app.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Python To-Do App – Task Manager with JSON Storage | ylearner">
+  <meta name="twitter:description" content="Build a Python to-do app with add, complete, delete, priority levels, and JSON file persistence. Full CLI project with dataclasses.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"LearningResource","name":"Python To-Do App Project","description":"Python task manager with JSON persistence, priorities, and CLI interface.","educationalLevel":"Beginner","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}</script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search"><span class="search-icon">🔍</span><input type="search" id="searchInput" placeholder="Search tutorials…" autocomplete="off"><div id="searchResults" class="search-results"></div></div>
+    <div class="header-actions"><button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button></div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span><a href="/python/projects/calculator.html">Projects</a><span class="separator">›</span><span class="current">To-Do App</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">✅ Projects</div>
+          <h1>Python To-Do App – Task Manager</h1>
+          <p class="lesson-intro">Build a persistent to-do app that saves tasks to JSON. Supports adding, completing, deleting, and filtering by priority.</p>
+          <div class="lesson-meta"><span>⏱️ 20 min read</span><span>🎯 Projects</span><span>📅 Updated 2026</span></div>
+        </header>
+        <article class="lesson-body">
+          <h2 id="code">Complete Implementation</h2>
+          <div class="code-block"><div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div><pre><code class="language-python">import json
+from pathlib import Path
+from datetime import datetime
+from dataclasses import dataclass, asdict
+
+TODO_FILE = Path("todos.json")
+
+@dataclass
+class Task:
+    id: int
+    title: str
+    done: bool = False
+    priority: str = "medium"
+    created: str = ""
+    def __post_init__(self):
+        if not self.created:
+            self.created = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+class TodoApp:
+    def __init__(self):
+        self.tasks: list[Task] = []
+        self._next_id = 1
+        self.load()
+
+    def load(self):
+        if TODO_FILE.exists():
+            data = json.loads(TODO_FILE.read_text())
+            self.tasks = [Task(**t) for t in data["tasks"]]
+            self._next_id = data.get("next_id", len(self.tasks) + 1)
+
+    def save(self):
+        TODO_FILE.write_text(json.dumps(
+            {"tasks": [asdict(t) for t in self.tasks], "next_id": self._next_id}, indent=2
+        ))
+
+    def add(self, title, priority="medium"):
+        task = Task(id=self._next_id, title=title, priority=priority)
+        self.tasks.append(task); self._next_id += 1; self.save(); return task
+
+    def complete(self, task_id):
+        task = next((t for t in self.tasks if t.id == task_id), None)
+        if task: task.done = True; self.save()
+        return task
+
+    def delete(self, task_id):
+        task = next((t for t in self.tasks if t.id == task_id), None)
+        if task: self.tasks.remove(task); self.save(); return True
+        return False
+
+app = TodoApp()
+ICONS = {"high": "🔴", "medium": "🟡", "low": "🟢"}
+
+while True:
+    print("\n[1]List [2]Add [3]Complete [4]Delete [q]Quit")
+    c = input("> ").strip().lower()
+    if c == "q": break
+    elif c == "1":
+        for t in sorted(app.tasks, key=lambda x: {"high":0,"medium":1,"low":2}[x.priority]):
+            print(f"  [{t.id}] {'✓' if t.done else '○'} {ICONS[t.priority]} {t.title}")
+    elif c == "2":
+        title = input("Title: "); p = input("Priority [medium]: ") or "medium"
+        task = app.add(title, p); print(f"Added #{task.id}")
+    elif c == "3":
+        tid = int(input("Task ID: "))
+        print("Done!" if app.complete(tid) else "Not found.")
+    elif c == "4":
+        tid = int(input("Task ID: "))
+        print("Deleted." if app.delete(tid) else "Not found.")</code></pre></div>
+          <div class="callout callout-tip"><strong>Tip:</strong> Extend this project with due dates and tags, then wrap it in a Flask web app for a full-stack portfolio piece.</div>
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Improve the to-do app:</p>
+            <ol>
+              <li>Add the ability to mark a task as complete and show its status.</li>
+              <li>Persist tasks to a JSON file so they survive restarts.</li>
+              <li>Add a command to delete a task by its number.</li>
+              <li>Add a due date to each task.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Turn the to-do app into a small task manager: support priorities, due dates, and filtering (e.g. show only incomplete or overdue tasks), persist everything to a file or SQLite database, and organize the code into clear functions or a class. Bonus: add a command-line interface with <code>argparse</code> so tasks can be managed via terminal commands.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>This project builds a to-do list that adds, lists, completes, and removes tasks.</li>
+              <li>Tasks are stored in a list (or objects) and persisted to a file or database.</li>
+              <li>Completion status, due dates, and priorities enrich each task.</li>
+              <li>Filtering surfaces relevant tasks (incomplete, overdue).</li>
+              <li>Organizing logic into functions or a class keeps it maintainable.</li>
+              <li>It can grow into a CLI tool, web app, or GUI.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions on Building a To-Do App</h2>
+          <ul class="interview-list">
+            <li>How would you model a task and a task list in Python?</li>
+            <li>How do you persist the task list between runs?</li>
+            <li>How would you implement marking tasks complete?</li>
+            <li>How do you add filtering (e.g. by status or due date)?</li>
+            <li>How would you structure the code as it grows?</li>
+            <li>How would you add a command-line interface?</li>
+            <li>How could you turn this into a web or GUI app?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/python/data-structures/lists.html" class="topic-tag">📚 Lists</a>
+            <a href="/python/intermediate/json.html" class="topic-tag">📄 JSON</a>
+            <a href="/python/oop/classes.html" class="topic-tag">🏛️ Classes</a>
+            <a href="/python/real-world/database.html" class="topic-tag">🗄️ Databases</a>
+            <a href="/python/intermediate/datetime.html" class="topic-tag">📅 Date & Time</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">How do I keep tasks after the program closes? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Persist them to storage — a JSON file is the simplest option, or SQLite for structured queries. Load the saved tasks on startup and write them back whenever they change.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Should I use a class for tasks? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>As the app grows beyond a few fields, a <code>Task</code> class (or dataclass) keeps related data and behavior together and is easier to extend than parallel lists or bare dictionaries. For a tiny app, a list of dicts is fine.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I add a command-line interface? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Use the standard-library <code>argparse</code> module to define commands like <code>add</code>, <code>list</code>, <code>done</code>, and <code>remove</code> with arguments, so the app can be driven from the terminal.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How would I make this a web app? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Reuse the task logic and add a Flask or FastAPI layer with routes for listing and modifying tasks, plus templates or a JSON API. Separating the data logic from the interface makes the transition smooth.</p></div>
+            </div>
+          </section>
+
+        </article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/python/projects/calculator.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Calculator</span>
+          </a>
+          <a href="/python/projects/expense-tracker.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Expense Tracker</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

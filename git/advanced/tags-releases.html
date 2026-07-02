@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git Tags &amp; Releases – Marking Versions with git tag | ylearner</title>
+  <meta name="description" content="Learn how to use git tag to mark release versions, the difference between lightweight and annotated tags, how to push tags to remote, and semantic versioning conventions.">
+  <meta name="keywords" content="git tag, git tags, annotated tag, lightweight tag, git push tags, semantic versioning, git releases, git tag delete">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/git/advanced/tags-releases.html">
+  <meta property="og:title" content="Git Tags &amp; Releases – Marking Versions with git tag | ylearner">
+  <meta property="og:description" content="Learn how to use git tag to mark release versions, the difference between lightweight and annotated tags, how to push tags, and semantic versioning conventions.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/git/advanced/tags-releases.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Git Tags &amp; Releases – Marking Versions with git tag | ylearner">
+  <meta name="twitter:description" content="Learn how to use git tag to mark release versions, the difference between lightweight and annotated tags, how to push tags, and semantic versioning conventions.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Git Tags & Releases – Marking Versions with git tag","description":"Learn how to use git tag to mark release versions, annotated vs lightweight tags, pushing tags, and semantic versioning.","educationalLevel":"Intermediate","keywords":"git tag, annotated tag, semantic versioning, git releases","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/git/what-is-git.html">Git</a><span class="separator">›</span>
+          <span>Advanced Git</span><span class="separator">›</span>
+          <span class="current">Tags &amp; Releases</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">⚙️ Advanced Git</div>
+          <h1>Git Tags &amp; Releases – Marking Versions with git tag</h1>
+          <p class="lesson-intro">While branches move with every commit, a <strong>tag</strong> is a permanent bookmark that never moves — perfect for marking release versions. Tags are how you tell the world "this commit is v1.2.0". This lesson covers creating lightweight and annotated tags, pushing them to GitHub, deleting stale tags, and the semantic versioning convention used by most professional projects.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 15 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-are-tags">What Are Tags?</h2>
+          <p>Tags are references that point to specific commits in your Git history. Unlike branches (which advance with each new commit), tags are <strong>fixed</strong> — they always point to the same commit. This makes them ideal for marking release points:</p>
+          <ul>
+            <li>Stable release: <code>v1.0.0</code>, <code>v2.3.1</code></li>
+            <li>Pre-release: <code>v2.0.0-beta.1</code>, <code>v1.5.0-rc.2</code></li>
+            <li>Internal milestones: <code>sprint-42-end</code></li>
+          </ul>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Tags vs Branches</strong>
+              <p>A branch pointer moves forward with every new commit. A tag pointer never moves — it permanently marks one specific commit. If you checkout a tag, you enter a "detached HEAD" state because there's no branch to advance.</p>
+            </div>
+          </div>
+
+          <h2 id="lightweight-tags">Lightweight Tags</h2>
+          <p>A lightweight tag is simply a named pointer to a commit — nothing more. It stores no metadata about who created the tag or why.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Create a lightweight tag on the current HEAD
+git tag v1.0.0
+
+# Create a lightweight tag on a specific past commit
+git tag v0.9.0 3f2a1b9
+
+# Show the commit a lightweight tag points to
+git show v1.0.0</code></pre>
+          </div>
+
+          <p>Lightweight tags are useful for temporary or personal bookmarks but are generally not recommended for public releases — use annotated tags for those.</p>
+
+          <h2 id="annotated-tags">Annotated Tags</h2>
+          <p>Annotated tags are full Git objects. They store: the tagger name and email, the tagging date, a message, and optionally a GPG signature. These are the standard for release tags.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Create an annotated tag with a message
+git tag -a v1.0.0 -m "Release v1.0.0 – initial public release"
+
+# Create an annotated tag on a specific past commit
+git tag -a v0.9.0 3f2a1b9 -m "Beta release v0.9.0"
+
+# View full tag details (tagger, date, message, commit info)
+git show v1.0.0</code></pre>
+          </div>
+
+          <div class="output-block">
+            <div class="output-label">▶ git show v1.0.0 output</div>
+            tag v1.0.0<br>
+            Tagger: Jane Dev &lt;jane@example.com&gt;<br>
+            Date: Mon Jun 8 14:30:00 2026 +0000<br>
+            <br>
+            Release v1.0.0 – initial public release<br>
+            <br>
+            commit a1b2c3d4e5f6... (HEAD -&gt; main)<br>
+            Author: Jane Dev &lt;jane@example.com&gt;<br>
+            ...
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="list-tags">Listing and Inspecting Tags</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># List all tags (alphabetically)
+git tag
+
+# List tags matching a pattern
+git tag -l "v1.*"
+
+# List tags with their associated commit messages
+git tag -n
+
+# Show full details of a specific tag
+git show v2.0.0</code></pre>
+          </div>
+
+          <h2 id="push-tags">Pushing Tags to Remote</h2>
+          <p>Tags are NOT pushed automatically with <code>git push</code>. You must push them explicitly:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Push a single tag to origin
+git push origin v1.0.0
+
+# Push ALL local tags to origin at once
+git push origin --tags
+
+# Push all tags along with a regular push
+git push --follow-tags   # Only pushes annotated tags reachable from pushed commits</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Prefer --follow-tags over --tags</strong>
+              <p>Use <code>git push --follow-tags</code> instead of <code>--tags</code> in CI/CD pipelines. It only pushes annotated tags that are reachable from the commits being pushed, avoiding accidentally pushing local test/temp tags.</p>
+            </div>
+          </div>
+
+          <h2 id="delete-tags">Deleting Tags</h2>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Delete a local tag
+git tag -d v1.0.0-beta
+
+# Delete a remote tag
+git push origin --delete v1.0.0-beta
+
+# Alternative syntax for deleting remote tag
+git push origin :refs/tags/v1.0.0-beta</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Avoid deleting published release tags</strong>
+              <p>Once a tag has been pushed and others may have pulled it (e.g., in open source projects), deleting it causes confusion. If you tagged the wrong commit, create a new corrected tag (e.g., <code>v1.0.1</code>) and document what happened, rather than deleting and recreating the original tag.</p>
+            </div>
+          </div>
+
+          <h2 id="semantic-versioning">Semantic Versioning</h2>
+          <p>The convention used by almost all software projects is <strong>Semantic Versioning (SemVer)</strong>: <code>MAJOR.MINOR.PATCH</code></p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Part</th><th>When to increment</th><th>Example</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>MAJOR</strong></td><td>Breaking API changes — existing code may break</td><td>v1.0.0 → v2.0.0</td></tr>
+                <tr><td><strong>MINOR</strong></td><td>New features, backward compatible</td><td>v1.2.0 → v1.3.0</td></tr>
+                <tr><td><strong>PATCH</strong></td><td>Bug fixes, backward compatible</td><td>v1.2.3 → v1.2.4</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>Pre-release versions use a hyphen suffix: <code>v2.0.0-alpha.1</code>, <code>v2.0.0-beta.3</code>, <code>v2.0.0-rc.1</code>. Starting from <code>v0.y.z</code> signals initial development — anything may change.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash"># Typical release tagging workflow
+git switch main
+git pull origin main
+
+# Create the annotated release tag
+git tag -a v1.3.0 -m "Release v1.3.0
+
+- Add OAuth2 login support
+- Fix null pointer in user profile
+- Improve dashboard load time by 40%"
+
+# Push the tag to trigger CI/CD release pipeline
+git push origin v1.3.0</code></pre>
+          </div>
+
+          <p>On GitHub, navigate to <strong>Releases → Draft a new release → Choose a tag</strong>. Select your tag, add release notes, attach binaries if needed, and publish. GitHub automatically generates a downloadable archive of the source code for each tag.</p>
+
+          <h2 id="deep-tags">Tags: Permanent Names for Release Points</h2>
+          <p>A tag is a fixed label on a specific commit — unlike a branch, it never moves. Tags mark releases (<code>v1.2.0</code>) so you can always check out the exact code that shipped.</p>
+          <pre><code class="language-bash">git tag v1.0.0                       # lightweight — just a name
+git tag -a v1.0.0 -m "First release" # annotated — has author, date, message
+git tag                              # list tags
+git checkout v1.0.0                  # inspect that release's code</code></pre>
+          <table>
+            <thead><tr><th></th><th>Lightweight</th><th>Annotated</th></tr></thead>
+            <tbody>
+              <tr><td>Stores</td><td>just a pointer</td><td>tagger, date, message (a real object)</td></tr>
+              <tr><td>Use for</td><td>private/temporary marks</td><td><strong>releases</strong> (recommended)</td></tr>
+            </tbody>
+          </table>
+          <p><strong>The push gotcha:</strong> <code>git push</code> does <em>not</em> send tags. You must push them explicitly:</p>
+          <pre><code class="language-bash">git push origin v1.0.0     # one tag
+git push --tags            # all tags</code></pre>
+          <p><strong>Use annotated tags for releases</strong> — they record who/when/why and can be signed. Follow <em>semantic versioning</em> (<code>MAJOR.MINOR.PATCH</code>): bump PATCH for fixes, MINOR for new features, MAJOR for breaking changes. On GitHub, pushing a tag can trigger a Release with notes and built artifacts.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create a lightweight tag.</li>
+              <li>Create an annotated tag with <code>-a</code>.</li>
+              <li>Tag a specific commit.</li>
+              <li>Push tags to the remote.</li>
+              <li>List and delete tags.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Tag a commit as <code>v1.0.0</code> with an annotated tag, push it to the remote, and explain how tags mark releases. Describe the difference between lightweight and annotated tags and how tags relate to GitHub Releases and semantic versioning.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><strong>Tags are permanent commit bookmarks</strong> — unlike branches, they never move.</li>
+              <li><strong>Lightweight tags</strong> (<code>git tag v1.0.0</code>) are just pointers — no extra metadata.</li>
+              <li><strong>Annotated tags</strong> (<code>git tag -a v1.0.0 -m "msg"</code>) store tagger, date, and message — use these for releases.</li>
+              <li>Tag a past commit with: <code>git tag -a v0.9.0 &lt;commit-hash&gt;</code></li>
+              <li>Tags are not pushed automatically — use <code>git push origin v1.0.0</code> or <code>git push --follow-tags</code>.</li>
+              <li>Delete locally: <code>git tag -d v1.0.0</code>. Delete remotely: <code>git push origin --delete v1.0.0</code>.</li>
+              <li><strong>Semantic versioning</strong>: MAJOR (breaking) . MINOR (new features) . PATCH (bug fixes).</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a Git tag?</li>
+            <li>What is the difference between a lightweight and an annotated tag?</li>
+            <li>How do you push tags to a remote?</li>
+            <li>How do tags relate to releases?</li>
+            <li>What is semantic versioning?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/git/advanced/stashing.html" class="topic-tag git-topic-tag">⚙️ git stash</a>
+            <a href="/git/advanced/cherry-pick.html" class="topic-tag git-topic-tag">⚙️ Cherry-Pick</a>
+            <a href="/git/workflows/gitflow.html" class="topic-tag git-topic-tag">🔀 Git Flow</a>
+            <a href="/git/projects/version-your-project.html" class="topic-tag git-topic-tag">🛠️ Version Your Project</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Should I use lightweight or annotated tags for releases? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Always use <strong>annotated tags</strong> for releases. They store who created the tag, when, and why — invaluable when reviewing release history months later. Lightweight tags are useful for temporary personal bookmarks (e.g., marking a commit before a risky rebase) but lack the provenance information that release tags need.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why didn't my tag show up on GitHub after git push? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Tags are not pushed with a regular <code>git push</code>. You must push them explicitly: <code>git push origin v1.0.0</code> for a single tag, or <code>git push origin --tags</code> for all tags. Many teams configure their CI/CD pipeline to push tags automatically when the release process is triggered, rather than relying on developers to remember.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens if I checkout a tag? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>You enter a "detached HEAD" state — your HEAD points directly to a commit rather than to a branch. This is fine for reading code or building from a specific version. If you want to make changes from a tagged commit, create a branch first: <code>git switch -c hotfix/1.0.1 v1.0.0</code>. Any commits made in detached HEAD state without first creating a branch will eventually be garbage collected by Git.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I move a tag to a different commit? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>You can force-update a local tag with <code>git tag -f v1.0.0 &lt;new-commit&gt;</code>, then force-push with <code>git push origin --force v1.0.0</code>. However, this is strongly discouraged for published tags because anyone who already fetched the tag will have a different reference than those who fetch after the change. It's better to create a new tag (e.g., <code>v1.0.1</code>) and document the correction.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/git/advanced/stashing.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">git stash</span>
+          </a>
+          <a href="/git/advanced/cherry-pick.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Cherry-Pick</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

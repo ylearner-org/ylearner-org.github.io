@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL CTEs (WITH Clause) – Readable, Reusable Subqueries | ylearner</title>
+  <meta name="description" content="Learn SQL Common Table Expressions (CTEs) using the WITH clause. Create named temporary result sets, chain multiple CTEs, and write recursive CTEs for hierarchical data.">
+  <meta name="keywords" content="SQL CTE, WITH clause SQL, common table expression, SQL recursive CTE, SQL WITH AS, CTE vs subquery, SQL named subquery, SQL hierarchy query">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/subqueries/cte-with.html">
+  <meta property="og:title" content="SQL CTEs (WITH Clause) – Readable, Reusable Subqueries | ylearner">
+  <meta property="og:description" content="Master SQL CTEs: name your subqueries for readability, chain multiple CTEs, and use recursive CTEs to traverse trees and hierarchies.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/subqueries/cte-with.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL CTEs (WITH Clause) – Readable, Reusable Subqueries | ylearner">
+  <meta name="twitter:description" content="Master SQL CTEs: name your subqueries for readability, chain multiple CTEs, and use recursive CTEs to traverse trees and hierarchies.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL CTEs with WITH Clause","description":"SQL Common Table Expressions (CTEs) using WITH. Covers single and multiple CTEs, recursive CTEs, and comparison with subqueries.","educationalLevel":"Intermediate","keywords":"SQL CTE, WITH clause, recursive CTE, common table expression","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <a href="/sql/subqueries/cte-with.html">Subqueries</a><span class="separator">›</span>
+          <span class="current">CTEs (WITH)</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🪆 Subqueries</div>
+          <h1>SQL CTEs (WITH Clause) – Readable, Reusable Subqueries</h1>
+          <p class="lesson-intro">A Common Table Expression (CTE) gives a name to a subquery, making complex queries dramatically more readable. CTEs can be referenced multiple times within the same query, chained together, and even made recursive to traverse hierarchical data like org charts or folder trees.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-cte">What Is a CTE?</h2>
+          <p>A CTE is defined with the WITH keyword before the main SELECT. It creates a named, temporary result set that exists only for the duration of the query. Think of it as giving a subquery a name so you can reference it like a table.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>CTE vs Temporary Table vs View</strong>
+              <p>A CTE lives only for the current query. A temporary table persists for the session. A view is stored in the database permanently. CTEs are ideal for breaking a complex query into readable steps without creating persistent objects.</p>
+            </div>
+          </div>
+
+          <h2 id="cte-syntax">CTE Syntax</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">WITH cte_name AS (
+    -- This is the CTE body: any valid SELECT
+    SELECT dept_id, AVG(salary) AS avg_sal
+    FROM employees
+    GROUP BY dept_id
+)
+-- Main query: references the CTE like a table
+SELECT e.name, e.salary, d.avg_sal
+FROM employees e
+JOIN cte_name d ON e.dept_id = d.dept_id
+WHERE e.salary > d.avg_sal
+ORDER BY e.salary DESC;</code></pre>
+          </div>
+
+          <p>Compared to an equivalent derived table, the CTE version is much more readable:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Same query as derived table (harder to read)
+SELECT e.name, e.salary, d.avg_sal
+FROM employees e
+JOIN (
+    SELECT dept_id, AVG(salary) AS avg_sal
+    FROM employees GROUP BY dept_id
+) d ON e.dept_id = d.dept_id
+WHERE e.salary > d.avg_sal;</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="multiple-ctes">Multiple CTEs</h2>
+          <p>Chain multiple CTEs with commas. Later CTEs can reference earlier ones:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">WITH
+-- Step 1: compute department salary stats
+dept_stats AS (
+    SELECT
+        department,
+        AVG(salary)  AS avg_sal,
+        MAX(salary)  AS max_sal,
+        COUNT(*)     AS headcount
+    FROM employees
+    GROUP BY department
+),
+-- Step 2: find high-value departments (large headcount AND high average)
+high_value_depts AS (
+    SELECT department
+    FROM dept_stats
+    WHERE headcount >= 5
+      AND avg_sal > 75000
+)
+-- Main query: employees in high-value departments
+SELECT e.name, e.department, e.salary
+FROM employees e
+JOIN high_value_depts hvd ON e.department = hvd.department
+ORDER BY e.department, e.salary DESC;</code></pre>
+          </div>
+
+          <h2 id="recursive-cte">Recursive CTEs</h2>
+          <p>A recursive CTE references itself to traverse hierarchical data. It has two parts separated by UNION ALL: an anchor member (base case) and a recursive member:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Traverse an org chart: find all reports under manager id = 1
+WITH RECURSIVE org_tree AS (
+    -- Anchor: start with the root manager
+    SELECT id, name, manager_id, 0 AS level
+    FROM employees
+    WHERE id = 1
+
+    UNION ALL
+
+    -- Recursive member: find direct reports
+    SELECT e.id, e.name, e.manager_id, ot.level + 1
+    FROM employees e
+    JOIN org_tree ot ON e.manager_id = ot.id
+)
+SELECT id, name, manager_id, level
+FROM org_tree
+ORDER BY level, name;</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Recursive CTEs need a termination condition</strong>
+              <p>The recursion stops when the recursive member returns zero rows. If your data has cycles (e.g., manager A reports to B who reports to A), the query will loop forever. Add a depth limit: <code>WHERE ot.level &lt; 10</code> in the recursive member, or use cycle detection features if your database supports them (PostgreSQL 14+ has <code>CYCLE</code> clause).</p>
+            </div>
+          </div>
+
+          <p>Generate a series of numbers (useful for date ranges or test data):</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">SQL</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-sql">-- Generate numbers 1 through 10
+WITH RECURSIVE nums AS (
+    SELECT 1 AS n
+    UNION ALL
+    SELECT n + 1 FROM nums WHERE n < 10
+)
+SELECT n FROM nums;
+
+-- Generate a date range (last 30 days)
+WITH RECURSIVE date_range AS (
+    SELECT CURRENT_DATE - INTERVAL '29 days' AS dt
+    UNION ALL
+    SELECT dt + INTERVAL '1 day' FROM date_range WHERE dt < CURRENT_DATE
+)
+SELECT dt FROM date_range ORDER BY dt;</code></pre>
+          </div>
+
+          <h2 id="cte-vs-subquery">CTE vs Subquery</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead><tr><th>Feature</th><th>CTE (WITH)</th><th>Subquery (inline)</th></tr></thead>
+              <tbody>
+                <tr><td>Readability</td><td>High — named, top-level</td><td>Lower — buried inline</td></tr>
+                <tr><td>Reusability in same query</td><td>Yes — reference by name multiple times</td><td>No — must repeat</td></tr>
+                <tr><td>Recursive?</td><td>Yes (WITH RECURSIVE)</td><td>No</td></tr>
+                <tr><td>Materialized?</td><td>Database-dependent</td><td>Usually not</td></tr>
+                <tr><td>Scope</td><td>Single query only</td><td>Single query only</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-cte">CTEs Turn Unreadable Queries Into Readable Ones</h2>
+          <p>A deeply nested subquery reads inside-out and is painful to debug. A <strong>CTE</strong> (<code>WITH</code>) names each step so the query reads top-to-bottom like a recipe:</p>
+          <pre><code class="language-sql">WITH monthly AS (
+    SELECT region, DATE_TRUNC('month', order_date) AS m, SUM(amount) AS total
+    FROM orders
+    GROUP BY region, m
+),
+ranked AS (
+    SELECT *, RANK() OVER (PARTITION BY m ORDER BY total DESC) AS rk
+    FROM monthly
+)
+SELECT * FROM ranked WHERE rk &lt;= 3;   -- top 3 regions per month</code></pre>
+          <p>Each CTE is a named, reusable result set you can reference (even multiple times) in the final query — far clearer than repeating a subquery.</p>
+          <div class="callout callout-info">
+            <span class="callout-icon">🔁</span>
+            <div class="callout-content">
+              <strong>Recursive CTEs walk hierarchies</strong>
+              <p>A <code>WITH RECURSIVE</code> CTE can traverse tree/graph data — an org chart, a category tree, a bill of materials — by repeatedly joining a table to itself until no new rows appear. It's the standard SQL answer to "give me all descendants of this node."</p>
+            </div>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Define a CTE with <code>WITH</code>.</li>
+              <li>Reference the CTE in the main query.</li>
+              <li>Chain two CTEs together.</li>
+              <li>Replace a nested subquery with a CTE.</li>
+              <li>Name the CTE’s output columns.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Rewrite a deeply nested subquery as a readable chain of CTEs using <code>WITH</code>, then add a second CTE that builds on the first. Explain how CTEs improve readability and what a recursive CTE enables.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A <strong>CTE</strong> names a subquery using <code>WITH name AS (...)</code> before the main SELECT.</li>
+              <li>CTEs make complex queries readable by breaking them into named steps.</li>
+              <li><strong>Multiple CTEs</strong> are separated by commas; later CTEs can reference earlier ones.</li>
+              <li><strong>Recursive CTEs</strong> (<code>WITH RECURSIVE</code>) traverse hierarchies and trees using anchor + recursive member separated by <code>UNION ALL</code>.</li>
+              <li>CTEs can be referenced multiple times in the main query — no need to repeat the subquery.</li>
+              <li>CTEs exist only for the duration of the query — they do not create permanent objects.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a CTE (Common Table Expression)?</li>
+            <li>How does a CTE differ from a subquery?</li>
+            <li>What keyword introduces a CTE?</li>
+            <li>Can CTEs reference each other?</li>
+            <li>What is a recursive CTE?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/subqueries/subqueries-intro.html" class="topic-tag sql-topic-tag">🗄️ Subqueries Intro</a>
+            <a href="/sql/subqueries/correlated-subqueries.html" class="topic-tag sql-topic-tag">🗄️ Correlated Subqueries</a>
+            <a href="/sql/subqueries/exists-in.html" class="topic-tag sql-topic-tag">🗄️ EXISTS &amp; IN</a>
+            <a href="/sql/grouping/window-functions.html" class="topic-tag sql-topic-tag">🗄️ Window Functions</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Is WITH RECURSIVE supported in all databases? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>PostgreSQL, SQL Server (just <code>WITH</code>, not <code>WITH RECURSIVE</code>), Oracle 11g+ (<code>WITH ... CYCLE</code>), MySQL 8.0+, and SQLite 3.35+ all support recursive CTEs. In SQL Server, you write <code>WITH cte AS (...)</code> — the RECURSIVE keyword is not used; recursion is implicit when the CTE references itself. MySQL 5.x and older SQLite do not support recursive CTEs.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use a CTE in an INSERT, UPDATE, or DELETE statement? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. CTEs can precede any DML statement: <code>WITH cte AS (...) INSERT INTO ... SELECT FROM cte</code>, or <code>WITH cte AS (...) DELETE FROM ... WHERE id IN (SELECT id FROM cte)</code>. This is particularly useful for complex conditional updates or bulk inserts based on derived logic.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Are CTEs always materialised (computed once)? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Not necessarily. The SQL standard leaves this to the database. PostgreSQL materialises CTEs by default (computes once, caches result) but you can override with <code>WITH cte AS NOT MATERIALIZED (...)</code> to let the optimiser inline it. MySQL and SQL Server typically inline CTEs like derived tables. The behaviour affects performance when the CTE is referenced multiple times.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/subqueries/exists-in.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">EXISTS &amp; IN</span>
+          </a>
+          <a href="/sql/subqueries/quiz.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

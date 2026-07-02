@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Portal Forms – Accepting User Input from the Portal | ylearner</title>
+  <meta name="description" content="Handle form submissions in the Odoo portal. Learn CSRF protection, GET/POST controller pattern, validation, file uploads, and error display.">
+  <meta name="keywords" content="Odoo portal forms, CSRF token, portal form POST, odoo form validation, portal file upload, request.params, Odoo 19 portal">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/portal/portal-forms.html">
+  <meta property="og:title" content="Odoo Portal Forms – Accepting User Input from the Portal">
+  <meta property="og:description" content="Handle form submissions in the Odoo portal. Learn CSRF protection, GET/POST controller pattern, validation, file uploads, and error display.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/portal/portal-forms.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo Portal Forms – Accepting User Input from the Portal | ylearner">
+  <meta name="twitter:description" content="Handle form submissions in the Odoo portal with CSRF, validation, and file uploads.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo Portal Forms – Accepting User Input from the Portal",
+    "description": "Handle form submissions in the Odoo portal. Learn CSRF protection, GET/POST controller pattern, validation, file uploads, and error display.",
+    "educationalLevel": "Intermediate",
+    "keywords": "Odoo portal forms, CSRF, form POST, validation, file upload",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <a href="/odoo/portal/portal-overview.html">Portal Development</a><span class="separator">›</span>
+          <span class="current">Portal Forms</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌐 Portal Development</div>
+          <h1>Odoo Portal Forms – Accepting User Input from the Portal</h1>
+          <p class="lesson-intro">Portal forms let customers submit data from the portal — extend loan requests, file returns, update contact info, or upload documents. The pattern involves a GET handler that renders the form and a POST handler that validates and processes the submission.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="deep-portalforms">Portal Forms: Letting Customers Submit Data</h2>
+          <p>Beyond viewing their records, portal users often need to <em>submit</em> data — update contact details, request a quote, add a support message. Portal forms handle this through controllers that validate and write to models.</p>
+          <pre><code class="language-python">@route("/my/account/update", type="http", auth="user", website=True, methods=["POST"])
+def update_details(self, **post):
+    partner = request.env.user.partner_id     # the logged-in user's own partner
+    partner.sudo().write({                      # sudo carefully — only their record
+        "phone": post.get("phone"),
+        "city": post.get("city"),
+    })
+    return request.redirect("/my/account")</code></pre>
+          <table>
+            <thead><tr><th>Concern</th><th>Handling</th></tr></thead>
+            <tbody>
+              <tr><td>CSRF</td><td>include the token; Odoo blocks forged POSTs</td></tr>
+              <tr><td>Validation</td><td>re-check every field server-side</td></tr>
+              <tr><td>Authorization</td><td>write only to the user's OWN records</td></tr>
+            </tbody>
+          </table>
+          <p><strong>The flow:</strong> a QWeb template renders an HTML form that POSTs to a controller route (<code>auth="user"</code> so only logged-in users reach it); the controller reads <code>**post</code>, validates, and writes to the model. <strong>Security is critical because input is user-controlled:</strong> always keep the CSRF token in the form (Odoo rejects POSTs without it, preventing cross-site request forgery); re-validate every field on the server (client checks are cosmetic); and — the big one — only ever write to records the user <em>owns</em>. Deriving the target from <code>request.env.user.partner_id</code> is safe; trusting an id from the form is not. <strong>The sudo() nuance:</strong> portal users have minimal write rights, so you often need <code>sudo()</code> to save — but scope it tightly to <em>their</em> record. A careless <code>sudo().write()</code> driven by a form-supplied id lets a user modify anyone's data. <strong>Good practice:</strong> show clear success/error feedback and redirect after a successful POST (Post/Redirect/Get) so a refresh doesn't resubmit.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Add a portal form for customer input.</li>
+              <li>Submit it to a controller.</li>
+              <li>Validate the input.</li>
+              <li>Create or update a record.</li>
+              <li>Show a confirmation message.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a portal form that lets a customer update their contact details or submit a request, posting to a controller that validates and saves the data to their own record. Explain CSRF protection on portal forms and why you must re-check ownership server-side.</p>
+          </div>
+
+          <div class="summary-box">
+            <strong>What you'll learn:</strong>
+            <ul>
+              <li>How CSRF protection works in Odoo portal forms</li>
+              <li>The GET/POST controller pattern</li>
+              <li>Validating form data and displaying errors</li>
+              <li>File uploads via <code>request.httprequest.files</code></li>
+            </ul>
+          </div>
+
+          <h2 id="form-submission">Form Submission in the Portal</h2>
+          <p>Portal forms use standard HTML <code>&lt;form&gt;</code> elements with <code>method="post"</code>. The controller has two responsibilities:</p>
+          <ul>
+            <li><strong>GET</strong> — render the empty form (or pre-fill it with existing data)</li>
+            <li><strong>POST</strong> — process the submitted data, validate it, create/update records, and redirect or re-render with errors</li>
+          </ul>
+
+          <h2 id="csrf-protection">CSRF Protection</h2>
+          <p>Odoo requires a CSRF token on every POST form to prevent cross-site request forgery. Add a hidden input using <code>request.csrf_token()</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (QWeb)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;form action="/my/loans/request" method="post"&gt;
+  &lt;input type="hidden" name="csrf_token"
+         t-att-value="request.csrf_token()"/&gt;
+
+  &lt;div class="form-group"&gt;
+    &lt;label for="book_id"&gt;Book ID&lt;/label&gt;
+    &lt;input type="number" name="book_id" class="form-control" required/&gt;
+  &lt;/div&gt;
+
+  &lt;div class="form-group"&gt;
+    &lt;label for="notes"&gt;Notes&lt;/label&gt;
+    &lt;textarea name="notes" class="form-control" rows="3"&gt;&lt;/textarea&gt;
+  &lt;/div&gt;
+
+  &lt;button type="submit" class="btn btn-primary"&gt;Submit Request&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+          </div>
+          <p>Without the CSRF token, Odoo returns a 403 error on POST.</p>
+
+          <h2 id="controller-pattern">Controller for Form POST</h2>
+          <p>Handle both GET and POST in one controller method using <code>methods=['GET', 'POST']</code>, or use two separate methods with the same route:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">from odoo import http
+from odoo.http import request
+from odoo.addons.portal.controllers.portal import CustomerPortal
+
+class LibraryPortal(CustomerPortal):
+
+    @http.route('/my/loans/request', type='http',
+                auth='user', website=True, methods=['GET', 'POST'])
+    def loan_request(self, **kw):
+        if request.httprequest.method == 'POST':
+            return self._process_loan_request(kw)
+
+        # GET: show empty form
+        books = request.env['library.book'].sudo().search([('available', '=', True)])
+        return request.render('my_module.portal_loan_request_form', {
+            'books': books,
+            'errors': {},
+        })
+
+    def _process_loan_request(self, values):
+        errors = {}
+
+        book_id = int(values.get('book_id', 0))
+        if not book_id:
+            errors['book_id'] = 'Please select a book.'
+
+        notes = (values.get('notes') or '').strip()
+
+        if errors:
+            books = request.env['library.book'].sudo().search([('available', '=', True)])
+            return request.render('my_module.portal_loan_request_form', {
+                'books': books,
+                'errors': errors,
+                'values': values,
+            })
+
+        # Create record
+        book = request.env['library.book'].sudo().browse(book_id)
+        request.env['library.loan'].sudo().create({
+            'member_id': request.env.user.partner_id.id,
+            'book_id': book.id,
+            'notes': notes,
+            'state': 'requested',
+        })
+
+        return request.redirect('/my/loans?request_sent=1')</code></pre>
+          </div>
+
+          <h2 id="displaying-errors">Displaying Errors</h2>
+          <p>Pass an <code>errors</code> dict from controller to template and render inline error messages:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">XML (QWeb)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-xml">&lt;div t-attf-class="form-group #{errors.get('book_id') and 'has-error' or ''}"&gt;
+  &lt;label&gt;Book&lt;/label&gt;
+  &lt;select name="book_id" class="form-control"&gt;
+    &lt;option value=""&gt;-- Select a book --&lt;/option&gt;
+    &lt;t t-foreach="books" t-as="book"&gt;
+      &lt;option t-att-value="book.id"
+              t-att-selected="values.get('book_id') == str(book.id)"&gt;
+        &lt;t t-out="book.name"/&gt;
+      &lt;/option&gt;
+    &lt;/t&gt;
+  &lt;/select&gt;
+  &lt;t t-if="errors.get('book_id')"&gt;
+    &lt;span class="help-block text-danger"&gt;
+      &lt;t t-out="errors['book_id']"/&gt;
+    &lt;/span&gt;
+  &lt;/t&gt;
+&lt;/div&gt;</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="file-uploads">File Uploads in Portal</h2>
+          <p>To allow file uploads, set <code>enctype="multipart/form-data"</code> on the form and access files via <code>request.httprequest.files</code>:</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">attachment_file = request.httprequest.files.get('attachment')
+if attachment_file and attachment_file.filename:
+    attachment_data = attachment_file.read()
+    request.env['ir.attachment'].sudo().create({
+        'name': attachment_file.filename,
+        'datas': base64.b64encode(attachment_data),
+        'res_model': 'library.loan',
+        'res_id': loan.id,
+    })</code></pre>
+          </div>
+          <p>Always validate file type and size before storing. Check <code>attachment_file.content_type</code> and <code>len(attachment_data)</code>.</p>
+
+          <div class="summary-box">
+            <strong>Key takeaways:</strong>
+            <ul>
+              <li>Always include <code>&lt;input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/&gt;</code> in forms</li>
+              <li>Use <code>request.httprequest.method</code> to distinguish GET from POST</li>
+              <li>On validation failure, re-render the form with errors dict and previous values</li>
+              <li>On success, always redirect — prevents duplicate submissions on browser refresh</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you build a form on the portal?</li>
+            <li>How is a portal form submission handled?</li>
+            <li>What is CSRF protection and does Odoo add it?</li>
+            <li>Why re-check record ownership on the server?</li>
+            <li>How do you show validation errors on a portal form?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <section class="related-topics">
+            <h3>Related Topics</h3>
+            <div class="topic-tags">
+              <a href="/odoo/portal/portal-controllers.html" class="topic-tag odoo-topic-tag">🌐 Portal Controllers</a>
+              <a href="/odoo/portal/portal-templates.html" class="topic-tag odoo-topic-tag">🌐 Portal Templates</a>
+              <a href="/odoo/portal/portal-security.html" class="topic-tag odoo-topic-tag">🌐 Portal Security</a>
+              <a href="/odoo/website/website-forms.html" class="topic-tag odoo-topic-tag">💻 Website Forms</a>
+            </div>
+          </section>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why always redirect after a successful POST? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>This is the POST/Redirect/GET pattern. If the user hits browser refresh after a successful POST without a redirect, the form would be re-submitted. A redirect turns the final response into a GET, which is safe to refresh.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I pre-fill form fields after a validation failure? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Pass the original <code>values</code> dict back to the template and use <code>t-att-value="values.get('field_name', '')"</code> on each input. For selects, compare with <code>t-att-selected</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Do I need sudo() when creating records from portal forms? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes, in most cases. Portal users have restricted access by design. Use <code>sudo()</code> to create records on their behalf, but always validate ownership and permissions first to prevent privilege escalation.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+            <a href="/odoo/portal/portal-templates.html" class="lesson-nav-link">
+              <span class="nav-label">← Prev</span>
+              <span class="nav-title">Portal Templates</span>
+            </a>
+            <a href="/odoo/portal/portal-security.html" class="lesson-nav-link next">
+              <span class="nav-label">Next →</span>
+              <span class="nav-title">Portal Security</span>
+            </a>
+          </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

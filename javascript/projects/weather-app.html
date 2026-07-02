@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Weather App – Fetch API & OpenWeatherMap Tutorial | ylearner</title>
+  <meta name="description" content="Build a JavaScript weather app using the Fetch API and OpenWeatherMap. Displays temperature, humidity, wind speed, and weather icons with full error handling.">
+  <meta name="keywords" content="JavaScript weather app, fetch API tutorial, OpenWeatherMap JavaScript, async await project, JavaScript API project">
+  <link rel="canonical" href="https://ylearner.org/javascript/projects/weather-app.html">
+  <meta property="og:title" content="JavaScript Weather App – Fetch API & OpenWeatherMap Tutorial | ylearner">
+  <meta property="og:description" content="Build a JavaScript weather app using the Fetch API and OpenWeatherMap. Displays temperature, humidity, wind speed, and weather icons with full error handling.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/projects/weather-app.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Weather App – Fetch API & OpenWeatherMap Tutorial | ylearner">
+  <meta name="twitter:description" content="Build a JavaScript weather app using the Fetch API and OpenWeatherMap. Displays temperature, humidity, wind speed, and weather icons with full error handling.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/projects/calculator.html">Projects</a><span class="separator">›</span>
+          <span class="current">Weather App</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🛠️ Projects</div>
+          <h1>JavaScript Weather App – Build with Fetch API</h1>
+          <p class="lesson-intro">Build a real weather application that searches cities by name and fetches live data from OpenWeatherMap's free API. Displays temperature, humidity, wind speed, and weather icons with robust error handling for invalid cities and network failures.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 28 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="api-setup">API Setup</h2>
+          <p>This project uses the OpenWeatherMap API (free tier — 60 calls/minute, no credit card required).</p>
+          <ol>
+            <li>Go to <strong>openweathermap.org</strong> and create a free account.</li>
+            <li>Navigate to API Keys in your account dashboard.</li>
+            <li>Copy your API key (it activates within a few minutes).</li>
+            <li>Replace <code>YOUR_API_KEY</code> in the code below with your actual key.</li>
+          </ol>
+
+          <div class="callout callout-warning">
+            <strong>API Key Security:</strong> Never commit your API key to a public GitHub repository. For a deployed production app, proxy requests through a backend server. For a personal portfolio project, using the key in client-side JavaScript is acceptable.
+          </div>
+
+          <table>
+            <thead><tr><th>API Endpoint</th><th>Purpose</th><th>Free Tier</th></tr></thead>
+            <tbody>
+              <tr><td>Current Weather</td><td>Temperature, humidity, wind, icon</td><td>Yes</td></tr>
+              <tr><td>5-Day Forecast</td><td>3-hour interval forecasts</td><td>Yes</td></tr>
+              <tr><td>Geocoding</td><td>City name → coordinates</td><td>Yes</td></tr>
+              <tr><td>One Call API 3.0</td><td>Hourly + daily forecasts</td><td>No (paid)</td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="html-structure">HTML Structure</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/* weather.html
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Weather App&lt;/title&gt;
+  &lt;link rel="stylesheet" href="weather-style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="weather-app"&gt;
+    &lt;div class="search-bar"&gt;
+      &lt;input id="city-input" type="text" placeholder="Enter city name…" autocomplete="off"&gt;
+      &lt;button id="search-btn"&gt;Search&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;div id="loading" class="loading hidden"&gt;Fetching weather…&lt;/div&gt;
+    &lt;div id="error"   class="error   hidden"&gt;&lt;/div&gt;
+
+    &lt;div id="weather-card" class="weather-card hidden"&gt;
+      &lt;div class="weather-top"&gt;
+        &lt;div&gt;
+          &lt;h2 id="city-name"&gt;&lt;/h2&gt;
+          &lt;p id="weather-desc"&gt;&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;img id="weather-icon" alt="Weather icon"&gt;
+      &lt;/div&gt;
+      &lt;div class="temp-main"&gt;
+        &lt;span id="temp"&gt;&lt;/span&gt;
+        &lt;button id="unit-toggle"&gt;Switch to °F&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div class="weather-details"&gt;
+        &lt;div class="detail"&gt;&lt;span&gt;💧 Humidity&lt;/span&gt;&lt;span id="humidity"&gt;&lt;/span&gt;&lt;/div&gt;
+        &lt;div class="detail"&gt;&lt;span&gt;💨 Wind&lt;/span&gt;&lt;span id="wind"&gt;&lt;/span&gt;&lt;/div&gt;
+        &lt;div class="detail"&gt;&lt;span&gt;🌡️ Feels Like&lt;/span&gt;&lt;span id="feels-like"&gt;&lt;/span&gt;&lt;/div&gt;
+        &lt;div class="detail"&gt;&lt;span&gt;👁️ Visibility&lt;/span&gt;&lt;span id="visibility"&gt;&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;script src="weather-script.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+*/</code></pre>
+          </div>
+
+          <h2 id="api-service">API Service Layer</h2>
+          <p>Separate the API call into its own function. This makes the code testable and easy to swap for a different API provider in the future.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// weather-script.js
+
+const API_KEY  = "YOUR_API_KEY"; // Replace with your OpenWeatherMap key
+const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
+
+// Custom error types
+class CityNotFoundError extends Error {
+  constructor(city) {
+    super(`City "${city}" not found. Check the spelling and try again.`);
+    this.name = "CityNotFoundError";
+  }
+}
+class NetworkError extends Error {
+  constructor() {
+    super("Network error. Check your internet connection and try again.");
+    this.name = "NetworkError";
+  }
+}
+
+// Fetch weather data from OpenWeatherMap
+async function fetchWeather(city, units = "metric") {
+  const url = `${BASE_URL}?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=${units}`;
+
+  let response;
+  try {
+    response = await fetch(url);
+  } catch {
+    throw new NetworkError();
+  }
+
+  if (response.status === 404) throw new CityNotFoundError(city);
+  if (!response.ok) throw new Error(`API Error: ${response.status} ${response.statusText}`);
+
+  return response.json();
+}</code></pre>
+          </div>
+
+          <h2 id="ui-controller">UI Controller</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// State
+let currentUnit = "metric"; // "metric" (°C) | "imperial" (°F)
+let lastCity    = "";
+
+// DOM refs
+const cityInput   = document.getElementById("city-input");
+const searchBtn   = document.getElementById("search-btn");
+const loadingEl   = document.getElementById("loading");
+const errorEl     = document.getElementById("error");
+const cardEl      = document.getElementById("weather-card");
+const unitToggle  = document.getElementById("unit-toggle");
+
+// UI state helpers
+function showLoading() {
+  loadingEl.classList.remove("hidden");
+  cardEl.classList.add("hidden");
+  errorEl.classList.add("hidden");
+}
+function showError(msg) {
+  errorEl.textContent = msg;
+  errorEl.classList.remove("hidden");
+  loadingEl.classList.add("hidden");
+}
+function showCard() {
+  cardEl.classList.remove("hidden");
+  loadingEl.classList.add("hidden");
+  errorEl.classList.add("hidden");
+}
+
+// Populate weather card
+function displayWeather(data) {
+  const unitSymbol = currentUnit === "metric" ? "°C" : "°F";
+  const speedUnit  = currentUnit === "metric" ? "m/s" : "mph";
+
+  document.getElementById("city-name").textContent =
+    `${data.name}, ${data.sys.country}`;
+  document.getElementById("weather-desc").textContent =
+    data.weather[0].description;
+  document.getElementById("weather-icon").src =
+    `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+  document.getElementById("weather-icon").alt =
+    data.weather[0].description;
+
+  document.getElementById("temp").textContent =
+    `${Math.round(data.main.temp)}${unitSymbol}`;
+  document.getElementById("humidity").textContent =
+    `${data.main.humidity}%`;
+  document.getElementById("wind").textContent =
+    `${data.wind.speed} ${speedUnit}`;
+  document.getElementById("feels-like").textContent =
+    `${Math.round(data.main.feels_like)}${unitSymbol}`;
+  document.getElementById("visibility").textContent =
+    `${(data.visibility / 1000).toFixed(1)} km`;
+
+  unitToggle.textContent = currentUnit === "metric"
+    ? "Switch to °F" : "Switch to °C";
+
+  showCard();
+}
+
+// Main search handler
+async function handleSearch() {
+  const city = cityInput.value.trim();
+  if (!city) return;
+  lastCity = city;
+  showLoading();
+
+  try {
+    const data = await fetchWeather(city, currentUnit);
+    displayWeather(data);
+  } catch (err) {
+    showError(err.message);
+  }
+}
+
+// Unit toggle (re-fetch with new unit)
+unitToggle.addEventListener("click", async () => {
+  currentUnit = currentUnit === "metric" ? "imperial" : "metric";
+  if (!lastCity) return;
+  showLoading();
+  try {
+    const data = await fetchWeather(lastCity, currentUnit);
+    displayWeather(data);
+  } catch (err) {
+    showError(err.message);
+  }
+});
+
+searchBtn.addEventListener("click", handleSearch);
+cityInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") handleSearch();
+});
+
+// Load a default city on startup
+cityInput.value = "London";
+handleSearch();</code></pre>
+          </div>
+
+          <div class="output-block"><strong>Sample API response (condensed):</strong><br>{ name: "London", sys: { country: "GB" }, main: { temp: 14.2, humidity: 72, feels_like: 13.1 }, weather: [{ description: "light rain", icon: "10d" }], wind: { speed: 5.1 }, visibility: 10000 }</div>
+
+          <div class="callout callout-info">
+            <strong>Concepts Practiced:</strong> Fetch API, async/await, custom error classes, encodeURIComponent for URL-safe city names, response.ok checking, loading state management, unit conversion, and DOM update patterns.
+          </div>
+
+          <h2 id="css-overview">CSS Highlights</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/* weather-style.css — key styles
+
+.weather-app {
+  max-width: 420px;
+  margin: 40px auto;
+  padding: 24px;
+  background: linear-gradient(135deg, #1e3a5f, #2d6a9f);
+  border-radius: 24px;
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.search-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+.search-bar input {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+}
+.weather-card { animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+.temp-main { font-size: 64px; font-weight: 200; text-align: center; margin: 20px 0; }
+.weather-details { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.detail {
+  background: rgba(255,255,255,0.15);
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.hidden { display: none !important; }
+.error { color: #fca5a5; text-align: center; padding: 20px; }
+*/</code></pre>
+          </div>
+
+          <h2 id="enhancements">Enhancements</h2>
+
+          <div class="exercise-box">
+            <h3>Extend the Weather App</h3>
+            <ul>
+              <li><strong>5-day forecast</strong> — use the <code>/forecast</code> endpoint and display daily highs/lows</li>
+              <li><strong>Geolocation</strong> — use <code>navigator.geolocation</code> to auto-detect the user's city on page load</li>
+              <li><strong>Search history</strong> — store the last 5 searched cities in localStorage as quick-access buttons</li>
+              <li><strong>Dynamic background</strong> — change the gradient based on weather condition (sunny = yellow, rain = grey, snow = light blue)</li>
+              <li><strong>AbortController</strong> — cancel the previous fetch if the user searches a new city before the first resolves</li>
+            </ul>
+          </div>
+
+          <div class="challenge-box">
+            <h3>AbortController Implementation</h3>
+            <p>Implement request cancellation so rapid searches don't cause race conditions:</p>
+            <pre style="background:#1e1e2e;color:#cdd6f4;padding:12px;border-radius:8px;font-size:13px;overflow:auto;"><code>let abortController = null;
+
+async function handleSearch() {
+  // Cancel any in-flight request
+  if (abortController) abortController.abort();
+  abortController = new AbortController();
+
+  const city = cityInput.value.trim();
+  if (!city) return;
+  showLoading();
+
+  try {
+    const url = `${BASE_URL}?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=${currentUnit}`;
+    const res = await fetch(url, { signal: abortController.signal });
+    if (!res.ok) throw new Error(...);
+    const data = await res.json();
+    displayWeather(data);
+  } catch (err) {
+    if (err.name === "AbortError") return; // ignore cancelled requests
+    showError(err.message);
+  }
+}</code></pre>
+          </div>
+
+          <div class="summary-box">
+            <h3>Summary</h3>
+            <ul>
+              <li>API setup: get a free OpenWeatherMap key, use the Current Weather endpoint</li>
+              <li>Fetch pattern: always check <code>response.ok</code> before calling <code>response.json()</code></li>
+              <li>Custom error classes: <code>CityNotFoundError</code> and <code>NetworkError</code> for typed handling</li>
+              <li>Loading states: show/hide elements based on current async status</li>
+              <li>Unit toggle: re-fetch with <code>units=imperial</code> parameter instead of converting client-side</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>This project demonstrates real-world async/await usage, not just toy examples</li>
+            <li>Proper fetch error handling (checking response.ok) is a very common interview question</li>
+            <li>Custom error classes show OOP knowledge applied to practical error handling</li>
+            <li>Loading state management is a pattern used in every production JavaScript application</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <h3>Related Topics</h3>
+            <ul>
+              <li><a href="/javascript/projects/todo-app.html">Todo App Project</a></li>
+              <li><a href="/javascript/projects/quiz-app.html">Quiz App Project</a></li>
+              <li><a href="/javascript/advanced/async-await.html">Async/Await Deep Dive</a></li>
+              <li><a href="/javascript/interview/questions.html">Interview Questions</a></li>
+            </ul>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why does fetch not throw on 404 responses? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The Fetch API only rejects (throws) on network-level failures like no internet connection. A 404 is a valid HTTP response, so fetch resolves successfully. You must always check <code>response.ok</code> or <code>response.status</code> manually.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I handle cities with the same name (e.g., multiple "Springfield" cities)? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Add a country code parameter: <code>q=Springfield,US</code>. OpenWeatherMap also supports <code>lat</code> and <code>lon</code> parameters for precise location queries — useful with the Geocoding API.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why use <code>encodeURIComponent(city)</code>? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>City names with spaces, accents, or special characters (e.g., "São Paulo") would break the URL. <code>encodeURIComponent</code> percent-encodes them into a URL-safe format.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I build this without an API key using a different data source? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — wttr.in provides weather data as JSON with no API key required: <code>https://wttr.in/London?format=j1</code>. It's less featureful but great for learning.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I deploy this to GitHub Pages? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Push your HTML/CSS/JS files to a GitHub repo, go to Settings → Pages, and select the main branch. Your app will be live at <code>username.github.io/repo-name</code>. Be aware the API key will be visible in client-side code.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/projects/todo-app.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Todo App</span></a>
+          <a href="/javascript/projects/quiz-app.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Quiz App</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

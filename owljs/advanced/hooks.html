@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS Custom Hooks – Writing Reusable Hook Functions | ylearner</title>
+  <meta name="description" content="Learn to write OWL JS custom hooks: how to compose lifecycle hooks and services into reusable functions, with real examples — useAutoFocus, useDebounce, useLocalStorage, useWindowSize, usePagination.">
+  <meta name="keywords" content="OWL JS custom hooks, OWL useHook, OWL reusable hooks, OWL hook composition, OWL useDebounce, OWL useLocalStorage, Odoo Web Library hooks, OWL JS hooks tutorial">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/owljs/advanced/hooks.html">
+  <meta property="og:title" content="OWL JS Custom Hooks – Reusable Hook Composition | ylearner">
+  <meta property="og:description" content="How to write OWL JS custom hooks: useAutoFocus, useDebounce, useLocalStorage, useWindowSize — real examples of composable hook functions.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/owljs/advanced/hooks.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS Custom Hooks Complete Guide | ylearner">
+  <meta name="twitter:description" content="Custom hooks in OWL JS: composing lifecycle hooks into reusable functions with real-world examples.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS Custom Hooks",
+    "description": "Complete guide to writing OWL JS custom hooks: composing lifecycle hooks and services into reusable functions with examples including useAutoFocus, useDebounce, useLocalStorage, and usePagination.",
+    "educationalLevel": "Intermediate",
+    "keywords": "OWL JS custom hooks, hook composition, useDebounce, useLocalStorage, reusable hooks, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/advanced/sub-components.html">Advanced OWL</a><span class="separator">›</span>
+          <span class="current">Custom Hooks</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Advanced OWL</div>
+          <h1>OWL JS Custom Hooks – Writing Reusable Hook Functions</h1>
+          <p class="lesson-intro">Custom hooks are plain JavaScript functions that call OWL hook functions internally — <code>useState</code>, <code>onMounted</code>, <code>onWillUnmount</code>, <code>useRef</code>, and others. They let you extract repeated lifecycle and state logic out of components and share it across your codebase without creating a new component. This is the most powerful abstraction pattern in OWL 2 — the same mechanism that makes Odoo's built-in <code>useService()</code>, <code>useModel()</code>, and <code>useEnv()</code> work. This lesson teaches you to write custom hooks from scratch.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 3 of 6</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="what-custom-hooks-are">What Makes a Custom Hook</h2>
+          <p>A custom hook is any function that:</p>
+          <ul>
+            <li>Is called inside <code>setup()</code> (or in another custom hook called from <code>setup()</code>)</li>
+            <li>Calls OWL hook functions like <code>useState</code>, <code>onMounted</code>, <code>onWillUnmount</code>, <code>useRef</code></li>
+            <li>Returns values or methods the component will use</li>
+          </ul>
+          <p>By convention, custom hook function names start with <code>use</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – minimal custom hook</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { useState } from "@odoo/owl";
+
+// Custom hook: encapsulates a toggle with on/off helpers
+function useToggle(initialValue = false) {
+  const state = useState({ value: initialValue });
+
+  return {
+    get value() { return state.value; },
+    on()        { state.value = true; },
+    off()       { state.value = false; },
+    toggle()    { state.value = !state.value; },
+  };
+}
+
+// Usage in any component:
+class MyComponent extends Component {
+  setup() {
+    this.menu   = useToggle(false);
+    this.modal  = useToggle(false);
+    this.darkMode = useToggle(true);
+  }
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;button t-on-click="menu.toggle"&gt;Toggle Menu&lt;/button&gt;
+      &lt;nav t-if="menu.value"&gt;…&lt;/nav&gt;
+    &lt;/div&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <h2 id="hook-with-lifecycle">Hooks with Lifecycle</h2>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – useAutoFocus hook</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { useRef, onMounted } from "@odoo/owl";
+
+/**
+ * Auto-focuses the element with the given t-ref name after mount.
+ * Usage: const ref = useAutoFocus("myInput");
+ *        Template: &lt;input t-ref="myInput"/&gt;
+ */
+function useAutoFocus(refName = "autofocus") {
+  const ref = useRef(refName);
+
+  onMounted(() =&gt; {
+    ref.el?.focus();
+  });
+
+  return ref;  // return so component can still use the ref
+}
+
+// ─── useWindowSize: reactive window dimensions ─────────────────────
+function useWindowSize() {
+  const size = useState({ width: window.innerWidth, height: window.innerHeight });
+
+  const onResize = () => {
+    size.width  = window.innerWidth;
+    size.height = window.innerHeight;
+  };
+
+  onMounted(()       =&gt; window.addEventListener("resize", onResize));
+  onWillUnmount(()   =&gt; window.removeEventListener("resize", onResize));
+
+  return size;  // reactive — component re-renders on window resize
+}</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="practical-hooks">Practical Custom Hooks</h2>
+
+          <h3 id="use-debounce">useDebounce</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – useDebounce</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { onWillUnmount } from "@odoo/owl";
+
+/**
+ * Returns a debounced version of fn that fires after `delay` ms of inactivity.
+ */
+function useDebounce(fn, delay = 300) {
+  let timerId = null;
+
+  onWillUnmount(() =&gt; clearTimeout(timerId));  // cancel on unmount
+
+  return function debounced(...args) {
+    clearTimeout(timerId);
+    timerId = setTimeout(() =&gt; fn(...args), delay);
+  };
+}
+
+// Usage:
+class SearchInput extends Component {
+  state = useState({ query: "", results: [] });
+
+  setup() {
+    // search() fires only after user stops typing for 400ms
+    this.debouncedSearch = useDebounce(this.search.bind(this), 400);
+  }
+
+  async search() {
+    this.state.results = await fetchResults(this.state.query);
+  }
+
+  static template = xml`
+    &lt;input t-model="state.query" t-on-input="debouncedSearch"/&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <h3 id="use-local-storage">useLocalStorage</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – useLocalStorage</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { useState } from "@odoo/owl";
+
+/**
+ * Persists a state value to localStorage. Reads initial value from storage.
+ */
+function useLocalStorage(key, defaultValue) {
+  const stored = localStorage.getItem(key);
+  const initial = stored !== null ? JSON.parse(stored) : defaultValue;
+
+  const state = useState({ value: initial });
+
+  // Wrap in a Proxy-like setter that also writes to storage
+  const set = (newValue) =&gt; {
+    state.value = newValue;
+    localStorage.setItem(key, JSON.stringify(newValue));
+  };
+
+  return {
+    get value() { return state.value; },
+    set,
+  };
+}
+
+// Usage:
+class ThemeToggle extends Component {
+  setup() {
+    this.theme = useLocalStorage("app-theme", "light");
+  }
+
+  toggle() {
+    this.theme.set(this.theme.value === "light" ? "dark" : "light");
+  }
+
+  static template = xml`
+    &lt;button t-on-click="toggle"&gt;
+      Current: &lt;t t-esc="theme.value"/&gt;
+    &lt;/button&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <h3 id="use-pagination">usePagination</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – usePagination</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { useState } from "@odoo/owl";
+
+function usePagination({ pageSize = 10 } = {}) {
+  const state = useState({ page: 1, pageSize });
+
+  return {
+    get page()     { return state.page; },
+    get pageSize() { return state.pageSize; },
+    get offset()   { return (state.page - 1) * state.pageSize; },
+
+    next()         { state.page++; },
+    prev()         { if (state.page &gt; 1) state.page--; },
+    goTo(n)        { state.page = Math.max(1, n); },
+    reset()        { state.page = 1; },
+
+    totalPages(totalCount) {
+      return Math.ceil(totalCount / state.pageSize);
+    },
+  };
+}
+
+// Usage:
+class RecordList extends Component {
+  setup() {
+    this.pagination = usePagination({ pageSize: 20 });
+    onWillStart(() =&gt; this.load());
+  }
+
+  async load() {
+    const { offset, pageSize } = this.pagination;
+    this.state.records = await this.orm.searchRead(
+      "res.partner", [], ["name"], { offset, limit: pageSize }
+    );
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="hook-rules">Hook Rules</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Rule</th><th>Why</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Call hooks synchronously in <code>setup()</code> only</td><td>OWL's current-component context only exists during setup</td></tr>
+                <tr><td>Never call hooks inside conditionals or loops</td><td>Hook registration order must be consistent across renders</td></tr>
+                <tr><td>Name hooks starting with <code>use</code></td><td>Convention — signals it must be called in setup()</td></tr>
+                <tr><td>Custom hooks can call other custom hooks</td><td>Composability — each registers its own lifecycle callbacks</td></tr>
+                <tr><td>Return reactive state or methods, not DOM elements</td><td>DOM not available during setup; use onMounted for DOM work</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="deep-hooks">Hooks: Reusable Logic, and the Rules That Keep Them Working</h2>
+          <p>Hooks are functions (named <code>use*</code>) that plug into a component's lifecycle and reactivity. OWL ships several; you can also write your own to share logic between components.</p>
+          <table>
+            <thead><tr><th>Hook</th><th>Gives you</th></tr></thead>
+            <tbody>
+              <tr><td><code>useState(obj)</code></td><td>reactive state — mutations re-render</td></tr>
+              <tr><td><code>useRef("name")</code></td><td>direct handle to a DOM element</td></tr>
+              <tr><td><code>onWillStart(fn)</code></td><td>async setup before first render</td></tr>
+              <tr><td><code>onMounted(fn)</code></td><td>run after DOM is in the page</td></tr>
+              <tr><td><code>useEnv()</code></td><td>access shared services/env</td></tr>
+            </tbody>
+          </table>
+          <h3>Writing a custom hook</h3>
+          <pre><code class="language-javascript">function useAutoTitle(getText) {
+    onMounted(() => { document.title = getText(); });
+    onPatched(() => { document.title = getText(); });
+}
+// in setup(): useAutoTitle(() => this.state.name);</code></pre>
+          <p><strong>The one rule:</strong> hooks must be called <em>synchronously inside <code>setup()</code></em> (or inside another hook). Never call a hook in an event handler, a condition, or after an <code>await</code> — OWL relies on call order to associate each hook with the component. Break that and you get "No active component" errors or state bound to the wrong instance.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Write three custom hooks and use them together in one component:</p>
+            <ol>
+              <li><code>useCounter(initial, step)</code> — returns <code>{ value, increment, decrement, reset }</code>. Uses <code>useState</code>.</li>
+              <li><code>useKeyPress(key, callback)</code> — calls <code>callback</code> when the given key is pressed. Uses <code>onMounted</code> and <code>onWillUnmount</code> to add/remove a <code>keydown</code> listener on <code>window</code>.</li>
+              <li><code>useTitle(title)</code> — sets <code>document.title</code> to <code>title</code> on mount and resets it on unmount. Uses <code>onMounted</code> and <code>onWillUnmount</code>.</li>
+              <li>Build a <code>ScoreBoard</code> component that uses all three: a counter for score, ArrowUp/ArrowDown keys increment/decrement via <code>useKeyPress</code>, and <code>useTitle</code> keeps the browser tab title in sync with the score.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a custom hook (e.g. <code>useCounter</code> or <code>useWindowSize</code>) that encapsulates reusable stateful logic, and use it in two components. Explain what hooks are in OWL, that they must be called from <code>setup</code>, and how they enable logic reuse.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Custom hooks are plain functions starting with <code>use</code> that call OWL hook functions internally.</li>
+              <li>They must be called synchronously inside <code>setup()</code> — calling hooks outside setup throws.</li>
+              <li>Multiple registrations of the same lifecycle hook (from different custom hooks) all fire — this is intentional.</li>
+              <li>Custom hooks can return reactive state, computed values, methods, or refs.</li>
+              <li>Real-world patterns: <code>useToggle</code>, <code>useAutoFocus</code>, <code>useDebounce</code>, <code>useLocalStorage</code>, <code>usePagination</code>, <code>useWindowSize</code>.</li>
+              <li>Odoo's built-in <code>useService()</code>, <code>useModel()</code>, <code>useEnv()</code> are all custom hooks — exactly the same pattern.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a hook in OWL?</li>
+            <li>Where must hooks be called?</li>
+            <li>How do you write a custom hook?</li>
+            <li>Why are hooks better than mixins for reuse?</li>
+            <li>Name three built-in OWL hooks.</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/owljs/lifecycle/overview.html" class="topic-tag owl-topic-tag">🦉 Lifecycle Overview</a>
+            <a href="/owljs/advanced/environment.html" class="topic-tag owl-topic-tag">🦉 Environment &amp; Services</a>
+            <a href="/owljs/core/state.html" class="topic-tag owl-topic-tag">🦉 State &amp; useState</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I call a custom hook inside another custom hook? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — this is one of the main powers of custom hooks. A custom hook calling another custom hook is fully supported as long as the call chain originates from <code>setup()</code>. OWL's "current component" context propagates through the synchronous call stack. This is how Odoo's hooks like <code>useOrmService</code> can internally call <code>useService("orm")</code> — it just works because the context is set when setup() is running.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How are custom hooks different from utility functions? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A utility function is called anywhere and has no access to the component context. A custom hook is called in <code>setup()</code> and registers callbacks on the component's lifecycle. The distinction: if your function calls <code>onMounted</code>, <code>useState</code>, or any OWL hook, it is a custom hook and must be called in setup. If it is pure computation (format a date, validate an email), it is a utility and can be called anywhere.</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/advanced/slots.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Slots</span>
+          </a>
+          <a href="/owljs/advanced/environment.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Environment &amp; Services</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

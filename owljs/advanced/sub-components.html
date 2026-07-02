@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OWL JS Sub-components – Composition & Component Trees | ylearner</title>
+  <meta name="description" content="Complete guide to OWL JS sub-components: static components registration, composition patterns, dynamic t-component, parent-child communication, and building reusable component libraries for Odoo.">
+  <meta name="keywords" content="OWL JS sub-components, OWL component composition, OWL static components, OWL t-component dynamic, OWL parent child communication, Odoo Web Library components, OWL reusable components tutorial">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/owljs/advanced/sub-components.html">
+  <meta property="og:title" content="OWL JS Sub-components – Composition Patterns | ylearner">
+  <meta property="og:description" content="How to compose OWL JS components: static components registration, dynamic t-component, parent-child communication, and reusable component patterns.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/owljs/advanced/sub-components.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OWL JS Sub-components Complete Guide | ylearner">
+  <meta name="twitter:description" content="static components, t-component dynamic rendering, parent-child patterns — complete OWL JS composition tutorial.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "OWL JS Sub-components and Composition",
+    "description": "Complete guide to OWL JS sub-components: static components registration, t-component dynamic rendering, parent-child communication, and reusable component library patterns.",
+    "educationalLevel": "Intermediate",
+    "keywords": "OWL JS sub-components, component composition, static components, t-component, Odoo Web Library",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/advanced/sub-components.html">Advanced OWL</a><span class="separator">›</span>
+          <span class="current">Sub-components</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Advanced OWL</div>
+          <h1>OWL JS Sub-components – Composition &amp; Component Trees</h1>
+          <p class="lesson-intro">Real OWL applications are not built from a single monolithic component — they are composed from many smaller, focused components arranged in a tree. Understanding how to break UI into sub-components, register them correctly, communicate between them, and render them dynamically is the skill that separates beginner OWL code from production-quality Odoo modules. This lesson covers every aspect of component composition: static registration, parent-child communication patterns, dynamic <code>t-component</code>, and building reusable component libraries.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 1 of 6</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="registration">Registering Sub-components</h2>
+          <p>Every component used in a template must be declared in the parent's <code>static components</code> object. OWL uses this map to look up the component class when it encounters a tag name in the template.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – static components registration</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import { Component, xml } from "@odoo/owl";
+import UserAvatar  from "./UserAvatar";
+import StatusBadge from "./StatusBadge";
+import ActionMenu  from "./ActionMenu";
+
+class UserCard extends Component {
+  // Every component used in the template must be listed here
+  static components = { UserAvatar, StatusBadge, ActionMenu };
+
+  static template = xml`
+    &lt;div class="user-card"&gt;
+      &lt;UserAvatar src="props.user.avatarUrl" size="48"/&gt;
+      &lt;div class="user-info"&gt;
+        &lt;strong t-esc="props.user.name"/&gt;
+        &lt;StatusBadge status="props.user.status"/&gt;
+      &lt;/div&gt;
+      &lt;ActionMenu items="props.actions" onSelect.bind="handleAction"/&gt;
+    &lt;/div&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Forgetting static components is the most common OWL error</strong>
+              <p>If <code>UserAvatar</code> is used in the template but not listed in <code>static components</code>, OWL throws "Cannot find the definition of component 'UserAvatar'". Every sub-component, at every level, must be registered by its immediate parent. Grandchildren register with their own parent — not the root.</p>
+            </div>
+          </div>
+
+          <h2 id="communication">Parent-Child Communication</h2>
+          <p>OWL uses one-way data flow: data goes down via props, events go up via callback props or <code>trigger()</code>. This pattern keeps data flow predictable.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – props down, callbacks up</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// ── Child ──────────────────────────────────────────────────────────
+class QuantityInput extends Component {
+  static template = xml`
+    &lt;div class="qty-input"&gt;
+      &lt;button t-on-click="() =&gt; change(-1)" t-att-disabled="props.value &lt;= props.min"&gt;−&lt;/button&gt;
+      &lt;span t-esc="props.value"/&gt;
+      &lt;button t-on-click="() =&gt; change(+1)" t-att-disabled="props.value &gt;= props.max"&gt;+&lt;/button&gt;
+    &lt;/div&gt;
+  `;
+
+  static props = {
+    value:    { type: Number },
+    min:      { type: Number, optional: true },
+    max:      { type: Number, optional: true },
+    onChange: { type: Function },
+  };
+
+  static defaultProps = { min: 0, max: 999 };
+
+  change(delta) {
+    const next = this.props.value + delta;
+    if (next >= this.props.min &amp;&amp; next <= this.props.max) {
+      this.props.onChange(next);   // notify parent
+    }
+  }
+}
+
+// ── Parent ──────────────────────────────────────────────────────────
+class CartItem extends Component {
+  static components = { QuantityInput };
+
+  static template = xml`
+    &lt;div class="cart-item"&gt;
+      &lt;span t-esc="props.product.name"/&gt;
+      &lt;QuantityInput
+        value="state.qty"
+        min="1"
+        max="99"
+        onChange.bind="updateQty"
+      /&gt;
+      &lt;span&gt;$&lt;t t-esc="(state.qty * props.product.price).toFixed(2)"/&gt;&lt;/span&gt;
+    &lt;/div&gt;
+  `;
+
+  state = useState({ qty: 1 });
+
+  updateQty(newQty) {
+    this.state.qty = newQty;
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="t-component">Dynamic Components with t-component</h2>
+          <p><code>t-component</code> renders a component class stored in a variable — useful for registries, plugin systems, and dynamic widget rendering (common in Odoo views).</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – t-component for dynamic rendering</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">import TextWidget    from "./TextWidget";
+import NumberWidget  from "./NumberWidget";
+import SelectWidget  from "./SelectWidget";
+import DateWidget    from "./DateWidget";
+
+// Widget registry — maps field type to component class
+const WIDGET_MAP = {
+  char:     TextWidget,
+  integer:  NumberWidget,
+  float:    NumberWidget,
+  many2one: SelectWidget,
+  date:     DateWidget,
+};
+
+class DynamicField extends Component {
+  static components = { TextWidget, NumberWidget, SelectWidget, DateWidget };
+
+  static template = xml`
+    &lt;div class="field-widget"&gt;
+      &lt;!-- t-component renders whichever class widgetComponent resolves to --&gt;
+      &lt;t t-component="widgetComponent"
+         value="props.field.value"
+         readonly="props.readonly"
+         onChange.bind="handleChange"
+      /&gt;
+    &lt;/div&gt;
+  `;
+
+  static props = {
+    field:    { type: Object },
+    readonly: { type: Boolean, optional: true },
+    onChange: { type: Function, optional: true },
+  };
+
+  get widgetComponent() {
+    // Return the component class for this field type
+    return WIDGET_MAP[this.props.field.type] || TextWidget;
+  }
+
+  handleChange(value) {
+    this.props.onChange?.(value);
+  }
+}</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="composition-patterns">Composition Patterns</h2>
+
+          <h3 id="container-presentational">Container / Presentational Split</h3>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript – container + presentational</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Presentational: pure display, no data fetching
+class ProductCard extends Component {
+  static template = xml`
+    &lt;div class="product-card"&gt;
+      &lt;img t-att-src="props.imageUrl" t-att-alt="props.name"/&gt;
+      &lt;h3 t-esc="props.name"/&gt;
+      &lt;p&gt;$&lt;t t-esc="props.price.toFixed(2)"/&gt;&lt;/p&gt;
+      &lt;button t-on-click="() =&gt; props.onAddToCart(props.id)"&gt;Add to Cart&lt;/button&gt;
+    &lt;/div&gt;
+  `;
+
+  static props = {
+    id: Number, name: String, imageUrl: String,
+    price: Number, onAddToCart: Function,
+  };
+}
+
+// Container: fetches data, passes to presentational children
+class ProductListContainer extends Component {
+  static components = { ProductCard };
+
+  state = useState({ products: [], cartItems: [] });
+
+  setup() {
+    this.orm = useService("orm");
+    onWillStart(() =&gt; this.loadProducts());
+  }
+
+  async loadProducts() {
+    this.state.products = await this.orm.searchRead("product.product",
+      [["active", "=", true]], ["id","name","list_price","image_url"], { limit: 20 });
+  }
+
+  addToCart(productId) {
+    this.state.cartItems.push(productId);
+  }
+
+  static template = xml`
+    &lt;div class="product-list"&gt;
+      &lt;ProductCard
+        t-foreach="state.products" t-as="p" t-key="p.id"
+        id="p.id" name="p.name" imageUrl="p.image_url"
+        price="p.list_price"
+        onAddToCart.bind="addToCart"
+      /&gt;
+    &lt;/div&gt;
+  `;
+}</code></pre>
+          </div>
+
+          <h2 id="re-render-isolation">Re-render Isolation</h2>
+          <p>A major benefit of splitting into sub-components: OWL re-renders only the component whose state or props changed. A large monolithic component re-renders entirely on any change. Split components give you free performance optimization.</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Scenario</th><th>Monolithic component</th><th>Split into sub-components</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>User edits a text field</td><td>Entire page re-renders</td><td>Only the field component re-renders</td></tr>
+                <tr><td>One list item changes</td><td>Entire list re-renders</td><td>Only that item's component re-renders</td></tr>
+                <tr><td>Counter in sidebar updates</td><td>Header, sidebar, content all re-render</td><td>Only the counter component re-renders</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="deep-subcomp">Sub-Components: Building a Tree of Reusable Pieces</h2>
+          <p>Real apps are trees of components — a parent composes children, each a self-contained unit. In OWL you register a child in the parent's <code>static components</code>, then use it as a tag in the template, passing data down as props.</p>
+          <pre><code class="language-javascript">class TodoItem extends Component {
+    static template = xml`&lt;li t-on-click="() =&gt; props.onToggle(props.id)"&gt;
+                            &lt;t t-esc="props.text"/&gt;&lt;/li&gt;`;
+    static props = ["id", "text", "onToggle"];
+}
+
+class TodoList extends Component {
+    static components = { TodoItem };   // ← register the child
+    static template = xml`
+      &lt;ul&gt;
+        &lt;TodoItem t-foreach="state.todos" t-as="t" t-key="t.id"
+                  id="t.id" text="t.text" onToggle="toggle"/&gt;
+      &lt;/ul&gt;`;
+    setup() { this.state = useState({ todos: [] }); }
+    toggle(id) { /* update parent state */ }
+}</code></pre>
+          <p><strong>The data-flow rule:</strong> props flow <em>down</em> (parent → child), events/callbacks flow <em>up</em> (child calls a function the parent passed as a prop). A child must never mutate its props or reach into the parent — it asks the parent to change state by calling <code>props.onToggle(...)</code>, and the re-render flows back down.</p>
+          <p>Registering in <code>static components</code> is what lets OWL resolve <code>&lt;TodoItem/&gt;</code> in the template. Forget it and you get an "unknown component" error. This one-way tree keeps large UIs predictable — state lives high, display lives low.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Build a <code>DataTable</code> system split into three components:</p>
+            <ol>
+              <li><code>TableCell</code>: props <code>value</code>, <code>type</code> ("text"|"number"|"date"|"badge"). Renders value differently per type.</li>
+              <li><code>TableRow</code>: props <code>row</code> (object), <code>columns</code> (array of <code>{key, type}</code>), <code>onSelect</code> (Function). Renders a <code>TableCell</code> per column. Clicking the row calls <code>onSelect(row)</code>.</li>
+              <li><code>DataTable</code>: props <code>columns</code>, <code>rows</code>. State: <code>selectedId</code>. Renders a <code>TableRow</code> per row, uses <code>t-att-class</code> to highlight the selected row. Shows "Nothing selected" or selected row data below the table.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Compose a UI from nested sub-components: a parent passing props to children and receiving events back, three levels deep. Explain component composition, how children are registered, and how data flows down (props) and events flow up.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Every component used in a template must be listed in <code>static components = { ComponentName }</code>.</li>
+              <li>Data flows down via props; events go up via callback props (<code>onChange.bind="method"</code>) or <code>this.trigger()</code>.</li>
+              <li><code>t-component="expression"</code> renders a component class resolved at runtime — the foundation for plugin and widget registry systems.</li>
+              <li>Split components into Container (data fetching, state) and Presentational (props-driven display) for clarity and reuse.</li>
+              <li>Sub-components isolate re-renders — only the component whose state/props changed updates, not the entire tree.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you use sub-components in OWL?</li>
+            <li>How do you register a child component?</li>
+            <li>How does data flow between parent and child?</li>
+            <li>How deep can composition go?</li>
+            <li>How do children communicate to parents?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/owljs/advanced/slots.html" class="topic-tag owl-topic-tag">🦉 Slots</a>
+            <a href="/owljs/core/props.html" class="topic-tag owl-topic-tag">🦉 Props</a>
+            <a href="/owljs/core/events.html" class="topic-tag owl-topic-tag">🦉 Event Handling</a>
+            <a href="/owljs/advanced/hooks.html" class="topic-tag owl-topic-tag">🦉 Custom Hooks</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can a sub-component use its parent's state directly? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — and this is intentional. A sub-component only receives what its parent explicitly passes as props. It cannot reach up and read <code>parent.state.something</code>. This isolation is what makes components reusable and testable. If a deeply nested component needs data that is far up the tree, use OWL's environment (via <code>useEnv()</code>) or Odoo services instead of prop drilling.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between t-component and t-if + multiple component tags? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>t-component</code> renders one component whose class is determined at runtime — clean for large dynamic registries. Multiple <code>t-if/t-elif</code> blocks with explicit component tags is more verbose but more readable for a small number of known cases (2–4 options). Use <code>t-component</code> when the set of possible components is open-ended, comes from a map/registry, or grows over time.</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/templates/quiz.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+          <a href="/owljs/advanced/slots.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Slots</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

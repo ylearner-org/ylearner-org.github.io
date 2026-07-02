@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Variables – let, const, var Explained | ylearner</title>
+  <meta name="description" content="Master JavaScript variables. Understand let, const, and var — their scoping rules, hoisting behavior, the temporal dead zone, and when to use each one.">
+  <meta name="keywords" content="javascript variables, let const var javascript, javascript hoisting, temporal dead zone, javascript variable scope, javascript camelCase, javascript variable declaration">
+  <link rel="canonical" href="https://ylearner.org/javascript/beginner/variables.html">
+  <meta property="og:title" content="JavaScript Variables – let, const, var Explained | ylearner">
+  <meta property="og:description" content="Master JavaScript variables. Understand let, const, and var — their scoping rules, hoisting behavior, the temporal dead zone, and when to use each one.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/beginner/variables.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Variables – let, const, var Explained | ylearner">
+  <meta name="twitter:description" content="Master JavaScript variables. Understand let, const, and var — their scoping rules, hoisting behavior, the temporal dead zone, and when to use each one.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/beginner/setting-up.html">Beginner</a><span class="separator">›</span>
+          <span class="current">Variables</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌱 Beginner</div>
+          <h1>JavaScript Variables – let, const, and var Explained</h1>
+          <p class="lesson-intro">Variables are named containers that hold data in your program. JavaScript has three ways to declare them — <code>var</code>, <code>let</code>, and <code>const</code> — and they behave quite differently from each other. Understanding these differences is essential, as confusing them leads to subtle bugs that trip up developers at every level. This lesson covers scoping, hoisting, the temporal dead zone, and the simple rule that makes variable choice easy.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-is-variable">What is a Variable?</h2>
+          <p>A variable is a labeled box in your computer's memory that stores a value. You give the box a name, put something in it, and refer to it by that name later in your code.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">let userName = "Alice";       // Declare and assign
+let userAge  = 30;
+let isLoggedIn = true;
+
+console.log(userName);        // Alice
+console.log(userAge);         // 30
+console.log(isLoggedIn);      // true
+
+userName = "Bob";             // Reassign
+console.log(userName);        // Bob</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>Alice
+30
+true
+Bob</div>
+
+          <h2 id="let">let – The Modern Default</h2>
+          <p><code>let</code> was introduced in ES6 (2015) and is the go-to choice for variables whose values will change. It is <strong>block-scoped</strong>, meaning it only exists within the <code>{ }</code> block where it was declared.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">let score = 100;
+
+if (true) {
+  let score = 200;        // Different variable — block scope!
+  console.log(score);     // 200
+}
+
+console.log(score);       // 100 — the outer score is unchanged
+
+// let cannot be redeclared in the same scope
+let score = 300;          // SyntaxError: Identifier 'score' already declared</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>200
+100</div>
+
+          <h2 id="const">const – For Values That Don't Change</h2>
+          <p><code>const</code> declares a variable that cannot be reassigned after its initial value is set. It is also block-scoped. Use <code>const</code> by default — it communicates intent and prevents accidental reassignment.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const PI = 3.14159;
+const MAX_RETRIES = 3;
+const SITE_NAME = "ylearner";
+
+console.log(PI);           // 3.14159
+
+PI = 3;                    // TypeError: Assignment to constant variable
+
+// const must be initialized at declaration
+const EMPTY;               // SyntaxError: Missing initializer in const declaration
+
+// IMPORTANT: const objects/arrays can be mutated!
+const user = { name: "Alice" };
+user.name = "Bob";         // This is allowed — the binding is const, not the object
+console.log(user.name);    // Bob</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>3.14159
+Bob</div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>const Doesn't Freeze Objects</strong><p><code>const</code> prevents you from <em>reassigning</em> the variable (pointing it to a new object), but you can still mutate the object's properties. If you need a truly immutable object, use <code>Object.freeze()</code>.</p></div>
+          </div>
+
+          <!-- place ad-in-content after 2nd or 3rd h2 -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="var">var – The Old Way (Avoid It)</h2>
+          <p><code>var</code> is the original way to declare variables (pre-ES6). It behaves very differently from <code>let</code> and <code>const</code>: it is <strong>function-scoped</strong> (not block-scoped), can be redeclared, and is hoisted to the top of its function. These quirks cause hard-to-find bugs.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// var is function-scoped — leaks out of blocks!
+if (true) {
+  var leakyVar = "I escape blocks!";
+}
+console.log(leakyVar);      // "I escape blocks!" — no error!
+
+// var can be redeclared (let cannot)
+var count = 1;
+var count = 2;               // No error — silent bug trap
+console.log(count);          // 2
+
+// var is function-scoped, not block-scoped
+function example() {
+  var x = 10;
+}
+console.log(x);              // ReferenceError: x is not defined</code></pre>
+          </div>
+
+          <h2 id="hoisting">Variable Hoisting Explained</h2>
+          <p>Hoisting is JavaScript's behavior of moving variable (and function) declarations to the top of their scope before code executes. This can lead to surprising results with <code>var</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// What you write:
+console.log(name);    // undefined (not an error!)
+var name = "Alice";
+console.log(name);    // "Alice"
+
+// What JavaScript actually executes (after hoisting):
+var name;             // Declaration hoisted to the top
+console.log(name);    // undefined — declared but not yet assigned
+name = "Alice";       // Assignment stays in place
+console.log(name);    // "Alice"</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>undefined
+Alice</div>
+
+          <h2 id="temporal-dead-zone">The Temporal Dead Zone</h2>
+          <p><code>let</code> and <code>const</code> are also hoisted, but they are <em>not initialized</em> — they exist in the "temporal dead zone" (TDZ) from the start of their block until the declaration is reached. Accessing them in this zone throws a <code>ReferenceError</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// var: hoisted and initialized to undefined
+console.log(varVar);    // undefined (no error)
+var varVar = "hello";
+
+// let: in the temporal dead zone → ReferenceError
+console.log(letVar);    // ReferenceError: Cannot access 'letVar' before initialization
+let letVar = "world";
+
+// const: same as let
+console.log(constVar);  // ReferenceError
+const constVar = "!";</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content"><strong>Always Declare Before Using</strong><p>The TDZ is actually a feature, not a bug — it forces you to declare variables before using them, which prevents the confusing <code>undefined</code> behavior of <code>var</code> hoisting. Write clean code and declare your variables at the top of the block they're used in.</p></div>
+          </div>
+
+          <h2 id="naming-rules">Naming Rules and Conventions</h2>
+          <p>JavaScript variable names must follow these rules:</p>
+          <ul>
+            <li>Can contain letters, digits, underscores (<code>_</code>), and dollar signs (<code>$</code>)</li>
+            <li>Must start with a letter, <code>_</code>, or <code>$</code> — not a digit</li>
+            <li>Are case-sensitive: <code>myVar</code> and <code>myvar</code> are different variables</li>
+            <li>Cannot be reserved keywords (<code>let</code>, <code>const</code>, <code>class</code>, <code>return</code>, etc.)</li>
+          </ul>
+
+          <table>
+            <thead>
+              <tr><th>Convention</th><th>Use For</th><th>Example</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>camelCase</td><td>Variables and functions</td><td><code>userName</code>, <code>maxRetries</code></td></tr>
+              <tr><td>PascalCase</td><td>Classes and constructors</td><td><code>UserProfile</code>, <code>HttpClient</code></td></tr>
+              <tr><td>UPPER_SNAKE_CASE</td><td>Constants (never change)</td><td><code>MAX_SIZE</code>, <code>API_KEY</code></td></tr>
+              <tr><td>_prefix</td><td>Private/internal (informal)</td><td><code>_id</code>, <code>_cache</code></td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="multiple-assignment">Multiple Assignment and Swapping</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// Declare multiple variables
+let x = 1, y = 2, z = 3;
+
+// Swap two variables without a temp variable (destructuring)
+let a = "first";
+let b = "second";
+[a, b] = [b, a];
+console.log(a, b);          // "second" "first"
+
+// Assign the same value to multiple variables
+let width = height = 100;   // Avoid — creates global 'height' if not declared!
+let width2 = 100;
+let height2 = 100;          // Prefer explicit declarations</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output</div>second first</div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content"><strong>The Simple Rule for const vs let</strong><p>Start with <code>const</code> for every variable. Only switch to <code>let</code> if you find yourself needing to reassign it. Never use <code>var</code> in modern code. This rule keeps your code predictable and intention-clear.</p></div>
+          </div>
+
+          <h2 id="deep-jsvariables">let, const, var: Which to Use and Why</h2>
+          <p>JavaScript has three ways to declare variables, but the modern rule is simple: <strong>use <code>const</code> by default, <code>let</code> when you must reassign, and never <code>var</code>.</strong> The difference is scope and hoisting.</p>
+          <table>
+            <thead><tr><th></th><th><code>const</code></th><th><code>let</code></th><th><code>var</code></th></tr></thead>
+            <tbody>
+              <tr><td>Scope</td><td>block</td><td>block</td><td>function (leaks!)</td></tr>
+              <tr><td>Reassign</td><td>no</td><td>yes</td><td>yes</td></tr>
+              <tr><td>Redeclare</td><td>no</td><td>no</td><td>yes (bug-prone)</td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-javascript">const PI = 3.14;         // can't reassign
+const user = { n: "A" };
+user.n = "B";            // ✅ allowed — const locks the BINDING, not contents
+// user = {};            // ❌ error — can't rebind
+
+let count = 0; count++;  // reassignable</code></pre>
+          <p><strong>const doesn't mean "immutable"</strong> — it means the variable can't be <em>reassigned</em>. You can still mutate a <code>const</code> object or array (<code>user.name = ...</code>, <code>arr.push(...)</code>); you just can't point the name at something new. This confuses beginners constantly. <strong>Why avoid <code>var</code>:</strong> it's function-scoped (leaks out of <code>if</code>/<code>for</code> blocks), can be redeclared silently, and hoists as <code>undefined</code> — all classic bug sources that <code>let</code>/<code>const</code> fixed. <strong>Practical habit:</strong> reach for <code>const</code> first; only switch to <code>let</code> when you find yourself needing to reassign. This makes code easier to reason about — a <code>const</code> tells the reader "this never changes."</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Declare a <code>const</code> called <code>BIRTH_YEAR</code> with your birth year, then calculate and log your age using <code>new Date().getFullYear() - BIRTH_YEAR</code>.</li>
+              <li>Declare <code>let firstName</code> and <code>let lastName</code>, then use a template literal to log your full name.</li>
+              <li>Try to reassign a <code>const</code> variable and observe the <code>TypeError</code>.</li>
+              <li>Demonstrate the temporal dead zone by logging a <code>let</code> variable before declaring it — read the error message.</li>
+              <li>Swap two variables using destructuring assignment: <code>[a, b] = [b, a]</code>.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Write a script that declares a <code>const</code> object called <code>config</code> with properties <code>siteName</code>, <code>version</code>, and <code>maxUsers</code>. Then add a new property <code>debugMode</code> to it and log the full object. Finally, try to reassign <code>config</code> to a new object and observe the <code>TypeError</code>. Explain in a comment why the property addition worked but the reassignment didn't.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Use <code>const</code> by default; switch to <code>let</code> only when reassignment is needed; never use <code>var</code>.</li>
+              <li><code>let</code> and <code>const</code> are block-scoped; <code>var</code> is function-scoped and leaks out of <code>if</code>/<code>for</code> blocks.</li>
+              <li><code>var</code> is hoisted and initialized to <code>undefined</code>; <code>let</code>/<code>const</code> are in the temporal dead zone until declared.</li>
+              <li><code>const</code> prevents reassignment but allows mutation of objects and arrays.</li>
+              <li>Use camelCase for variables and functions, PascalCase for classes, UPPER_SNAKE_CASE for true constants.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between <code>let</code>, <code>const</code>, and <code>var</code>?</li>
+            <li>What is variable hoisting in JavaScript?</li>
+            <li>What is the temporal dead zone?</li>
+            <li>Why does <code>const</code> allow object properties to be changed?</li>
+            <li>What is the difference between block scope and function scope?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/javascript/beginner/data-types.html" class="topic-tag">⚡ Data Types</a>
+            <a href="/javascript/beginner/operators.html" class="topic-tag">⚡ Operators</a>
+            <a href="/javascript/beginner/type-conversion.html" class="topic-tag">⚡ Type Conversion</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Should I ever use var in modern JavaScript? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. <code>var</code>'s function-scoping and hoisting quirks serve no purpose that <code>let</code> and <code>const</code> don't handle better. The only time you'll encounter <code>var</code> is in legacy code. When maintaining old code, it's generally safe to replace <code>var</code> with <code>let</code> or <code>const</code>, but test thoroughly since subtle scoping differences can exist.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I declare a variable without assigning it? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes with <code>let</code>: <code>let x;</code> creates a variable with the value <code>undefined</code>. With <code>const</code>, you must provide a value at declaration — <code>const x;</code> is a syntax error. With <code>var</code>, <code>var x;</code> also creates an <code>undefined</code> variable.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What happens if I forget to declare a variable? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>In non-strict mode, assigning to an undeclared variable creates a global variable — a major source of bugs. In strict mode (<code>'use strict';</code> at the top of a file or function), it throws a <code>ReferenceError</code>. Always declare your variables explicitly with <code>let</code> or <code>const</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Is JavaScript's camelCase convention enforced by the language? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No, it's just a convention — the JavaScript engine accepts any valid identifier regardless of case. However, following conventions makes your code readable to other JavaScript developers. Linters like ESLint can enforce naming conventions in a team setting.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between undefined and not declared? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A variable that is declared but not assigned is <code>undefined</code>: <code>let x; console.log(x); // undefined</code>. A variable that was never declared at all throws a <code>ReferenceError</code> when accessed: <code>console.log(y); // ReferenceError: y is not defined</code>. They are different error conditions.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/beginner/hello-world.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Hello World in JavaScript</span>
+          </a>
+          <a href="/javascript/beginner/data-types.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">JavaScript Data Types</span>
+          </a>
+        </nav>
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

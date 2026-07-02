@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Indexes – Speed Up Queries with CREATE INDEX | ylearner</title>
+  <meta name="description" content="Learn how SQL indexes work, how to create them with CREATE INDEX, the different types (B-tree, Hash, Composite, Partial), and when to use or avoid indexes for query optimization.">
+  <meta name="keywords" content="SQL indexes, CREATE INDEX, B-tree index, composite index, SQL query optimization, EXPLAIN plan, database index types, partial index">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/sql/advanced/indexes.html">
+  <meta property="og:title" content="SQL Indexes – Speed Up Queries with CREATE INDEX | ylearner">
+  <meta property="og:description" content="Understand how SQL indexes work and when to use them. Covers CREATE INDEX syntax, B-tree, Hash, Composite, and Partial index types, EXPLAIN plans, and trade-offs.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/sql/advanced/indexes.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SQL Indexes – Speed Up Queries with CREATE INDEX | ylearner">
+  <meta name="twitter:description" content="Understand how SQL indexes work and when to use them. Covers CREATE INDEX syntax, B-tree, Hash, Composite, and Partial index types, EXPLAIN plans, and trade-offs.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"SQL Indexes","description":"How SQL indexes work, how to create them, and when to use them for query optimization.","educationalLevel":"Intermediate","keywords":"SQL indexes, CREATE INDEX, B-tree, composite index, EXPLAIN","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/sql/what-is-sql.html">SQL</a><span class="separator">›</span>
+          <span>Advanced SQL</span><span class="separator">›</span>
+          <span class="current">Indexes</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Advanced SQL</div>
+          <h1>SQL Indexes – Speed Up Queries with CREATE INDEX</h1>
+          <p class="lesson-intro">Indexes are one of the most powerful tools for database performance. A well-placed index can turn a query that takes seconds into one that takes milliseconds. This lesson explains how indexes work, the different types available, how to read an EXPLAIN plan, and the trade-offs you must consider before adding one.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-are-indexes">What Are Indexes?</h2>
+          <p>An <strong>index</strong> is a data structure — most commonly a B-tree — maintained by the database engine alongside your table. It maps the values of one or more columns to the physical locations of the corresponding rows, enabling the database to find matching rows without scanning every single row in the table.</p>
+
+          <p>Think of a book's index at the back: instead of reading the entire book to find mentions of a topic, you look up the term and jump directly to the relevant pages. SQL indexes work the same way.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Without an index: full table scan</strong>
+              <p>When no index exists for a column used in a WHERE clause, the database reads every row from top to bottom. On a table with millions of rows, this is extremely slow. An index lets the engine jump directly to the matching rows — O(log n) instead of O(n).</p>
+            </div>
+          </div>
+
+          <h2 id="create-index">Creating Indexes</h2>
+          <p>The basic syntax is <code>CREATE INDEX</code> followed by a name, the table, and the column(s) to index.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Basic index on a single column
+CREATE INDEX idx_email ON users(email);
+
+-- Unique index — enforces uniqueness AND speeds up lookups
+CREATE UNIQUE INDEX idx_email_unique ON users(email);
+
+-- Index on a foreign key column (very common)
+CREATE INDEX idx_orders_customer ON orders(customer_id);
+
+-- Drop an index
+DROP INDEX idx_email ON users;           -- MySQL
+DROP INDEX idx_email;                    -- PostgreSQL</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Naming convention</strong>
+              <p>Use a consistent naming pattern like <code>idx_tablename_columnname</code>. This makes it easy to identify indexes in query plans and schema inspection queries. For unique indexes, some teams use <code>uix_</code> as a prefix.</p>
+            </div>
+          </div>
+
+          <h2 id="types-of-indexes">Types of Indexes</h2>
+          <p>Different database engines support different index types. Here are the most important ones:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Type</th><th>Best For</th><th>Notes</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>B-tree</strong></td><td>Range queries, equality, ORDER BY, LIKE 'prefix%'</td><td>Default in almost all databases. Works for most use cases.</td></tr>
+                <tr><td><strong>Hash</strong></td><td>Exact equality only (<code>=</code>)</td><td>Faster than B-tree for equality, but useless for range queries (&gt;, &lt;, BETWEEN).</td></tr>
+                <tr><td><strong>Composite</strong></td><td>Multi-column queries</td><td>Column order matters — see below.</td></tr>
+                <tr><td><strong>Partial / Filtered</strong></td><td>Subset of rows</td><td>Smaller and faster when you only query a filtered subset.</td></tr>
+                <tr><td><strong>Full-text</strong></td><td>Text search (CONTAINS, MATCH)</td><td>Specialized for keyword search in text columns.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Hash index (PostgreSQL)
+CREATE INDEX idx_user_hash ON users USING HASH (username);
+
+-- Partial index — only index active users (PostgreSQL / SQLite)
+CREATE INDEX idx_active_users ON users(email)
+WHERE status = 'active';
+
+-- Full-text index (MySQL)
+CREATE FULLTEXT INDEX idx_article_body ON articles(body);
+
+-- Full-text index (PostgreSQL — uses GIN)
+CREATE INDEX idx_article_tsv ON articles USING GIN (to_tsvector('english', body));</code></pre>
+          </div>
+
+          <h2 id="composite-index">Composite Indexes and Column Order</h2>
+          <p>A <strong>composite index</strong> covers multiple columns. The order of columns in the index definition is critical — the index is only usable when the query filters on the leftmost column(s) first (the <em>leading column rule</em>).</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Create a composite index on (department, salary)
+CREATE INDEX idx_dept_salary ON employees(department, salary);
+
+-- ✅ Uses the index — filters on leading column
+SELECT * FROM employees WHERE department = 'Engineering';
+
+-- ✅ Uses the index — filters on both columns
+SELECT * FROM employees WHERE department = 'Engineering' AND salary > 80000;
+
+-- ❌ Does NOT use the index — skips the leading column
+SELECT * FROM employees WHERE salary > 80000;
+
+-- ✅ Correct order for range + equality: put equality column first
+CREATE INDEX idx_status_created ON orders(status, created_at);
+SELECT * FROM orders WHERE status = 'pending' AND created_at > '2024-01-01';</code></pre>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Leading column rule</strong>
+              <p>Put the column with the highest cardinality (most distinct values) first in a composite index, UNLESS you always filter by an equality column — in that case, put the equality column first so the database can narrow down rows before applying the range filter.</p>
+            </div>
+          </div>
+
+          <h2 id="when-to-index">When to Add an Index</h2>
+          <p>Indexes are not free — they consume storage and slow down writes. Add an index only when you have a clear reason:</p>
+
+          <ul>
+            <li><strong>Foreign key columns</strong> — always index FK columns to speed up JOINs and prevent lock issues on DELETE.</li>
+            <li><strong>WHERE clause columns</strong> — columns you filter on frequently in hot queries.</li>
+            <li><strong>JOIN columns</strong> — columns used in ON clauses between large tables.</li>
+            <li><strong>ORDER BY / GROUP BY columns</strong> — indexes can eliminate sort operations.</li>
+            <li><strong>High-cardinality columns</strong> — columns with many distinct values (email, user_id). Low-cardinality columns (is_active with only 0/1) rarely benefit from an index.</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- Find existing indexes on a table (MySQL)
+SHOW INDEX FROM employees;
+
+-- Find existing indexes (PostgreSQL)
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE tablename = 'employees';
+
+-- Identify missing FK indexes (PostgreSQL)
+SELECT conname, conrelid::regclass AS table_name,
+       a.attname AS column_name
+FROM pg_constraint c
+JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = c.conkey[1]
+WHERE c.contype = 'f'
+  AND NOT EXISTS (
+    SELECT 1 FROM pg_index i
+    WHERE i.indrelid = c.conrelid AND i.indkey[0] = a.attnum
+  );</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="explain-plan">Reading the EXPLAIN Plan</h2>
+          <p><code>EXPLAIN</code> shows the query execution plan — how the database intends to retrieve your data. <code>EXPLAIN ANALYZE</code> actually runs the query and shows real timing information.</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">SQL</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-sql">-- MySQL: see the execution plan
+EXPLAIN SELECT * FROM orders WHERE customer_id = 42;
+
+-- MySQL: with actual runtime stats (MySQL 8.0+)
+EXPLAIN ANALYZE SELECT * FROM orders WHERE customer_id = 42;
+
+-- PostgreSQL: estimated plan
+EXPLAIN SELECT * FROM orders WHERE customer_id = 42;
+
+-- PostgreSQL: actual execution plan with timings
+EXPLAIN ANALYZE SELECT * FROM orders WHERE customer_id = 42;</code></pre>
+          </div>
+
+          <p>Key things to look for in the output:</p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Output Term</th><th>Meaning</th><th>Good or Bad?</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Seq Scan / ALL</strong></td><td>Full table scan — reads every row</td><td>Bad on large tables; investigate</td></tr>
+                <tr><td><strong>Index Scan</strong></td><td>Uses an index to find rows, then fetches full row</td><td>Good for low-cardinality matches</td></tr>
+                <tr><td><strong>Index Only Scan</strong></td><td>All needed data is in the index — never touches the table</td><td>Excellent</td></tr>
+                <tr><td><strong>rows</strong></td><td>Estimated number of rows to process</td><td>Lower is better</td></tr>
+                <tr><td><strong>cost</strong></td><td>Relative cost estimate (not wall-clock time)</td><td>Lower is better</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="trade-offs">Trade-offs of Indexes</h2>
+          <p>Every index you add has a cost:</p>
+
+          <ul>
+            <li><strong>Slower writes</strong> — every INSERT, UPDATE, and DELETE must also update all relevant indexes. Tables with many indexes suffer noticeably on write-heavy workloads.</li>
+            <li><strong>Storage space</strong> — indexes consume disk space. A large table with many indexes can use more space for indexes than for the actual data.</li>
+            <li><strong>Maintenance overhead</strong> — over time, indexes can become fragmented and need to be rebuilt (<code>REINDEX</code> in PostgreSQL, <code>OPTIMIZE TABLE</code> in MySQL).</li>
+          </ul>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Don't over-index</strong>
+              <p>More indexes is not always better. Profile your actual queries, identify the slow ones, and add targeted indexes. A common anti-pattern is adding an index on every column "just in case" — this degrades write performance without benefiting most queries.</p>
+            </div>
+          </div>
+
+          <h2 id="summary">Summary</h2>
+          <h2 id="deep-indexes">Indexes: the Trade That Makes Reads Fast and Writes Slower</h2>
+          <p>An index is a sorted lookup structure (usually a B-tree) the database keeps alongside your table. Without one, finding a row means a <strong>full table scan</strong> — reading every row. With one, the engine jumps straight to the match, like a book's index instead of flipping every page.</p>
+          <pre><code class="language-sql">-- Slow at scale: scans the whole table
+SELECT * FROM users WHERE email = 'a@b.com';
+
+CREATE INDEX idx_users_email ON users(email);
+-- Now the same query is a near-instant lookup</code></pre>
+          <h3>Indexes aren't free</h3>
+          <table>
+            <thead><tr><th>Helps</th><th>Costs</th></tr></thead>
+            <tbody>
+              <tr><td><code>WHERE</code>, <code>JOIN</code>, <code>ORDER BY</code> lookups</td><td>every <code>INSERT/UPDATE/DELETE</code> must update the index too</td></tr>
+              <tr><td>enforcing <code>UNIQUE</code></td><td>extra disk space</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Index the columns you filter and join on — not every column.</strong> On a write-heavy table, too many indexes slow inserts to a crawl.</p>
+          <h3>The composite index left-prefix rule</h3>
+          <p>An index on <code>(last_name, first_name)</code> speeds queries filtering by <code>last_name</code> alone, or both — but <em>not</em> <code>first_name</code> alone. Like a phone book sorted by last name then first: useless for finding everyone named "John." Order composite columns most-selective / most-filtered first.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Create an index on a column.</li>
+              <li>Create a composite index on two columns.</li>
+              <li>Create a unique index.</li>
+              <li>Inspect a query plan with EXPLAIN.</li>
+              <li>Drop an index.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Add an index to speed up lookups by <code>email</code>, then use EXPLAIN to compare query plans before and after. Explain how indexes speed reads but slow writes, and when a composite index helps.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>An index is a B-tree (or other) data structure that speeds up row lookups at the cost of write overhead and storage.</li>
+              <li>Use <code>CREATE INDEX idx_name ON table(column);</code> to add an index; <code>CREATE UNIQUE INDEX</code> to enforce uniqueness.</li>
+              <li>Main types: B-tree (default), Hash (equality only), Composite (multi-column, order matters), Partial (filtered subset), Full-text.</li>
+              <li>In composite indexes, queries must filter on the leading column; skipping it means the index is not used.</li>
+              <li>Index FK columns, high-cardinality WHERE/JOIN/ORDER BY columns; avoid low-cardinality columns.</li>
+              <li>Use <code>EXPLAIN</code> / <code>EXPLAIN ANALYZE</code> to verify that indexes are being used.</li>
+              <li>Every index slows INSERT/UPDATE/DELETE — don't over-index write-heavy tables.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is a database index?</li>
+            <li>How do indexes improve query performance?</li>
+            <li>What is the downside of having too many indexes?</li>
+            <li>What is a composite index, and does column order matter?</li>
+            <li>What is the difference between a clustered and a non-clustered index?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/sql/advanced/views.html" class="topic-tag sql-topic-tag">🗄️ SQL Views</a>
+            <a href="/sql/advanced/stored-procedures.html" class="topic-tag sql-topic-tag">🗄️ Stored Procedures</a>
+            <a href="/sql/advanced/normalization.html" class="topic-tag sql-topic-tag">🗄️ Normalization</a>
+            <a href="/sql/dml/upsert.html" class="topic-tag sql-topic-tag">🗄️ UPSERT</a>
+            <a href="/sql/interview/questions.html" class="topic-tag sql-topic-tag">🗄️ Interview Questions</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does adding a PRIMARY KEY automatically create an index? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes. In MySQL (InnoDB) and PostgreSQL, declaring a PRIMARY KEY automatically creates a unique index on that column. In MySQL InnoDB, the primary key is the <em>clustered index</em> — the table data is physically stored in primary key order. You do not need to manually create an index for primary key columns.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why isn't my index being used? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The query optimizer may skip your index for several reasons: the table is small (a full scan is faster than an index lookup for tiny tables); you used a function on the indexed column (<code>WHERE LOWER(email) = ...</code> breaks the index — use a functional index instead); the column has low cardinality; or statistics are stale. Run <code>ANALYZE</code> (PostgreSQL) or <code>ANALYZE TABLE</code> (MySQL) to update statistics.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is a covering index? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>A covering index includes all columns that a query needs — both the filter columns and the SELECT columns — so the database never has to access the actual table rows. This is called an "Index Only Scan" in PostgreSQL and produces the best read performance. You can create one by including extra columns: <code>CREATE INDEX idx_cover ON orders(customer_id) INCLUDE (total, status);</code> (PostgreSQL 11+).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How many indexes should a table have? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>There is no fixed number, but a common guideline is 3–6 indexes on OLTP tables. Start with a primary key index (automatic), indexes on all foreign keys, and indexes on your most frequently queried WHERE columns. Then profile slow queries and add targeted indexes as needed. Tables in reporting/data warehouse databases can have many more since they are read-heavy.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/sql/dml/quiz.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">📝 Section Quiz</span>
+          </a>
+          <a href="/sql/advanced/views.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">SQL Views</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

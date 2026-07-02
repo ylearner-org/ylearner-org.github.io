@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Quiz App – Build an Interactive Quiz | ylearner</title>
+  <meta name="description" content="Build an interactive multiple-choice JavaScript quiz app with score tracking, correct/wrong feedback, a results screen, and restart functionality. Full working code included.">
+  <meta name="keywords" content="JavaScript quiz app, interactive quiz JavaScript, multiple choice quiz JS, JavaScript project, OOP JavaScript project">
+  <link rel="canonical" href="https://ylearner.org/javascript/projects/quiz-app.html">
+  <meta property="og:title" content="JavaScript Quiz App – Build an Interactive Quiz | ylearner">
+  <meta property="og:description" content="Build an interactive multiple-choice JavaScript quiz app with score tracking, correct/wrong feedback, a results screen, and restart functionality. Full working code included.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/projects/quiz-app.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript Quiz App – Build an Interactive Quiz | ylearner">
+  <meta name="twitter:description" content="Build an interactive multiple-choice JavaScript quiz app with score tracking, correct/wrong feedback, a results screen, and restart functionality. Full working code included.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/projects/calculator.html">Projects</a><span class="separator">›</span>
+          <span class="current">Quiz App</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🛠️ Projects</div>
+          <h1>JavaScript Quiz App – Build an Interactive Multiple-Choice Quiz</h1>
+          <p class="lesson-intro">Build a polished multiple-choice quiz app entirely in vanilla JavaScript. Covers question display, option selection, correct/wrong feedback, score tracking, a results screen with percentage, and full restart functionality — all managed through a clean class-based architecture.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 28 min read</span>
+            <span>🎯 Advanced</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="data-structure">Question Data Structure</h2>
+          <p>The quiz data is an array of objects. Each question has a text, an array of options, and the index of the correct answer. This structure is easy to extend, load from an API, or store in JSON.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// quiz-data.js (or inline in quiz-script.js)
+
+const questions = [
+  {
+    question: "Which keyword declares a block-scoped variable in JavaScript?",
+    options: ["var", "let", "def", "local"],
+    correct: 1
+  },
+  {
+    question: "What does the Array method .map() return?",
+    options: ["The original array (mutated)", "A new array", "undefined", "An object"],
+    correct: 1
+  },
+  {
+    question: "Which of these is NOT a JavaScript primitive?",
+    options: ["string", "boolean", "array", "null"],
+    correct: 2
+  },
+  {
+    question: "What does 'use strict' do?",
+    options: [
+      "Prevents variable hoisting",
+      "Enables strict type checking",
+      "Enables a stricter parsing and error handling mode",
+      "Disables closures"
+    ],
+    correct: 2
+  },
+  {
+    question: "What is the output of: typeof null?",
+    options: ["null", "undefined", "object", "string"],
+    correct: 2
+  },
+  {
+    question: "Which method removes the last element from an array?",
+    options: [".shift()", ".splice(-1)", ".pop()", ".slice(-1)"],
+    correct: 2
+  },
+  {
+    question: "What is a closure?",
+    options: [
+      "A way to close the browser tab",
+      "A function that retains access to its outer scope after the outer function returns",
+      "A method for ending async operations",
+      "A type of loop"
+    ],
+    correct: 1
+  },
+  {
+    question: "Which symbol is used for template literals?",
+    options: ["Single quote (')", "Double quote (\")", "Backtick (`)", "Tilde (~)"],
+    correct: 2
+  },
+  {
+    question: "What does Promise.all() do when one promise rejects?",
+    options: [
+      "Ignores the rejection and continues",
+      "Resolves with null for the failed promise",
+      "Immediately rejects with the first rejection reason",
+      "Waits for all promises then reports failures"
+    ],
+    correct: 2
+  },
+  {
+    question: "How do you create a deep clone of an object in modern JavaScript?",
+    options: [
+      "Object.assign({}, obj)",
+      "{ ...obj }",
+      "structuredClone(obj)",
+      "JSON.copy(obj)"
+    ],
+    correct: 2
+  }
+];</code></pre>
+          </div>
+
+          <h2 id="html-structure">HTML Structure</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/* quiz.html
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;JavaScript Quiz&lt;/title&gt;
+  &lt;link rel="stylesheet" href="quiz-style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class="quiz-container"&gt;
+
+    &lt;!-- Quiz Screen --&gt;
+    &lt;div id="quiz-screen"&gt;
+      &lt;div class="quiz-header"&gt;
+        &lt;span id="question-counter"&gt;Question 1 / 10&lt;/span&gt;
+        &lt;span id="score-display"&gt;Score: 0&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class="progress-bar"&gt;&lt;div id="progress-fill"&gt;&lt;/div&gt;&lt;/div&gt;
+      &lt;p id="question-text" class="question-text"&gt;&lt;/p&gt;
+      &lt;div id="options-grid" class="options-grid"&gt;&lt;/div&gt;
+      &lt;button id="next-btn" class="next-btn hidden"&gt;Next Question →&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Results Screen --&gt;
+    &lt;div id="results-screen" class="hidden"&gt;
+      &lt;h2&gt;Quiz Complete!&lt;/h2&gt;
+      &lt;div class="score-circle"&gt;
+        &lt;span id="final-score"&gt;&lt;/span&gt;
+        &lt;small&gt;out of 10&lt;/small&gt;
+      &lt;/div&gt;
+      &lt;p id="score-message"&gt;&lt;/p&gt;
+      &lt;div id="results-breakdown"&gt;&lt;/div&gt;
+      &lt;button id="restart-btn"&gt;Try Again&lt;/button&gt;
+    &lt;/div&gt;
+
+  &lt;/div&gt;
+  &lt;script src="quiz-script.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+*/</code></pre>
+          </div>
+
+          <h2 id="quiz-class">Quiz Class Architecture</h2>
+          <p>Encapsulating all quiz state and methods inside a <code>Quiz</code> class prevents global namespace pollution and keeps related logic together — a clean OOP approach.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// quiz-script.js
+
+class Quiz {
+  #questions;
+  #currentIndex;
+  #score;
+  #answered;
+  #userAnswers;
+
+  constructor(questions) {
+    this.#questions  = this.#shuffle([...questions]); // shuffle a copy
+    this.#currentIndex = 0;
+    this.#score      = 0;
+    this.#answered   = false;
+    this.#userAnswers = [];
+  }
+
+  get currentQuestion() {
+    return this.#questions[this.#currentIndex];
+  }
+
+  get progress() {
+    return ((this.#currentIndex) / this.#questions.length) * 100;
+  }
+
+  get isFinished() {
+    return this.#currentIndex >= this.#questions.length;
+  }
+
+  get score()     { return this.#score; }
+  get total()     { return this.#questions.length; }
+  get answered()  { return this.#answered; }
+  get userAnswers() { return this.#userAnswers; }
+
+  answer(optionIndex) {
+    if (this.#answered) return null; // prevent double answers
+    this.#answered = true;
+    const isCorrect = optionIndex === this.currentQuestion.correct;
+    if (isCorrect) this.#score++;
+    this.#userAnswers.push({
+      question: this.currentQuestion.question,
+      chosen:   optionIndex,
+      correct:  this.currentQuestion.correct,
+      isCorrect
+    });
+    return isCorrect;
+  }
+
+  next() {
+    this.#currentIndex++;
+    this.#answered = false;
+  }
+
+  #shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+}</code></pre>
+          </div>
+
+          <h2 id="ui-controller">UI Controller</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// UI Controller — all DOM interactions
+
+let quiz; // will be initialised in startQuiz()
+
+// DOM refs
+const quizScreen    = document.getElementById("quiz-screen");
+const resultsScreen = document.getElementById("results-screen");
+const questionText  = document.getElementById("question-text");
+const optionsGrid   = document.getElementById("options-grid");
+const nextBtn       = document.getElementById("next-btn");
+const counterEl     = document.getElementById("question-counter");
+const scoreEl       = document.getElementById("score-display");
+const progressFill  = document.getElementById("progress-fill");
+
+function renderQuestion() {
+  const q = quiz.currentQuestion;
+
+  counterEl.textContent  = `Question ${quiz.userAnswers.length + 1} / ${quiz.total}`;
+  scoreEl.textContent    = `Score: ${quiz.score}`;
+  progressFill.style.width = `${quiz.progress}%`;
+  questionText.textContent = q.question;
+  nextBtn.classList.add("hidden");
+
+  optionsGrid.innerHTML = q.options.map((option, i) => `
+    &lt;button class="option-btn" data-index="${i}"&gt;
+      &lt;span class="option-letter"&gt;${String.fromCharCode(65 + i)}&lt;/span&gt;
+      ${option}
+    &lt;/button&gt;
+  `).join("");
+}
+
+function handleAnswer(optionIndex) {
+  const isCorrect = quiz.answer(optionIndex);
+  if (isCorrect === null) return; // already answered
+
+  const buttons = optionsGrid.querySelectorAll(".option-btn");
+
+  // Show feedback on all options
+  buttons.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === quiz.currentQuestion.correct) {
+      btn.classList.add("correct");
+    } else if (i === optionIndex && !isCorrect) {
+      btn.classList.add("incorrect");
+    }
+  });
+
+  scoreEl.textContent = `Score: ${quiz.score}`;
+  nextBtn.classList.remove("hidden");
+  nextBtn.textContent = quiz.userAnswers.length >= quiz.total
+    ? "See Results" : "Next Question →";
+}
+
+function showResults() {
+  quizScreen.classList.add("hidden");
+  resultsScreen.classList.remove("hidden");
+
+  const { score, total, userAnswers } = quiz;
+  const percentage = Math.round((score / total) * 100);
+
+  document.getElementById("final-score").textContent = score;
+  document.getElementById("score-message").textContent =
+    percentage >= 80 ? "Excellent! You really know JavaScript!" :
+    percentage >= 60 ? "Good job! Keep practising." :
+    "Keep learning! Review the topics and try again.";
+
+  // Results breakdown
+  document.getElementById("results-breakdown").innerHTML = userAnswers.map(a => `
+    &lt;div class="breakdown-item ${a.isCorrect ? "correct" : "incorrect"}"&gt;
+      &lt;span class="breakdown-icon"&gt;${a.isCorrect ? "✅" : "❌"}&lt;/span&gt;
+      &lt;div&gt;
+        &lt;p class="breakdown-question"&gt;${a.question}&lt;/p&gt;
+        ${!a.isCorrect
+          ? `&lt;p class="breakdown-answer"&gt;Correct: ${quiz.currentQuestion?.options[a.correct] ?? "—"}&lt;/p&gt;`
+          : ""}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  `).join("");
+}
+
+// Event listeners
+optionsGrid.addEventListener("click", e => {
+  const btn = e.target.closest(".option-btn");
+  if (btn) handleAnswer(Number(btn.dataset.index));
+});
+
+nextBtn.addEventListener("click", () => {
+  quiz.next();
+  if (quiz.isFinished) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+});
+
+document.getElementById("restart-btn").addEventListener("click", startQuiz);
+
+// Keyboard navigation (1–4 for options, Enter/Space for next)
+document.addEventListener("keydown", e => {
+  if (quizScreen.classList.contains("hidden")) return;
+  const num = parseInt(e.key);
+  if (num >= 1 && num <= 4) handleAnswer(num - 1);
+  if ((e.key === "Enter" || e.key === " ") && !nextBtn.classList.contains("hidden")) {
+    nextBtn.click();
+  }
+});
+
+// Initialize
+function startQuiz() {
+  quiz = new Quiz(questions);
+  quizScreen.classList.remove("hidden");
+  resultsScreen.classList.add("hidden");
+  renderQuestion();
+}
+
+startQuiz();</code></pre>
+          </div>
+
+          <div class="output-block"><strong>Behavior:</strong> 10 questions display one at a time. Clicking an option highlights it green (correct) or red (incorrect) and reveals the correct answer. "Next Question" advances the quiz. The results screen shows score out of 10, a percentage message, and a per-question breakdown.</div>
+
+          <div class="callout callout-tip">
+            <strong>Private Fields:</strong> The Quiz class uses private fields (<code>#questions</code>, <code>#score</code>, etc.) introduced in ES2022. This ensures the game state can only be modified through the public <code>answer()</code> and <code>next()</code> methods — preventing accidental state corruption from outside the class.
+          </div>
+
+          <div class="callout callout-info">
+            <strong>Concepts Practiced:</strong> ES6 classes, private class fields, array shuffling (Fisher-Yates), closures for state, event delegation, keyboard accessibility, conditional rendering, and data-driven UI patterns.
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="css-overview">CSS Highlights</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">/* quiz-style.css — key styles
+
+.option-btn {
+  padding: 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  font-size: 15px;
+}
+.option-btn:hover:not(:disabled) {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+.option-btn.correct   { background: #d1fae5; border-color: #10b981; color: #065f46; }
+.option-btn.incorrect { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+.option-btn:disabled  { cursor: not-allowed; }
+.progress-bar { height: 6px; background: #e2e8f0; border-radius: 3px; margin: 12px 0; }
+#progress-fill { height: 100%; background: #3b82f6; border-radius: 3px; transition: width 0.4s; }
+.score-circle {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: white; font-size: 40px; font-weight: 700;
+  margin: 24px auto;
+}
+*/</code></pre>
+          </div>
+
+          <h2 id="enhancements">Enhancements</h2>
+
+          <div class="exercise-box">
+            <h3>Extend the Quiz App</h3>
+            <ul>
+              <li><strong>Timer</strong> — add a countdown timer per question (e.g., 30 seconds); auto-advance on timeout</li>
+              <li><strong>Categories</strong> — add a <code>category</code> field to questions and let the user choose a topic</li>
+              <li><strong>High score</strong> — store the best score in localStorage and display it on the results screen</li>
+              <li><strong>Lifelines</strong> — 50/50 lifeline that removes two wrong options</li>
+              <li><strong>Fetch questions</strong> — load questions from the free Open Trivia DB API (<code>opentdb.com</code>)</li>
+            </ul>
+          </div>
+
+          <div class="challenge-box">
+            <h3>Timer Implementation</h3>
+            <p>Add a 30-second countdown to the Quiz class and UI:</p>
+            <pre style="background:#1e1e2e;color:#cdd6f4;padding:12px;border-radius:8px;font-size:13px;overflow:auto;"><code>// In the Quiz class:
+#timeLimit = 30;
+#timeLeft  = 30;
+#timerId   = null;
+
+startTimer(onTick, onExpire) {
+  this.#timeLeft = this.#timeLimit;
+  this.#timerId  = setInterval(() => {
+    this.#timeLeft--;
+    onTick(this.#timeLeft);
+    if (this.#timeLeft <= 0) {
+      clearInterval(this.#timerId);
+      onExpire();
+    }
+  }, 1000);
+}
+
+stopTimer() { clearInterval(this.#timerId); }</code></pre>
+          </div>
+
+          <h2 id="quiz-concepts">Concepts Breakdown</h2>
+          <table>
+            <thead><tr><th>Concept</th><th>Where Applied</th></tr></thead>
+            <tbody>
+              <tr><td>ES6 Class</td><td>Quiz class encapsulates all game logic</td></tr>
+              <tr><td>Private Fields (#)</td><td>Prevent external state mutation</td></tr>
+              <tr><td>Fisher-Yates Shuffle</td><td><code>#shuffle()</code> randomizes question order</td></tr>
+              <tr><td>Closures</td><td>Event handlers capture <code>quiz</code> variable</td></tr>
+              <tr><td>Event Delegation</td><td>Options grid click handler</td></tr>
+              <tr><td>Keyboard Events</td><td>Press 1–4 to select options</td></tr>
+              <tr><td>Conditional Rendering</td><td>show/hide quiz vs results screen</td></tr>
+              <tr><td>Data-driven UI</td><td>HTML generated from question objects</td></tr>
+            </tbody>
+          </table>
+
+          <div class="summary-box">
+            <h3>Summary</h3>
+            <ul>
+              <li>Data structure: array of question objects with text, options array, and correct index</li>
+              <li>Quiz class: encapsulates state using private fields, exposes only controlled mutations</li>
+              <li>Fisher-Yates shuffle: randomizes question order on every new game</li>
+              <li>UI controller: reads from the Quiz instance and renders DOM based on current state</li>
+              <li>Results screen: per-question breakdown with correct answers shown for wrong guesses</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>Class-based quiz architecture demonstrates OOP knowledge applied to a real feature</li>
+            <li>Fisher-Yates shuffle is a classic algorithm question — knowing it by name impresses interviewers</li>
+            <li>Private fields show awareness of modern JavaScript features (ES2022)</li>
+            <li>Separating data (questions array), logic (Quiz class), and UI (controller) demonstrates separation of concerns</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <h3>Related Topics</h3>
+            <ul>
+              <li><a href="/javascript/projects/weather-app.html">Weather App Project</a></li>
+              <li><a href="/javascript/projects/expense-tracker.html">Expense Tracker Project</a></li>
+              <li><a href="/javascript/oop/classes.html">JavaScript Classes</a></li>
+            </ul>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Why shuffle the questions using a copy of the array? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Shuffling the original <code>questions</code> array in-place would mutate the source data. Creating a copy with <code>[...questions]</code> means the original is preserved and restarting the quiz produces a new shuffle each time.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Why use a class instead of plain functions and variables? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Classes group related state and behavior together, making the code easier to understand, test, and extend. Private fields prevent bugs from accidental external modification. For a larger quiz app (multiple quiz types, difficulty levels), the class architecture scales cleanly.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I load questions from an external API? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Open Trivia DB (opentdb.com) provides free quiz questions as JSON: <code>https://opentdb.com/api.php?amount=10&type=multiple</code>. Fetch on app load and map the response to your question format.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How does keyboard navigation improve accessibility? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Users who prefer keyboards (power users, accessibility needs) can answer with number keys 1–4 and advance with Enter or Space without touching the mouse. Ensure answer buttons also have proper <code>aria</code> attributes for screen reader support.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I add multiple quiz topics? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Add a <code>category</code> field to each question object. Show a topic selection screen before the quiz starts. Filter questions by selected category: <code>questions.filter(q => q.category === selected)</code>.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/projects/weather-app.html" class="lesson-nav-link"><span class="nav-label">← Previous</span><span class="nav-title">Weather App</span></a>
+          <a href="/javascript/projects/expense-tracker.html" class="lesson-nav-link next"><span class="nav-label">Next →</span><span class="nav-title">Expense Tracker</span></a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

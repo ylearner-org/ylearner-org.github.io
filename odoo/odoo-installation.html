@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo 19 Installation & Setup for Development | ylearner</title>
+  <meta name="description" content="Step-by-step Odoo 19 installation guide for developers: Ubuntu/Debian native setup, Docker for Windows/macOS, VS Code configuration, and activating developer mode.">
+  <meta name="keywords" content="Odoo installation, Odoo 19 setup, install Odoo Ubuntu, Odoo Docker, Odoo development environment, Odoo VS Code, Odoo developer mode">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/odoo/odoo-installation.html">
+  <meta property="og:title" content="Odoo 19 Installation & Setup for Development | ylearner">
+  <meta property="og:description" content="Complete Odoo 19 installation guide: Ubuntu/Debian native, Docker for Windows/macOS, VS Code setup, and developer mode activation.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/odoo/odoo-installation.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Odoo 19 Installation & Setup for Development | ylearner">
+  <meta name="twitter:description" content="Install Odoo 19 for development: Ubuntu native, Docker, VS Code setup, creating your first database, and activating developer mode.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Odoo 19 Installation & Setup for Development",
+    "description": "Complete step-by-step guide to installing Odoo 19 for development on Ubuntu/Debian, Docker, and configuring VS Code.",
+    "educationalLevel": "Beginner",
+    "keywords": "Odoo installation, Odoo 19 setup, Docker, Ubuntu, VS Code, developer mode",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/odoo/what-is-odoo.html">Odoo</a><span class="separator">›</span>
+          <span class="current">Installation & Setup</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🐍 Introduction</div>
+          <h1>Odoo Installation & Setup for Development</h1>
+          <p class="lesson-intro">Setting up a local Odoo development environment requires Python 3.11+, PostgreSQL 16+, and the Odoo source code from GitHub. This page walks through installation on Ubuntu/Debian (recommended for development), Docker-based setup for Windows/macOS, and how to set up VS Code for Odoo development. By the end you'll have a running Odoo instance and a custom addons directory ready for your first module.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 25 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="requirements">System Requirements</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>Component</th><th>Version</th><th>Notes</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Python</strong></td><td>3.11–3.12</td><td>3.12 recommended</td></tr>
+                <tr><td><strong>PostgreSQL</strong></td><td>16+</td><td>17 recommended</td></tr>
+                <tr><td><strong>Node.js</strong></td><td>18+</td><td>Required for asset compilation (Less, SCSS)</td></tr>
+                <tr><td><strong>wkhtmltopdf</strong></td><td>0.12.6</td><td>Required for PDF reports</td></tr>
+                <tr><td><strong>OS</strong></td><td>Ubuntu 22.04 / Debian 12</td><td>Recommended; Docker for Windows/macOS</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 id="ubuntu-install">Ubuntu/Debian Installation</h2>
+          <p>This is the recommended approach for development. Follow these steps in order:</p>
+
+          <h3>Step 1 — Install system dependencies</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">sudo apt update &amp;&amp; sudo apt upgrade -y
+sudo apt install -y python3-pip python3-dev python3-venv \
+    libxml2-dev libxslt1-dev libldap2-dev libsasl2-dev \
+    libtiff5-dev libjpeg8-dev libopenjp2-7-dev zlib1g-dev \
+    libfreetype6-dev liblcms2-dev libwebp-dev libharfbuzz-dev \
+    libfribidi-dev libxcb1-dev libpq-dev git curl</code></pre>
+          </div>
+
+          <h3>Step 2 — Install PostgreSQL</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">sudo apt install -y postgresql postgresql-contrib
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+# Create Odoo database user (same as your Linux username)
+sudo -u postgres createuser -s $USER</code></pre>
+          </div>
+
+          <h3>Step 3 — Clone Odoo 19</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">git clone https://github.com/odoo/odoo.git --depth=1 --branch=19.0 ~/odoo19</code></pre>
+          </div>
+
+          <p>The <code>--depth=1</code> flag clones only the latest commit, which is much faster than a full history clone. The <code>--branch=19.0</code> flag checks out the Odoo 19 branch.</p>
+
+          <h3>Step 4 — Create virtual environment and install dependencies</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">python3 -m venv ~/odoo19-venv
+source ~/odoo19-venv/bin/activate
+pip install -r ~/odoo19/requirements.txt</code></pre>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h3>Step 5 — Create config file</h3>
+          <p>Create <code>~/odoo19.conf</code> with the following content (replace <code>your_username</code> with your Linux username):</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">INI</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-ini">[options]
+db_host = localhost
+db_port = 5432
+db_user = your_username
+db_password = False
+addons_path = /home/your_username/odoo19/addons,/home/your_username/custom_addons
+logfile = /var/log/odoo/odoo.log</code></pre>
+          </div>
+
+          <h3>Step 6 — Create custom addons directory</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">mkdir ~/custom_addons</code></pre>
+          </div>
+
+          <h3>Step 7 — Start Odoo</h3>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">source ~/odoo19-venv/bin/activate
+python ~/odoo19/odoo-bin -c ~/odoo19.conf
+# Open http://localhost:8069 in your browser</code></pre>
+          </div>
+
+          <h2 id="docker-setup">Docker Setup (Windows / macOS)</h2>
+          <p>If you're on Windows or macOS, Docker is the easiest path to a working Odoo environment. Create a <code>docker-compose.yml</code> file:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">YAML</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-yaml"># docker-compose.yml
+version: '3.8'
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+      POSTGRES_DB: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  odoo:
+    image: odoo:19.0
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    environment:
+      HOST: db
+      USER: odoo
+      PASSWORD: odoo
+    volumes:
+      - odoo-data:/var/lib/odoo
+      - ./custom_addons:/mnt/extra-addons
+
+volumes:
+  pgdata:
+  odoo-data:</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">Bash</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-bash">mkdir custom_addons
+docker-compose up -d
+# Open http://localhost:8069 in your browser</code></pre>
+          </div>
+
+          <p>The <code>custom_addons</code> directory is mounted into the container at <code>/mnt/extra-addons</code>. Any module you place there will be available in Odoo after updating the app list.</p>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>Windows users: use WSL2 + Ubuntu for native development</strong>
+              <p>The Docker approach works for running Odoo, but if you want to edit Odoo's source code or run Python tests, WSL2 with Ubuntu gives you a full Linux environment inside Windows. Install Ubuntu from the Microsoft Store, then follow the Ubuntu installation steps above inside WSL2.</p>
+            </div>
+          </div>
+
+          <h2 id="vscode-setup">VS Code Setup</h2>
+          <p>VS Code is the recommended editor for Odoo development. Install these extensions:</p>
+          <ul>
+            <li><strong>Python</strong> (Microsoft) — core Python language support</li>
+            <li><strong>Pylance</strong> (Microsoft) — type checking and autocompletion</li>
+            <li><strong>XML</strong> (Red Hat) — XML formatting and validation</li>
+            <li><strong>Odoo Snippets</strong> — code snippets for common Odoo patterns</li>
+          </ul>
+
+          <p>Configure your workspace settings in <code>.vscode/settings.json</code>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JSON</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-json">{
+  "python.defaultInterpreterPath": "~/odoo19-venv/bin/python",
+  "python.analysis.extraPaths": [
+    "~/odoo19"
+  ],
+  "editor.formatOnSave": true,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  }
+}</code></pre>
+          </div>
+
+          <p><strong>Tip:</strong> Add <code>~/odoo19</code> to your VS Code workspace (File → Add Folder to Workspace). This lets Pylance index Odoo's source code, giving you autocompletion for all Odoo models, fields, and methods as you write custom code.</p>
+
+          <h2 id="first-database">Creating Your First Database</h2>
+          <p>Once Odoo is running at <code>http://localhost:8069</code>, you'll see the database manager page. Fill in the fields:</p>
+          <ol>
+            <li><strong>Master Password</strong> — set a password (it protects database management)</li>
+            <li><strong>Database Name</strong> — e.g. <code>odoo_dev</code></li>
+            <li><strong>Email</strong> — your admin login email</li>
+            <li><strong>Password</strong> — your admin user password</li>
+            <li><strong>Language</strong> — select English</li>
+            <li><strong>Country</strong> — select yours</li>
+            <li><strong>Demo Data</strong> — check this (useful for learning — gives you sample customers, products, orders)</li>
+          </ol>
+          <p>Click <strong>Create database</strong> and wait ~2 minutes for initialisation. You'll be redirected to the Odoo main menu — your development environment is ready.</p>
+
+          <h2 id="dev-mode">Activating Developer Mode</h2>
+          <p>Developer mode unlocks technical tools that are essential for module development:</p>
+          <ul>
+            <li>Shows the <strong>Technical menu</strong> under Settings (access to views, models, actions, sequences, etc.)</li>
+            <li>Enables <strong>direct view editing</strong> from the UI</li>
+            <li>Shows <strong>field technical names</strong> on hover</li>
+            <li>Enables the <strong>Assets debug mode</strong> for frontend debugging</li>
+          </ul>
+
+          <p>To activate:</p>
+          <ul>
+            <li><strong>Method 1</strong>: Settings → General Settings → scroll to Developer Tools section → click <strong>Activate developer mode</strong></li>
+            <li><strong>Method 2</strong>: Append <code>?debug=1</code> to any URL, e.g. <code>http://localhost:8069/web?debug=1</code></li>
+            <li><strong>Method 3</strong>: Append <code>?debug=assets</code> for full asset debugging (unminified JS)</li>
+          </ul>
+
+          <div class="callout callout-success">
+            <span class="callout-icon">✅</span>
+            <div class="callout-content">
+              <strong>Always work in developer mode</strong>
+              <p>When developing, always keep developer mode active. Without it, you cannot access the Technical menu, directly inspect views, or see field names — all essential for day-to-day module development.</p>
+            </div>
+          </div>
+
+          <h2 id="deep-odooinstall">Setting Up an Odoo Development Environment</h2>
+          <p>Odoo needs three things running together: Python, a PostgreSQL database, and the Odoo source. For development, the choice of setup method affects how easily you can debug and customize.</p>
+          <table>
+            <thead><tr><th>Method</th><th>Good for</th></tr></thead>
+            <tbody>
+              <tr><td>Source + venv</td><td>development — full control, easy debugging</td></tr>
+              <tr><td>Docker</td><td>quick, isolated, reproducible setups</td></tr>
+              <tr><td>Odoo.sh / SaaS</td><td>hosting production, less control</td></tr>
+            </tbody>
+          </table>
+          <pre><code class="language-bash"># dev setup essentials
+python -m venv venv &amp;&amp; source venv/bin/activate
+pip install -r requirements.txt
+# start pointing at your custom modules folder:
+./odoo-bin -d mydb --addons-path=addons,my_addons -u my_module --dev=all</code></pre>
+          <p><strong>For development, run from source</strong> in a virtual environment: it gives you full control, breakpoints, and instant code reloading — far better for building modules than a packaged install. <strong>PostgreSQL is mandatory:</strong> Odoo only works with Postgres, so set up a database and a database user before starting the server. <strong>The flags that matter:</strong> <code>--addons-path</code> tells Odoo where to find your custom modules (put yours in a separate folder from core); <code>-u module_name</code> upgrades a module to apply code/XML changes; <code>--dev=all</code> enables auto-reload and better tracebacks. <strong>The upgrade gotcha:</strong> changing a Python model or XML view requires restarting with <code>-u your_module</code> for the changes to take effect (data files and schema aren't hot-reloaded like a normal web app) — forgetting this is the #1 "why isn't my change showing?" beginner issue. <strong>Enable Developer Mode</strong> in Odoo's settings to see technical menus, field names, and debugging tools. Docker is a fine alternative for a clean, reproducible environment.</p>
+
+<div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Note the install options (source, Docker, package).</li>
+              <li>Install the dependencies (Python, PostgreSQL).</li>
+              <li>Create a PostgreSQL user for Odoo.</li>
+              <li>Run Odoo with a config file.</li>
+              <li>Open the web UI on port 8069.</li>
+            </ol>
+          </div>
+
+<div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Set up an Odoo development environment: install PostgreSQL, download the Odoo source, install the Python requirements, create a database, and launch the server. Explain the role of the config file (addons_path, DB credentials) and the default port.</p>
+          </div>
+
+<div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Odoo 19 requires <strong>Python 3.11–3.12, PostgreSQL 16+, Node.js 18+</strong>.</li>
+              <li><strong>Ubuntu/Debian</strong> is the recommended OS for native development — 7 steps from clean OS to running Odoo.</li>
+              <li><strong>Docker Compose</strong> is the easiest path for Windows/macOS development.</li>
+              <li>VS Code with Python + Pylance + XML + Odoo Snippets extensions gives the best development experience.</li>
+              <li><strong>Developer mode</strong> is essential for module development — activate it via Settings or <code>?debug=1</code> in the URL.</li>
+              <li>Your <code>custom_addons</code> directory is where all your custom modules will live.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How do you install Odoo for development?</li>
+            <li>What database does Odoo require?</li>
+            <li>What is the addons_path?</li>
+            <li>What port does Odoo run on by default?</li>
+            <li>What does the Odoo config file specify?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+<div class="related-topics">
+            <a href="/odoo/what-is-odoo.html" class="topic-tag odoo-topic-tag">🐍 What is Odoo?</a>
+            <a href="/odoo/odoo-architecture.html" class="topic-tag odoo-topic-tag">🐍 Odoo Architecture</a>
+            <a href="/odoo/odoo-prerequisites.html" class="topic-tag odoo-topic-tag">🐍 Odoo Prerequisites</a>
+            <a href="/odoo/module/module-structure.html" class="topic-tag odoo-topic-tag">🐍 Module Structure</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Can I use Windows for Odoo development? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Native Windows is not recommended — wkhtmltopdf and some Python C-extension dependencies have issues on Windows. Two alternatives work well: <strong>Docker on Windows</strong> (good for running Odoo, limited for editing source), or <strong>WSL2 with Ubuntu</strong> (the best Windows option — gives you a full Linux environment with proper Python compilation, full Odoo source access, and VS Code Remote development). Install WSL2, install Ubuntu from the Microsoft Store, then follow the Ubuntu installation steps above.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the Odoo master password? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The master password is a <strong>server-level password</strong> that protects database management operations (creating, dropping, duplicating databases). It is set in <code>odoo.conf</code> as the <code>admin_passwd</code> option. It is completely separate from any Odoo user account password. For local development, you can set it to something simple like <code>admin</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What port does Odoo run on? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Odoo's web interface runs on <strong>port 8069</strong> by default. The long-polling server (used for live chat, bus notifications, and real-time features) runs on <strong>port 8072</strong> by default. Both can be changed in <code>odoo.conf</code> via the <code>xmlrpc_port</code> and <code>longpolling_port</code> options.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I update a module after changing its Python code? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Python method changes take effect after a <strong>server restart</strong> — Odoo is a Python process; it doesn't hot-reload Python code. For changes that affect the database schema (new fields, new models) or data (new views, menus, security records), you also need to <strong>upgrade the module</strong>. You can do this by restarting with <code>-u module_name</code>, e.g. <code>python odoo-bin -c ~/odoo19.conf -u my_custom_module</code>. In developer mode, you can also upgrade from Settings → Technical → Installed Modules.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/odoo/postgresql-basics.html" class="lesson-nav-link">
+            <span class="nav-label">← Prev</span>
+            <span class="nav-title">PostgreSQL for Odoo</span>
+          </a>
+          <a href="/odoo/module/module-structure.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">Module Structure</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

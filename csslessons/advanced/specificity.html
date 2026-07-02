@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Specificity – How the Cascade Decides Which Style Wins | ylearner</title>
+  <meta name="description" content="Master CSS specificity: how browsers calculate which rule wins, the (a,b,c) specificity score, inline styles, !important, the cascade, inheritance, and how to avoid specificity wars.">
+  <meta name="keywords" content="CSS specificity, CSS cascade, CSS !important, CSS specificity calculator, CSS selector weight, CSS inheritance, CSS specificity score, override CSS rules, CSS specificity wars">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/csslessons/advanced/specificity.html">
+  <meta property="og:title" content="CSS Specificity – How the Cascade Decides Which Style Wins | ylearner">
+  <meta property="og:description" content="Learn how CSS specificity works — the (a,b,c) scoring system, !important, cascade order, inheritance, and best practices.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/csslessons/advanced/specificity.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CSS Specificity Complete Guide | ylearner">
+  <meta name="twitter:description" content="Cascade, (a,b,c) scoring, !important, inheritance — master CSS specificity so your styles always apply.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "CSS Specificity",
+    "description": "Complete guide to CSS specificity — (a,b,c) scoring, inline styles, IDs, classes, elements, !important, the cascade, inheritance, and avoiding specificity wars.",
+    "educationalLevel": "Intermediate",
+    "keywords": "CSS specificity, CSS cascade, !important, CSS selector weight, specificity calculator",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "provider": { "@type": "Organization", "name": "ylearner", "url": "https://ylearner.org/" }
+  }
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+  <style>
+    .spec-table { width:100%; border-collapse:collapse; margin:1rem 0 1.5rem; font-size:.9rem; }
+    .spec-table th, .spec-table td { padding:10px 14px; border:1px solid var(--border-color,#e0e0e0); text-align:left; }
+    .spec-table thead th { background:var(--surface,#f5f5f5); font-weight:700; }
+    .spec-score { font-family:monospace; font-weight:700; color:#1572B6; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search" role="search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Tutorial navigation">
+      <nav id="sidebarNav" aria-label="Lessons"></nav>
+    </aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/csslessons/what-is-css.html">CSS</a><span class="separator">›</span>
+          <a href="/csslessons/advanced/variables.html">Advanced CSS</a><span class="separator">›</span>
+          <span class="current">CSS Specificity</span>
+        </nav>
+
+        <header class="lesson-header">
+          <div class="lesson-tag">🔧 Advanced CSS</div>
+          <h1>CSS Specificity – Why Your Styles Get Overridden</h1>
+          <p class="lesson-intro">Specificity is the algorithm browsers use to decide which CSS rule wins when multiple rules target the same element and property. Understanding it means you stop fighting your own styles — and you know exactly why <code>color: red</code> isn't working and what to do about it. Specificity is one of the most common sources of confusion in CSS, and mastering it will make you dramatically faster at debugging.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Intermediate</span>
+            <span>📅 Updated 2026</span>
+            <span>👁️ Lesson 4 of 5</span>
+          </div>
+        </header>
+
+        <article class="lesson-body">
+
+          <h2 id="how-it-works">How Specificity Works</h2>
+          <p>Each CSS selector has a specificity score — a three-column value written as <code>(a, b, c)</code>. The browser compares scores column by column, left to right. The rule with the highest score wins. If scores are equal, the rule declared last in the source wins (the cascade).</p>
+
+          <table class="spec-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>What counts</th>
+                <th>Score contribution</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Column A</strong> — ID selectors</td>
+                <td><code>#id</code></td>
+                <td class="spec-score">(1, 0, 0)</td>
+              </tr>
+              <tr>
+                <td><strong>Column B</strong> — Class, attribute, pseudo-class</td>
+                <td><code>.class</code>, <code>[attr]</code>, <code>:hover</code>, <code>:nth-child()</code></td>
+                <td class="spec-score">(0, 1, 0)</td>
+              </tr>
+              <tr>
+                <td><strong>Column C</strong> — Element, pseudo-element</td>
+                <td><code>div</code>, <code>p</code>, <code>a</code>, <code>::before</code></td>
+                <td class="spec-score">(0, 0, 1)</td>
+              </tr>
+              <tr>
+                <td><strong>Inline style</strong></td>
+                <td><code>style="..."</code> attribute</td>
+                <td class="spec-score">(1, 0, 0, 0)</td>
+              </tr>
+              <tr>
+                <td><strong>Universal / combinators</strong></td>
+                <td><code>*</code>, <code>&gt;</code>, <code>+</code>, <code>~</code>, <code>&nbsp;</code></td>
+                <td class="spec-score">(0, 0, 0)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Calculating specificity scores</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Selector                         Score (a, b, c) */
+
+p                                /* (0, 0, 1) — 1 element */
+.intro                           /* (0, 1, 0) — 1 class */
+#header                          /* (1, 0, 0) — 1 ID */
+div p                            /* (0, 0, 2) — 2 elements */
+.nav li                          /* (0, 1, 1) — 1 class, 1 element */
+.nav li a                        /* (0, 1, 2) — 1 class, 2 elements */
+#header .nav li a                /* (1, 1, 2) — 1 ID, 1 class, 2 elements */
+.card:hover                      /* (0, 2, 0) — 1 class, 1 pseudo-class */
+input[type="text"]               /* (0, 1, 1) — 1 attribute, 1 element */
+ul li:first-child                /* (0, 1, 2) — 1 pseudo-class, 2 elements */
+#nav > ul > li > a:hover         /* (1, 1, 3) — 1 ID, 1 pseudo-class, 3 elements */
+</code></pre>
+          </div>
+
+          <h2 id="comparison">Comparing Specificity</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Specificity comparison examples</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* Which color wins? */
+p { color: blue; }           /* (0,0,1) */
+.text { color: red; }        /* (0,1,0) */
+/* Winner: .text → red (0,1,0 beats 0,0,1) */
+
+#main p { color: green; }    /* (1,0,1) */
+.section .text { color: orange; } /* (0,2,0) */
+/* Winner: #main p → green (1 in column A wins regardless of B and C) */
+
+/* Same specificity — last one in source wins */
+.btn { background: blue; }   /* (0,1,0) */
+.cta { background: red; }    /* (0,1,0) */
+/* &lt;button class="btn cta"&gt; → red wins (declared last) */
+</code></pre>
+          </div>
+
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="important">!important</h2>
+          <p><code>!important</code> overrides all specificity — including inline styles. It adds a separate "important" layer above the normal specificity scale. When two <code>!important</code> declarations compete, the one with higher specificity wins.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – !important</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* !important beats everything in the normal cascade */
+p { color: blue !important; }     /* wins over: */
+#main p { color: red; }           /* even though (1,0,1) > (0,0,1) */
+
+/* Two !important — specificity wins */
+p { color: blue !important; }     /* (0,0,1) with !important */
+.text { color: red !important; }  /* (0,1,0) with !important — wins */
+
+/* Utility class pattern — legitimate use of !important */
+.text-center { text-align: center !important; }
+.hidden      { display: none !important; }
+.mt-0        { margin-top: 0 !important; }
+</code></pre>
+          </div>
+
+          <h2 id="the-cascade">The Cascade Order</h2>
+          <p>When specificity is equal, the cascade applies — rules are resolved in this order (later stages override earlier ones):</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">Text – Cascade order (lowest to highest)</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-text">1. Browser default stylesheet (user-agent styles)
+2. User stylesheet (accessibility overrides in browser settings)
+3. Author stylesheet (your CSS) — by order:
+   a. External stylesheets (in link order)
+   b. Internal &lt;style&gt; blocks (in document order)
+   c. Inline styles (style="" attribute)
+4. !important in author styles
+5. !important in user styles (accessibility overrides — highest priority)
+</code></pre>
+          </div>
+
+          <h2 id="inheritance">Inheritance</h2>
+          <p>Some properties inherit down to children automatically (<code>color</code>, <code>font-*</code>, <code>line-height</code>). Others don't (<code>border</code>, <code>padding</code>, <code>margin</code>, <code>background</code>). You can force or reset inheritance with the keywords below.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Inheritance keywords</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* inherit — force the element to inherit its parent's value */
+.child { color: inherit; }
+
+/* initial — reset to the browser's initial value for that property */
+button { background: initial; }   /* removes browser button background */
+
+/* unset — inherit if naturally inherited, otherwise initial */
+.reset { all: unset; }   /* strips all styles from an element */
+
+/* revert — roll back to browser's user-agent stylesheet value */
+h1 { font-size: revert; }
+</code></pre>
+          </div>
+
+          <h2 id="avoiding-wars">Avoiding Specificity Wars</h2>
+          <p>Specificity wars happen when you pile on selectors trying to override each other. The solution is to keep specificity low and consistent.</p>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">CSS – Specificity best practices</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-css">/* BAD — high ID specificity locks you in */
+#page #main-content .sidebar .widget h3 { color: red; }
+
+/* GOOD — single class, low specificity */
+.widget-title { color: red; }
+
+/* BAD — escaping with !important */
+.btn { color: blue !important; }
+
+/* GOOD — raise specificity slightly instead */
+.btn.btn-primary { color: #1572B6; }
+
+/* Use :where() to write complex selectors without adding specificity */
+:where(#app) .btn { color: #1572B6; }   /* (0,1,0) — not (1,1,0) */
+
+/* Layers: @layer lets you control cascade order independent of specificity */
+@layer base, components, utilities;
+
+@layer base {
+  a { color: blue; }
+}
+@layer components {
+  .link { color: #1572B6; }   /* wins over base — even same specificity */
+}
+@layer utilities {
+  .text-red { color: red; }   /* wins over components */
+}
+</code></pre>
+          </div>
+
+          <h2 id="deep-speccalc">How Specificity Is Actually Calculated</h2>
+          <p>When two rules target the same element, the browser scores each selector as three numbers — <strong>(IDs, classes, elements)</strong> — and the higher score wins.</p>
+          <table>
+            <thead><tr><th>Selector</th><th>IDs</th><th>Classes</th><th>Elements</th><th>Score</th></tr></thead>
+            <tbody>
+              <tr><td><code>p</code></td><td>0</td><td>0</td><td>1</td><td>0,0,1</td></tr>
+              <tr><td><code>.btn</code></td><td>0</td><td>1</td><td>0</td><td>0,1,0</td></tr>
+              <tr><td><code>nav .btn</code></td><td>0</td><td>1</td><td>1</td><td>0,1,1</td></tr>
+              <tr><td><code>#hero</code></td><td>1</td><td>0</td><td>0</td><td>1,0,0</td></tr>
+            </tbody>
+          </table>
+          <p>Compare left-to-right: one ID beats any number of classes; one class beats any number of elements. If scores tie, the rule that appears <strong>later</strong> in the CSS wins (source order).</p>
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong><code>!important</code> is a code smell, not a fix</strong>
+              <p>It overrides the whole cascade, so the next override needs <em>another</em> <code>!important</code>, and soon nothing is predictable. Fix specificity properly instead — usually by using a single, well-named class rather than deep <code>#id div ul li a</code> chains. Keep specificity flat and low.</p>
+            </div>
+          </div>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Calculate the specificity of three different selectors.</li>
+              <li>Override a class rule with an id rule.</li>
+              <li>See an inline style beat a stylesheet rule.</li>
+              <li>Use <code>!important</code> to override everything.</li>
+              <li>Inspect the winning rule in DevTools.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Given a paragraph targeted by an element selector, a class, an id, and an inline style, predict the final color using specificity rules, then verify in DevTools. Explain the specificity weights (inline, id, class, element) and why <code>!important</code> should be a last resort.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>Specificity score is <strong>(a, b, c)</strong>: a = IDs, b = classes/attributes/pseudo-classes, c = elements/pseudo-elements.</li>
+              <li>Compare column by column left to right. Column A wins over any number of B or C.</li>
+              <li>Equal specificity → last rule in source wins (the cascade).</li>
+              <li>Inline styles beat all selector specificity (unless <code>!important</code> is involved).</li>
+              <li><code>!important</code> is a nuclear option — overrides everything in the normal layer. Legitimate for utility classes (<code>.hidden</code>, <code>.sr-only</code>).</li>
+              <li><code>:where()</code> is zero-specificity — write complex selectors without raising the score.</li>
+              <li><code>@layer</code> creates cascade layers — later layers win regardless of specificity within the layer.</li>
+              <li>Keep selectors flat (1 class level) to avoid specificity wars.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>How is CSS specificity calculated?</li>
+            <li>What is the specificity order from highest to lowest?</li>
+            <li>How does <code>!important</code> affect specificity?</li>
+            <li>What wins when two selectors have equal specificity?</li>
+            <li>Why is high specificity hard to maintain?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/csslessons/advanced/pseudo-classes.html" class="topic-tag css-topic-tag">🔧 CSS Pseudo-classes</a>
+            <a href="/csslessons/selectors/selectors-basics.html" class="topic-tag css-topic-tag">🌱 CSS Selectors</a>
+            <a href="/csslessons/advanced/best-practices.html" class="topic-tag css-topic-tag">🔧 CSS Best Practices</a>
+            <a href="/csslessons/adding-css.html" class="topic-tag css-topic-tag">🎨 Adding CSS</a>
+          </div>
+
+<section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does the order of selectors in the stylesheet affect specificity? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No — only the selector type and count affect the specificity score. Source order only matters as a tiebreaker when two rules have the same specificity score. A class selector (<code>.btn</code>) always loses to an ID selector (<code>#btn</code>) regardless of where they appear in the stylesheet.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How many class selectors does it take to beat an ID? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Technically infinite — specificity scores do not overflow between columns. Even <code>.a.b.c.d.e.f.g.h.i.j.k</code> (11 classes = score 0,11,0) does not beat <code>#id</code> (score 1,0,0), because column A is compared first and 1 beats 0. This is why using IDs in selectors creates a specificity problem that can only be resolved with another ID or <code>!important</code>.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is @layer and when should I use it? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>@layer</code> (CSS Cascade Layers, introduced in 2022) lets you group CSS rules into named layers with a defined order. Rules in a higher-priority layer win over all rules in lower-priority layers, regardless of specificity. This is especially useful when integrating third-party CSS (reset, component libraries) — put them in a low-priority layer so your application styles always win without needing <code>!important</code>. Browser support is above 93% as of 2026.</p></div>
+            </div>
+          </section>
+</article>
+
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/csslessons/advanced/pseudo-elements.html" class="lesson-nav-link prev">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">CSS Pseudo-elements</span>
+          </a>
+          <a href="/csslessons/advanced/best-practices.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">CSS Best Practices</span>
+          </a>
+        </nav>
+
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript User Input – prompt(), DOM input, Forms | ylearner</title>
+  <meta name="description" content="Learn how to get user input in JavaScript. Covers prompt(), confirm(), DOM input elements, addEventListener, reading form values, input validation, keypress events, and a complete interactive example.">
+  <meta name="keywords" content="javascript user input, javascript prompt, javascript form input, addEventListener javascript, javascript getElementById, javascript DOM input, javascript form validation, javascript keypress">
+  <link rel="canonical" href="https://ylearner.org/javascript/beginner/user-input.html">
+  <meta property="og:title" content="JavaScript User Input – prompt(), DOM input, Forms | ylearner">
+  <meta property="og:description" content="Learn how to get user input in JavaScript: prompt(), confirm(), DOM input elements, event listeners, form reading, and validation.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/javascript/beginner/user-input.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JavaScript User Input – prompt(), DOM input, Forms | ylearner">
+  <meta name="twitter:description" content="Learn how to get user input in JavaScript: prompt(), confirm(), DOM input elements, event listeners, form reading, and validation.">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <!-- Adsense Header -->
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/javascript/beginner/setting-up.html">Beginner</a><span class="separator">›</span>
+          <span class="current">User Input</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🌱 Beginner</div>
+          <h1>JavaScript User Input – Getting Input from the User</h1>
+          <p class="lesson-intro">Real applications are interactive — they respond to what the user types, clicks, and selects. JavaScript has several ways to receive user input, from the old-school <code>prompt()</code> dialog to modern DOM event listeners on HTML form elements. This lesson covers both approaches, teaches you to read and validate form values, handle keyboard events, and build a complete interactive example that ties it all together.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 22 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="prompt-dialog">prompt() and confirm() – Browser Dialogs</h2>
+          <p><code>prompt()</code> shows a browser popup with a text input. It returns the string the user typed, or <code>null</code> if they clicked Cancel. <code>confirm()</code> shows a yes/no dialog and returns a boolean.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// prompt() — returns string or null
+const name = prompt("What is your name?");
+
+if (name !== null && name.trim() !== "") {
+  console.log(`Hello, ${name}!`);
+} else {
+  console.log("No name provided.");
+}
+
+// prompt() with a default value (second argument)
+const city = prompt("Enter your city:", "New York");
+console.log("City:", city);
+
+// confirm() — returns boolean
+const agreed = confirm("Do you agree to the terms?");
+if (agreed) {
+  console.log("User agreed!");
+} else {
+  console.log("User declined.");
+}</code></pre>
+          </div>
+          <div class="output-block"><div class="output-label">▶ Output (if user types "Alice" and clicks OK)</div>Hello, Alice!
+City: New York
+User agreed!</div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content"><strong>Why prompt() is Rarely Used in Production</strong><p><code>prompt()</code> blocks all JavaScript execution until the user responds, creates a poor mobile experience, looks different in every browser, cannot be styled, and is disabled in some browser contexts (like iframes). Modern apps use HTML form elements with event listeners instead.</p></div>
+          </div>
+
+          <h2 id="dom-input">Reading DOM Input Elements</h2>
+          <p>The modern way to get user input is through HTML <code>&lt;input&gt;</code> elements accessed via the DOM. The two most common methods to find an element are <code>getElementById()</code> and <code>querySelector()</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// HTML:
+// &lt;input type="text" id="nameInput" placeholder="Enter name"&gt;
+// &lt;button id="submitBtn"&gt;Submit&lt;/button&gt;
+// &lt;p id="output"&gt;&lt;/p&gt;
+
+// Get elements
+const nameInput  = document.getElementById("nameInput");
+const submitBtn  = document.getElementById("submitBtn");
+const output     = document.getElementById("output");
+
+// Same thing with querySelector (more flexible, accepts CSS selectors)
+const nameInput2 = document.querySelector("#nameInput");
+const firstInput = document.querySelector("input");
+const allInputs  = document.querySelectorAll("input");  // NodeList
+
+// Read the input value
+submitBtn.addEventListener("click", function() {
+  const name = nameInput.value;         // always a string!
+  const trimmed = name.trim();
+
+  if (trimmed === "") {
+    output.textContent = "Please enter a name.";
+  } else {
+    output.textContent = `Hello, ${trimmed}!`;
+  }
+});</code></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content"><strong>input.value is Always a String</strong><p>No matter what type an input is (<code>type="number"</code>, <code>type="date"</code>, etc.), <code>input.value</code> always returns a string. Always convert explicitly: <code>const age = Number(ageInput.value)</code>.</p></div>
+          </div>
+
+          <!-- place ad-in-content after 2nd or 3rd h2 -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="event-listeners">addEventListener – Responding to Events</h2>
+          <p>Event listeners let your code respond to user actions. The most useful input events are <code>click</code>, <code>input</code>, <code>change</code>, and <code>keydown</code>/<code>keyup</code>.</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">const input = document.querySelector("#myInput");
+
+// "input" fires on every keystroke
+input.addEventListener("input", function(event) {
+  console.log("Current value:", event.target.value);
+});
+
+// "change" fires when element loses focus after a change
+input.addEventListener("change", function(event) {
+  console.log("Final value:", event.target.value);
+});
+
+// "keydown" fires when any key is pressed
+input.addEventListener("keydown", function(event) {
+  console.log("Key pressed:", event.key);
+
+  // Submit on Enter key
+  if (event.key === "Enter") {
+    console.log("Enter pressed! Submitting:", input.value);
+  }
+});
+
+// Click event on a button
+const btn = document.querySelector("#myBtn");
+btn.addEventListener("click", function() {
+  console.log("Button clicked!");
+});</code></pre>
+          </div>
+
+          <h2 id="reading-forms">Reading Form Values</h2>
+          <p>HTML forms can contain many different input types. Here's how to read each:</p>
+
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// &lt;input type="text" id="name"&gt; → use .value
+const name = document.getElementById("name").value;
+
+// &lt;input type="number" id="age"&gt; → use .value then convert
+const age = Number(document.getElementById("age").value);
+
+// &lt;input type="checkbox" id="agree"&gt; → use .checked (boolean)
+const agreed = document.getElementById("agree").checked;
+
+// &lt;select id="color"&gt; → use .value
+const color = document.getElementById("color").value;
+
+// &lt;textarea id="message"&gt; → use .value
+const message = document.getElementById("message").value;
+
+// &lt;input type="radio" name="gender"&gt; → find checked one
+const gender = document.querySelector('input[name="gender"]:checked')?.value;
+
+console.log({ name, age, agreed, color, message, gender });</code></pre>
+          </div>
+
+          <h2 id="input-validation">Input Validation Basics</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">function validateForm() {
+  const name  = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const age   = Number(document.getElementById("age").value);
+  const errors = [];
+
+  if (name.length < 2) {
+    errors.push("Name must be at least 2 characters.");
+  }
+
+  if (!email.includes("@") || !email.includes(".")) {
+    errors.push("Please enter a valid email address.");
+  }
+
+  if (isNaN(age) || age < 1 || age > 120) {
+    errors.push("Please enter a valid age (1–120).");
+  }
+
+  if (errors.length > 0) {
+    document.getElementById("errorMsg").textContent = errors.join(" ");
+    return false;
+  }
+
+  // All valid!
+  document.getElementById("errorMsg").textContent = "";
+  return true;
+}</code></pre>
+          </div>
+
+          <h2 id="innerHTML-vs-textContent">innerHTML vs textContent for Output</h2>
+          <p>When displaying results, choose between <code>innerHTML</code> and <code>textContent</code> carefully:</p>
+
+          <table>
+            <thead>
+              <tr><th>Property</th><th>Parses HTML?</th><th>Security Risk?</th><th>Use When</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>textContent</code></td><td>No</td><td>Safe</td><td>Displaying user-provided text</td></tr>
+              <tr><td><code>innerHTML</code></td><td>Yes</td><td>XSS risk if unescaped</td><td>Inserting trusted HTML markup</td></tr>
+              <tr><td><code>innerText</code></td><td>No</td><td>Safe</td><td>Similar to textContent (layout-aware)</td></tr>
+            </tbody>
+          </table>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content"><strong>Never Set innerHTML with User Input</strong><p>Setting <code>element.innerHTML = userInput</code> can execute malicious scripts (XSS — Cross-Site Scripting). A user could type <code>&lt;img src=x onerror="alert('hacked')"&gt;</code> as their name. Always use <code>textContent</code> for displaying user-provided data.</p></div>
+          </div>
+
+          <h2 id="complete-example">Complete Interactive Example</h2>
+          <div class="code-block">
+            <div class="code-block-header"><span class="code-lang">JavaScript</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-javascript">// HTML structure:
+// &lt;input type="text" id="nameInput" placeholder="Enter your name"&gt;
+// &lt;button id="greetBtn"&gt;Greet Me!&lt;/button&gt;
+// &lt;p id="greeting"&gt;&lt;/p&gt;
+
+const nameInput = document.getElementById("nameInput");
+const greetBtn  = document.getElementById("greetBtn");
+const greeting  = document.getElementById("greeting");
+
+function showGreeting() {
+  const name = nameInput.value.trim();
+
+  if (name === "") {
+    greeting.textContent = "Please enter your name first!";
+    greeting.style.color = "red";
+    return;
+  }
+
+  const hour = new Date().getHours();
+  let timeGreeting;
+
+  if (hour < 12) {
+    timeGreeting = "Good morning";
+  } else if (hour < 18) {
+    timeGreeting = "Good afternoon";
+  } else {
+    timeGreeting = "Good evening";
+  }
+
+  greeting.textContent = `${timeGreeting}, ${name}! Welcome to ylearner!`;
+  greeting.style.color = "green";
+}
+
+// Respond to button click
+greetBtn.addEventListener("click", showGreeting);
+
+// Respond to Enter key in the input
+nameInput.addEventListener("keydown", function(event) {
+  if (event.key === "Enter") {
+    showGreeting();
+  }
+});</code></pre>
+          </div>
+
+          <h2 id="deep-jsuserinput">Getting User Input in the Browser</h2>
+          <p>Unlike Python's <code>input()</code>, browser JavaScript gets input from <em>the page</em> — reading form fields, reacting to events. (The old <code>prompt()</code> exists but blocks everything and looks dated.)</p>
+          <pre><code class="language-javascript">// read a field's value — ALWAYS a string
+const name = document.querySelector("#name").value;
+
+// react as the user types
+input.addEventListener("input", (e) => {
+  console.log(e.target.value);   // current text
+});
+
+prompt("Your name?");            // ⚠️ blocking, ugly — avoid in real apps</code></pre>
+          <table>
+            <thead><tr><th>Source</th><th>How</th></tr></thead>
+            <tbody>
+              <tr><td>text field</td><td><code>input.value</code> (string)</td></tr>
+              <tr><td>checkbox</td><td><code>input.checked</code> (boolean)</td></tr>
+              <tr><td>live typing</td><td><code>"input"</code> event</td></tr>
+              <tr><td>on submit</td><td><code>"submit"</code> event + <code>FormData</code></td></tr>
+            </tbody>
+          </table>
+          <p><strong>The core fact:</strong> <code>input.value</code> is always a <em>string</em>, even for <code>type="number"</code> — convert with <code>Number(...)</code> before math, exactly like Python's <code>input()</code>. <strong>Modern input is event-driven:</strong> instead of "stop and wait," you attach listeners — <code>"input"</code> fires on every keystroke (great for live search/validation), <code>"change"</code> fires when the field loses focus, and <code>"submit"</code> on the form is where you gather everything (call <code>e.preventDefault()</code> to stop the page reload). <strong>Avoid <code>prompt()</code>/<code>alert()</code></strong> in real apps — they freeze the whole page and can't be styled; use real form elements. <strong>Security:</strong> never trust input — validate on the client for UX, but re-validate on the server.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <ol>
+              <li>Open your browser console and test <code>prompt("Enter a number:")</code>. What happens if you click Cancel?</li>
+              <li>Create a simple HTML page with a text input and a button. Use <code>addEventListener</code> to log the input value when the button is clicked.</li>
+              <li>Add a <code>keydown</code> listener that triggers the same action when the user presses Enter in the input field.</li>
+              <li>Add basic validation: show an error if the input is empty or shorter than 3 characters.</li>
+              <li>Change the output to use <code>textContent</code> and confirm that HTML tags typed by the user are displayed as plain text, not rendered.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build a simple tip calculator. Create an HTML page with two inputs: a "Bill Amount" (number) and a "Tip Percentage" (number, default 15). Add a "Calculate" button. When clicked, validate that both fields contain valid positive numbers, then display the tip amount, total bill, and a per-person split amount (add a third input for number of people). Format all monetary outputs to 2 decimal places.</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li><code>prompt()</code> and <code>confirm()</code> show blocking browser dialogs — avoid in production.</li>
+              <li>Use <code>getElementById()</code> or <code>querySelector()</code> to access HTML input elements.</li>
+              <li><code>input.value</code> always returns a string — convert explicitly with <code>Number()</code> when needed.</li>
+              <li><code>addEventListener("click", fn)</code> and <code>addEventListener("input", fn)</code> are the standard way to handle user interactions.</li>
+              <li>Use <code>event.key === "Enter"</code> in a <code>keydown</code> listener to support keyboard submission.</li>
+              <li>Always use <code>textContent</code> (not <code>innerHTML</code>) to display user-provided text to prevent XSS.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What is the difference between <code>getElementById()</code> and <code>querySelector()</code>?</li>
+            <li>Why is it unsafe to use <code>innerHTML</code> with user input?</li>
+            <li>What is the difference between the <code>input</code> and <code>change</code> events?</li>
+            <li>Why should you avoid <code>prompt()</code> in production applications?</li>
+            <li>How do you read the value from a checkbox vs a text input?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/javascript/beginner/type-conversion.html" class="topic-tag">⚡ Type Conversion</a>
+            <a href="/javascript/beginner/comments.html" class="topic-tag">⚡ Comments</a>
+            <a href="/javascript/beginner/strings.html" class="topic-tag">⚡ Strings</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between the input and change events? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>The <code>input</code> event fires immediately on every keystroke or paste — it's ideal for real-time feedback like character counts or live search. The <code>change</code> event fires only when the element loses focus AND the value has changed since it gained focus — better for final validation or form submission triggers.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I prevent form submission and handle it with JavaScript? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Add an event listener to the form's <code>submit</code> event and call <code>event.preventDefault()</code>: <code>form.addEventListener("submit", function(e) { e.preventDefault(); /* your code */ })</code>. Without <code>preventDefault()</code>, the form submits the traditional way (page reload or navigation to the action URL).</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">How do I clear an input field with JavaScript? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Simply set <code>input.value = ""</code>. To also move focus to the field afterward, chain with <code>input.focus()</code>. For a complete form reset, you can call <code>formElement.reset()</code> to restore all fields to their default values.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is event delegation and why is it useful? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Event delegation means adding one event listener to a parent element instead of multiple listeners to individual children. When a child is clicked, the event "bubbles up" to the parent. Check <code>event.target</code> to determine which child triggered it. This is more efficient, works for dynamically added elements, and reduces memory usage.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">What is the difference between textContent and innerText? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p><code>textContent</code> returns all text including hidden elements and doesn't trigger a reflow. <code>innerText</code> is layout-aware — it only returns visible text and respects CSS styling (including <code>display: none</code>). For setting text output, <code>textContent</code> is usually preferred because it's faster and more predictable. Both are safe against XSS.</p></div>
+            </div>
+          </section>
+
+        </article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/javascript/beginner/type-conversion.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">JavaScript Type Conversion</span>
+          </a>
+          <a href="/javascript/beginner/comments.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">JavaScript Comments</span>
+          </a>
+        </nav>
+        <!-- Adsense Footer -->
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>

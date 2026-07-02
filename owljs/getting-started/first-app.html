@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google-adsense-account" content="ca-pub-1755924855244642">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your First OWL JS App – Step-by-Step Tutorial | ylearner</title>
+  <meta name="description" content="Build your first OWL JS application step by step: a working Todo list app. Learn how to write OWL components, use useState reactivity, handle events, render lists with t-foreach, and compose components.">
+  <meta name="keywords" content="first OWL JS app, OWL JS tutorial for beginners, OWL JS todo app, OWL JS step by step, build OWL component, OWL useState example, OWL JS complete example, Odoo Web Library first application">
+  <meta name="author" content="ylearner – Algorid">
+  <link rel="canonical" href="https://ylearner.org/owljs/getting-started/first-app.html">
+  <meta property="og:title" content="Your First OWL JS App – Step-by-Step | ylearner">
+  <meta property="og:description" content="Build a working Todo list app with OWL JS from scratch. Step-by-step tutorial covering components, state, events, and list rendering.">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:image" content="https://ylearner.org/assets/og.jpg">
+  <meta property="og:url" content="https://ylearner.org/owljs/getting-started/first-app.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Your First OWL JS App – Step-by-Step | ylearner">
+  <meta name="twitter:description" content="Build a working Todo list app with OWL JS from scratch. Step-by-step tutorial covering components, state, events, and list rendering.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Your First OWL JS App","description":"A step-by-step tutorial to build your first OWL JS application — a Todo list app covering components, useState, events, and t-foreach list rendering.","educationalLevel":"Beginner","keywords":"OWL JS first app, OWL todo app, OWL JS tutorial","inLanguage":"en","isAccessibleForFree":true,"provider":{"@type":"Organization","name":"ylearner","url":"https://ylearner.org/"}}
+  </script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="icon" type="image/png" href="/assets/favcon.png">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1755924855244642" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"></div>
+  <header class="site-header">
+    <button class="btn-icon menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+    <a href="/" class="header-logo"><img src="/assets/logo.png" alt="ylearner" class="header-logo-img"></a>
+    <div class="header-search">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="searchInput" placeholder="Search tutorials…" aria-label="Search" autocomplete="off">
+      <div id="searchResults" class="search-results"></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </header>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="page-layout">
+    <aside class="sidebar" id="sidebar"><nav id="sidebarNav"></nav></aside>
+    <div class="content-wrapper">
+      <main class="main-content" id="main-content">
+        <div class="ad-container ad-header"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="/">Home</a><span class="separator">›</span>
+          <a href="/owljs/what-is-owl.html">OWL JS</a><span class="separator">›</span>
+          <a href="/owljs/getting-started/setup.html">Getting Started</a><span class="separator">›</span>
+          <span class="current">Your First OWL App</span>
+        </nav>
+        <header class="lesson-header">
+          <div class="lesson-tag">🦉 Getting Started</div>
+          <h1>Your First OWL JS App – Build a Todo List Step by Step</h1>
+          <p class="lesson-intro">The best way to understand a framework is to build something real with it. In this lesson you will build a <strong>working Todo list application</strong> with OWL JS — step by step, from a blank file to a functional app. Along the way you will see OWL's core features in action: reactive state, template directives, event handling, list rendering, and computed getters. By the end, you will have built your first real OWL component and have a solid mental model of how OWL applications work.</p>
+          <div class="lesson-meta">
+            <span>⏱️ 20 min read</span>
+            <span>🎯 Beginner</span>
+            <span>📅 Updated 2026</span>
+          </div>
+        </header>
+        <article class="lesson-body">
+
+          <h2 id="what-we-build">What We Will Build</h2>
+          <p>A Todo list app with the following features:</p>
+          <ul>
+            <li>Type a task in an input and press Enter (or click Add) to add it to the list</li>
+            <li>Click a task to toggle it between done and not-done</li>
+            <li>Delete a task with a ✕ button</li>
+            <li>A counter showing how many tasks are remaining</li>
+            <li>Filter buttons: All, Active, Completed</li>
+          </ul>
+          <p>This covers: <code>useState</code>, <code>t-foreach</code>, <code>t-if</code>/<code>t-else</code>, <code>t-on-click</code>, <code>t-model</code>, <code>t-att-class</code>, and JavaScript getters inside a component.</p>
+
+          <div class="callout callout-tip">
+            <span class="callout-icon">💡</span>
+            <div class="callout-content">
+              <strong>Set up first</strong>
+              <p>This lesson uses the <strong>single HTML + CDN setup</strong> (Approach 1 from the Setup lesson). Create <code>index.html</code> and <code>app.js</code> in a new folder. If you have not done that yet, see <a href="/owljs/getting-started/setup.html">Setting Up OWL JS</a> first.</p>
+            </div>
+          </div>
+
+          <h2 id="step1">Step 1 – The HTML Shell</h2>
+          <p>Create <code>index.html</code>. This is just the OWL bootstrap — all the UI comes from the component:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">HTML – index.html</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;OWL JS Todo App&lt;/title&gt;
+  &lt;script src="https://cdn.jsdelivr.net/npm/@odoo/owl/dist/owl.iife.js"&gt;&lt;/script&gt;
+  &lt;style&gt;
+    body { font-family: sans-serif; max-width: 500px; margin: 3rem auto; padding: 0 1rem; }
+    .todo-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0; border-bottom: 1px solid #eee; }
+    .todo-item.done span { text-decoration: line-through; color: #999; }
+    .todo-text { flex: 1; cursor: pointer; }
+    .delete-btn { background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 1.1rem; }
+    .filters { display: flex; gap: 0.5rem; margin: 1rem 0; }
+    .filters button { padding: 0.3rem 0.75rem; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: white; }
+    .filters button.active-filter { background: #3498db; color: white; border-color: #3498db; }
+    input[type="text"] { width: 100%; padding: 0.6rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-bottom: 0.5rem; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div id="app"&gt;&lt;/div&gt;
+  &lt;script src="app.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          </div>
+
+          <h2 id="step2">Step 2 – Basic Component with State</h2>
+          <p>Create <code>app.js</code>. Start with the component class and reactive state:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript – app.js (Step 2)</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-javascript">const { Component, mount, xml, useState } = owl;
+
+class TodoApp extends Component {
+  // Reactive state — OWL re-renders when any property changes
+  state = useState({
+    todos: [
+      { id: 1, text: "Learn OWL JS", done: false },
+      { id: 2, text: "Build a real Odoo module", done: false },
+    ],
+    newTodo: "",      // bound to the input via t-model
+    filter: "all",   // "all" | "active" | "completed"
+    nextId: 3,       // auto-increment ID for new todos
+  });
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;h1&gt;🦉 OWL Todo App&lt;/h1&gt;
+      &lt;p&gt;(more coming in steps below)&lt;/p&gt;
+    &lt;/div&gt;
+  `;
+}
+
+mount(TodoApp, document.getElementById("app"));</code></pre>
+          </div>
+
+          <p>Save and open in the browser — you should see the heading. Now build up the template step by step.</p>
+
+          <h2 id="step3">Step 3 – Input and Add Button</h2>
+          <p>Replace the template with one that has the input field and add button. The key piece here is <code>t-model</code> for two-way binding and <code>t-on-keydown</code> to add a todo on Enter:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript – template + addTodo method</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-javascript">// Add these methods INSIDE the class, before static template:
+
+addTodo() {
+  const text = this.state.newTodo.trim();
+  if (!text) return;
+  this.state.todos.push({
+    id: this.state.nextId++,
+    text,
+    done: false,
+  });
+  this.state.newTodo = "";  // clear the input
+}
+
+onKeyDown(ev) {
+  if (ev.key === "Enter") this.addTodo();
+}
+
+// Replace the static template with:
+static template = xml`
+  &lt;div&gt;
+    &lt;h1&gt;🦉 OWL Todo App&lt;/h1&gt;
+
+    &lt;!-- Two-way binding: state.newTodo mirrors the input value --&gt;
+    &lt;input
+      type="text"
+      t-model="state.newTodo"
+      t-on-keydown="onKeyDown"
+      placeholder="What needs to be done?"
+    /&gt;
+    &lt;button t-on-click="addTodo"&gt;Add Task&lt;/button&gt;
+  &lt;/div&gt;
+`;</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <span class="callout-icon">ℹ️</span>
+            <div class="callout-content">
+              <strong>t-model and two-way binding</strong>
+              <p><code>t-model="state.newTodo"</code> does two things: (1) sets the input's <code>value</code> to <code>state.newTodo</code>, and (2) attaches an <code>input</code> event listener that updates <code>state.newTodo</code> whenever the user types. This is identical to Vue's <code>v-model</code> and replaces the React pattern of <code>value + onChange</code>.</p>
+            </div>
+          </div>
+
+          <!-- Adsense In Content -->
+          <div class="ad-container ad-in-content"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="9705613558"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+
+          <h2 id="step4">Step 4 – Render the Todo List</h2>
+          <p>Add the todo list with <code>t-foreach</code>. Add a computed getter <code>filteredTodos</code> that returns the filtered list based on <code>state.filter</code>:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript – getter + delete + toggle methods</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-javascript">// Getter — computed property based on reactive state
+// OWL re-evaluates this when state.todos or state.filter changes
+get filteredTodos() {
+  const { todos, filter } = this.state;
+  if (filter === "active")    return todos.filter(t => !t.done);
+  if (filter === "completed") return todos.filter(t => t.done);
+  return todos;
+}
+
+get remaining() {
+  return this.state.todos.filter(t => !t.done).length;
+}
+
+toggleTodo(id) {
+  const todo = this.state.todos.find(t => t.id === id);
+  if (todo) todo.done = !todo.done;  // direct mutation — OWL detects it
+}
+
+deleteTodo(id) {
+  const idx = this.state.todos.findIndex(t => t.id === id);
+  if (idx !== -1) this.state.todos.splice(idx, 1);
+}</code></pre>
+          </div>
+
+          <h2 id="step5">Step 5 – The Complete Template</h2>
+          <p>Now replace the template with the full version including the list, filters, and remaining count:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript – complete template</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-javascript">static template = xml`
+  &lt;div&gt;
+    &lt;h1&gt;🦉 OWL Todo App&lt;/h1&gt;
+
+    &lt;!-- Input + Add button --&gt;
+    &lt;input
+      type="text"
+      t-model="state.newTodo"
+      t-on-keydown="onKeyDown"
+      placeholder="What needs to be done?"
+    /&gt;
+    &lt;button t-on-click="addTodo" style="margin-bottom:1rem;"&gt;Add&lt;/button&gt;
+
+    &lt;!-- Filter buttons --&gt;
+    &lt;div class="filters"&gt;
+      &lt;button
+        t-att-class="{ 'active-filter': state.filter === 'all' }"
+        t-on-click="() =&gt; state.filter = 'all'"
+      &gt;All&lt;/button&gt;
+      &lt;button
+        t-att-class="{ 'active-filter': state.filter === 'active' }"
+        t-on-click="() =&gt; state.filter = 'active'"
+      &gt;Active&lt;/button&gt;
+      &lt;button
+        t-att-class="{ 'active-filter': state.filter === 'completed' }"
+        t-on-click="() =&gt; state.filter = 'completed'"
+      &gt;Completed&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Todo list --&gt;
+    &lt;ul style="list-style:none;padding:0;"&gt;
+      &lt;li t-foreach="filteredTodos" t-as="todo" t-key="todo.id"
+          t-att-class="{ 'todo-item': true, done: todo.done }"&gt;
+
+        &lt;!-- Clicking the text toggles done state --&gt;
+        &lt;span class="todo-text" t-on-click="() =&gt; toggleTodo(todo.id)"&gt;
+          &lt;t t-esc="todo.text"/&gt;
+        &lt;/span&gt;
+
+        &lt;!-- Delete button --&gt;
+        &lt;button class="delete-btn" t-on-click="() =&gt; deleteTodo(todo.id)"&gt;✕&lt;/button&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+
+    &lt;!-- Empty state --&gt;
+    &lt;p t-if="filteredTodos.length === 0" style="color:#999;text-align:center;"&gt;
+      No tasks here!
+    &lt;/p&gt;
+
+    &lt;!-- Remaining count --&gt;
+    &lt;p style="color:#666;font-size:0.9rem;"&gt;
+      &lt;t t-esc="remaining"/&gt; task(s) remaining
+    &lt;/p&gt;
+  &lt;/div&gt;
+`;</code></pre>
+          </div>
+
+          <h2 id="complete-app">Complete app.js</h2>
+          <p>Here is the full <code>app.js</code> file combining all steps:</p>
+
+          <div class="code-block">
+            <div class="code-block-header">
+              <span class="code-lang">JavaScript – complete app.js</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-javascript">const { Component, mount, xml, useState } = owl;
+
+class TodoApp extends Component {
+  state = useState({
+    todos: [
+      { id: 1, text: "Learn OWL JS", done: false },
+      { id: 2, text: "Build a real Odoo module", done: false },
+    ],
+    newTodo: "",
+    filter: "all",
+    nextId: 3,
+  });
+
+  get filteredTodos() {
+    const { todos, filter } = this.state;
+    if (filter === "active")    return todos.filter(t => !t.done);
+    if (filter === "completed") return todos.filter(t => t.done);
+    return todos;
+  }
+
+  get remaining() {
+    return this.state.todos.filter(t => !t.done).length;
+  }
+
+  addTodo() {
+    const text = this.state.newTodo.trim();
+    if (!text) return;
+    this.state.todos.push({ id: this.state.nextId++, text, done: false });
+    this.state.newTodo = "";
+  }
+
+  onKeyDown(ev) {
+    if (ev.key === "Enter") this.addTodo();
+  }
+
+  toggleTodo(id) {
+    const todo = this.state.todos.find(t => t.id === id);
+    if (todo) todo.done = !todo.done;
+  }
+
+  deleteTodo(id) {
+    const idx = this.state.todos.findIndex(t => t.id === id);
+    if (idx !== -1) this.state.todos.splice(idx, 1);
+  }
+
+  static template = xml`
+    &lt;div&gt;
+      &lt;h1&gt;🦉 OWL Todo App&lt;/h1&gt;
+
+      &lt;input type="text" t-model="state.newTodo" t-on-keydown="onKeyDown"
+             placeholder="What needs to be done?"/&gt;
+      &lt;button t-on-click="addTodo" style="margin-bottom:1rem;"&gt;Add&lt;/button&gt;
+
+      &lt;div class="filters"&gt;
+        &lt;button t-att-class="{ 'active-filter': state.filter === 'all' }"
+                t-on-click="() =&gt; state.filter = 'all'"&gt;All&lt;/button&gt;
+        &lt;button t-att-class="{ 'active-filter': state.filter === 'active' }"
+                t-on-click="() =&gt; state.filter = 'active'"&gt;Active&lt;/button&gt;
+        &lt;button t-att-class="{ 'active-filter': state.filter === 'completed' }"
+                t-on-click="() =&gt; state.filter = 'completed'"&gt;Completed&lt;/button&gt;
+      &lt;/div&gt;
+
+      &lt;ul style="list-style:none;padding:0;"&gt;
+        &lt;li t-foreach="filteredTodos" t-as="todo" t-key="todo.id"
+            t-att-class="{ 'todo-item': true, done: todo.done }"&gt;
+          &lt;span class="todo-text" t-on-click="() =&gt; toggleTodo(todo.id)"&gt;
+            &lt;t t-esc="todo.text"/&gt;
+          &lt;/span&gt;
+          &lt;button class="delete-btn" t-on-click="() =&gt; deleteTodo(todo.id)"&gt;✕&lt;/button&gt;
+        &lt;/li&gt;
+      &lt;/ul&gt;
+
+      &lt;p t-if="filteredTodos.length === 0" style="color:#999;text-align:center;"&gt;
+        No tasks here!
+      &lt;/p&gt;
+
+      &lt;p style="color:#666;font-size:0.9rem;"&gt;
+        &lt;t t-esc="remaining"/&gt; task(s) remaining
+      &lt;/p&gt;
+    &lt;/div&gt;
+  `;
+}
+
+mount(TodoApp, document.getElementById("app"));</code></pre>
+          </div>
+
+          <h2 id="what-you-learned">What You Used in This App</h2>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr><th>OWL Feature</th><th>Where used</th><th>What it does</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>useState()</code></td><td><code>this.state = useState({...})</code></td><td>Makes the state object reactive — any mutation triggers re-render</td></tr>
+                <tr><td><code>t-model</code></td><td>Input for new todo text</td><td>Two-way binding between input value and <code>state.newTodo</code></td></tr>
+                <tr><td><code>t-on-click</code></td><td>Add, toggle, delete, filters</td><td>Attaches click event listener to a DOM element</td></tr>
+                <tr><td><code>t-on-keydown</code></td><td>Input field</td><td>Listens for keyboard events (Enter key)</td></tr>
+                <tr><td><code>t-foreach</code> / <code>t-as</code> / <code>t-key</code></td><td>Todo list</td><td>Loops over <code>filteredTodos</code>, renders one <code>&lt;li&gt;</code> per item</td></tr>
+                <tr><td><code>t-att-class</code></td><td>Todo items, filter buttons</td><td>Conditionally applies CSS classes based on state</td></tr>
+                <tr><td><code>t-if</code></td><td>Empty state message</td><td>Conditionally renders the "No tasks here!" paragraph</td></tr>
+                <tr><td><code>t-esc</code></td><td>Todo text, remaining count</td><td>Renders a value safely (HTML-escaped)</td></tr>
+                <tr><td>JS getter</td><td><code>filteredTodos</code>, <code>remaining</code></td><td>Computed properties — derived from state, re-evaluated on render</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout callout-warning">
+            <span class="callout-icon">⚠️</span>
+            <div class="callout-content">
+              <strong>Important: t-key is required in t-foreach</strong>
+              <p><code>t-key</code> gives each list item a stable identity so OWL can efficiently diff the DOM when items are added, removed, or reordered. Always use a <strong>unique, stable value</strong> from your data (like an <code>id</code> field) — never use <code>todo_index</code> (the loop index) as the key when items can be deleted or reordered, as this causes subtle rendering bugs.</p>
+            </div>
+          </div>
+
+          <h2 id="deep-owlfirst">Your First OWL App: Component + Template + State</h2>
+          <p>A minimal OWL app is one component: a class with a template and some reactive state. Building it shows the three ideas you'll use in every OWL component — template, <code>setup()</code>, and <code>useState</code>.</p>
+          <pre><code class="language-javascript">import { Component, mount, useState, xml } from "@odoo/owl";
+
+class Counter extends Component {
+    static template = xml`
+        &lt;div&gt;
+            Count: &lt;t t-esc="state.value"/&gt;
+            &lt;button t-on-click="increment"&gt;+&lt;/button&gt;
+        &lt;/div&gt;`;
+
+    setup() {
+        this.state = useState({ value: 0 });   // reactive state
+    }
+    increment() {
+        this.state.value++;                    // mutating re-renders the UI
+    }
+}
+mount(Counter, document.body);</code></pre>
+          <table>
+            <thead><tr><th>Piece</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td><code>static template</code></td><td>the QWeb markup</td></tr>
+              <tr><td><code>setup()</code></td><td>init state &amp; hooks (constructor replacement)</td></tr>
+              <tr><td><code>useState</code></td><td>makes data reactive</td></tr>
+              <tr><td><code>t-on-click</code></td><td>bind an event to a method</td></tr>
+            </tbody>
+          </table>
+          <p><strong>The whole model in one example:</strong> the <em>template</em> describes the UI and reads from <code>this</code> (so <code>state.value</code> and methods are accessible); <code>setup()</code> runs once at creation to initialize state and hooks; <code>useState</code> wraps your data so that <em>mutating</em> it (<code>this.state.value++</code>) automatically triggers a re-render — you never manually touch the DOM. <strong>Events</strong> wire template to logic via <code>t-on-click="increment"</code>, pointing at a method. <strong>Why <code>setup()</code> not <code>constructor()</code>:</strong> hooks like <code>useState</code> need OWL's internal context, which is ready when <code>setup</code> runs. <strong>The reactivity rule:</strong> only changes to a <code>useState</code> object re-render; assigning to a plain <code>this.x</code> won't update the UI. <strong>Mounting:</strong> standalone you call <code>mount(Component, target)</code>; in Odoo the framework mounts it for you via the registry. <strong>Single root:</strong> a template must have one root element — wrap siblings in a <code>&lt;div&gt;</code> or <code>&lt;t&gt;</code>. Get comfortable with this counter and you understand the foundation of every OWL component.</p>
+
+          <div class="exercise-box">
+            <h3>🏋️ Practical Exercise</h3>
+            <p>Extend the todo app with these additional features:</p>
+            <ol>
+              <li>Add a <strong>"Clear completed"</strong> button that removes all completed todos at once. Only show the button when there is at least one completed todo (use <code>t-if</code>).</li>
+              <li>Add a <strong>priority field</strong> to each todo (<code>priority: 'normal'</code>). Show a star ⭐ button next to each item. Clicking it toggles priority between <code>'high'</code> and <code>'normal'</code>. Use <code>t-att-class</code> to highlight high-priority items.</li>
+              <li><strong>Challenge:</strong> Add inline editing — double-clicking a todo text puts it into edit mode (show an input pre-filled with the current text). Pressing Enter or clicking away saves the edit.</li>
+            </ol>
+          </div>
+
+          <div class="challenge-box">
+            <h3>🔥 Challenge Exercise</h3>
+            <p>Build your first OWL app: a Root component with an inline XML template that renders a greeting, mounted to the page, then add a child component. Explain the anatomy of an OWL component (class + template + optional setup).</p>
+          </div>
+
+          <div class="summary-box">
+            <h3>📋 Summary</h3>
+            <ul>
+              <li>A real OWL JS app consists of: reactive state (<code>useState</code>), a template with <code>t-*</code> directives, and class methods that respond to user events.</li>
+              <li><code>t-model</code> provides two-way binding between form inputs and reactive state.</li>
+              <li><code>t-foreach</code> + <code>t-key</code> renders lists — always provide a stable unique key.</li>
+              <li><code>t-att-class</code> conditionally applies CSS classes based on JavaScript expressions.</li>
+              <li>JavaScript getters (like <code>get filteredTodos()</code>) act as computed properties — derived from reactive state and automatically fresh each render.</li>
+              <li>Direct mutation of <code>useState</code> objects (<code>todo.done = !todo.done</code>) is the OWL way — no setter function needed.</li>
+            </ul>
+          </div>
+
+          <h2 id="interview-q">Interview Questions</h2>
+          <ul class="interview-list">
+            <li>What are the parts of an OWL component?</li>
+            <li>How do you define a template?</li>
+            <li>How do you mount an app?</li>
+            <li>How do you nest components?</li>
+            <li>What is the <code>static template</code> property?</li>
+          </ul>
+
+          <h2 id="related">Related Topics</h2>
+          <div class="related-topics">
+            <a href="/owljs/getting-started/project-structure.html" class="topic-tag owl-topic-tag">🦉 Project Structure</a>
+            <a href="/owljs/core/components.html" class="topic-tag owl-topic-tag">🦉 Components Deep Dive</a>
+            <a href="/owljs/core/state.html" class="topic-tag owl-topic-tag">🦉 State & useState</a>
+            <a href="/owljs/templates/conditional.html" class="topic-tag owl-topic-tag">🦉 Conditional Rendering</a>
+            <a href="/owljs/templates/list-rendering.html" class="topic-tag owl-topic-tag">🦉 List Rendering</a>
+          </div>
+
+          <section class="faq-section">
+            <h2 id="faq">FAQ</h2>
+            <div class="faq-item">
+              <div class="faq-question">Does OWL need JSX? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>No. OWL uses XML/QWeb templates (as tagged strings via <code>xml`...`</code> or <code>.xml</code> files), not JSX. Templates are compiled to render functions.</p></div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-question">Can I use OWL without a bundler? <span class="faq-toggle">+</span></div>
+              <div class="faq-answer"><p>Yes — load the UMD build from a CDN and use the <code>owl.Component</code>/<code>owl.mount</code> globals. A bundler (Vite/webpack) is recommended for real projects.</p></div>
+            </div>
+          </section>
+</article>
+        <nav class="lesson-nav" aria-label="Lesson navigation">
+          <a href="/owljs/getting-started/setup.html" class="lesson-nav-link">
+            <span class="nav-label">← Previous</span>
+            <span class="nav-title">Setting Up OWL JS</span>
+          </a>
+          <a href="/owljs/getting-started/project-structure.html" class="lesson-nav-link next">
+            <span class="nav-label">Next →</span>
+            <span class="nav-title">OWL Project Structure</span>
+          </a>
+        </nav>
+        <div class="ad-container ad-footer"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><picture class="ad-image-pic"><source media="(max-width: 768px)" srcset="/assets/ad-mobile-algorid.png"><img src="/assets/ad-web-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></picture></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8093148983"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      </main>
+    </div>
+    <aside class="right-sidebar">
+      <div class="toc-title">On This Page</div>
+      <div id="toc"></div>
+      <div class="ad-container ad-sidebar sidebar-ad-box"><a href="https://algorid.com/" target="_blank" rel="noopener sponsored" class="ad-link"><img src="/assets/ad-mobile-algorid.png" alt="Advertisement" class="ad-image" loading="lazy"></a><!-- AdSense (saved for future use):
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-1755924855244642"
+     data-ad-slot="8584103571"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+--></div>
+      <a href="/contact.html" class="report-problem-btn">🐛 Report a Problem</a>
+    </aside>
+  </div>
+  <footer class="site-footer">
+    <div class="footer-bottom" style="max-width:1200px;margin:0 auto;">
+      <span>© 2026 ylearner. All rights reserved.</span>
+      <span><a href="/privacy-policy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/sitemap.html">Sitemap</a></span>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="../../js/main.js"></script>
+</body>
+</html>
